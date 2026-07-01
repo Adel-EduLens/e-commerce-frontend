@@ -351,6 +351,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
                         className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                         {...registerSignup("phone")}
                       />
+                      {signupErrors.phone && (
+                        <p className="text-[13px] text-red-500">
+                          {signupErrors.phone.message}
+                        </p>
+                      )}
                     </div>
 
                     {/* Name */}
