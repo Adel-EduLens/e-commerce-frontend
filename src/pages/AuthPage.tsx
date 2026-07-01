@@ -12,6 +12,12 @@ import { loginSchema, signupSchema } from "../schemas";
 import type { LoginFormValues, SignupFormValues } from "../schemas";
 import { useTranslation } from "react-i18next";
 import { Globe, ChevronDown } from "lucide-react";
+import { AxiosError } from "axios";
+
+interface ApiErrorResponse {
+  message?: string;
+  [key: string]: unknown;
+}
 interface AuthPageProps {
   mode: "login" | "signup";
 }
@@ -99,8 +105,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
       setAuth(user, token);
       toast.success(t("toast.welcomeBack", { name: user.name }));
       navigate("/");
-    } catch (error: any) {
-      const errMsg = error.response?.data?.message || t("toast.loginFailed");
+    } catch (error) {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const errMsg = err.response?.data?.message || t("toast.loginFailed");
       toast.error(errMsg);
     } finally {
       setIsLoading(false);
@@ -115,9 +122,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
       setAuth(user, token);
       toast.success(t("toast.signupSuccess"));
       navigate("/");
-    } catch (error: any) {
-      console.log("error", error);
-      const errMsg = error.response?.data?.message || t("toast.signupFailed");
+    } catch (error) {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const errMsg = err.response?.data?.message || t("toast.signupFailed");
       toast.error(errMsg);
     } finally {
       setIsLoading(false);
