@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
