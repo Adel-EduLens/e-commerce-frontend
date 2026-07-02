@@ -62,14 +62,14 @@ type FooterProps = {
 };
 
 export default function Footer({
-  top = "top-[1507px]",
+  top,
   height = "h-96",
   innerHeight = "h-96",
   style,
 }: FooterProps) {
   return (
     <div
-      className={`absolute left-0 ${top} ${height} w-[1440px] overflow-hidden border-t border-[#E0E0E0]`}
+      className={`relative w-full overflow-hidden border-t border-[#E0E0E0] ${top ? `absolute left-0 ${top} w-[1440px]` : ""} ${height}`}
       style={style}
     >
       <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20">

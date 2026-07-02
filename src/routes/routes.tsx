@@ -198,7 +198,9 @@ export const router = createBrowserRouter([
         path: "dropshipping",
         element: (
           <ProtectedRoute>
-            <DropshippingPage />
+            <UserLayout>
+              <DropshippingPage />
+            </UserLayout>
           </ProtectedRoute>
         ),
       },

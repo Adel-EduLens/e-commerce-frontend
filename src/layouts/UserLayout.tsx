@@ -4,12 +4,14 @@ import { Footer, Navbar } from "../components/shared";
 
 export default function UserLayout({ children }: PropsWithChildren) {
   return (
-    <div className="relative mx-auto min-h-[1498px] w-[1440px] bg-[#F9FAFB]">
-      <Navbar />
-      <div className="absolute left-[24px] top-[122px] right-[24px]">
+    <div className="mx-auto flex min-h-screen w-[1440px] flex-col bg-[#F9FAFB]">
+      <div className="sticky top-0 z-20 px-[48px] pt-[18px] pb-[12px]">
+        <Navbar />
+      </div>
+      <div className="flex-1 px-[24px] py-[12px]">
         {children ?? <Outlet />}
       </div>
-      <Footer top="top-[1056px]" />
+      <Footer />
     </div>
   );
 }

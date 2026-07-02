@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer, CollapsibleFAQ } from "../components/shared";
+import { CollapsibleFAQ } from "../components/shared";
 const ds = (file: string) =>
   `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
 const homeAsset = (file: string) =>
@@ -24,7 +24,7 @@ function AssetImage({
 
 function HeroSection() {
   return (
-    <div className="absolute left-[24px] top-[24px] h-[770px] w-[1392px] rounded-3xl bg-[#BBFF63]">
+    <div className="relative h-[770px] w-full rounded-3xl bg-[#BBFF63]">
       <div className="absolute left-[24px] top-[614px] font-['Montserrat'] text-3xl font-medium text-[#1A1A1A]">
         No inventory, no hassle — just profit
       </div>
@@ -38,29 +38,22 @@ function HeroSection() {
       <div className="absolute left-[24px] top-[122px] w-[833px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Start Your Online Business with Zero Investment
       </div>
-    </div>
-  );
-}
-
-function HeroImage() {
-  return (
-    <>
       <AssetImage
         file="image 45.png"
         base="dropshipping"
-        className="absolute left-[518px] top-0 h-[794px] w-[1191px]"
+        className="absolute left-[494px] top-0 h-[794px] w-[1191px]"
       />
-    </>
+    </div>
   );
 }
 
 function WhyDropshipSection() {
   return (
-    <>
-      <div className="absolute left-[24px] top-[876px] w-[774px] font-['Montserrat'] text-6xl font-bold text-[#1A1A1A]">
+    <div className="mt-16 flex flex-col gap-10">
+      <div className="w-[774px] font-['Montserrat'] text-6xl font-bold text-[#1A1A1A]">
         Why Dropship with Us?
       </div>
-      <div className="absolute left-[24px] top-[1072px] h-[676px] w-[1392px]">
+      <div className="relative h-[676px] w-full">
         {/* Zero Inventory */}
         <div className="absolute left-0 top-0 h-72 w-[566px] overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
           <div className="absolute left-[24px] top-[148px] text-center font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A]">
@@ -107,8 +100,8 @@ function WhyDropshipSection() {
           </div>
         </div>
         {/* Center circle with icon */}
-        <div className="absolute left-[618px] top-[282px] h-40 w-40 overflow-hidden rounded-full bg-[#BBFF63] flex items-center justify-center">
-          <img src={ds("lucide_box.svg")} className="size-20 " alt="" />
+        <div className="absolute left-[618px] top-[282px] flex h-40 w-40 items-center justify-center overflow-hidden rounded-full bg-[#BBFF63]">
+          <img src={ds("lucide_box.svg")} className="size-20" alt="" />
         </div>
         {/* Wide Catalog */}
         <div className="absolute left-[826px] top-0 h-72 w-[566px] overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -147,13 +140,13 @@ function WhyDropshipSection() {
           alt=""
         />
       </div>
-    </>
+    </div>
   );
 }
 
 function HowWeStartSection() {
   return (
-    <div className="absolute left-[24px] top-[1828px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="inline-flex items-center justify-between self-stretch">
         <div className="w-[594px] font-['Montserrat'] text-6xl font-semibold text-[#1A1A1A]">
           Here's How We Start Together
@@ -294,7 +287,7 @@ function EverythingYouNeedSection() {
   ];
 
   return (
-    <div className="absolute left-[24px] top-[2322px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="w-[594px] font-['Montserrat'] text-6xl font-semibold text-[#1A1A1A]">
         Everything You Need to Succeed
       </div>
@@ -332,6 +325,7 @@ function EverythingYouNeedSection() {
     </div>
   );
 }
+
 function FAQSection() {
   const faqs = [
     {
@@ -353,7 +347,7 @@ function FAQSection() {
     },
   ];
   return (
-    <div className="absolute left-[24px] top-[2973px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Frequently asked questions
       </div>
@@ -364,10 +358,7 @@ function FAQSection() {
           alt=""
         />
         <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
-  
-        
           <CollapsibleFAQ faqs={faqs} />
-          
         </div>
       </div>
     </div>
@@ -389,15 +380,12 @@ export default function DropshippingPage() {
   }
 
   return (
-    <div className="relative h-[4490px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar />
+    <div className="w-full">
       <HeroSection />
-      <HeroImage />
       <WhyDropshipSection />
       <HowWeStartSection />
       <EverythingYouNeedSection />
       <FAQSection />
-      <Footer top="top-[4048px]" />
     </div>
   );
 }

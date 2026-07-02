@@ -50,13 +50,11 @@ function FilterSection() {
             <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
               Sort by
             </div>
-            <div className="relative h-8 w-8 overflow-hidden rounded-full bg-white">
-              <div className="absolute left-[28px] top-[10px] h-6 w-0 origin-top-left rotate-90 overflow-hidden">
-                <AssetImage
-                  file="weui_arrow-filled-1.svg"
-                  className="absolute left-0 top-0 h-6 w-6"
-                />
-              </div>
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
+              <AssetImage
+                file="weui_arrow-filled-1.svg"
+                className="h-4 w-4 rotate-90"
+              />
             </div>
           </div>
           {/* Filter by */}
@@ -64,13 +62,11 @@ function FilterSection() {
             <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
               Filter by
             </div>
-            <div className="relative h-8 w-8 overflow-hidden rounded-full bg-white">
-              <div className="absolute left-[28px] top-[10px] h-6 w-0 origin-top-left rotate-90 overflow-hidden">
-                <AssetImage
-                  file="weui_arrow-filled-1.svg"
-                  className="absolute left-0 top-0 h-6 w-6"
-                />
-              </div>
+            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
+              <AssetImage
+                file="weui_arrow-filled-1.svg"
+                className="h-4 w-4 rotate-90"
+              />
             </div>
           </div>
         </div>
