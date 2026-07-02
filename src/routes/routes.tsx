@@ -10,6 +10,7 @@ import NotifyMeListPage from '../pages/NotifyMeListPage'
 import SettingsPage from '../pages/SettingsPage'
 import AuthPage from '../pages/AuthPage'
 import AdminDashboard from '../pages/dashboards/AdminDashboard'
+import PrizeControllerPage from '../pages/dashboards/PrizeControllerPage'
 import TraderDashboard from '../pages/dashboards/TraderDashboard'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
@@ -19,8 +20,11 @@ import DropshippingPage from '../pages/DropshippingPage'
 import FavoritesPage from '../pages/FavoritesPage'
 import WholesalePage from '../pages/WholesalePage'
 import ProtectedRoute from '../components/ProtectedRoute'
+
 import AdminLoginPage from '../pages/admin/AdminLoginPage'
 import AdminLayout from '../layouts/AdminLayout'
+
+import PrizeWheel from '../pages/TestPage'
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +36,7 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+
         path: 'product-details',
         element: <ProductDetailsPage />,
       },
@@ -57,7 +62,10 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
-        element: <SettingsPage />,
+        element: <SettingsPage />},
+{
+        path: 'random',
+        element: <PrizeWheel />,
       },
       {
         path: 'login',
@@ -82,6 +90,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminLoginPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'dashboard/admin/prizes',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <PrizeControllerPage />
           </ProtectedRoute>
         ),
       },
