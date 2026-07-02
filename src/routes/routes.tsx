@@ -16,6 +16,7 @@ import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
 import CheckoutPage from '../pages/CheckoutPage'
 import DropshippingPage from '../pages/DropshippingPage'
+import FavoritesPage from '../pages/FavoritesPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -116,6 +117,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <DropshippingPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'favorites',
+        element: (
+          <ProtectedRoute>
+            <FavoritesPage />
           </ProtectedRoute>
         ),
       },
