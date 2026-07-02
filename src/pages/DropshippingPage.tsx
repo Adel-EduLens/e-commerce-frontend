@@ -170,9 +170,10 @@ function WhyDropshipSection() {
         </div>
         {/* Center circle with icon */}
         <div className="absolute left-[618px] top-[282px] h-40 w-40 overflow-hidden rounded-full bg-[#BBFF63]">
-          <AssetImage
-            file="vuesax/linear/user-octagon.svg"
-            className="absolute left-[48px] top-[48px] h-14 w-14"
+          <img
+            src={ds("vuesax/linear/user-octagon.svg")}
+            className="absolute left-[20px] top-[28px] h-[120px] w-[120px]"
+            alt=""
           />
         </div>
         {/* Wide Catalog */}
@@ -191,10 +192,10 @@ function WhyDropshipSection() {
           </div>
         </div>
         {/* Connector lines */}
-        <div className="absolute left-[741px] top-[279.17px] h-20 w-12 origin-top-left -rotate-90 outline outline-2 outline-offset-[-1px] outline-[#0F1115]" />
-        <div className="absolute left-[824.50px] top-[489px] h-20 w-16 origin-top-left -rotate-180 outline outline-2 outline-offset-[-1px] outline-[#0F1115]" />
-        <div className="absolute left-[569px] top-[405px] h-20 w-16 outline outline-2 outline-offset-[-1px] outline-[#0F1115]" />
-        <div className="absolute left-[565px] top-[279.17px] h-20 w-12 origin-top-left -rotate-90 outline outline-2 outline-offset-[-1px] outline-[#0F1115]" />
+        <img src={ds("Line 9.svg")} className="absolute left-[550px] top-[220px]" alt="" />
+        <img src={ds("Line 10.svg")} className="absolute left-[755px] top-[220px]" alt="" />
+        <img src={ds("Line 11.svg")} className="absolute left-[555px] top-[400px]" alt="" />
+        <img src={ds("Line 12.svg")} className="absolute left-[760px] top-[400px]" alt="" />
       </div>
     </>
   );
@@ -236,11 +237,7 @@ function HowWeStartSection() {
               </div>
             </div>
           </div>
-          <div className="absolute left-[216px] top-[-24px] h-32 w-32 opacity-40 overflow-hidden outline outline-[5px] outline-offset-[-5px] outline-[#BBFF63]">
-            <div className="absolute left-[71.17px] top-[101.67px] h-8 w-20 origin-top-left -rotate-90 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[20.33px] top-[61px] h-0 w-14 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[55.92px] top-[81.33px] h-5 w-10 origin-top-left -rotate-90 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-          </div>
+          <img src={ds("login.svg")} className="absolute left-[216px] top-[-24px] h-32 w-32" alt="" />
         </div>
         {/* Step 2 - Select Products */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -257,11 +254,7 @@ function HowWeStartSection() {
               Add items from our catalog to your store
             </div>
           </div>
-          <div className="absolute left-[198px] top-[-16px] h-32 w-32 opacity-40 overflow-hidden outline outline-[5px] outline-offset-[-5px] outline-[#BBFF63]">
-            <div className="absolute left-[20.33px] top-[50.83px] h-14 w-20 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[61px] top-[71.17px] h-4 w-0 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[40.67px] top-[50.83px] h-10 w-9 origin-top-left -rotate-90 rounded-[1px] outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-          </div>
+          <img src={ds("lock.svg")} className="absolute left-[198px] top-[-16px] h-32 w-32" alt="" />
         </div>
         {/* Step 3 - Promote & Sell */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -278,10 +271,7 @@ function HowWeStartSection() {
               Share products online and attract customers
             </div>
           </div>
-          <div className="absolute left-[246.79px] top-[-6.09px] h-24 w-24 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-          <div className="absolute left-[281.16px] top-[15.97px] h-6 w-6 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-          <div className="absolute left-[272.66px] top-[51.86px] h-4 w-10 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-          <div className="absolute left-[232px] top-[-16.25px] h-32 w-32 border-[6px] border-[#BBFF63] opacity-0" />
+          <img src={ds("vuesax/linear/search-favorite.svg")} className="absolute left-[232px] top-[-16px] h-32 w-32" alt="" />
         </div>
         {/* Step 4 - We Ship, You Earn */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -298,12 +288,7 @@ function HowWeStartSection() {
               We handle delivery, you keep the profit
             </div>
           </div>
-          <div className="absolute left-[228px] top-[-20px] h-28 w-28 opacity-40 outline outline-[5px] outline-offset-[-5px] outline-[#BBFF63]">
-            <div className="absolute left-[10px] top-[10px] h-24 w-24 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[66.89px] top-[16.05px] h-7 w-8 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-[94.14px] top-[93.60px] h-4 w-4 outline outline-[6px] outline-offset-[-3px] outline-[#BBFF63]" />
-            <div className="absolute left-0 top-0 h-28 w-28 opacity-0" />
-          </div>
+          <img src={ds("lucide_box.svg")} className="absolute left-[248px] top-[0px] h-16 w-16 opacity-40" alt="" />
         </div>
       </div>
     </div>
@@ -401,10 +386,11 @@ function FAQSection() {
               <div className="font-['Montserrat'] text-2xl font-medium text-[#BBFF63]">
                 Can Cancel at any time ?
               </div>
-              <div className="relative h-12 w-0 origin-top-left rotate-90 overflow-hidden rounded-full bg-white">
-                <div className="absolute left-[12px] top-[18px] h-3 w-6 overflow-hidden">
-                  <div className="absolute left-[5.63px] top-[3.09px] h-2 w-3 bg-[#1A1A1A]" />
-                </div>
+              <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white rotate-90">
+                <AssetImage
+                  file="weui_arrow-filled.svg"
+                  className="absolute left-[18px] top-[12px] h-6 w-3"
+                />
               </div>
             </div>
             <div className="inline-flex items-center justify-start gap-[878px] self-stretch">
@@ -427,9 +413,10 @@ function FAQSection() {
                   Can Cancel at any time ?
                 </div>
                 <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-                  <div className="absolute left-[18px] top-[12px] h-6 w-3 overflow-hidden">
-                    <div className="absolute left-[3.09px] top-[5.64px] h-3 w-2 bg-[#1A1A1A]" />
-                  </div>
+                  <AssetImage
+                    file="weui_arrow-filled.svg"
+                    className="absolute left-[18px] top-[12px] h-6 w-3"
+                  />
                 </div>
               </div>
             </div>
