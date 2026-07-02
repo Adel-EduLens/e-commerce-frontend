@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CreditCard, Gift, PlusCircle } from "lucide-react";
-import { Footer } from "../components/shared";
 
 type Tab = "all" | "orders" | "refunds" | "rewards";
 
@@ -142,10 +141,5 @@ function WalletPanel() {
 }
 
 export default function WalletRewardsPage() {
-  return (
-    <>
-      <WalletPanel />
-      <Footer top="top-[894px]" />
-    </>
-  );
+  return <WalletPanel />;
 }

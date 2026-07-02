@@ -19,7 +19,7 @@ export default function Navbar({ left = "left-[48px]", top = "top-[18px]" }: Nav
   const location = useLocation();
 
   return (
-    <div className={`absolute ${left} ${top} h-20 w-[1344px] rounded-2xl bg-[#F9FAFB] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]`}>
+    <div className={`absolute z-20 ${left} ${top} h-20 w-[1344px] rounded-2xl bg-[#F9FAFB] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]`}>
       <Link to="/">
         <img
           className="absolute left-[16px] top-[16px] h-12 w-[90px]"

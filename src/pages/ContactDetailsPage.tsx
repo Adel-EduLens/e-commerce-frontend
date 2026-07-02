@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, PenLine, Plus, RotateCcwKey, Trash2, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
-import { Footer } from "../components/shared";
+import { useOutletContext } from "react-router-dom";
+import type { AccountLayoutContext } from "../layouts/AccountLayout";
 import { useAuthStore } from "../store/useAuthStore";
 
 type ContactForm = {
@@ -194,6 +195,7 @@ function AddressCard({
 }
 
 export default function ContactDetailsPage() {
+  const { setFooterConfig } = useOutletContext<AccountLayoutContext>();
   const { user, updateUser } = useAuthStore();
   const [contactDetails, setContactDetails] = useState<ContactForm>({
     name: String(user?.name ?? "Maan Galal"),
@@ -229,6 +231,13 @@ export default function ContactDetailsPage() {
   }, [addresses]);
 
   const footerTop = useMemo(() => 970 + Math.max(addresses.length - 2, 0) * 210, [addresses.length]);
+
+  useEffect(() => {
+    setFooterConfig({
+      top: "top-0",
+      style: { top: footerTop },
+    });
+  }, [footerTop, setFooterConfig]);
 
   const hasUnsavedContactChanges =
     contactDraft.name !== contactDetails.name ||
@@ -340,93 +349,90 @@ export default function ContactDetailsPage() {
   };
 
   return (
-    <>
-      <div className="absolute left-[378px] top-[122px] inline-flex w-[658px] flex-col items-start justify-start gap-8">
-        <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
-        <div className="flex self-stretch flex-col items-start justify-start gap-6">
-          <DetailField
-            label="Name"
-            value={contactDraft.name}
-            isEditing
-            onChange={(value) => setContactDraft((current) => ({ ...current, name: value }))}
-          />
-          <DetailField
-            label="Email"
-            value={contactDraft.email}
-            type="email"
-            isEditing
-            onChange={(value) => setContactDraft((current) => ({ ...current, email: value }))}
-          />
-          <DetailField
-            label="Phone Number"
-            value={contactDraft.phone}
-            type="tel"
-            isEditing
-            onChange={(value) => setContactDraft((current) => ({ ...current, phone: value }))}
-          />
-          <div className="inline-flex items-center justify-start gap-4">
-            <button
-              type="button"
-              onClick={handleSaveContact}
-              disabled={!hasUnsavedContactChanges}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Check className="h-5 w-5" strokeWidth={2} />
-              Save Changes
-            </button>
-            <button
-              type="button"
-              onClick={handleResetContact}
-              disabled={!hasUnsavedContactChanges}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <X className="h-5 w-5" strokeWidth={2} />
-              Reset
-            </button>
-          </div>
+    <div className="absolute left-[378px] top-[122px] inline-flex w-[658px] flex-col items-start justify-start gap-8">
+      <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
+      <div className="flex self-stretch flex-col items-start justify-start gap-6">
+        <DetailField
+          label="Name"
+          value={contactDraft.name}
+          isEditing
+          onChange={(value) => setContactDraft((current) => ({ ...current, name: value }))}
+        />
+        <DetailField
+          label="Email"
+          value={contactDraft.email}
+          type="email"
+          isEditing
+          onChange={(value) => setContactDraft((current) => ({ ...current, email: value }))}
+        />
+        <DetailField
+          label="Phone Number"
+          value={contactDraft.phone}
+          type="tel"
+          isEditing
+          onChange={(value) => setContactDraft((current) => ({ ...current, phone: value }))}
+        />
+        <div className="inline-flex items-center justify-start gap-4">
           <button
             type="button"
-            onClick={handleResetPassword}
-            className="inline-flex items-center justify-start gap-2"
+            onClick={handleSaveContact}
+            disabled={!hasUnsavedContactChanges}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <div className="relative h-6 w-6 overflow-hidden">
-              <RotateCcwKey
-                className="absolute left-[2px] top-[2px] h-5 w-5 text-[#B91C1C]"
-                strokeWidth={1.8}
-              />
-            </div>
-            <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
-              Reset your password
-            </div>
+            <Check className="h-5 w-5" strokeWidth={2} />
+            Save Changes
+          </button>
+          <button
+            type="button"
+            onClick={handleResetContact}
+            disabled={!hasUnsavedContactChanges}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <X className="h-5 w-5" strokeWidth={2} />
+            Reset
           </button>
         </div>
-        <SectionHeader title="ADDRESSES" icon={Plus}>
-          <button
-            type="button"
-            onClick={handleAddAddress}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#BBFF63] px-4 py-2 font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]"
-          >
-            <Plus className="h-4 w-4" strokeWidth={2} />
-            Add Address
-          </button>
-        </SectionHeader>
-        <div className="flex w-[658px] flex-col items-start justify-start gap-6">
-          {addresses.map((address) => (
-            <AddressCard
-              key={address.id}
-              address={address}
-              isEditing={editingAddressId === address.id}
-              draft={editingAddressId === address.id ? addressDraft : address}
-              onEdit={() => handleStartEditingAddress(address)}
-              onSave={() => handleSaveAddress(address.id)}
-              onCancel={handleCancelEditingAddress}
-              onDelete={() => handleDeleteAddress(address.id)}
-              onDraftChange={setAddressDraft}
+        <button
+          type="button"
+          onClick={handleResetPassword}
+          className="inline-flex items-center justify-start gap-2"
+        >
+          <div className="relative h-6 w-6 overflow-hidden">
+            <RotateCcwKey
+              className="absolute left-[2px] top-[2px] h-5 w-5 text-[#B91C1C]"
+              strokeWidth={1.8}
             />
-          ))}
-        </div>
+          </div>
+          <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
+            Reset your password
+          </div>
+        </button>
       </div>
-      <Footer top="top-0" style={{ top: footerTop }} />
-    </>
+      <SectionHeader title="ADDRESSES" icon={Plus}>
+        <button
+          type="button"
+          onClick={handleAddAddress}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#BBFF63] px-4 py-2 font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2} />
+          Add Address
+        </button>
+      </SectionHeader>
+      <div className="flex w-[658px] flex-col items-start justify-start gap-6">
+        {addresses.map((address) => (
+          <AddressCard
+            key={address.id}
+            address={address}
+            isEditing={editingAddressId === address.id}
+            draft={editingAddressId === address.id ? addressDraft : address}
+            onEdit={() => handleStartEditingAddress(address)}
+            onSave={() => handleSaveAddress(address.id)}
+            onCancel={handleCancelEditingAddress}
+            onDelete={() => handleDeleteAddress(address.id)}
+            onDraftChange={setAddressDraft}
+          />
+        ))}
+      </div>
+    </div>
   );
 }

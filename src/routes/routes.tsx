@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import StudentLayout from "../layouts/StudentLayout";
 import AccountLayout from "../layouts/AccountLayout";
+import UserLayout from "../layouts/UserLayout";
 import HomePage from "../pages/HomePage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import SeasonMustHavesPage from "../pages/SeasonMustHavesPage";
@@ -55,35 +56,75 @@ export const router = createBrowserRouter([
         element: <BagPage />,
       },
       {
-        element: <AccountLayout />,
+        element: (
+          <ProtectedRoute allowedRoles={["user"]}>
+            <AccountLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
             path: "contact-details",
             element: <ContactDetailsPage />,
+            handle: {
+              footer: {
+                top: "top-0",
+                style: { top: 970 },
+              },
+            },
           },
           {
             path: "notifications",
             element: <NotificationsPage />,
+            handle: {
+              footer: {
+                top: "top-[863px]",
+              },
+            },
           },
           {
             path: "notify-me-list",
             element: <NotifyMeListPage />,
+            handle: {
+              footer: {
+                top: "top-[863px]",
+              },
+            },
           },
           {
             path: "settings",
             element: <SettingsPage />,
+            handle: {
+              footer: {
+                top: "top-[917px]",
+              },
+            },
           },
           {
             path: "my-orders",
             element: <MyOrdersPage />,
+            handle: {
+              footer: {
+                top: "top-[950px]",
+              },
+            },
           },
           {
             path: "help-center",
             element: <HelpCenterPage />,
+            handle: {
+              footer: {
+                top: "top-[917px]",
+              },
+            },
           },
           {
             path: "wallet-rewards",
             element: <WalletRewardsPage />,
+            handle: {
+              footer: {
+                top: "top-[894px]",
+              },
+            },
           },
         ],
       },
@@ -139,7 +180,9 @@ export const router = createBrowserRouter([
         path: "dashboard/user",
         element: (
           <ProtectedRoute allowedRoles={["user"]}>
-            <UserDashboard />
+            <UserLayout>
+              <UserDashboard />
+            </UserLayout>
           </ProtectedRoute>
         ),
       },

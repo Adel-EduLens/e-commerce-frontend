@@ -4,7 +4,6 @@ import {
   MessageSquare,
   Phone,
 } from "lucide-react";
-import { Footer } from "../components/shared";
 
 function CategoryCard({ title }: { title: string }) {
   return (
@@ -90,10 +89,5 @@ function HelpCenterPanel() {
 }
 
 export default function HelpCenterPage() {
-  return (
-    <>
-      <HelpCenterPanel />
-      <Footer top="top-[917px]" />
-    </>
-  );
+  return <HelpCenterPanel />;
 }

@@ -1,5 +1,3 @@
-import { Footer } from "../components/shared";
-
 const placeholderAvatar =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23D9D9D9'/%3E%3C/svg%3E";
 
@@ -48,10 +46,5 @@ function NotificationsPanel() {
 }
 
 export default function NotificationsPage() {
-  return (
-    <>
-      <NotificationsPanel />
-      <Footer top="top-[863px]" />
-    </>
-  );
+  return <NotificationsPanel />;
 }

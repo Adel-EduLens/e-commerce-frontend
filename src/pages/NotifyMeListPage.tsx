@@ -1,6 +1,4 @@
 import { Trash2 } from "lucide-react";
-import { Footer } from "../components/shared";
-
 const placeholderProduct =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='166' viewBox='0 0 140 166'%3E%3Crect width='140' height='166' fill='%23D9D9D9'/%3E%3C/svg%3E";
 
@@ -68,10 +66,5 @@ function NotifyMePanel() {
 }
 
 export default function NotifyMeListPage() {
-  return (
-    <>
-      <NotifyMePanel />
-      <Footer top="top-[863px]" />
-    </>
-  );
+  return <NotifyMePanel />;
 }

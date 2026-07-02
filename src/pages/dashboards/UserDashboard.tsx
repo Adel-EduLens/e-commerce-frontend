@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,11 +21,11 @@ export default function UserDashboard() {
   const handleLogout = () => {
     clearAuth();
     toast.success("Logged out successfully");
-    navigate("/auth");
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen bg-dark-background text-white font-['Inter'] flex">
+    <div className="flex min-h-[860px] w-full overflow-hidden rounded-[32px] bg-dark-background font-['Inter'] text-white shadow-[0px_20px_60px_-24px_rgba(30,37,45,0.55)]">
       {/* Sidebar */}
       <aside className="w-64 border-r border-neutral-800 bg-neutral-950 p-6 flex flex-col justify-between">
         <div>

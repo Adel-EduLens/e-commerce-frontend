@@ -1,12 +1,10 @@
 import { useState } from "react";
 import {
-  ChevronRight,
   FileText,
   Package,
   Truck,
   CheckCircle2,
 } from "lucide-react";
-import { Footer } from "../components/shared";
 
 type Tab = "active" | "completed" | "returns";
 
@@ -170,57 +168,18 @@ export default function MyOrdersPage() {
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
   return (
-    <>
-      <div className="absolute left-[378px] top-[122px] right-[24px]">
-        <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
+    <div className="absolute left-[378px] top-[122px] right-[24px]">
+      <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div className="mt-6 flex gap-6">
-          <div className="flex-1 flex flex-col gap-4">
-            <OrderHeader />
-            {orderItems.map((item) => (
-              <OrderItemCard key={item.id} item={item} />
-            ))}
-          </div>
-          <OrderStatus />
+      <div className="mt-6 flex gap-6">
+        <div className="flex-1 flex flex-col gap-4">
+          <OrderHeader />
+          {orderItems.map((item) => (
+            <OrderItemCard key={item.id} item={item} />
+          ))}
         </div>
+        <OrderStatus />
       </div>
-
-      <div className="absolute left-0 top-[950px] w-[1440px] overflow-hidden border-t border-[#E0E0E0]">
-        <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20 pointer-events-none select-none">
-          GEN Z
-        </div>
-        <div className="relative mx-6 pt-8 pb-8">
-          <div className="flex gap-8 mt-[80px]">
-            {[
-              { title: "About", items: ["About Us", "Design Lab", "Dropship"] },
-              { title: "Shop", items: ["Men", "Kids", "Women"] },
-              { title: "Help", items: ["FAQ", "Contact", "Shipping", "Returns", "Track Order"] },
-              { title: "Legal", items: ["Privacy", "Terms", "Cookies"] },
-            ].map((column) => (
-              <div key={column.title} className="inline-flex w-48 flex-col items-start justify-center gap-4">
-                <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">{column.title}</div>
-                {column.items.map((item) => (
-                  <div key={item} className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#6B7280]">{item}</div>
-                ))}
-              </div>
-            ))}
-          </div>
-          <div className="absolute right-0 top-[72px] font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-            SIGN UP FOR DISCOUNTS + UPDATES
-          </div>
-          <div className="absolute right-0 top-[117px] flex w-[460px] items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-            <span className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-              Phone Number or Email
-            </span>
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
-              <ChevronRight className="h-6 w-6 text-[#1A1A1A]" />
-            </div>
-          </div>
-          <div className="mt-[280px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-            © 2025 GenZ, LLC. All Rights Reserved.
-          </div>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

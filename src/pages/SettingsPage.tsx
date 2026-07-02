@@ -1,5 +1,4 @@
 import { CheckCircle, ChevronDown } from "lucide-react";
-import { Footer } from "../components/shared";
 
 function LanguageField() {
   return (
@@ -105,10 +104,5 @@ function SettingsPanel() {
 }
 
 export default function SettingsPage() {
-  return (
-    <>
-      <SettingsPanel />
-      <Footer top="top-[917px]" />
-    </>
-  );
+  return <SettingsPanel />;
 }
