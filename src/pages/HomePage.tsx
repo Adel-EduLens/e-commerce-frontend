@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer, ProductCard } from "../components/shared";
+import { Navbar, Footer, ProductCard, CollapsibleFAQ } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -19,27 +19,6 @@ function AssetImage({ file, className, alt = "" }: AssetImageProps) {
       alt={alt}
       draggable={false}
     />
-  );
-}
-
-function ArrowCircle({ direction = "right" }: { direction?: "right" | "left" | "down" }) {
-  const icon =
-    direction === "left"
-      ? "weui_arrow-filled-2.svg"
-      : direction === "down"
-        ? "weui_arrow-filled-1.svg"
-        : "weui_arrow-filled-3.svg";
-  const iconClass =
-    direction === "down"
-      ? "absolute left-[12px] top-[18px] h-3 w-6"
-      : direction === "left"
-        ? "absolute left-[16px] top-[8px] h-8 w-4"
-        : "absolute left-[18px] top-[12px] h-6 w-3";
-
-  return (
-    <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-      <AssetImage file={icon} className={iconClass} />
-    </div>
   );
 }
 
@@ -466,6 +445,26 @@ function FlashDealsSection() {
 }
 
 function FaqSection() {
+  const faqs = [
+    {
+      question: "Can Cancel at any time ?",
+      answer:
+        'You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase. For more details, please visit our "Return Policy" page.',
+    },
+    {
+      question: "How do I track my order?",
+      answer: "You can track your order from your account page.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer: "Yes, we ship to most countries worldwide.",
+    },
+    {
+      question: "How can I contact support?",
+      answer: "You can contact us via email or live chat.",
+    },
+  ];
+
   return (
     <div className="absolute left-[24px] top-[6641px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
@@ -477,35 +476,7 @@ function FaqSection() {
           className="h-[721px] w-[566px] rounded-3xl"
         />
         <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
-          <div className="self-stretch flex flex-col items-start justify-start gap-8 overflow-hidden rounded-3xl bg-[#1A1A1A] p-8">
-            <div className="self-stretch inline-flex items-center justify-between">
-              <div className="font-['Montserrat'] text-2xl font-medium text-[#BBFF63]">
-                Can Cancel at any time ?
-              </div>
-              <ArrowCircle direction="down" />
-            </div>
-            <div className="self-stretch inline-flex items-center justify-start gap-[878px]">
-              <div className="w-[620px] font-['Montserrat'] text-2xl font-medium text-white">
-                You can return items within 14 days of receiving your order, as
-                long as they are in their original condition, unused, and with
-                the receipt or proof of purchase. For more details, please visit
-                our &quot;Return Policy&quot; page.
-              </div>
-            </div>
-          </div>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              key={index}
-              className="self-stretch flex flex-col items-start justify-start gap-8 overflow-hidden rounded-3xl bg-[#EDEDED] p-8"
-            >
-              <div className="self-stretch inline-flex items-center justify-between">
-                <div className="font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-                  Can Cancel at any time ?
-                </div>
-                <ArrowCircle />
-              </div>
-            </div>
-          ))}
+          <CollapsibleFAQ faqs={faqs} />
         </div>
       </div>
     </div>

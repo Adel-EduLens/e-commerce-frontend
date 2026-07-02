@@ -1,0 +1,73 @@
+import { useState } from "react";
+
+export type FAQItem = {
+  question: string;
+  answer: string;
+};
+
+const asset = (file: string) =>
+  `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
+
+export default function CollapsibleFAQ({
+  faqs,
+  defaultOpenIndex = 0,
+}: {
+  faqs: FAQItem[];
+  defaultOpenIndex?: number;
+}) {
+  const [openIndex, setOpenIndex] = useState(defaultOpenIndex);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {faqs.map((faq, index) => {
+        const isOpen = openIndex === index;
+
+        return (
+          <div
+            key={`${faq.question}-${index}`}
+            className={`rounded-3xl p-8 transition-colors duration-300 ${
+              isOpen ? "bg-[#1C1B2E]" : "bg-[#EDEDED]"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenIndex(isOpen ? -1 : index)}
+              className="flex w-full items-center justify-between"
+            >
+              <h3
+                className={`text-2xl font-medium ${
+                  isOpen ? "text-[#BBFF63]" : "text-[#1A1A1A]"
+                }`}
+              >
+                {faq.question}
+              </h3>
+
+              <div
+                className={`rounded-full bg-white p-3 transition-transform duration-300 ${
+                  isOpen ? "rotate-90" : ""
+                }`}
+              >
+                <img
+                  src={asset("weui_arrow-filled.svg")}
+                  className="h-6 w-3"
+                  alt=""
+                  draggable={false}
+                />
+              </div>
+            </button>
+
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                isOpen ? "mt-6 max-h-40 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              <p className={`text-xl ${isOpen ? "text-white" : "text-[#1A1A1A]"}`}>
+                {faq.answer}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}

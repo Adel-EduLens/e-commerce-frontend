@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from "../components/shared";
-import { useState } from "react";
+import { Navbar, Footer, CollapsibleFAQ } from "../components/shared";
 const ds = (file: string) =>
   `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
 const homeAsset = (file: string) =>
@@ -333,61 +332,6 @@ function EverythingYouNeedSection() {
     </div>
   );
 }
-
-export function CollapsibleFAQ({
-  faqs,
-}: {
-  faqs: { question: string; answer: string }[];
-}) {
-  const [openIndex, setOpenIndex] = useState(0);
-
-  return (
-    <div className="flex flex-col gap-8">
-      {faqs.map((faq, index) => {
-        const isOpen = openIndex === index;
-
-        return (
-          <div
-            key={index}
-            className={`rounded-3xl p-8 transition-colors duration-300 ${
-              isOpen ? "bg-[#1C1B2E]" : "bg-[#EDEDED]"
-            }`}
-          >
-            <button
-              onClick={() => setOpenIndex(isOpen ? -1 : index)}
-              className="flex w-full items-center justify-between"
-            >
-              <h3
-                className={`text-2xl font-medium ${
-                  isOpen ? "text-[#BBFF63]" : "text-[#1A1A1A]"
-                }`}
-              >
-                {faq.question}
-              </h3>
-
-              <div
-                className={`rounded-full bg-white p-3 transition-transform duration-300 ${
-                  isOpen ? "rotate-90" : ""
-                }`}
-              >
-                <AssetImage file="weui_arrow-filled.svg" className="h-6 w-3" />
-              </div>
-            </button>
-
-            <div
-              className={`overflow-hidden transition-all duration-300 ${
-                isOpen ? "max-h-40 opacity-100 mt-6" : "max-h-0 opacity-0"
-              }`}
-            >
-              <p className="text-xl text-white">{faq.answer}</p>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function FAQSection() {
   const faqs = [
     {
