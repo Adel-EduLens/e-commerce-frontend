@@ -150,8 +150,8 @@ function ProductCard({ featured = false }: { featured?: boolean }) {
     <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
       <div className="absolute left-[8px] top-[8px] h-64 w-80 overflow-hidden rounded-lg bg-[#F9FAFB]">
         <AssetImage
-          file="medium-shot-man-posing-with-blue-background-removebg-preview 1(1).png"
-          className="absolute left-[34px] top-0 h-[266px] w-[247px]"
+          file="medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
+          className="absolute left-[34px] top-0 h-[371px] w-[247px]"
         />
         <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
           <AssetImage
@@ -386,8 +386,8 @@ function MustHavesSection() {
 
 function CategoriesSection() {
   const categories = [
-    { label: "Men", file: "image 9.png", labelLeft: "left-[96px]" },
-    { label: "Kids", file: "image 8.png", labelLeft: "left-[96px]" },
+    { label: "Men", file: "image 8.png", labelLeft: "left-[96px]" },
+    { label: "Kids", file: "image 9.png", labelLeft: "left-[96px]" },
     { label: "Women", file: "image 7.png", labelLeft: "left-[62px]" },
   ];
 
