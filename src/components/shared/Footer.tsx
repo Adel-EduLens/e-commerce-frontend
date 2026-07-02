@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
 const footerLinks: Record<string, { label: string; path: string }[]> = {
   About: [

@@ -4,7 +4,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Navbar, Footer } from '../components/shared';
 
 const ds = (file: string) => `/dropshipping/${encodeURIComponent(file)}`;
-const homeAsset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
+const homeAsset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
 function AssetImage({
   file,

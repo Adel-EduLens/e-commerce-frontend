@@ -67,10 +67,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [open, setOpen] = useState(false);
   const lang = isRTL ? "AR" : "EN";
 
-  useEffect(() => {
-    document.documentElement.dir = isRTL ? "rtl" : "ltr";
-    document.documentElement.lang = i18n.language;
-  }, [isRTL, i18n.language]);
+
 
   useEffect(() => {
     if (isAuthenticated) {
