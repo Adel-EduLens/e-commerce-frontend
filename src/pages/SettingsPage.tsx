@@ -16,82 +16,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-
-const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
-
-type AssetImageProps = {
-  file: string;
-  className: string;
-  alt?: string;
-};
-
-function AssetImage({ file, className, alt = "" }: AssetImageProps) {
-  return (
-    <img
-      className={className}
-      src={asset(file)}
-      alt={alt}
-      draggable={false}
-    />
-  );
-}
-
-function ArrowCircle() {
-  return (
-    <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-      <AssetImage
-        file="weui_arrow-filled-3.svg"
-        className="absolute left-[18px] top-[12px] h-6 w-3"
-      />
-    </div>
-  );
-}
-
-function Navbar() {
-  const navItems = ["Shop", "Wholesale", "Design Lab", "Dropshipping"];
-
-  return (
-    <div className="absolute left-[48px] top-[18px] h-20 w-[1344px] rounded-2xl bg-[#F9FAFB] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-      <AssetImage
-        file="logo gen-z 2 copy 1.png"
-        className="absolute left-[16px] top-[16px] h-12 w-[90px]"
-        alt="Gen Z"
-      />
-      <div className="absolute left-[138px] top-[20px] inline-flex items-center justify-start gap-4">
-        <div className="flex items-center justify-center gap-2.5 rounded-lg bg-[#BBFF63] px-4 py-2">
-          <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
-            Home
-          </div>
-        </div>
-        {navItems.map((item) => (
-          <div
-            key={item}
-            className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]"
-          >
-            {item}
-          </div>
-        ))}
-      </div>
-      <div className="absolute left-[1148px] top-[18px] inline-flex items-center justify-start gap-6">
-        <AssetImage
-          file="material-symbols-light_shopping-bag-outline.svg"
-          className="h-11 w-11"
-        />
-        <AssetImage file="mdi-light_heart.svg" className="h-11 w-11" />
-        <AssetImage
-          file="iconamoon_profile-light.svg"
-          className="h-11 w-11"
-        />
-      </div>
-      <div className="absolute left-[741px] top-[16px] inline-flex w-96 items-center justify-start gap-2 rounded-3xl bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-        <AssetImage file="mynaui_search-1.svg" className="h-8 w-8" />
-        <div className="font-['Montserrat'] text-base font-semibold text-[#6B7280]">
-          Search
-        </div>
-      </div>
-    </div>
-  );
-}
+import { Navbar, Footer } from "../components/shared";
 
 type SidebarItem = {
   label: string;
@@ -253,86 +178,6 @@ function SettingsPanel() {
   );
 }
 
-function FooterColumn({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="inline-flex w-48 flex-col items-start justify-center gap-4">
-      <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-        {title}
-      </div>
-      {items.map((item) => (
-        <div
-          key={item}
-          className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#6B7280]"
-        >
-          {item}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Footer() {
-  const columns = [
-    { title: "About", items: ["About Us", "Design Lab", "Dropship"] },
-    { title: "Shop", items: ["Men", "Kids", "Women"] },
-    {
-      title: "Help",
-      items: ["FAQ", "Contact", "Shipping", "Returns", "Track Order"],
-    },
-    { title: "Legal", items: ["Privacy", "Terms", "Cookies"] },
-  ];
-  const socials = [
-    "prime_twitter.svg",
-    "ri_facebook-fill.svg",
-    "ic_outline-tiktok.svg",
-    "iconoir_instagram.svg",
-  ];
-
-  return (
-    <div className="absolute left-0 top-[917px] h-96 w-[1440px] overflow-hidden border-t border-[#E0E0E0]">
-      <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20">
-        GEN Z
-      </div>
-      <div className="absolute left-[24px] top-[32px] h-96 w-[1392px]">
-        <div className="absolute left-0 top-[80px] inline-flex items-start justify-start gap-8">
-          {columns.map((column) => (
-            <FooterColumn
-              key={column.title}
-              title={column.title}
-              items={column.items}
-            />
-          ))}
-        </div>
-        <div className="absolute left-[1096px] top-0 inline-flex items-center justify-start gap-6">
-          {socials.map((social) => (
-            <div
-              key={social}
-              className="relative h-14 w-14 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
-            >
-              <AssetImage
-                file={social}
-                className="absolute left-[12px] top-[12px] h-8 w-8"
-              />
-            </div>
-          ))}
-        </div>
-        <div className="absolute left-[932px] top-[72px] font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-          SIGN UP FOR DISCOUNTS + UPDATES
-        </div>
-        <div className="absolute left-0 top-[358px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          © 2025 GenZ, LLC. All Rights Reserved.
-        </div>
-        <div className="absolute left-[932px] top-[117px] inline-flex w-[460px] items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-          <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-            Phone Number or Email
-          </div>
-          <ArrowCircle />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
@@ -349,7 +194,7 @@ export default function SettingsPage() {
 
   return (
     <div className="relative h-[1359px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Footer />
+      <Footer top="top-[917px]" />
       <Navbar />
       <AccountSidebar />
       <SettingsPanel />

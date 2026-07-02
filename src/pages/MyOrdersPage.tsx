@@ -10,30 +10,27 @@ import {
   Gamepad2,
   Settings,
   LogOut,
-  Search,
-  Heart,
-  ShoppingCart,
   ChevronRight,
   FileText,
   Package,
   Truck,
   CheckCircle2,
 } from "lucide-react";
-
-const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
+import { Link } from "react-router-dom";
+import { Navbar, Footer } from "../components/shared";
 
 type Tab = "active" | "completed" | "returns";
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard" },
-  { icon: ShoppingBag, label: "My Orders", active: true },
-  { icon: Wallet, label: "Wallet & Rewards" },
-  { icon: User, label: "My Info" },
-  { icon: Bell, label: "Notifications" },
-  { icon: Clock, label: "Notify Me List" },
-  { icon: Gift, label: "Gift Cards" },
-  { icon: Gamepad2, label: "Avatar" },
-  { icon: Settings, label: "Settings" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/user" },
+  { icon: ShoppingBag, label: "My Orders", active: true, path: "/my-orders" },
+  { icon: Wallet, label: "Wallet & Rewards", path: "/" },
+  { icon: User, label: "My Info", path: "/settings" },
+  { icon: Bell, label: "Notifications", path: "/notifications" },
+  { icon: Clock, label: "Notify Me List", path: "/notify-me-list" },
+  { icon: Gift, label: "Gift Cards", path: "/" },
+  { icon: Gamepad2, label: "Avatar", path: "/" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const orderItems = [
@@ -49,49 +46,14 @@ const orderSteps = [
   { icon: Truck, label: "Delivered", date: "Pending Delivery", completed: false },
 ];
 
-function Navbar() {
-  const navItems = ["Shop", "Wholesale", "Design Lab", "Dropshipping"];
-
-  return (
-    <div className="mx-12 mt-[18px] flex h-20 items-center rounded-2xl bg-[#F9FAFB] px-4 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-      <img
-        src={asset("logo gen-z 2 copy 1.png")}
-        className="h-12 w-[90px]"
-        alt="Gen Z"
-        draggable={false}
-      />
-      <div className="ml-8 flex items-center gap-4">
-        <div className="flex items-center justify-center rounded-lg bg-[#BBFF63] px-4 py-2">
-          <span className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">Home</span>
-        </div>
-        {navItems.map((item) => (
-          <span key={item} className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
-            {item}
-          </span>
-        ))}
-      </div>
-      <div className="ml-auto flex items-center gap-4">
-        <div className="flex w-96 items-center gap-2 rounded-3xl bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-          <Search className="h-8 w-8 text-[#6B7280]" strokeWidth={1.5} />
-          <span className="font-['Montserrat'] text-base font-semibold text-[#6B7280]">Search</span>
-        </div>
-        <div className="flex items-center gap-6 ml-4">
-          <ShoppingCart className="h-11 w-11 text-[#1A1A1A]" strokeWidth={1.2} />
-          <Heart className="h-11 w-11 text-[#1A1A1A]" strokeWidth={1.2} />
-          <User className="h-11 w-11 text-[#1A1A1A]" strokeWidth={1.2} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Sidebar() {
   return (
     <div className="w-56 flex flex-col justify-between py-6 pl-6 shrink-0">
       <div className="flex flex-col gap-3">
         {sidebarItems.map((item) => (
-          <div
+          <Link
             key={item.label}
+            to={item.path}
             className={`flex items-center gap-4 rounded-lg p-4 cursor-pointer ${
               item.active
                 ? "bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
@@ -102,7 +64,7 @@ function Sidebar() {
             <span className="font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
               {item.label}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
       <div className="flex items-center gap-4 p-4 cursor-pointer mt-24">
@@ -204,9 +166,7 @@ function OrderStatus() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div
-                  className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${
-                    step.completed ? "bg-[#2A2D35]" : "bg-[#2A2D35]"
-                  }`}
+                  className={`flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#2A2D35]`}
                 >
                   <step.icon
                     className={`h-8 w-8 ${step.completed ? "text-[#BBFF63]" : "text-zinc-400"}`}
@@ -258,87 +218,6 @@ function OrderStatus() {
   );
 }
 
-function FooterColumn({ title, items }: { title: string; items: string[] }) {
-  return (
-    <div className="inline-flex w-48 flex-col items-start justify-center gap-4">
-      <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-        {title}
-      </div>
-      {items.map((item) => (
-        <div
-          key={item}
-          className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#6B7280]"
-        >
-          {item}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Footer() {
-  const columns = [
-    { title: "About", items: ["About Us", "Design Lab", "Dropship"] },
-    { title: "Shop", items: ["Men", "Kids", "Women"] },
-    { title: "Help", items: ["FAQ", "Contact", "Shipping", "Returns", "Track Order"] },
-    { title: "Legal", items: ["Privacy", "Terms", "Cookies"] },
-  ];
-  const socials = [
-    "prime_twitter.svg",
-    "ri_facebook-fill.svg",
-    "ic_outline-tiktok.svg",
-    "iconoir_instagram.svg",
-  ];
-
-  return (
-    <div className="relative mt-16 border-t border-[#E0E0E0] overflow-hidden">
-      <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20 pointer-events-none select-none">
-        GEN Z
-      </div>
-      <div className="relative mx-6 pt-8 pb-8">
-        <div className="flex gap-8 mt-[80px]">
-          {columns.map((column) => (
-            <FooterColumn key={column.title} title={column.title} items={column.items} />
-          ))}
-        </div>
-
-        <div className="absolute right-0 top-8 flex items-center gap-6">
-          {socials.map((social) => (
-            <div
-              key={social}
-              className="relative h-14 w-14 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
-            >
-              <img
-                src={asset(social)}
-                className="absolute left-[12px] top-[12px] h-8 w-8"
-                alt=""
-                draggable={false}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="absolute right-0 top-[72px] font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-          SIGN UP FOR DISCOUNTS + UPDATES
-        </div>
-
-        <div className="absolute right-0 top-[117px] flex w-[460px] items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-          <span className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-            Phone Number or Email
-          </span>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
-            <ChevronRight className="h-6 w-6 text-[#1A1A1A]" />
-          </div>
-        </div>
-
-        <div className="mt-[280px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          © 2025 GenZ, LLC. All Rights Reserved.
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function MyOrdersPage() {
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
@@ -367,7 +246,42 @@ export default function MyOrdersPage() {
         </div>
       </div>
 
-      <Footer />
+      <div className="relative mt-16 border-t border-[#E0E0E0] overflow-hidden">
+        <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20 pointer-events-none select-none">
+          GEN Z
+        </div>
+        <div className="relative mx-6 pt-8 pb-8">
+          <div className="flex gap-8 mt-[80px]">
+            {[
+              { title: "About", items: ["About Us", "Design Lab", "Dropship"] },
+              { title: "Shop", items: ["Men", "Kids", "Women"] },
+              { title: "Help", items: ["FAQ", "Contact", "Shipping", "Returns", "Track Order"] },
+              { title: "Legal", items: ["Privacy", "Terms", "Cookies"] },
+            ].map((column) => (
+              <div key={column.title} className="inline-flex w-48 flex-col items-start justify-center gap-4">
+                <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">{column.title}</div>
+                {column.items.map((item) => (
+                  <div key={item} className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#6B7280]">{item}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="absolute right-0 top-[72px] font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
+            SIGN UP FOR DISCOUNTS + UPDATES
+          </div>
+          <div className="absolute right-0 top-[117px] flex w-[460px] items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
+            <span className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
+              Phone Number or Email
+            </span>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white">
+              <ChevronRight className="h-6 w-6 text-[#1A1A1A]" />
+            </div>
+          </div>
+          <div className="mt-[280px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
+            © 2025 GenZ, LLC. All Rights Reserved.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
