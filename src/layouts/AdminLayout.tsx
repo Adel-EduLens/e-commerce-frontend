@@ -1,17 +1,17 @@
-import { Activity, LogOut, Shield } from 'lucide-react'
-import React from 'react'
-import { useAuthStore } from '../store/useAuthStore'
-import { toast } from 'sonner'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Activity, LogOut, Shield ,Award } from "lucide-react";
+import React from "react";
+import { useAuthStore } from "../store/useAuthStore";
+import { toast } from "sonner";
+import {  useNavigate } from "react-router-dom";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user, clearAuth } = useAuthStore()
-  const navigate = useNavigate()
+  const { user, clearAuth } = useAuthStore();
+  const navigate = useNavigate();
   const handleLogout = () => {
-    clearAuth()
-    toast.success('Logged out successfully')
-    navigate('/auth')
-  }
+    clearAuth();
+    toast.success("Logged out successfully");
+    navigate("/auth");
+  };
   return (
     <div className="min-h-screen flex">
       <aside className="w-64 border-r border-neutral-800 bg-neutral-950 p-6 flex flex-col justify-between">
@@ -24,9 +24,19 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className="space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left">
+            <button
+              onClick={() => navigate("/dashboard/admin")}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left"
+            >
               <Activity size={18} />
               <span>FAQ</span>
+            </button>
+            <button
+              onClick={() => navigate("/dashboard/admin/prizes")}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left"
+            >
+              <Award  size={18} />
+              <span>Prize</span>
             </button>
           </div>
         </div>
@@ -38,7 +48,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             </div>
             <div className="overflow-hidden">
               <p className="text-sm font-semibold truncate">
-                {user?.name || 'Admin'}
+                {user?.name || "Admin"}
               </p>
               <span className="text-xs text-red-500 font-semibold tracking-wider uppercase">
                 {user?.role}
@@ -59,7 +69,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminLayout
+export default AdminLayout;
