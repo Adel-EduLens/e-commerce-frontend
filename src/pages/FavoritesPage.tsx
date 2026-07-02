@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer, ProductCard } from "../components/shared";
+import { ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -26,9 +26,9 @@ function AssetImage({
 
 
 
-function ProductRow({ top }: { top: string }) {
+function ProductRow() {
   return (
-    <div className={`absolute left-[24px] ${top} inline-flex items-center justify-start gap-6`}>
+    <div className="inline-flex w-full items-center justify-start gap-6">
       <ProductCard />
       <ProductCard featured accentClassName="bg-[#C4B5FD]" />
       <ProductCard />
@@ -39,7 +39,7 @@ function ProductRow({ top }: { top: string }) {
 
 function FilterSection() {
   return (
-    <div className="absolute left-[24px] top-[211px] inline-flex w-[1392px] flex-col items-start justify-start gap-3">
+    <div className="mt-6 inline-flex w-full flex-col items-start justify-start gap-3">
       <div className="self-stretch font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
         Filter by
       </div>
@@ -104,17 +104,17 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="relative h-[2483px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar />
-      <div className="absolute left-[24px] top-[122px] font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]">
+    <div className="w-full">
+      <div className="font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]">
         Favorites
       </div>
       <FilterSection />
-      <ProductRow top="top-[375px]" />
-      <ProductRow top="top-[784px]" />
-      <ProductRow top="top-[1193px]" />
-      <ProductRow top="top-[1602px]" />
-      <Footer top="top-[2041px]" />
+      <div className="mt-6 flex flex-col gap-6">
+        <ProductRow />
+        <ProductRow />
+        <ProductRow />
+        <ProductRow />
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer, ProductCard, CollapsibleFAQ } from "../components/shared";
+import { ProductCard, CollapsibleFAQ } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -93,7 +93,7 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
 
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
   return (
-    <div className="w-[1392px] flex flex-col items-center justify-start gap-8">
+    <div className="w-full flex flex-col items-center justify-start gap-8">
       <FilterBar />
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
@@ -111,75 +111,73 @@ function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
 
 function HeroSection() {
   return (
-    <>
-      <div className="absolute left-[24px] top-[24px] h-[978px] w-[1392px] rounded-3xl bg-[#BBFF63]">
-        <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-[#1A1A1A]" />
-        <div className="absolute left-[30px] top-[367.19px] h-32 w-[504.79px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
-        <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
-          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-[#1A1A1A]">
-            Discover
-          </div>
-          <div className="relative h-56 w-[517.21px]">
-            <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
-            <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-white">
-              fashion
-            </div>
-          </div>
-          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-[#1A1A1A]">
-            Fits Your Story
+    <div className="relative h-[978px] w-full rounded-3xl bg-[#BBFF63]">
+      <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-[#1A1A1A]" />
+      <div className="absolute left-[30px] top-[367.19px] h-32 w-[504.79px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
+      <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
+        <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-[#1A1A1A]">
+          Discover
+        </div>
+        <div className="relative h-56 w-[517.21px]">
+          <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
+          <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-white">
+            fashion
           </div>
         </div>
-        <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
-          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-[#F9FAFB] opacity-75">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-[#1A1A1A]">
-              step into the spotilght with our latest drop. each piece is made
-              to turn heads while keeping you comfortable from day to night.
-              <br />
-            </div>
-            <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
-              <AssetImage
-                file="medium-shot-man-posing-with-blue-background 1_2.png"
-                className="absolute left-[1px] top-0 h-60 w-[222px]"
-              />
-            </div>
-          </div>
-          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-[#F9FAFB]">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-              step into the spotilght with our latest drop. each piece is made
-              to turn heads while keeping you comfortable from day to night.
-              <br />
-            </div>
-            <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
-              <AssetImage
-                file="medium-shot-man-posing-with-blue-background 1.png"
-                className="absolute left-[1px] top-0 h-60 w-[222px]"
-              />
-            </div>
-          </div>
+        <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-[#1A1A1A]">
+          Fits Your Story
         </div>
-        <div className="absolute left-[675px] top-[7px] h-[971px] w-[788px] overflow-hidden">
-          <AssetImage
-            file="image 1.png"
-            className="absolute left-0 top-0 h-[971px] w-[741px]"
-          />
-        </div>
-        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-[#F9FAFB]">
-          <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-            Unlock fresh styles, exclusive drops, and a whole new vibe
-            that&apos;s set to dominarte 2025
+      </div>
+      <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
+        <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-[#F9FAFB] opacity-75">
+          <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-[#1A1A1A]">
+            step into the spotilght with our latest drop. each piece is made
+            to turn heads while keeping you comfortable from day to night.
             <br />
+          </div>
+          <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
+            <AssetImage
+              file="medium-shot-man-posing-with-blue-background 1_2.png"
+              className="absolute left-[1px] top-0 h-60 w-[222px]"
+            />
+          </div>
+        </div>
+        <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-[#F9FAFB]">
+          <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
+            step into the spotilght with our latest drop. each piece is made
+            to turn heads while keeping you comfortable from day to night.
             <br />
+          </div>
+          <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
+            <AssetImage
+              file="medium-shot-man-posing-with-blue-background 1.png"
+              className="absolute left-[1px] top-0 h-60 w-[222px]"
+            />
           </div>
         </div>
       </div>
-      <div className="absolute left-[603px] top-[537px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-[#1A1A1A]" />
-    </>
+      <div className="absolute left-[675px] top-[7px] h-[971px] w-[788px] overflow-hidden">
+        <AssetImage
+          file="image 1.png"
+          className="absolute left-0 top-0 h-[971px] w-[741px]"
+        />
+      </div>
+      <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-[#F9FAFB]">
+        <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
+          Unlock fresh styles, exclusive drops, and a whole new vibe
+          that&apos;s set to dominarte 2025
+          <br />
+          <br />
+        </div>
+      </div>
+      <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-[#1A1A1A]" />
+    </div>
   );
 }
 
 function CollectionSection() {
   return (
-    <div className="absolute left-[24px] top-[1082px] h-[770px] w-[1392px]">
+    <div className="mt-16 relative h-[770px] w-full">
       <Link
         to="/collections/men"
         className="absolute left-0 top-0 block h-[770px] w-[1029px] overflow-hidden rounded-3xl no-underline"
@@ -246,11 +244,11 @@ function MustHavesSection() {
   const navigate = useNavigate();
 
   return (
-    <div className="absolute left-[24px] top-[1932px] h-[904px] w-[1392px]">
-      <div className="absolute left-0 top-0 w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
-        This Season’s Must-Haves
+    <div className="mt-16 w-full">
+      <div className="w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+        This Season's Must-Haves
       </div>
-      <div className="absolute left-0 top-[274px] inline-flex w-[1392px] flex-col items-center justify-start gap-8">
+      <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
         <FilterBar />
         <div className="self-stretch inline-flex items-center justify-start gap-6">
           {Array.from({ length: 4 }).map((_, index) => (
@@ -271,7 +269,7 @@ function CategoriesSection() {
   ];
 
   return (
-    <div className="absolute left-[24px] top-[2916px] inline-flex w-[1392px] flex-col items-center justify-start gap-10">
+    <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Explore Our Categories
       </div>
@@ -302,7 +300,7 @@ function CategoriesSection() {
 
 function RecommendedSection() {
   return (
-    <div className="absolute left-[24px] top-[3715px] inline-flex w-[1392px] flex-col items-center justify-start gap-10">
+    <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Recommended for You
       </div>
@@ -358,11 +356,11 @@ function VoteRings() {
 
 function VoteSection() {
   return (
-    <div className="absolute left-[24px] top-[4582px] h-[1242px] w-[1392px]">
+    <div className="mt-16 relative h-[1242px] w-full">
       <div className="absolute left-0 top-0 w-[646px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Vote for next design
       </div>
-      <div className="absolute left-0 top-[266px] h-[772px] w-[1392px] overflow-hidden rounded-3xl bg-[#BBFF63]">
+      <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-[#BBFF63]">
         <div className="absolute left-[604px] top-[672px] h-16 w-52 rounded-2xl bg-white">
           <div className="absolute left-[12px] top-[12px] inline-flex items-center justify-start gap-4">
             <div className="relative h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]">
@@ -418,7 +416,7 @@ function VoteSection() {
 
 function FlashDealsSection() {
   return (
-    <div className="absolute left-[24px] top-[5774px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="inline-flex items-center justify-center gap-11">
         <div className="font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
           Flash Deals
@@ -466,7 +464,7 @@ function FaqSection() {
   ];
 
   return (
-    <div className="absolute left-[24px] top-[6641px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Frequently asked questions
       </div>
@@ -498,9 +496,8 @@ export function HomePage() {
   }
 
   return (
-    <div className="relative h-[8118px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
+    <div className="w-full overflow-hidden">
       <HeroSection />
-      <Navbar left="left-[48px]" top="top-[48px]" />
       <CollectionSection />
       <MustHavesSection />
       <CategoriesSection />
@@ -508,7 +505,6 @@ export function HomePage() {
       <VoteSection />
       <FlashDealsSection />
       <FaqSection />
-      <Footer top="top-[7676px]" />
     </div>
   );
 }

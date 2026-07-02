@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from "../components/shared";
+
+
 
 function OrderSummary() {
   return (
@@ -342,17 +343,15 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="relative h-[2614px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar />
+    <div className="relative w-full overflow-hidden">
       {/* Order Summary - right side */}
       <OrderSummary />
       {/* Left column: Delivery + Payment + Remember Me */}
-      <div className="absolute left-[23px] top-[122px] inline-flex w-[685px] flex-col items-end justify-start gap-12">
+      <div className="absolute left-0 top-0 inline-flex w-[685px] flex-col items-end justify-start gap-12">
         <DeliverySection />
         <PaymentMethodSection />
         <RememberMeSection />
       </div>
-      <Footer top="top-[2172px]" />
     </div>
   );
 }

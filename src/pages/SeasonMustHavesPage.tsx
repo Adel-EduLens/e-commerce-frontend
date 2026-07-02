@@ -1,20 +1,15 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer, ProductCard, CatalogFilters } from "../components/shared";
+import { ProductCard, CatalogFilters } from "../components/shared";
 
-function ProductRow({ top }: { top: number }) {
+function ProductRow() {
   return (
-    <div
-      className="absolute left-[24px] inline-flex w-[1392px] flex-col items-start justify-start gap-6"
-      style={{ top }}
-    >
-      <div className="self-stretch inline-flex items-center justify-start gap-6">
-        <ProductCard />
-        <ProductCard featured />
-        <ProductCard featured />
-        <ProductCard />
-      </div>
+    <div className="inline-flex w-full items-center justify-start gap-6">
+      <ProductCard />
+      <ProductCard featured />
+      <ProductCard featured />
+      <ProductCard />
     </div>
   );
 }
@@ -36,19 +31,18 @@ export default function SeasonMustHavesPage() {
   }
 
   return (
-    <div className="relative h-[2226px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      
-      <Navbar />
-      <div className="absolute left-[24px] top-[122px] w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+    <div className="w-full">
+      <div className="w-full font-[‘Montserrat’] text-8xl font-bold text-[#1A1A1A]">
         This Season’s Must-Haves
       </div>
-      <div className="absolute left-[24px] top-[396px] w-[1392px]">
+      <div className="mt-8 w-full">
         <CatalogFilters />
       </div>
-      <ProductRow top={552} />
-      <ProductRow top={977} />
-      <ProductRow top={1402} />
-      <Footer top="top-[1784px]" />
+      <div className="mt-8 flex flex-col gap-6">
+        <ProductRow />
+        <ProductRow />
+        <ProductRow />
+      </div>
     </div>
   );
 }

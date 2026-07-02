@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { CatalogFilters, Footer, Navbar, ProductCard } from "../components/shared";
+import { CatalogFilters, ProductCard } from "../components/shared";
 import { useAuthStore } from "../store/useAuthStore";
 
 const productRows = [
@@ -12,12 +12,9 @@ const productRows = [
 
 const featuredIndexes = new Set([2, 6, 10, 14]);
 
-function ProductRow({ top, indexes }: { top: number; indexes: number[] }) {
+function ProductRow({ indexes }: { indexes: number[] }) {
   return (
-    <div
-      className="absolute left-[24px] inline-flex w-[1392px] items-center justify-start gap-6"
-      style={{ top }}
-    >
+    <div className="inline-flex w-full items-center justify-start gap-6">
       {indexes.map((index) => (
         <ProductCard
           key={index}
@@ -50,20 +47,18 @@ export default function MenCollectionPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#F9FAFB]">
-      <div className="relative mx-auto h-[2520px] w-[1440px] overflow-hidden bg-[#F9FAFB]">
-        <Navbar />
-        <div className="absolute left-[24px] top-[122px] w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
-          {categoryTitle}
-        </div>
-        <div className="absolute left-[24px] top-[220px] w-[1392px]">
-          <CatalogFilters />
-        </div>
-        <ProductRow top={376} indexes={productRows[0]} />
-        <ProductRow top={801} indexes={productRows[1]} />
-        <ProductRow top={1226} indexes={productRows[2]} />
-        <ProductRow top={1651} indexes={productRows[3]} />
-        <Footer top="top-[2124px]" />
+    <div className="w-full">
+      <div className="w-full font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+        {categoryTitle}
+      </div>
+      <div className="mt-8 w-full">
+        <CatalogFilters />
+      </div>
+      <div className="mt-8 flex flex-col gap-6">
+        <ProductRow indexes={productRows[0]} />
+        <ProductRow indexes={productRows[1]} />
+        <ProductRow indexes={productRows[2]} />
+        <ProductRow indexes={productRows[3]} />
       </div>
     </div>
   );

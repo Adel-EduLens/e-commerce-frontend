@@ -15,7 +15,7 @@ import {
 import { toast } from "sonner";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCartStore } from "../store/useCartStore";
-import { Footer, Navbar, ProductCard } from "../components/shared";
+import { ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -982,8 +982,7 @@ export default function ProductDetailsPage() {
   };
 
   return (
-    <div className="relative h-[3584px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar top="top-[24px]" />
+    <div className="relative h-[3142px] w-full overflow-hidden">
       <Gallery
         images={GALLERY_IMAGES}
         selectedImageIndex={selectedImageIndex}
@@ -1034,7 +1033,6 @@ export default function ProductDetailsPage() {
         onAddToCart={handleAddToCart}
         onBuyNow={handleBuyNow}
       />
-      <Footer top="top-[3142px]" height="h-[442px]" innerHeight="h-[378px]" />
     </div>
   );
 }

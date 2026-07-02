@@ -69,7 +69,7 @@ export default function AccountSidebar() {
   };
 
   return (
-    <div className="absolute left-[24px] top-[122px] inline-flex w-56 flex-col items-start justify-start gap-24">
+    <div className="inline-flex w-56 shrink-0 flex-col items-start justify-start gap-24">
       <div className="flex self-stretch flex-col items-start justify-start gap-3 rounded-lg">
         {items.map((item) => (
           <SidebarRow

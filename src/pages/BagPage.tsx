@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Navbar, Footer, ProductCard } from "../components/shared";
+import { ProductCard } from "../components/shared";
 import { useAuthStore } from "../store/useAuthStore";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 
@@ -470,10 +470,9 @@ export default function BagPage() {
 
   return (
     <div
-      className="relative mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]"
-      style={{ height: pageHeight }}
+      className="relative w-full overflow-hidden"
+      style={{ minHeight: pageHeight }}
     >
-      <Navbar />
       <SummaryCard
         subtotal={subtotal}
         discount={discount}
@@ -504,7 +503,6 @@ export default function BagPage() {
         selectedTab={selectedTab}
         onSelectTab={setSelectedTab}
       />
-      <Footer top="top-0" style={{ top: footerTop }} />
     </div>
   );
 }

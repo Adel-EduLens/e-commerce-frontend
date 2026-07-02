@@ -23,6 +23,7 @@ import CheckoutPage from "../pages/CheckoutPage";
 import DropshippingPage from "../pages/DropshippingPage";
 import FavoritesPage from "../pages/FavoritesPage";
 import WholesalePage from "../pages/WholesalePage";
+import DesignLabPage from "../pages/DesignLabPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 import AdminLoginPage from "../pages/admin/AdminLoginPage";
@@ -37,27 +38,47 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: (
+          <UserLayout>
+            <HomePage />
+          </UserLayout>
+        ),
       },
       {
         path: "product-details",
-        element: <ProductDetailsPage />,
+        element: (
+          <UserLayout>
+            <ProductDetailsPage />
+          </UserLayout>
+        ),
       },
       {
         path: "season-must-haves",
-        element: <SeasonMustHavesPage />,
+        element: (
+          <UserLayout>
+            <SeasonMustHavesPage />
+          </UserLayout>
+        ),
       },
       {
         path: "collections/:category",
-        element: <MenCollectionPage />,
+        element: (
+          <UserLayout>
+            <MenCollectionPage />
+          </UserLayout>
+        ),
       },
       {
         path: "bag",
-        element: <BagPage />,
+        element: (
+          <UserLayout>
+            <BagPage />
+          </UserLayout>
+        ),
       },
       {
         element: (
-          <ProtectedRoute allowedRoles={["user"]}>
+          <ProtectedRoute>
             <AccountLayout />
           </ProtectedRoute>
         ),
@@ -190,7 +211,9 @@ export const router = createBrowserRouter([
         path: "checkout",
         element: (
           <ProtectedRoute>
-            <CheckoutPage />
+            <UserLayout>
+              <CheckoutPage />
+            </UserLayout>
           </ProtectedRoute>
         ),
       },
@@ -208,7 +231,9 @@ export const router = createBrowserRouter([
         path: "favorites",
         element: (
           <ProtectedRoute>
-            <FavoritesPage />
+            <UserLayout>
+              <FavoritesPage />
+            </UserLayout>
           </ProtectedRoute>
         ),
       },
@@ -216,8 +241,18 @@ export const router = createBrowserRouter([
         path: "wholesale",
         element: (
           <ProtectedRoute>
-            <WholesalePage />
+            <UserLayout>
+              <WholesalePage />
+            </UserLayout>
           </ProtectedRoute>
+        ),
+      },
+      {
+        path: "design-lab",
+        element: (
+          <UserLayout>
+            <DesignLabPage />
+          </UserLayout>
         ),
       },
     ],

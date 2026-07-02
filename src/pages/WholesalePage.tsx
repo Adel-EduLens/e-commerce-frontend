@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from '../components/shared';
+import { CollapsibleFAQ } from "../components/shared";
+
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -265,8 +266,28 @@ function CategoriesSection() {
 }
 
 function FAQSection() {
+  const faqs = [
+    {
+      question: "Can Cancel at any time ?",
+      answer:
+        "You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase.",
+    },
+    {
+      question: "How do I track my order?",
+      answer: "You can track your order from your account page.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer: "Yes, we ship to most countries worldwide.",
+    },
+    {
+      question: "How can I contact support?",
+      answer: "You can contact us via email or live chat.",
+    },
+  ];
+
   return (
-    <div className="absolute left-[24px] top-[3984px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
+    <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Frequently asked questions
       </div>
@@ -277,41 +298,7 @@ function FAQSection() {
           alt=""
         />
         <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
-          {/* Expanded FAQ */}
-          <div className="flex w-full flex-col items-start justify-start gap-8 overflow-hidden rounded-3xl bg-[#1A1A1A] p-8">
-            <div className="inline-flex w-full items-center justify-between">
-              <div className="font-['Montserrat'] text-2xl font-medium text-[#BBFF63]">
-                Can Cancel at any time ?
-              </div>
-              <div className="relative h-12 w-0 origin-top-left rotate-90 overflow-hidden rounded-full bg-white">
-                <AssetImage
-                  file="weui_arrow-filled-1.svg"
-                  className="absolute left-[12px] top-[18px] h-3 w-6"
-                />
-              </div>
-            </div>
-            <div className="inline-flex w-full items-center justify-start">
-              <div className="w-[620px] font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
-                You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase. For more details, please visit our &quot;Return Policy&quot; page.
-              </div>
-            </div>
-          </div>
-          {/* Collapsed FAQs */}
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex w-full flex-col items-start justify-start gap-8 overflow-hidden rounded-3xl bg-gray-200 p-8">
-              <div className="inline-flex w-full items-center justify-between">
-                <div className="font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-                  Can Cancel at any time ?
-                </div>
-                <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-                  <AssetImage
-                    file="weui_arrow-filled-3.svg"
-                    className="absolute left-[18px] top-[12px] h-6 w-3"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+          <CollapsibleFAQ faqs={faqs} />
         </div>
       </div>
     </div>
@@ -335,15 +322,13 @@ export default function WholesalePage() {
   }
 
   return (
-    <div className="relative h-[5441px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar />
+    <div className="w-full">
       <HeroBanner />
       <ProductSection title="Best Deals" top="top-[593px]" />
       <CategoriesSection />
       <ProductSection title="Most Popular" top="top-[2246px]" />
       <ProductSection title="Premium Collections" top="top-[3115px]" />
       <FAQSection />
-      <Footer top="top-[5059px]" />
     </div>
   );
 }
