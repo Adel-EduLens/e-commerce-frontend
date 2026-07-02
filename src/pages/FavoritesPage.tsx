@@ -318,7 +318,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="relative h-[2483px] w-[1440px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+    <div className="relative h-[2483px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
       <Footer />
       <Navbar />
       <div className="absolute left-[24px] top-[122px] font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]">

@@ -348,7 +348,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="relative h-[1359px] w-[1440px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+    <div className="relative h-[1359px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
       <Footer />
       <Navbar />
       <AccountSidebar />

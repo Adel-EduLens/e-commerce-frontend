@@ -216,7 +216,7 @@ function HeroSection() {
           </div>
         </div>
         <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
-          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden rounded-3xl bg-[#F9FAFB] opacity-75">
+          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-[#F9FAFB] opacity-75">
             <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-[#1A1A1A]">
               step into the spotilght with our latest drop. each piece is made
               to turn heads while keeping you comfortable from day to night.
@@ -229,7 +229,7 @@ function HeroSection() {
               />
             </div>
           </div>
-          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-[#F9FAFB]">
             <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
               step into the spotilght with our latest drop. each piece is made
               to turn heads while keeping you comfortable from day to night.
@@ -249,7 +249,7 @@ function HeroSection() {
             className="absolute left-0 top-0 h-[971px] w-[741px]"
           />
         </div>
-        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden rounded-3xl bg-[#F9FAFB]">
+        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-[#F9FAFB]">
           <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
             Unlock fresh styles, exclusive drops, and a whole new vibe
             that&apos;s set to dominarte 2025
@@ -706,7 +706,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="relative h-[8118px] w-[1440px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+    <div className="relative h-[8118px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
       <HeroSection />
       <Navbar />
       <CollectionSection />

@@ -522,7 +522,7 @@ export default function DropshippingPage() {
   }
 
   return (
-    <div className="relative h-[4490px] w-[1440px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+    <div className="relative h-[4490px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
       <HeroSection />
       <HeroImage />
       <WhyDropshipSection />

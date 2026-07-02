@@ -644,7 +644,7 @@ export default function ProductDetailsPage() {
   }
 
   return (
-    <div className="relative h-[3584px] w-[1440px] overflow-hidden rounded-3xl bg-[#F9FAFB]">
+    <div className="relative h-[3584px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
       <ProductFooter />
       <Gallery />
       <FloatingActions />
