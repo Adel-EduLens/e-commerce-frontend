@@ -1,3 +1,5 @@
 export { default as Navbar } from './Navbar'
 export { default as Footer } from './Footer'
 export { default as ProductCard } from './ProductCard'
+export { default as CatalogFilters } from './CatalogFilters'
+export { default as AccountSidebar } from './AccountSidebar'

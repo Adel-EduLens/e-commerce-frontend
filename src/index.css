@@ -10,6 +10,10 @@
   --color-gray-light: var(--gray-light);
   --color-gray-text: var(--gray-text);
   --color-shadow: var(--shadow);
+  --color-light-Background: var(--background);
+  --color-light-card: var(--card);
+  --color-light-Text: var(--foreground);
+  --color-Stroke-light: var(--stroke);
 }
 
 :root {

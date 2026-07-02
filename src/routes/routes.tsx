@@ -1,8 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import StudentLayout from "../layouts/StudentLayout";
+import AccountLayout from "../layouts/AccountLayout";
 import HomePage from "../pages/HomePage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import SeasonMustHavesPage from "../pages/SeasonMustHavesPage";
+import MenCollectionPage from "../pages/MenCollectionPage";
 import BagPage from "../pages/BagPage";
 import ContactDetailsPage from "../pages/ContactDetailsPage";
 import NotificationsPage from "../pages/NotificationsPage";
@@ -15,6 +17,7 @@ import TraderDashboard from "../pages/dashboards/TraderDashboard";
 import UserDashboard from "../pages/dashboards/UserDashboard";
 import MyOrdersPage from "../pages/MyOrdersPage";
 import HelpCenterPage from "../pages/HelpCenterPage";
+import WalletRewardsPage from "../pages/WalletRewardsPage";
 import CheckoutPage from "../pages/CheckoutPage";
 import DropshippingPage from "../pages/DropshippingPage";
 import FavoritesPage from "../pages/FavoritesPage";
@@ -44,24 +47,45 @@ export const router = createBrowserRouter([
         element: <SeasonMustHavesPage />,
       },
       {
+        path: "collections/:category",
+        element: <MenCollectionPage />,
+      },
+      {
         path: "bag",
         element: <BagPage />,
       },
       {
-        path: "contact-details",
-        element: <ContactDetailsPage />,
-      },
-      {
-        path: "notifications",
-        element: <NotificationsPage />,
-      },
-      {
-        path: "notify-me-list",
-        element: <NotifyMeListPage />,
-      },
-      {
-        path: "settings",
-        element: <SettingsPage />,
+        element: <AccountLayout />,
+        children: [
+          {
+            path: "contact-details",
+            element: <ContactDetailsPage />,
+          },
+          {
+            path: "notifications",
+            element: <NotificationsPage />,
+          },
+          {
+            path: "notify-me-list",
+            element: <NotifyMeListPage />,
+          },
+          {
+            path: "settings",
+            element: <SettingsPage />,
+          },
+          {
+            path: "my-orders",
+            element: <MyOrdersPage />,
+          },
+          {
+            path: "help-center",
+            element: <HelpCenterPage />,
+          },
+          {
+            path: "wallet-rewards",
+            element: <WalletRewardsPage />,
+          },
+        ],
       },
       {
         path: "random",
@@ -116,22 +140,6 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["user"]}>
             <UserDashboard />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "my-orders",
-        element: (
-          <ProtectedRoute>
-            <MyOrdersPage />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "help-center",
-        element: (
-          <ProtectedRoute>
-            <HelpCenterPage />
           </ProtectedRoute>
         ),
       },

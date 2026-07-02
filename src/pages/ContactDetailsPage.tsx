@@ -1,166 +1,432 @@
-import { useEffect } from "react";
-import {
-  Bell,
-  Clock,
-  Gamepad2,
-  Gift,
-  LayoutDashboard,
-  LogOut,
-  PenLine,
-  Plus,
-  RotateCcwKey,
-  Settings,
-  ShoppingBag,
-  User,
-  Wallet,
-} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Check, PenLine, Plus, RotateCcwKey, Trash2, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Footer } from "../components/shared";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from "../components/shared";
 
-type SidebarItem = {
-  label: string;
-  icon: LucideIcon;
-  active?: boolean;
+type ContactForm = {
+  name: string;
+  email: string;
+  phone: string;
 };
 
-function SidebarRow({ item }: { item: SidebarItem }) {
-  const Icon = item.icon;
+type AddressItem = {
+  id: string;
+  label: string;
+  value: string;
+};
 
+const ADDRESS_STORAGE_KEY = "contact-details-addresses";
+const defaultAddresses: AddressItem[] = [
+  { id: "home", label: "Home", value: "21 Example St, Cairo" },
+  { id: "work", label: "Work", value: "15 Business Rd, Giza" },
+];
+
+function loadStoredAddresses(): AddressItem[] {
+  if (typeof window === "undefined") {
+    return defaultAddresses;
+  }
+
+  const stored = window.localStorage.getItem(ADDRESS_STORAGE_KEY);
+
+  if (!stored) {
+    return defaultAddresses;
+  }
+
+  try {
+    const parsed = JSON.parse(stored) as AddressItem[];
+
+    return Array.isArray(parsed) && parsed.length ? parsed : defaultAddresses;
+  } catch {
+    return defaultAddresses;
+  }
+}
+
+function FieldLabel({ children }: { children: string }) {
   return (
-    <div
-      className={`inline-flex items-center justify-start gap-4 rounded-lg p-4 ${
-        item.active
-          ? "self-stretch bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-          : item.label === "Wallet & Rewards"
-            ? ""
-            : "self-stretch"
-      }`}
-    >
-      <Icon className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-      <div className="whitespace-nowrap font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
-        {item.label}
-      </div>
+    <div className="self-stretch font-['Montserrat'] text-xl font-medium text-[#6B7280]">
+      {children}
     </div>
   );
 }
 
-function AccountSidebar() {
-  const items: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard" },
-    { icon: ShoppingBag, label: "My Orders" },
-    { icon: Wallet, label: "Wallet & Rewards" },
-    { icon: User, label: "My Info", active: true },
-    { icon: Bell, label: "Notifications" },
-    { icon: Clock, label: "Notify Me List" },
-    { icon: Gift, label: "Gift Cards" },
-    { icon: Gamepad2, label: "Avatar" },
-    { icon: Settings, label: "Settings" },
-  ];
-
-  return (
-    <div className="absolute left-[24px] top-[122px] inline-flex w-56 flex-col items-start justify-start gap-24">
-      <div className="flex self-stretch flex-col items-start justify-start gap-3 rounded-lg">
-        {items.map((item) => (
-          <SidebarRow key={item.label} item={item} />
-        ))}
-      </div>
-      <div className="inline-flex items-center justify-start gap-4 self-stretch p-4">
-        <LogOut className="h-6 w-6 text-[#DC2626]" strokeWidth={1.5} />
-        <div className="font-['Montserrat'] text-lg font-medium text-[#DC2626]">
-          Sign Out
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DetailField({ label, value }: { label: string; value: string }) {
+function DetailField({
+  label,
+  value,
+  isEditing = false,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  isEditing?: boolean;
+  onChange?: (value: string) => void;
+  type?: "text" | "email" | "tel";
+}) {
   return (
     <div className="flex self-stretch flex-col items-start justify-start gap-4">
-      <div className="self-stretch font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-        {label}
-      </div>
+      <FieldLabel>{label}</FieldLabel>
       <div className="inline-flex items-center justify-start gap-2.5 self-stretch overflow-hidden border-b border-[#E0E0E0] pb-4">
-        <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          {value}
-        </div>
+        {isEditing ? (
+          <input
+            type={type}
+            value={value}
+            onChange={(event) => onChange?.(event.target.value)}
+            className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] outline-none placeholder:text-[#9CA3AF]"
+          />
+        ) : (
+          <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
+            {value}
+          </div>
+        )}
       </div>
     </div>
+  );
+}
+
+function IconButton({
+  icon: Icon,
+  label,
+  tone = "neutral",
+  onClick,
+}: {
+  icon: LucideIcon;
+  label: string;
+  tone?: "neutral" | "danger" | "success";
+  onClick: () => void;
+}) {
+  const toneClassName =
+    tone === "danger"
+      ? "text-[#DC2626] hover:bg-[#FEE2E2]"
+      : tone === "success"
+        ? "text-[#15803D] hover:bg-[#DCFCE7]"
+        : "text-[#1A1A1A] hover:bg-[#F3F4F6]";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex items-center justify-center gap-2 rounded-xl p-2 transition-colors ${toneClassName}`}
+      aria-label={label}
+      title={label}
+    >
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
+    </button>
   );
 }
 
 function SectionHeader({
   title,
   icon: Icon,
+  children,
 }: {
   title: string;
   icon: LucideIcon;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="inline-flex items-center justify-between self-stretch">
-      <div className="font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
-        {title}
+      <div className="inline-flex items-center justify-start gap-3">
+        <div className="font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+          {title}
+        </div>
+        <div className="relative h-8 w-8 overflow-hidden">
+          <Icon className="absolute left-[4px] top-[4px] h-6 w-6 text-[#1A1A1A]" />
+        </div>
       </div>
-      <div className="relative h-8 w-8 overflow-hidden">
-        <Icon className="absolute left-[4px] top-[4px] h-6 w-6 text-[#1A1A1A]" />
-      </div>
+      {children}
     </div>
   );
 }
 
-function ContactDetailsPanel() {
+function AddressCard({
+  address,
+  isEditing,
+  draft,
+  onEdit,
+  onSave,
+  onCancel,
+  onDelete,
+  onDraftChange,
+}: {
+  address: AddressItem;
+  isEditing: boolean;
+  draft: AddressItem;
+  onEdit: () => void;
+  onSave: () => void;
+  onCancel: () => void;
+  onDelete: () => void;
+  onDraftChange: (value: AddressItem) => void;
+}) {
   return (
-    <div className="absolute left-[498px] top-[122px] inline-flex w-[537px] flex-col items-start justify-start gap-8">
-      <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
-      <div className="flex self-stretch flex-col items-start justify-start gap-6">
-        <DetailField label="Name" value="Maan Galal" />
-        <DetailField label="Email" value="Maan Galal" />
-        <DetailField label="Phone Number" value="+201024941663" />
-        <div className="inline-flex items-center justify-start gap-2">
-          <div className="relative h-6 w-6 overflow-hidden">
-            <RotateCcwKey
-              className="absolute left-[2px] top-[2px] h-5 w-5 text-[#B91C1C]"
-              strokeWidth={1.8}
-            />
-          </div>
-          <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
-            Reset your password
-          </div>
+    <div className="flex w-[537px] flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
+      <div className="inline-flex w-full items-center justify-between">
+        <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+          {isEditing ? "Editing Address" : address.label}
+        </div>
+        <div className="inline-flex items-center justify-start gap-1">
+          {isEditing ? (
+            <>
+              <IconButton icon={Check} label="Save address" tone="success" onClick={onSave} />
+              <IconButton icon={X} label="Cancel address" onClick={onCancel} />
+            </>
+          ) : (
+            <IconButton icon={PenLine} label="Edit address" onClick={onEdit} />
+          )}
+          <IconButton icon={Trash2} label="Delete address" tone="danger" onClick={onDelete} />
         </div>
       </div>
-      <SectionHeader title="ADDRESSRS" icon={Plus} />
-      <div className="flex w-[537px] flex-col items-start justify-start gap-4">
-        <DetailField label="Home" value="21 Example St, Cairo" />
-      </div>
-      <div className="flex w-[537px] flex-col items-start justify-start gap-4">
-        <DetailField label="Work" value="15 Business Rd, Giza" />
-      </div>
+      <DetailField
+        label="Label"
+        value={isEditing ? draft.label : address.label}
+        isEditing={isEditing}
+        onChange={(value) => onDraftChange({ ...draft, label: value })}
+      />
+      <DetailField
+        label="Address"
+        value={isEditing ? draft.value : address.value}
+        isEditing={isEditing}
+        onChange={(value) => onDraftChange({ ...draft, value })}
+      />
     </div>
   );
 }
 
 export default function ContactDetailsPage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
+  const [contactDetails, setContactDetails] = useState<ContactForm>({
+    name: String(user?.name ?? "Maan Galal"),
+    email: String(user?.email ?? "maan@example.com"),
+    phone: String(user?.phone ?? "+201024941663"),
+  });
+  const [contactDraft, setContactDraft] = useState<ContactForm>(contactDetails);
+  const [addresses, setAddresses] = useState<AddressItem[]>(loadStoredAddresses);
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+  const [addressDraft, setAddressDraft] = useState<AddressItem>({
+    id: "",
+    label: "",
+    value: "",
+  });
 
   useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
+    if (!user) {
+      return;
     }
-  }, [isAuthenticated, user, navigate]);
 
-  if (!isAuthenticated || !user) {
-    return null;
-  }
+    const nextDetails = {
+      name: String(user.name ?? "Maan Galal"),
+      email: String(user.email ?? "maan@example.com"),
+      phone: String(user.phone ?? "+201024941663"),
+    };
+
+    setContactDetails(nextDetails);
+    setContactDraft(nextDetails);
+  }, [user]);
+
+  useEffect(() => {
+    window.localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(addresses));
+  }, [addresses]);
+
+  const footerTop = useMemo(() => 970 + Math.max(addresses.length - 2, 0) * 210, [addresses.length]);
+
+  const hasUnsavedContactChanges =
+    contactDraft.name !== contactDetails.name ||
+    contactDraft.email !== contactDetails.email ||
+    contactDraft.phone !== contactDetails.phone;
+
+  const handleResetContact = () => {
+    setContactDraft(contactDetails);
+  };
+
+  const handleSaveContact = () => {
+    const trimmedName = contactDraft.name.trim();
+    const trimmedEmail = contactDraft.email.trim();
+    const trimmedPhone = contactDraft.phone.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedPhone) {
+      toast.error("Please complete all contact details");
+      return;
+    }
+
+    if (!trimmedEmail.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    const nextDetails = {
+      name: trimmedName,
+      email: trimmedEmail,
+      phone: trimmedPhone,
+    };
+
+    setContactDetails(nextDetails);
+    setContactDraft(nextDetails);
+
+    if (user) {
+      updateUser({
+        ...user,
+        name: trimmedName,
+        email: trimmedEmail,
+        phone: trimmedPhone,
+      });
+    }
+
+    toast.success("Contact details updated");
+  };
+
+  const handleStartEditingAddress = (address: AddressItem) => {
+    setEditingAddressId(address.id);
+    setAddressDraft(address);
+  };
+
+  const handleCancelEditingAddress = () => {
+    setEditingAddressId(null);
+    setAddressDraft({ id: "", label: "", value: "" });
+  };
+
+  const handleSaveAddress = (addressId: string) => {
+    const trimmedLabel = addressDraft.label.trim();
+    const trimmedValue = addressDraft.value.trim();
+
+    if (!trimmedLabel || !trimmedValue) {
+      toast.error("Please complete the address label and value");
+      return;
+    }
+
+    const nextAddress = {
+      ...addressDraft,
+      id: addressId,
+      label: trimmedLabel,
+      value: trimmedValue,
+    };
+
+    setAddresses((currentAddresses) =>
+      currentAddresses.map((address) =>
+        address.id === addressId ? nextAddress : address
+      )
+    );
+    handleCancelEditingAddress();
+    toast.success("Address updated");
+  };
+
+  const handleDeleteAddress = (addressId: string) => {
+    setAddresses((currentAddresses) =>
+      currentAddresses.filter((address) => address.id !== addressId)
+    );
+
+    if (editingAddressId === addressId) {
+      handleCancelEditingAddress();
+    }
+
+    toast.success("Address removed");
+  };
+
+  const handleAddAddress = () => {
+    const nextId = `address-${Date.now()}`;
+    const nextAddress = {
+      id: nextId,
+      label: "New Address",
+      value: "",
+    };
+
+    setAddresses((currentAddresses) => [...currentAddresses, nextAddress]);
+    setEditingAddressId(nextId);
+    setAddressDraft(nextAddress);
+  };
+
+  const handleResetPassword = () => {
+    toast.message("Password reset flow is coming soon");
+  };
 
   return (
-    <div className="relative h-[1388px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Footer top="top-[946px]" />
-      <Navbar />
-      <AccountSidebar />
-      <ContactDetailsPanel />
-    </div>
+    <>
+      <div className="absolute left-[378px] top-[122px] inline-flex w-[658px] flex-col items-start justify-start gap-8">
+        <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
+        <div className="flex self-stretch flex-col items-start justify-start gap-6">
+          <DetailField
+            label="Name"
+            value={contactDraft.name}
+            isEditing
+            onChange={(value) => setContactDraft((current) => ({ ...current, name: value }))}
+          />
+          <DetailField
+            label="Email"
+            value={contactDraft.email}
+            type="email"
+            isEditing
+            onChange={(value) => setContactDraft((current) => ({ ...current, email: value }))}
+          />
+          <DetailField
+            label="Phone Number"
+            value={contactDraft.phone}
+            type="tel"
+            isEditing
+            onChange={(value) => setContactDraft((current) => ({ ...current, phone: value }))}
+          />
+          <div className="inline-flex items-center justify-start gap-4">
+            <button
+              type="button"
+              onClick={handleSaveContact}
+              disabled={!hasUnsavedContactChanges}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Check className="h-5 w-5" strokeWidth={2} />
+              Save Changes
+            </button>
+            <button
+              type="button"
+              onClick={handleResetContact}
+              disabled={!hasUnsavedContactChanges}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <X className="h-5 w-5" strokeWidth={2} />
+              Reset
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={handleResetPassword}
+            className="inline-flex items-center justify-start gap-2"
+          >
+            <div className="relative h-6 w-6 overflow-hidden">
+              <RotateCcwKey
+                className="absolute left-[2px] top-[2px] h-5 w-5 text-[#B91C1C]"
+                strokeWidth={1.8}
+              />
+            </div>
+            <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
+              Reset your password
+            </div>
+          </button>
+        </div>
+        <SectionHeader title="ADDRESSES" icon={Plus}>
+          <button
+            type="button"
+            onClick={handleAddAddress}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#BBFF63] px-4 py-2 font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2} />
+            Add Address
+          </button>
+        </SectionHeader>
+        <div className="flex w-[658px] flex-col items-start justify-start gap-6">
+          {addresses.map((address) => (
+            <AddressCard
+              key={address.id}
+              address={address}
+              isEditing={editingAddressId === address.id}
+              draft={editingAddressId === address.id ? addressDraft : address}
+              onEdit={() => handleStartEditingAddress(address)}
+              onSave={() => handleSaveAddress(address.id)}
+              onCancel={handleCancelEditingAddress}
+              onDelete={() => handleDeleteAddress(address.id)}
+              onDraftChange={setAddressDraft}
+            />
+          ))}
+        </div>
+      </div>
+      <Footer top="top-0" style={{ top: footerTop }} />
+    </>
   );
 }

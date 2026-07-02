@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthStore } from "../store/useAuthStore";
+import { useCartStore } from "../store/useCartStore";
 import { Footer, Navbar, ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
@@ -49,6 +50,9 @@ const REVIEW_SORTS = [
 
 const PRODUCT_DESCRIPTION =
   "Crafted from a premium cotton blend, this round neck t-shirt dress is soft, breathable, and easy to style for everyday wear. The relaxed fit, polished finish, and clean silhouette make it a dependable staple for casual and elevated looks alike.";
+const PRODUCT_TITLE = "Plain Maxi Tabard Dress";
+const PRODUCT_PRICE = 1000;
+const PRODUCT_ID = "plain-maxi-tabard-dress";
 
 const PRODUCT_REVIEWS = [
   {
@@ -243,7 +247,7 @@ function Gallery({
         className="absolute left-[24px] top-[150px] h-[1013px] w-[750px] object-cover"
         alt="Selected product view"
       />
-      <div className="absolute left-[792px] top-[150px] inline-flex w-[150px] flex-col items-center justify-start gap-6">
+      <div className="absolute left-[792px] top-[150px] flex w-[150px] flex-col items-center justify-start gap-6">
         <div className="self-stretch flex flex-col items-start justify-start gap-6">
           {images.map((image, index) => (
             <button
@@ -265,18 +269,20 @@ function Gallery({
             </button>
           ))}
         </div>
-        <div className="inline-flex origin-top-left rotate-[-90deg] items-center justify-start gap-6">
-          <button type="button" onClick={onPrevious} aria-label="Previous image">
-            <ArrowCircle direction="left" dark />
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            className="rounded-full outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
-            aria-label="Next image"
-          >
-            <ArrowCircle />
-          </button>
+        <div className="absolute left-1/2 top-[990px] -translate-x-1/2">
+          <div className="inline-flex origin-top-left rotate-[-90deg] items-center justify-start gap-6">
+            <button type="button" onClick={onPrevious} aria-label="Previous image">
+              <ArrowCircle direction="left" dark />
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              className="rounded-full outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+              aria-label="Next image"
+            >
+              <ArrowCircle />
+            </button>
+          </div>
         </div>
       </div>
       <div className="absolute left-[232px] top-[1034px] h-[50.47px] w-[311px] rounded-full border-[1.5px] border-[#87C3FF]" />
@@ -841,6 +847,7 @@ function ReviewsSection({
 export default function ProductDetailsPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
+  const addItem = useCartStore((state) => state.addItem);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState<string>(COLOR_OPTIONS[0].name);
   const [selectedSize, setSelectedSize] = useState<SizeOption>("M");
@@ -908,6 +915,29 @@ export default function ProductDetailsPage() {
   };
 
   const handleAddToCart = () => {
+    const selectedColorOption =
+      COLOR_OPTIONS.find((color) => color.name === selectedColor) ?? COLOR_OPTIONS[0];
+
+    addItem({
+      id: `${PRODUCT_ID}-${selectedSize}-${selectedColorOption.name}`,
+      productId: PRODUCT_ID,
+      title: PRODUCT_TITLE,
+      unitPrice: PRODUCT_PRICE,
+      currency: "EGP",
+      size: selectedSize,
+      color: selectedColorOption.name,
+      colorHex:
+        selectedColorOption.swatchClassName === "bg-[#1A1A1A]"
+          ? "#1A1A1A"
+          : selectedColorOption.swatchClassName === "bg-[#F6D1C9]"
+            ? "#F6D1C9"
+            : selectedColorOption.swatchClassName === "bg-[#A29F8E]"
+              ? "#A29F8E"
+              : "#D1BBA4",
+      imageSrc: asset(GALLERY_IMAGES[selectedImageIndex]),
+      quantity,
+    });
+
     toast.success(
       `${quantity} item${quantity > 1 ? "s" : ""} added to bag (${selectedSize}, ${selectedColor})`
     );

@@ -30,9 +30,12 @@ export default function Navbar({ left = "left-[48px]", top = "top-[18px]" }: Nav
       </Link>
       <div className="absolute left-[138px] top-[20px] inline-flex items-center justify-start gap-4">
         {navLinks.map((item) => {
-          const isActive = item.label === "Home"
-            ? location.pathname === "/"
-            : location.pathname === item.path;
+          const isActive =
+            item.label === "Home"
+              ? location.pathname === "/"
+              : item.label === "Shop"
+                ? location.pathname === item.path || location.pathname.startsWith("/collections/")
+                : location.pathname === item.path;
 
           return (
             <Link

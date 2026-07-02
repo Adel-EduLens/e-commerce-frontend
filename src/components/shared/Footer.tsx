@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
@@ -57,11 +58,20 @@ type FooterProps = {
   top?: string;
   height?: string;
   innerHeight?: string;
+  style?: CSSProperties;
 };
 
-export default function Footer({ top = "top-[1507px]", height = "h-96", innerHeight = "h-96" }: FooterProps) {
+export default function Footer({
+  top = "top-[1507px]",
+  height = "h-96",
+  innerHeight = "h-96",
+  style,
+}: FooterProps) {
   return (
-    <div className={`absolute left-0 ${top} ${height} w-[1440px] overflow-hidden border-t border-[#E0E0E0]`}>
+    <div
+      className={`absolute left-0 ${top} ${height} w-[1440px] overflow-hidden border-t border-[#E0E0E0]`}
+      style={style}
+    >
       <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20">
         GEN Z
       </div>

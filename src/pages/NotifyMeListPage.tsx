@@ -1,81 +1,8 @@
-import { useEffect } from "react";
-import {
-  Bell,
-  Clock,
-  Gamepad2,
-  Gift,
-  LayoutDashboard,
-  LogOut,
-  Settings,
-  ShoppingBag,
-  Trash2,
-  User,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from "../components/shared";
+import { Trash2 } from "lucide-react";
+import { Footer } from "../components/shared";
 
 const placeholderProduct =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='166' viewBox='0 0 140 166'%3E%3Crect width='140' height='166' fill='%23D9D9D9'/%3E%3C/svg%3E";
-
-type SidebarItem = {
-  label: string;
-  icon: LucideIcon;
-  active?: boolean;
-};
-
-function SidebarRow({ item }: { item: SidebarItem }) {
-  const Icon = item.icon;
-
-  return (
-    <div
-      className={`inline-flex items-center justify-start gap-4 rounded-lg p-4 ${
-        item.active
-          ? "self-stretch bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-          : item.label === "Wallet & Rewards"
-            ? ""
-            : "self-stretch"
-      }`}
-    >
-      <Icon className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-      <div className="whitespace-nowrap font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
-        {item.label}
-      </div>
-    </div>
-  );
-}
-
-function AccountSidebar() {
-  const items: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard" },
-    { icon: ShoppingBag, label: "My Orders" },
-    { icon: Wallet, label: "Wallet & Rewards" },
-    { icon: User, label: "My Info" },
-    { icon: Bell, label: "Notifications" },
-    { icon: Clock, label: "Notify Me List", active: true },
-    { icon: Gift, label: "Gift Cards" },
-    { icon: Gamepad2, label: "Avatar" },
-    { icon: Settings, label: "Settings" },
-  ];
-
-  return (
-    <div className="absolute left-[24px] top-[122px] inline-flex w-56 flex-col items-start justify-start gap-24">
-      <div className="flex self-stretch flex-col items-start justify-start gap-3 rounded-lg">
-        {items.map((item) => (
-          <SidebarRow key={item.label} item={item} />
-        ))}
-      </div>
-      <div className="inline-flex items-center justify-start gap-4 self-stretch p-4">
-        <LogOut className="h-6 w-6 text-[#DC2626]" strokeWidth={1.5} />
-        <div className="font-['Montserrat'] text-lg font-medium text-[#DC2626]">
-          Sign Out
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function ProductRequestCard() {
   return (
@@ -129,7 +56,7 @@ function NotifyMePanel() {
           </div>
         </div>
         <div className="self-stretch font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          You’ll be notified as soon as these items come back in stock.
+          You'll be notified as soon as these items come back in stock.
         </div>
       </div>
       <div className="flex self-stretch flex-col items-start justify-start gap-4">
@@ -140,28 +67,11 @@ function NotifyMePanel() {
   );
 }
 
-
-
 export default function NotifyMeListPage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, user, navigate]);
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
-
   return (
-    <div className="relative h-[1305px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Navbar />
-      <AccountSidebar />
+    <>
       <NotifyMePanel />
       <Footer top="top-[863px]" />
-    </div>
+    </>
   );
 }

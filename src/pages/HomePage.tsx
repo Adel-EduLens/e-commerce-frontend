@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { Navbar, Footer, ProductCard } from "../components/shared";
 
@@ -92,9 +92,13 @@ function FilterBar() {
   );
 }
 
-function ViewAllButton() {
+function ViewAllButton({ onClick }: { onClick?: () => void }) {
   return (
-    <div className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4">
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4"
+    >
       <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
         View All
       </div>
@@ -104,7 +108,7 @@ function ViewAllButton() {
           className="absolute left-[14px] top-[8px] h-6 w-3"
         />
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -197,7 +201,10 @@ function HeroSection() {
 function CollectionSection() {
   return (
     <div className="absolute left-[24px] top-[1082px] h-[770px] w-[1392px]">
-      <div className="absolute left-0 top-0 h-[770px] w-[1029px] overflow-hidden rounded-3xl">
+      <Link
+        to="/collections/men"
+        className="absolute left-0 top-0 block h-[770px] w-[1029px] overflow-hidden rounded-3xl no-underline"
+      >
         <AssetImage
           file="image 2.png"
           className="absolute left-0 top-0 h-[770px] w-[1029px]"
@@ -221,9 +228,12 @@ function CollectionSection() {
             </div>
           </div>
         </div>
-      </div>
+      </Link>
       <div className="absolute left-[1040px] top-0 inline-flex w-[352px] flex-col items-start justify-start gap-2.5">
-        <div className="relative h-[380px] self-stretch overflow-hidden rounded-[40px] bg-[#EDEDED]">
+        <Link
+          to="/collections/men"
+          className="relative block h-[380px] self-stretch overflow-hidden rounded-[40px] bg-[#EDEDED] no-underline"
+        >
           <AssetImage
             file="image 4.png"
             className="absolute left-0 top-0 h-[380px] w-[352px]"
@@ -233,8 +243,11 @@ function CollectionSection() {
             <br />
             Active
           </div>
-        </div>
-        <div className="relative h-[380px] self-stretch overflow-hidden rounded-[40px] bg-[#EDEDED]">
+        </Link>
+        <Link
+          to="/collections/men"
+          className="relative block h-[380px] self-stretch overflow-hidden rounded-[40px] bg-[#EDEDED] no-underline"
+        >
           <AssetImage
             file="image 5.png"
             className="absolute left-0 top-0 h-[380px] w-[352px]"
@@ -244,13 +257,15 @@ function CollectionSection() {
             <br />
             Comfort
           </div>
-        </div>
+        </Link>
       </div>
     </div>
   );
 }
 
 function MustHavesSection() {
+  const navigate = useNavigate();
+
   return (
     <div className="absolute left-[24px] top-[1932px] h-[904px] w-[1392px]">
       <div className="absolute left-0 top-0 w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
@@ -263,7 +278,7 @@ function MustHavesSection() {
             <ProductCard key={index} />
           ))}
         </div>
-        <ViewAllButton />
+        <ViewAllButton onClick={() => navigate("/season-must-haves")} />
       </div>
     </div>
   );
@@ -271,9 +286,9 @@ function MustHavesSection() {
 
 function CategoriesSection() {
   const categories = [
-    { label: "Men", file: "image 8.png", labelLeft: "left-[96px]" },
-    { label: "Kids", file: "image 9.png", labelLeft: "left-[96px]" },
-    { label: "Women", file: "image 7.png", labelLeft: "left-[62px]" },
+    { label: "Men", slug: "men", file: "image 8.png", labelLeft: "left-[96px]" },
+    { label: "Kids", slug: "kids", file: "image 9.png", labelLeft: "left-[96px]" },
+    { label: "Women", slug: "women", file: "image 7.png", labelLeft: "left-[62px]" },
   ];
 
   return (
@@ -283,9 +298,10 @@ function CategoriesSection() {
       </div>
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {categories.map((category) => (
-          <div
+          <Link
             key={category.label}
-            className="relative h-[547px] w-[448px] overflow-hidden bg-white"
+            to={`/collections/${category.slug}`}
+            className="relative h-[547px] w-[448px] overflow-hidden bg-white no-underline"
           >
             <AssetImage
               file={category.file}
@@ -298,7 +314,7 @@ function CategoriesSection() {
                 {category.label}
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

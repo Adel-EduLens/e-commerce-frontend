@@ -1,37 +1,14 @@
 import { useState } from "react";
 import {
-  LayoutDashboard,
-  ShoppingBag,
-  Wallet,
-  User,
-  Bell,
-  Clock,
-  Gift,
-  Gamepad2,
-  Settings,
-  LogOut,
   ChevronRight,
   FileText,
   Package,
   Truck,
   CheckCircle2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Navbar, Footer } from "../components/shared";
+import { Footer } from "../components/shared";
 
 type Tab = "active" | "completed" | "returns";
-
-const sidebarItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/user" },
-  { icon: ShoppingBag, label: "My Orders", active: true, path: "/my-orders" },
-  { icon: Wallet, label: "Wallet & Rewards", path: "/" },
-  { icon: User, label: "My Info", path: "/settings" },
-  { icon: Bell, label: "Notifications", path: "/notifications" },
-  { icon: Clock, label: "Notify Me List", path: "/notify-me-list" },
-  { icon: Gift, label: "Gift Cards", path: "/" },
-  { icon: Gamepad2, label: "Avatar", path: "/" },
-  { icon: Settings, label: "Settings", path: "/settings" },
-];
 
 const orderItems = [
   { id: 1, name: "Amber Blaze Classic Tee", price: "$250", size: "XXL", color: "bg-red-200", qty: 1 },
@@ -45,35 +22,6 @@ const orderSteps = [
   { icon: Package, label: "Shipped", date: "25 Sep, 2025", completed: true },
   { icon: Truck, label: "Delivered", date: "Pending Delivery", completed: false },
 ];
-
-function Sidebar() {
-  return (
-    <div className="w-56 flex flex-col justify-between py-6 pl-6 shrink-0">
-      <div className="flex flex-col gap-3">
-        {sidebarItems.map((item) => (
-          <Link
-            key={item.label}
-            to={item.path}
-            className={`flex items-center gap-4 rounded-lg p-4 cursor-pointer ${
-              item.active
-                ? "bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-                : "hover:bg-white/50"
-            }`}
-          >
-            <item.icon className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-            <span className="font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
-              {item.label}
-            </span>
-          </Link>
-        ))}
-      </div>
-      <div className="flex items-center gap-4 p-4 cursor-pointer mt-24">
-        <LogOut className="h-6 w-6 text-red-600" strokeWidth={1.5} />
-        <span className="font-['Montserrat'] text-lg font-medium text-red-600">Sign Out</span>
-      </div>
-    </div>
-  );
-}
 
 function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (tab: Tab) => void }) {
   const tabs: { key: Tab; label: string }[] = [
@@ -222,31 +170,22 @@ export default function MyOrdersPage() {
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] font-['Inter']">
-      <Navbar />
+    <>
+      <div className="absolute left-[378px] top-[122px] right-[24px]">
+        <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="flex mt-6">
-        <Sidebar />
-
-        <div className="flex-1 px-6">
-          <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-          <div className="mt-6 flex gap-6">
-            {/* Order Items Column */}
-            <div className="flex-1 flex flex-col gap-4">
-              <OrderHeader />
-              {orderItems.map((item) => (
-                <OrderItemCard key={item.id} item={item} />
-              ))}
-            </div>
-
-            {/* Order Status Column */}
-            <OrderStatus />
+        <div className="mt-6 flex gap-6">
+          <div className="flex-1 flex flex-col gap-4">
+            <OrderHeader />
+            {orderItems.map((item) => (
+              <OrderItemCard key={item.id} item={item} />
+            ))}
           </div>
+          <OrderStatus />
         </div>
       </div>
 
-      <div className="relative mt-16 border-t border-[#E0E0E0] overflow-hidden">
+      <div className="absolute left-0 top-[950px] w-[1440px] overflow-hidden border-t border-[#E0E0E0]">
         <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20 pointer-events-none select-none">
           GEN Z
         </div>
@@ -282,6 +221,6 @@ export default function MyOrdersPage() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

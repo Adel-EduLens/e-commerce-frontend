@@ -1,79 +1,5 @@
-import { useEffect } from "react";
-import {
-  Bell,
-  CheckCircle,
-  ChevronDown,
-  Clock,
-  Gamepad2,
-  Gift,
-  LayoutDashboard,
-  LogOut,
-  Settings as SettingsIcon,
-  ShoppingBag,
-  User,
-  Wallet,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from "../components/shared";
-
-type SidebarItem = {
-  label: string;
-  icon: LucideIcon;
-  active?: boolean;
-};
-
-function SidebarRow({ item }: { item: SidebarItem }) {
-  const Icon = item.icon;
-
-  return (
-    <div
-      className={`inline-flex items-center justify-start gap-4 rounded-lg p-4 ${
-        item.active
-          ? "self-stretch bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-          : item.label === "Wallet & Rewards"
-            ? ""
-            : "self-stretch"
-      }`}
-    >
-      <Icon className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-      <div className="whitespace-nowrap font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
-        {item.label}
-      </div>
-    </div>
-  );
-}
-
-function AccountSidebar() {
-  const items: SidebarItem[] = [
-    { icon: LayoutDashboard, label: "Dashboard" },
-    { icon: ShoppingBag, label: "My Orders" },
-    { icon: Wallet, label: "Wallet & Rewards" },
-    { icon: User, label: "My Info" },
-    { icon: Bell, label: "Notifications" },
-    { icon: Clock, label: "Notify Me List" },
-    { icon: Gift, label: "Gift Cards" },
-    { icon: Gamepad2, label: "Avatar" },
-    { icon: SettingsIcon, label: "Settings", active: true },
-  ];
-
-  return (
-    <div className="absolute left-[24px] top-[122px] inline-flex w-56 flex-col items-start justify-start gap-24">
-      <div className="flex self-stretch flex-col items-start justify-start gap-3 rounded-lg">
-        {items.map((item) => (
-          <SidebarRow key={item.label} item={item} />
-        ))}
-      </div>
-      <div className="inline-flex items-center justify-start gap-4 self-stretch p-4">
-        <LogOut className="h-6 w-6 text-[#DC2626]" strokeWidth={1.5} />
-        <div className="font-['Montserrat'] text-lg font-medium text-[#DC2626]">
-          Sign Out
-        </div>
-      </div>
-    </div>
-  );
-}
+import { CheckCircle, ChevronDown } from "lucide-react";
+import { Footer } from "../components/shared";
 
 function LanguageField() {
   return (
@@ -179,25 +105,10 @@ function SettingsPanel() {
 }
 
 export default function SettingsPage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, user, navigate]);
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
-
   return (
-    <div className="relative h-[1359px] mx-auto w-[1440px] overflow-hidden bg-[#F9FAFB]">
-      <Footer top="top-[917px]" />
-      <Navbar />
-      <AccountSidebar />
+    <>
       <SettingsPanel />
-    </div>
+      <Footer top="top-[917px]" />
+    </>
   );
 }
