@@ -15,7 +15,7 @@ import {
 import { useAuthStore } from "../store/useAuthStore";
 import { Footer, Navbar } from "../components/shared";
 
-const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
 type AssetImageProps = {
   file: string;
