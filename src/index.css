@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap');
+@import 'tailwindcss';
 
 @theme {
   --color-primary: var(--primary);
@@ -22,7 +22,7 @@
   --gray-text: #6b7280;
   --shadow: #1e252d1a;
 
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .dark {
@@ -41,9 +41,16 @@
 
 body {
   margin: 0;
+  width: 100%;
+  min-height: 100%;
   background: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* Custom Text Stroke for outline text */
@@ -94,4 +101,3 @@ body {
 .interactive-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-

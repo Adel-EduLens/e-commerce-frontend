@@ -1,213 +1,444 @@
-import React, { useState, useEffect } from "react";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useNavigate } from "react-router-dom";
 import {
-  Users,
-  Store,
-  DollarSign,
-  TrendingUp,
-  Settings,
-  Shield,
   Activity,
-  LogOut,
-  ChevronRight,
-  UserCheck,
   Ban,
   CheckCircle,
-  AlertCircle
-} from "lucide-react";
-import { toast } from "sonner";
-import { api } from "../../lib/axios";
+  DollarSign,
+  LogOut,
+  MessageCircleQuestion,
+  Pencil,
+  Settings,
+  Shield,
+  Store,
+  Trash2,
+  TrendingUp,
+  UserCheck,
+  Users,
+} from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { api } from '../../lib/axios'
+import { useAuthStore } from '../../store/useAuthStore'
 
 interface DemoUser {
-  id: string;
-  name: string;
-  email: string;
-  role: "user" | "trader" | "admin";
-  createdAt: string;
-  status: "active" | "suspended";
+  id: string
+  name: string
+  email: string
+  role: 'user' | 'trader' | 'admin'
+  createdAt: string
+  status: 'active' | 'suspended'
 }
 
 export default function AdminDashboard() {
-  const { user, clearAuth } = useAuthStore();
-  const navigate = useNavigate();
-  const [users, setUsers] = useState<DemoUser[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, clearAuth } = useAuthStore()
+  const navigate = useNavigate()
+  const [users, setUsers] = useState<DemoUser[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [faqQuestion, setFaqQuestion] = useState('')
+  const [faqAnswer, setFaqAnswer] = useState('')
+  const [faqs, setFaqs] = useState<
+    Array<{ id: number; question: string; answer: string; createdAt: string }>
+  >([])
+  const [faqLoading, setFaqLoading] = useState(false)
+  const [editingFaqId, setEditingFaqId] = useState<number | null>(null)
+  const [editingFaqQuestion, setEditingFaqQuestion] = useState('')
+  const [editingFaqAnswer, setEditingFaqAnswer] = useState('')
+  const [isSavingFaq, setIsSavingFaq] = useState(false)
+  const [deletingFaqId, setDeletingFaqId] = useState<number | null>(null)
+  const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null)
 
-  // Initialize demo users list
   useEffect(() => {
     setUsers([
-      { id: "1", name: "Alice Johnson", email: "alice@example.com", role: "user", createdAt: "2026-06-15", status: "active" },
-      { id: "2", name: "David Miller", email: "david.m@trader.com", role: "trader", createdAt: "2026-06-10", status: "active" },
-      { id: "3", name: "Sophia Stark", email: "sophia@example.com", role: "user", createdAt: "2026-06-20", status: "active" },
-      { id: "4", name: "Nasu Trader", email: "trader@nasu.com", role: "trader", createdAt: "2026-06-23", status: "active" },
-      { id: "5", name: "Emma Watson", email: "emma@example.com", role: "user", createdAt: "2026-06-01", status: "suspended" },
-    ]);
-  }, []);
+      {
+        id: '1',
+        name: 'Alice Johnson',
+        email: 'alice@example.com',
+        role: 'user',
+        createdAt: '2026-06-15',
+        status: 'active',
+      },
+      {
+        id: '2',
+        name: 'David Miller',
+        email: 'david.m@trader.com',
+        role: 'trader',
+        createdAt: '2026-06-10',
+        status: 'active',
+      },
+      {
+        id: '3',
+        name: 'Sophia Stark',
+        email: 'sophia@example.com',
+        role: 'user',
+        createdAt: '2026-06-20',
+        status: 'active',
+      },
+      {
+        id: '4',
+        name: 'Nasu Trader',
+        email: 'trader@nasu.com',
+        role: 'trader',
+        createdAt: '2026-06-23',
+        status: 'active',
+      },
+      {
+        id: '5',
+        name: 'Emma Watson',
+        email: 'emma@example.com',
+        role: 'user',
+        createdAt: '2026-06-01',
+        status: 'suspended',
+      },
+    ])
 
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/auth");
-  };
+    const fetchFaqs = async () => {
+      setFaqLoading(true)
+      try {
+        const response = await api.get('/admin/auth/questions')
+        setFaqs(response?.data?.data || [])
+      } catch (error) {
+        console.error('Failed to fetch FAQs:', error)
+        toast.error('Unable to load questions')
+      } finally {
+        setFaqLoading(false)
+      }
+    }
+
+    fetchFaqs()
+  }, [])
 
   const toggleUserStatus = (userId: string) => {
     setUsers(
       users.map((u) => {
         if (u.id === userId) {
-          const newStatus = u.status === "active" ? "suspended" : "active";
-          toast.success(`User status updated to ${newStatus}`);
-          return { ...u, status: newStatus };
+          const newStatus = u.status === 'active' ? 'suspended' : 'active'
+          toast.success(`User status updated to ${newStatus}`)
+          return { ...u, status: newStatus }
         }
-        return u;
+        return u
       })
-    );
-  };
+    )
+  }
 
   const promoteToTrader = (userId: string) => {
     setUsers(
       users.map((u) => {
         if (u.id === userId) {
-          toast.success(`${u.name} has been promoted to Trader!`);
-          return { ...u, role: "trader" };
+          toast.success(`${u.name} has been promoted to Trader!`)
+          return { ...u, role: 'trader' }
         }
-        return u;
+        return u
       })
-    );
-  };
+    )
+  }
+
+  const handleCreateFaq = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!faqQuestion.trim() || !faqAnswer.trim()) {
+      toast.error('Please provide both a question and an answer')
+      return
+    }
+
+    setIsSavingFaq(true)
+
+    try {
+      const response = await api.post('/admin/auth/questions', {
+        question: faqQuestion.trim(),
+        answer: faqAnswer.trim(),
+      })
+
+      const createdFaq = response?.data?.data
+      if (createdFaq) {
+        setFaqs((prev) => [createdFaq, ...prev])
+      }
+
+      setFaqQuestion('')
+      setFaqAnswer('')
+      toast.success(response?.data?.message || 'Question added successfully')
+    } catch (error) {
+      console.error('Failed to create FAQ:', error)
+      toast.error('Unable to add question')
+    } finally {
+      setIsSavingFaq(false)
+    }
+  }
+
+  const handleDeleteFaq = async (id: number) => {
+    setDeletingFaqId(id)
+
+    try {
+      await api.delete(`/admin/auth/questions/${id}`)
+      setFaqs((prev) => prev.filter((faq) => faq.id !== id))
+      setExpandedFaqId((prev) => (prev === id ? null : prev))
+      toast.success('Question removed successfully')
+    } catch (error) {
+      console.error('Failed to delete FAQ:', error)
+      toast.error('Unable to delete question')
+    } finally {
+      setDeletingFaqId(null)
+    }
+  }
+
+  const startEditingFaq = (faq: {
+    id: number
+    question: string
+    answer: string
+  }) => {
+    setEditingFaqId(faq.id)
+    setEditingFaqQuestion(faq.question)
+    setEditingFaqAnswer(faq.answer)
+    setExpandedFaqId(faq.id)
+  }
+
+  const cancelEditingFaq = () => {
+    setEditingFaqId(null)
+    setEditingFaqQuestion('')
+    setEditingFaqAnswer('')
+  }
+
+  const handleUpdateFaq = async (id: number) => {
+    if (!editingFaqQuestion.trim() || !editingFaqAnswer.trim()) {
+      toast.error('Please provide both a question and an answer')
+      return
+    }
+
+    setIsSavingFaq(true)
+
+    try {
+      const response = await api.put(`/admin/auth/questions/${id}`, {
+        question: editingFaqQuestion.trim(),
+        answer: editingFaqAnswer.trim(),
+      })
+
+      const updatedFaq = response?.data?.data
+      if (updatedFaq) {
+        setFaqs((prev) =>
+          prev.map((faq) =>
+            faq.id === id
+              ? {
+                  ...faq,
+                  question: updatedFaq.question,
+                  answer: updatedFaq.answer,
+                }
+              : faq
+          )
+        )
+      }
+
+      toast.success(response?.data?.message || 'Question updated successfully')
+      cancelEditingFaq()
+    } catch (error) {
+      console.error('Failed to update FAQ:', error)
+      toast.error('Unable to update question')
+    } finally {
+      setIsSavingFaq(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-dark-background text-white font-['Inter'] flex">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-800 bg-neutral-950 p-6 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-8">
-            <Shield className="text-red-500" size={28} />
-            <span className="font-extrabold font-['Montserrat'] text-xl tracking-wider">
-              ADMIN<span className="text-red-500">PORTAL</span>
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left">
-              <Activity size={18} />
-              <span>Overview</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-text hover:text-white hover:bg-neutral-900 rounded-xl font-medium text-sm text-left transition-all">
-              <Users size={18} />
-              <span>User Management</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-text hover:text-white hover:bg-neutral-900 rounded-xl font-medium text-sm text-left transition-all">
-              <Store size={18} />
-              <span>Trader Approvals</span>
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-text hover:text-white hover:bg-neutral-900 rounded-xl font-medium text-sm text-left transition-all">
-              <Settings size={18} />
-              <span>Settings</span>
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center gap-3 p-3 bg-neutral-900 rounded-xl mb-4">
-            <div className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center font-bold text-white text-sm">
-              AD
-            </div>
-            <div className="overflow-hidden">
-              <p className="text-sm font-semibold truncate">{user?.name || "Admin"}</p>
-              <span className="text-xs text-red-500 font-semibold tracking-wider uppercase">
-                {user?.role}
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-neutral-800 hover:border-red-500/30 hover:bg-red-500/10 text-gray-text hover:text-red-500 rounded-xl font-semibold text-sm transition-all cursor-pointer"
-          >
-            <LogOut size={16} />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
-
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-extrabold font-['Montserrat']">System Dashboard</h1>
-            <p className="text-gray-text text-sm mt-1">Platform overview and user privilege logs</p>
+            <h1 className="text-3xl font-extrabold font-['Montserrat']">
+              System Dashboard
+            </h1>
+            <p className="text-gray-text text-sm mt-1">
+              Platform overview and user privilege logs
+            </p>
           </div>
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="px-5 py-2.5 bg-white text-dark-background hover:bg-lime-300 font-semibold rounded-xl text-sm transition-all"
           >
             Back to Storefront
           </button>
         </header>
 
-        {/* Stats Grid */}
-        <section className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-text text-sm font-semibold uppercase tracking-wider">
-                Total Revenue
-              </span>
-              <DollarSign className="text-lime-300" size={20} />
+        <section className="bg-neutral-900/40 border border-neutral-800 rounded-3xl p-6 mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="text-xl font-bold font-['Montserrat'] flex items-center gap-2">
+                <MessageCircleQuestion size={18} className="text-lime-300" />
+                FAQ Management
+              </h3>
+              <p className="text-sm text-gray-text mt-1">
+                Add, edit, and remove frequently asked questions.
+              </p>
             </div>
-            <p className="text-3xl font-extrabold font-['Montserrat'] text-white">$124,580</p>
-            <div className="flex items-center gap-1 mt-2 text-lime-300 text-xs font-semibold">
-              <TrendingUp size={14} />
-              <span>+18.2% this week</span>
-            </div>
+            <span className="px-3 py-1 bg-neutral-800 text-gray-text rounded-full text-xs font-semibold">
+              Admin Content
+            </span>
           </div>
 
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-text text-sm font-semibold uppercase tracking-wider">
-                Active Users
-              </span>
-              <Users className="text-sky-400" size={20} />
+          <form onSubmit={handleCreateFaq} className="grid gap-4 mb-6">
+            <div className="grid gap-2">
+              <label
+                htmlFor="faq-question"
+                className="text-sm font-medium text-white"
+              >
+                Question
+              </label>
+              <input
+                id="faq-question"
+                value={faqQuestion}
+                onChange={(e) => setFaqQuestion(e.target.value)}
+                placeholder="Enter a frequently asked question"
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-lime-400"
+              />
             </div>
-            <p className="text-3xl font-extrabold font-['Montserrat'] text-white">4,829</p>
-            <div className="flex items-center gap-1 mt-2 text-sky-400 text-xs font-semibold">
-              <TrendingUp size={14} />
-              <span>+4.7% signups</span>
-            </div>
-          </div>
 
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-text text-sm font-semibold uppercase tracking-wider">
-                Active Traders
-              </span>
-              <Store className="text-amber-400" size={20} />
+            <div className="grid gap-2">
+              <label
+                htmlFor="faq-answer"
+                className="text-sm font-medium text-white"
+              >
+                Answer
+              </label>
+              <textarea
+                id="faq-answer"
+                rows={4}
+                value={faqAnswer}
+                onChange={(e) => setFaqAnswer(e.target.value)}
+                placeholder="Write a clear answer"
+                className="w-full rounded-xl border border-neutral-800 bg-neutral-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-lime-400"
+              />
             </div>
-            <p className="text-3xl font-extrabold font-['Montserrat'] text-white">186</p>
-            <div className="flex items-center gap-1 mt-2 text-amber-400 text-xs font-semibold">
-              <CheckCircle size={14} />
-              <span>12 pending approval</span>
-            </div>
-          </div>
 
-          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-6">
-            <div className="flex justify-between items-start mb-4">
-              <span className="text-gray-text text-sm font-semibold uppercase tracking-wider">
-                System Health
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSavingFaq}
+                className="rounded-xl bg-lime-400 px-4 py-2.5 text-sm font-semibold text-dark-background transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSavingFaq ? 'Saving…' : 'Add FAQ'}
+              </button>
+            </div>
+          </form>
+
+          <div className="border-t border-neutral-800 pt-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h4 className="text-lg font-semibold text-white">Questions</h4>
+              <span className="rounded-full bg-neutral-800 px-3 py-1 text-xs font-semibold text-gray-text">
+                {faqs.length} saved
               </span>
-              <Activity className="text-emerald-400" size={20} />
             </div>
-            <p className="text-3xl font-extrabold font-['Montserrat'] text-emerald-400">99.98%</p>
-            <div className="flex items-center gap-1 mt-2 text-emerald-400 text-xs font-semibold">
-              <span>All nodes operational</span>
-            </div>
+
+            {faqLoading ? (
+              <div className="rounded-2xl border border-dashed border-neutral-700 bg-neutral-950/50 p-6 text-sm text-gray-text">
+                Loading questions...
+              </div>
+            ) : faqs.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-neutral-700 bg-neutral-950/50 p-6 text-sm text-gray-text">
+                No questions added yet.
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {faqs.map((faq) => {
+                  const isExpanded = expandedFaqId === faq.id
+                  const isEditing = editingFaqId === faq.id
+
+                  return (
+                    <li
+                      key={faq.id}
+                      className="rounded-2xl border border-neutral-800 bg-neutral-950/70 px-4 py-3"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedFaqId((prev) =>
+                              prev === faq.id ? null : faq.id
+                            )
+                          }
+                          className="flex-1 text-left"
+                        >
+                          <p className="font-semibold text-white">
+                            {faq.question}
+                          </p>
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => startEditingFaq(faq)}
+                            className="rounded-lg p-2 text-gray-text transition hover:bg-lime-400/10 hover:text-lime-300"
+                            title="Edit question"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteFaq(faq.id)}
+                            disabled={deletingFaqId === faq.id}
+                            className="rounded-lg p-2 text-gray-text transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+                            title="Delete question"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="mt-3 rounded-xl border border-neutral-800 bg-neutral-900/80 p-3 text-sm text-gray-text">
+                          {isEditing ? (
+                            <div className="grid gap-3">
+                              <input
+                                value={editingFaqQuestion}
+                                onChange={(e) =>
+                                  setEditingFaqQuestion(e.target.value)
+                                }
+                                className="w-full rounded-xl border border-neutral-800 bg-neutral-950/80 px-3 py-2 text-sm text-white outline-none transition focus:border-lime-400"
+                              />
+                              <textarea
+                                rows={4}
+                                value={editingFaqAnswer}
+                                onChange={(e) =>
+                                  setEditingFaqAnswer(e.target.value)
+                                }
+                                className="w-full rounded-xl border border-neutral-800 bg-neutral-950/80 px-3 py-2 text-sm text-white outline-none transition focus:border-lime-400"
+                              />
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={cancelEditingFaq}
+                                  className="rounded-lg border border-neutral-700 px-3 py-2 text-sm font-medium text-gray-text transition hover:text-lime-300"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateFaq(faq.id)}
+                                  disabled={isSavingFaq}
+                                  className="rounded-lg bg-lime-400 px-3 py-2 text-sm font-semibold text-dark-background transition hover:bg-lime-300 disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                  {isSavingFaq ? 'Saving…' : 'Save'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="whitespace-pre-line">
+                              {faq.answer}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
           </div>
         </section>
 
         {/* User Management Section */}
         <section className="bg-neutral-900/40 border border-neutral-800 rounded-3xl p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold font-['Montserrat']">User Registration Directory</h3>
+            <h3 className="text-xl font-bold font-['Montserrat']">
+              User Registration Directory
+            </h3>
             <span className="px-3 py-1 bg-neutral-800 text-gray-text rounded-full text-xs font-semibold">
               Live Platform Users
             </span>
@@ -226,7 +457,10 @@ export default function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-neutral-800/50 text-sm">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-neutral-900/20 transition-all">
+                  <tr
+                    key={u.id}
+                    className="hover:bg-neutral-900/20 transition-all"
+                  >
                     <td className="py-4 px-2">
                       <div>
                         <p className="font-semibold text-white">{u.name}</p>
@@ -236,11 +470,11 @@ export default function AdminDashboard() {
                     <td className="py-4 px-2">
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                          u.role === "admin"
-                            ? "bg-red-500/10 text-red-500 border border-red-500/20"
-                            : u.role === "trader"
-                            ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                            : "bg-sky-500/10 text-sky-500 border border-sky-500/20"
+                          u.role === 'admin'
+                            ? 'bg-red-500/10 text-red-500 border border-red-500/20'
+                            : u.role === 'trader'
+                              ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                              : 'bg-sky-500/10 text-sky-500 border border-sky-500/20'
                         }`}
                       >
                         {u.role}
@@ -250,14 +484,16 @@ export default function AdminDashboard() {
                     <td className="py-4 px-2">
                       <span
                         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          u.status === "active"
-                            ? "bg-emerald-500/10 text-emerald-400"
-                            : "bg-red-500/10 text-red-400"
+                          u.status === 'active'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : 'bg-red-500/10 text-red-400'
                         }`}
                       >
                         <span
                           className={`w-1.5 h-1.5 rounded-full ${
-                            u.status === "active" ? "bg-emerald-400" : "bg-red-400"
+                            u.status === 'active'
+                              ? 'bg-emerald-400'
+                              : 'bg-red-400'
                           }`}
                         />
                         {u.status}
@@ -265,7 +501,7 @@ export default function AdminDashboard() {
                     </td>
                     <td className="py-4 px-2 text-right">
                       <div className="flex justify-end gap-2">
-                        {u.role === "user" && (
+                        {u.role === 'user' && (
                           <button
                             onClick={() => promoteToTrader(u.id)}
                             className="p-1.5 bg-neutral-800 hover:bg-amber-500/20 text-gray-text hover:text-amber-500 rounded-lg transition-all"
@@ -277,13 +513,21 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => toggleUserStatus(u.id)}
                           className={`p-1.5 bg-neutral-800 rounded-lg transition-all ${
-                            u.status === "active"
-                              ? "hover:bg-red-500/20 text-gray-text hover:text-red-400"
-                              : "hover:bg-emerald-500/20 text-gray-text hover:text-emerald-400"
+                            u.status === 'active'
+                              ? 'hover:bg-red-500/20 text-gray-text hover:text-red-400'
+                              : 'hover:bg-emerald-500/20 text-gray-text hover:text-emerald-400'
                           }`}
-                          title={u.status === "active" ? "Suspend Account" : "Activate Account"}
+                          title={
+                            u.status === 'active'
+                              ? 'Suspend Account'
+                              : 'Activate Account'
+                          }
                         >
-                          {u.status === "active" ? <Ban size={16} /> : <CheckCircle size={16} />}
+                          {u.status === 'active' ? (
+                            <Ban size={16} />
+                          ) : (
+                            <CheckCircle size={16} />
+                          )}
                         </button>
                       </div>
                     </td>
@@ -295,5 +539,5 @@ export default function AdminDashboard() {
         </section>
       </main>
     </div>
-  );
+  )
 }

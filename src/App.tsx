@@ -4,9 +4,13 @@ import { useThemeStore } from './store/useThemeStore'
 
 function App() {
   // Initialize theme from persisted storage on mount
-  useThemeStore();
+  useThemeStore()
 
-  return <RouterProvider router={router} />
+  return (
+    <div className="min-h-screen w-full bg-background text-foreground font-['Inter']">
+      <RouterProvider router={router} />
+    </div>
+  )
 }
 
 export default App
