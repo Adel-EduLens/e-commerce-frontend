@@ -7,6 +7,7 @@ import BagPage from '../pages/BagPage'
 import ContactDetailsPage from '../pages/ContactDetailsPage'
 import NotificationsPage from '../pages/NotificationsPage'
 import NotifyMeListPage from '../pages/NotifyMeListPage'
+import SettingsPage from '../pages/SettingsPage'
 import AuthPage from '../pages/AuthPage'
 import AdminDashboard from '../pages/dashboards/AdminDashboard'
 import TraderDashboard from '../pages/dashboards/TraderDashboard'
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
       {
         path: 'notify-me-list',
         element: <NotifyMeListPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
       },
       {
         path: 'login',
