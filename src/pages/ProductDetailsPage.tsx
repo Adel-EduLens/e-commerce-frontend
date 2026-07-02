@@ -13,7 +13,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Footer, Navbar } from "../components/shared";
+import { Footer, Navbar, ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
 
@@ -329,55 +329,6 @@ function ProductInfoPanel() {
   );
 }
 
-function ProductCard({ variant = false }: { variant?: boolean }) {
-  return (
-    <div
-      className={`relative h-[385px] w-[330px] overflow-hidden rounded-2xl shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] ${
-        variant ? "bg-[#BEA1DF]" : "bg-white"
-      }`}
-    >
-      <div
-        className={`absolute left-[8px] top-[8px] overflow-hidden rounded-lg ${
-          variant
-            ? "h-[369px] w-[314px] bg-[#BEA1DF]"
-            : "h-[266px] w-[314px] bg-[#F9FAFB]"
-        }`}
-      >
-        <AssetImage
-          file="medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
-          className={`absolute top-0 ${
-            variant ? "left-[23px] h-[404px] w-[269px]" : "left-[34px] h-[371px] w-[247px]"
-          }`}
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <div
-        className={`absolute left-[8px] h-[95px] w-[314px] rounded-lg bg-white ${
-          variant
-            ? "top-[282px] outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]"
-            : "top-[274px]"
-        }`}
-      >
-        <StarRow className="absolute left-[170px] top-[8px]" />
-        <div className="absolute left-[8px] top-[8px] w-[163px] font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          Amber Blaze Classic Tee
-        </div>
-        <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          XS - XXL
-        </div>
-        <div className="absolute left-[246px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-          $250
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ViewAllButton() {
   return (
     <div className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4">
@@ -407,8 +358,8 @@ function ProductShelf({
         <div className="self-stretch flex flex-col items-start justify-start gap-6">
           <div className="self-stretch inline-flex items-center justify-start gap-6">
             <ProductCard />
-            <ProductCard variant />
-            <ProductCard variant />
+            <ProductCard featured />
+            <ProductCard featured />
             <ProductCard />
           </div>
         </div>

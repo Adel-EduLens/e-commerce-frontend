@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from '../components/shared';
+import { Navbar, Footer, ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page%20/${encodeURIComponent(file)}`;
 
@@ -92,80 +92,6 @@ function FilterBar() {
   );
 }
 
-function Stars() {
-  return (
-    <div className="absolute left-[170px] top-[8px] inline-flex items-center justify-start gap-1">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <div key={index} className="relative h-6 w-6 overflow-hidden">
-          <AssetImage
-            file="material-symbols_star.svg"
-            className="absolute left-0 top-0 h-6 w-6"
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ProductInfo({ featured = false }: { featured?: boolean }) {
-  return (
-    <div
-      className={`${featured ? "top-[282px] outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]" : "top-[274px]"} absolute left-[8px] h-24 w-80 rounded-lg bg-white`}
-    >
-      <Stars />
-      <div className="absolute left-[8px] top-[8px] w-40 font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-        Amber Blaze Classic Tee
-      </div>
-      <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-        XS - XXL
-      </div>
-      <div className="absolute left-[246px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-        $250
-      </div>
-    </div>
-  );
-}
-
-function ProductCard({ featured = false }: { featured?: boolean }) {
-  if (featured) {
-    return (
-      <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-violet-300 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-        <div className="absolute left-[8px] top-[8px] h-96 w-80 overflow-hidden rounded-lg bg-violet-300">
-          <AssetImage
-            file="medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
-            className="absolute left-[23px] top-0 h-[369px] w-[269px]"
-          />
-          <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-            <AssetImage
-              file="mdi_heart.svg"
-              className="absolute left-[8px] top-[8px] h-6 w-6"
-            />
-          </div>
-        </div>
-        <ProductInfo featured />
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="absolute left-[8px] top-[8px] h-64 w-80 overflow-hidden rounded-lg bg-[#F9FAFB]">
-        <AssetImage
-          file="medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
-          className="absolute left-[34px] top-0 h-[371px] w-[247px]"
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <ProductInfo />
-    </div>
-  );
-}
-
 function ViewAllButton() {
   return (
     <div className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4">
@@ -188,7 +114,11 @@ function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
       <FilterBar />
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
-          <ProductCard key={index} featured={featuredIndex === index} />
+          <ProductCard
+            key={index}
+            featured={featuredIndex === index}
+            accentClassName="bg-violet-300"
+          />
         ))}
       </div>
       <ViewAllButton />
