@@ -19,6 +19,8 @@ import DropshippingPage from '../pages/DropshippingPage'
 import FavoritesPage from '../pages/FavoritesPage'
 import WholesalePage from '../pages/WholesalePage'
 import ProtectedRoute from '../components/ProtectedRoute'
+import AdminLoginPage from '../pages/admin/AdminLoginPage'
+import AdminLayout from '../layouts/AdminLayout'
 
 export const router = createBrowserRouter([
   {
@@ -69,7 +71,17 @@ export const router = createBrowserRouter([
         path: 'dashboard/admin',
         element: (
           <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'dashboard/admin/login',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLoginPage />
           </ProtectedRoute>
         ),
       },
