@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from '../components/shared';
-
-const ds = (file: string) => `/dropshipping/${encodeURIComponent(file)}`;
-const homeAsset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
+import { Navbar, Footer } from "../components/shared";
+import { useState } from "react";
+const ds = (file: string) =>
+  `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
+const homeAsset = (file: string) =>
+  `/home%20page/${file.split("/").map(encodeURIComponent).join("/")}`;
 
 function AssetImage({
   file,
@@ -18,14 +20,7 @@ function AssetImage({
   base?: "dropshipping" | "home";
 }) {
   const src = base === "home" ? homeAsset(file) : ds(file);
-  return (
-    <img
-      className={className}
-      src={src}
-      alt={alt}
-      draggable={false}
-    />
-  );
+  return <img className={className} src={src} alt={alt} draggable={false} />;
 }
 
 function HeroSection() {
@@ -50,11 +45,13 @@ function HeroSection() {
 
 function HeroImage() {
   return (
-    <img
-      className="absolute left-[518px] top-0 h-[794px] w-[1191px]"
-      src={ds("image 45.png")}
-      alt=""
-    />
+    <>
+      <AssetImage
+        file="image 45.png"
+        base="dropshipping"
+        className="absolute left-[518px] top-0 h-[794px] w-[1191px]"
+      />
+    </>
   );
 }
 
@@ -111,12 +108,8 @@ function WhyDropshipSection() {
           </div>
         </div>
         {/* Center circle with icon */}
-        <div className="absolute left-[618px] top-[282px] h-40 w-40 overflow-hidden rounded-full bg-[#BBFF63]">
-          <img
-            src={ds("vuesax/linear/user-octagon.svg")}
-            className="absolute left-[20px] top-[28px] h-[120px] w-[120px]"
-            alt=""
-          />
+        <div className="absolute left-[618px] top-[282px] h-40 w-40 overflow-hidden rounded-full bg-[#BBFF63] flex items-center justify-center">
+          <img src={ds("lucide_box.svg")} className="size-20 " alt="" />
         </div>
         {/* Wide Catalog */}
         <div className="absolute left-[826px] top-0 h-72 w-[566px] overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -134,10 +127,26 @@ function WhyDropshipSection() {
           </div>
         </div>
         {/* Connector lines */}
-        <img src={ds("Line 9.svg")} className="absolute left-[550px] top-[220px]" alt="" />
-        <img src={ds("Line 10.svg")} className="absolute left-[755px] top-[220px]" alt="" />
-        <img src={ds("Line 11.svg")} className="absolute left-[555px] top-[400px]" alt="" />
-        <img src={ds("Line 12.svg")} className="absolute left-[760px] top-[400px]" alt="" />
+        <img
+          src={ds("Line 9.svg")}
+          className="absolute left-[740px] top-[224px]"
+          alt=""
+        />
+        <img
+          src={ds("Line 10.svg")}
+          className="absolute left-[565px] top-[227px]"
+          alt=""
+        />
+        <img
+          src={ds("Line 11.svg")}
+          className="absolute left-[755px] top-[415px]"
+          alt=""
+        />
+        <img
+          src={ds("Line 12.svg")}
+          className="absolute left-[568px] top-[410px]"
+          alt=""
+        />
       </div>
     </>
   );
@@ -179,7 +188,11 @@ function HowWeStartSection() {
               </div>
             </div>
           </div>
-          <img src={ds("login.svg")} className="absolute left-[216px] top-[-24px] h-32 w-32" alt="" />
+          <img
+            src={ds("login.svg")}
+            className="absolute left-[216px] top-[-24px] h-32 w-32"
+            alt=""
+          />
         </div>
         {/* Step 2 - Select Products */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -196,7 +209,11 @@ function HowWeStartSection() {
               Add items from our catalog to your store
             </div>
           </div>
-          <img src={ds("lock.svg")} className="absolute left-[198px] top-[-16px] h-32 w-32" alt="" />
+          <img
+            src={ds("lock.svg")}
+            className="absolute left-[198px] top-[-16px] h-32 w-32"
+            alt=""
+          />
         </div>
         {/* Step 3 - Promote & Sell */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -213,7 +230,11 @@ function HowWeStartSection() {
               Share products online and attract customers
             </div>
           </div>
-          <img src={ds("vuesax/linear/search-favorite.svg")} className="absolute left-[232px] top-[-16px] h-32 w-32" alt="" />
+          <img
+            src={ds("vuesax/linear/user-octagon.svg")}
+            className="absolute left-[232px] top-[-16px] h-32 w-32"
+            alt=""
+          />
         </div>
         {/* Step 4 - We Ship, You Earn */}
         <div className="relative h-56 w-80 overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
@@ -230,7 +251,11 @@ function HowWeStartSection() {
               We handle delivery, you keep the profit
             </div>
           </div>
-          <img src={ds("lucide_box.svg")} className="absolute left-[248px] top-[0px] h-16 w-16 opacity-40" alt="" />
+          <img
+            src={ds("vuesax/linear/search-favorite.svg")}
+            className="absolute left-[232px] top-[-16px] h-32 w-32"
+            alt=""
+          />
         </div>
       </div>
     </div>
@@ -309,7 +334,80 @@ function EverythingYouNeedSection() {
   );
 }
 
+export function CollapsibleFAQ({
+  faqs,
+}: {
+  faqs: { question: string; answer: string }[];
+}) {
+  const [openIndex, setOpenIndex] = useState(0);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {faqs.map((faq, index) => {
+        const isOpen = openIndex === index;
+
+        return (
+          <div
+            key={index}
+            className={`rounded-3xl p-8 transition-colors duration-300 ${
+              isOpen ? "bg-[#1C1B2E]" : "bg-[#EDEDED]"
+            }`}
+          >
+            <button
+              onClick={() => setOpenIndex(isOpen ? -1 : index)}
+              className="flex w-full items-center justify-between"
+            >
+              <h3
+                className={`text-2xl font-medium ${
+                  isOpen ? "text-[#BBFF63]" : "text-[#1A1A1A]"
+                }`}
+              >
+                {faq.question}
+              </h3>
+
+              <div
+                className={`rounded-full bg-white p-3 transition-transform duration-300 ${
+                  isOpen ? "rotate-90" : ""
+                }`}
+              >
+                <AssetImage file="weui_arrow-filled.svg" className="h-6 w-3" />
+              </div>
+            </button>
+
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                isOpen ? "max-h-40 opacity-100 mt-6" : "max-h-0 opacity-0"
+              }`}
+            >
+              <p className="text-xl text-white">{faq.answer}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function FAQSection() {
+  const faqs = [
+    {
+      question: "Can Cancel at any time ?",
+      answer:
+        "You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase.",
+    },
+    {
+      question: "How do I track my order?",
+      answer: "You can track your order from your account page.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer: "Yes, we ship to most countries worldwide.",
+    },
+    {
+      question: "How can I contact support?",
+      answer: "You can contact us via email or live chat.",
+    },
+  ];
   return (
     <div className="absolute left-[24px] top-[2973px] inline-flex w-[1392px] flex-col items-start justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
@@ -322,54 +420,15 @@ function FAQSection() {
           alt=""
         />
         <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
-          {/* Expanded FAQ */}
-          <div className="flex flex-col items-start justify-start gap-8 overflow-hidden self-stretch rounded-3xl bg-[#1C1B2E] p-8">
-            <div className="inline-flex items-center justify-between self-stretch">
-              <div className="font-['Montserrat'] text-2xl font-medium text-[#BBFF63]">
-                Can Cancel at any time ?
-              </div>
-              <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white rotate-90">
-                <AssetImage
-                  file="weui_arrow-filled.svg"
-                  className="absolute left-[18px] top-[12px] h-6 w-3"
-                />
-              </div>
-            </div>
-            <div className="inline-flex items-center justify-start gap-[878px] self-stretch">
-              <div className="w-[620px] font-['Montserrat'] text-2xl font-medium text-white">
-                You can return items within 14 days of receiving your order, as
-                long as they are in their original condition, unused, and with
-                the receipt or proof of purchase. For more details, please visit
-                our &quot;Return Policy&quot; page.
-              </div>
-            </div>
-          </div>
-          {/* Collapsed FAQs */}
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="flex flex-col items-start justify-start gap-8 overflow-hidden self-stretch rounded-3xl bg-[#EDEDED] p-8"
-            >
-              <div className="inline-flex items-center justify-between self-stretch">
-                <div className="font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-                  Can Cancel at any time ?
-                </div>
-                <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-                  <AssetImage
-                    file="weui_arrow-filled.svg"
-                    className="absolute left-[18px] top-[12px] h-6 w-3"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+  
+        
+          <CollapsibleFAQ faqs={faqs} />
+          
         </div>
       </div>
     </div>
   );
 }
-
-
 
 export default function DropshippingPage() {
   const navigate = useNavigate();
