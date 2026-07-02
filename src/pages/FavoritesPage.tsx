@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { Navbar, Footer } from '../components/shared';
+import { Navbar, Footer, ProductCard } from "../components/shared";
 
 const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
 
@@ -26,91 +26,13 @@ function AssetImage({
 
 
 
-function StarRating() {
-  return (
-    <div className="absolute left-[170px] top-[8px] inline-flex items-center justify-start gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <AssetImage
-          key={i}
-          file="material-symbols_star.svg"
-          className="h-6 w-6"
-        />
-      ))}
-    </div>
-  );
-}
-
-function DefaultProductCard() {
-  return (
-    <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="absolute left-[8px] top-[8px] h-64 w-80 overflow-hidden rounded-lg bg-[#F9FAFB]">
-        <img
-          className="absolute left-[34px] top-0 h-96 w-60"
-          src="https://placehold.co/247x371"
-          alt=""
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <div className="absolute left-[8px] top-[274px] h-24 w-80 rounded-lg bg-white">
-        <StarRating />
-        <div className="absolute left-[8px] top-[8px] w-40 font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          Amber Blaze Classic Tee
-        </div>
-        <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          XS - XXL
-        </div>
-        <div className="absolute left-[246px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-          $250
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Variant2ProductCard() {
-  return (
-    <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-[#C4B5FD] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="absolute left-[8px] top-[8px] h-96 w-80 overflow-hidden rounded-lg bg-[#C4B5FD]">
-        <img
-          className="absolute left-[23px] top-0 h-96 w-64"
-          src="https://placehold.co/269x404"
-          alt=""
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <div className="absolute left-[8px] top-[282px] h-24 w-80 rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]">
-        <StarRating />
-        <div className="absolute left-[8px] top-[8px] w-40 font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          Amber Blaze Classic Tee
-        </div>
-        <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          XS - XXL
-        </div>
-        <div className="absolute left-[246px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-          $250
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ProductRow({ top }: { top: string }) {
   return (
     <div className={`absolute left-[24px] ${top} inline-flex items-center justify-start gap-6`}>
-      <DefaultProductCard />
-      <Variant2ProductCard />
-      <DefaultProductCard />
-      <DefaultProductCard />
+      <ProductCard />
+      <ProductCard featured accentClassName="bg-[#C4B5FD]" />
+      <ProductCard />
+      <ProductCard />
     </div>
   );
 }
