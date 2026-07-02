@@ -13,6 +13,8 @@ import AdminDashboard from '../pages/dashboards/AdminDashboard'
 import TraderDashboard from '../pages/dashboards/TraderDashboard'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
+import HelpCenterPage from '../pages/HelpCenterPage'
+import CheckoutPage from '../pages/CheckoutPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 
 export const router = createBrowserRouter([
@@ -89,6 +91,22 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <MyOrdersPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'help-center',
+        element: (
+          <ProtectedRoute>
+            <HelpCenterPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'checkout',
+        element: (
+          <ProtectedRoute>
+            <CheckoutPage />
           </ProtectedRoute>
         ),
       },
