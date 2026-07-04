@@ -7,17 +7,23 @@ import ar from "./locales/ar/translation.json";
 
 import authEn from "./locales/en/auth.json";
 import authAr from "./locales/ar/auth.json"
+
+import dropshippingEn from "./locales/en/dropshipping.json";
+import dropshippingAr from "./locales/ar/dropshipping.json"
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
       en: {
-        auth : authEn,
+        dropshipping: dropshippingEn,
+        auth: authEn,
         translation: en,
       },
       ar: {
-        auth :authAr , 
+        dropshipping: dropshippingAr,
+        auth: authAr,
         translation: ar,
       },
     },
