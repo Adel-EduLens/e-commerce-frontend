@@ -1,4 +1,4 @@
-import { Activity, LogOut, Shield, Award } from "lucide-react";
+import { Activity, Award, BarChart2, LogOut, Shield } from "lucide-react";
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { toast } from "sonner";
@@ -35,6 +35,16 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 }`}            >
               <Activity size={18} />
               <span>FAQ</span>
+            </button>
+            <button
+              onClick={() => navigate("/dashboard/admin/analytics")}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${isActive("/dashboard/admin/analytics")
+                ? "bg-primary/15 text-primary font-semibold"
+                : "text-gray-text hover:bg-gray-light"
+                }`}
+            >
+              <BarChart2 size={18} />
+              <span>Analytics</span>
             </button>
             <button
               onClick={() => navigate("/dashboard/admin/prizes")}

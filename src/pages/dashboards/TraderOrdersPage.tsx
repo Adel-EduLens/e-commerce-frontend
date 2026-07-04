@@ -333,6 +333,7 @@ export default function TraderOrdersPage() {
     if (label === "Overview") navigate("/dashboard/trader");
     if (label === "Products") navigate("/dashboard/trader/products");
     if (label === "Customers") navigate("/dashboard/trader/customers");
+    if (label === "Finance") navigate("/dashboard/trader/finance");
   };
 
   const toggleRow = (id: number) => {

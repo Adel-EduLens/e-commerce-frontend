@@ -92,6 +92,7 @@ export default function TraderInventoryPage() {
     if (label === "Products") navigate("/dashboard/trader/products");
     if (label === "Orders") navigate("/dashboard/trader/orders");
     if (label === "Customers") navigate("/dashboard/trader/customers");
+    if (label === "Finance") navigate("/dashboard/trader/finance");
   };
 
   const toggleRow = (id: number) => {

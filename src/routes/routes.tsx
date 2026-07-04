@@ -19,6 +19,12 @@ import TraderProductsPage from '../pages/dashboards/TraderProductsPage'
 import TraderCustomersPage from '../pages/dashboards/TraderCustomersPage'
 import TraderOrdersPage from '../pages/dashboards/TraderOrdersPage'
 import TraderInventoryPage from '../pages/dashboards/TraderInventoryPage'
+import TraderFinancePage from '../pages/dashboards/TraderFinancePage'
+import TraderAnalyticsPage from '../pages/dashboards/TraderAnalyticsPage'
+import TraderDropshippingPage from '../pages/dashboards/TraderDropshippingPage'
+import TraderWholesalePage from '../pages/dashboards/TraderWholesalePage'
+import TraderBrandPartnersPage from '../pages/dashboards/TraderBrandPartnersPage'
+import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -205,6 +211,30 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard/trader/inventory',
         element: <TraderInventoryPage />,
+      },
+      {
+        path: 'dashboard/trader/finance',
+        element: <TraderFinancePage />,
+      },
+      {
+        path: 'dashboard/trader/analytics',
+        element: <TraderAnalyticsPage />,
+      },
+      {
+        path: 'dashboard/trader/dropshipping',
+        element: <TraderDropshippingPage />,
+      },
+      {
+        path: 'dashboard/trader/wholesale',
+        element: <TraderWholesalePage />,
+      },
+      {
+        path: 'dashboard/trader/brand-partners',
+        element: <TraderBrandPartnersPage />,
+      },
+      {
+        path: 'dashboard/trader/notifications',
+        element: <TraderNotificationsPage />,
       },
       {
         path: 'dashboard/user',

@@ -457,6 +457,12 @@ export default function TraderDashboard() {
                       if (item.label === "Customers") navigate("/dashboard/trader/customers");
                       if (item.label === "Orders") navigate("/dashboard/trader/orders");
                       if (item.label === "Inventory") navigate("/dashboard/trader/inventory");
+                      if (item.label === "Finance") navigate("/dashboard/trader/finance");
+                      if (item.label === "Analytics") navigate("/dashboard/trader/analytics");
+                      if (item.label === "Dropshipping") navigate("/dashboard/trader/dropshipping");
+                      if (item.label === "Wholesale") navigate("/dashboard/trader/wholesale");
+                      if (item.label === "Brand Partners") navigate("/dashboard/trader/brand-partners");
+                      if (item.label === "Notifications") navigate("/dashboard/trader/notifications");
                     }}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
                       isActive
