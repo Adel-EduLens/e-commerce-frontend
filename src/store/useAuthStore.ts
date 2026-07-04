@@ -8,13 +8,15 @@ import type { AuthStore, User } from "../types/auth";
 
 const STORAGE_KEY = "auth-storage";
 
-export const useAuthStore = create<AuthStore>()(
+export const useAuthStore = create<AuthStore & { _hasHydrated: boolean; setHasHydrated: (v: boolean) => void }>()(
   persist(
     (set, get) => ({
       // State
       user: null,
       token: null,
       isAuthenticated: false,
+      _hasHydrated: false,
+      setHasHydrated: (v: boolean) => set({ _hasHydrated: v }),
 
       // Actions
       setAuth: (user: User, token: string) => {
@@ -53,6 +55,9 @@ export const useAuthStore = create<AuthStore>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

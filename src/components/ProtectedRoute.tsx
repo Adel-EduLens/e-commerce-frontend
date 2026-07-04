@@ -13,9 +13,9 @@ export default function ProtectedRoute({
   children,
   allowedRoles,
 }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated, user, _hasHydrated } = useAuthStore()
 
-  console.log('[ProtectedRoute]', { isAuthenticated, role: user?.role, allowedRoles })
+  if (!_hasHydrated) return null
 
   if (!isAuthenticated || !user) {
     const fallbackRoute = allowedRoles?.includes('admin')

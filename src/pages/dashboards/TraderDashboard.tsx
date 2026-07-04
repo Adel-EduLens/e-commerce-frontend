@@ -451,7 +451,13 @@ export default function TraderDashboard() {
                   <button
                     key={item.label}
                     type="button"
-                    onClick={() => setActiveItem(item.label)}
+                    onClick={() => {
+                      setActiveItem(item.label);
+                      if (item.label === "Products") navigate("/dashboard/trader/products");
+                      if (item.label === "Customers") navigate("/dashboard/trader/customers");
+                      if (item.label === "Orders") navigate("/dashboard/trader/orders");
+                      if (item.label === "Inventory") navigate("/dashboard/trader/inventory");
+                    }}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
                       isActive
                         ? "bg-[#BBFF63] text-[#111827]"
