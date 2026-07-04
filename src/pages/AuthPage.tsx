@@ -13,11 +13,8 @@ import type { LoginFormValues, SignupFormValues } from "../schemas";
 import { useTranslation } from "react-i18next";
 import { Globe, ChevronDown } from "lucide-react";
 import { AxiosError } from "axios";
+import type { ApiErrorResponse } from "../types/api";
 
-interface ApiErrorResponse {
-  message?: string;
-  [key: string]: unknown;
-}
 interface AuthPageProps {
   mode: "login" | "signup";
 }
@@ -98,10 +95,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
     setIsLoading(true);
     try {
       const response = await api.post("/auth/login", data);
-      const { token, user } = response.data.data;
-      setAuth(user, token);
-      toast.success(t("toast.welcomeBack", { name: user.name }));
-      navigate("/");
+      const { token, user: loggedInUser } = response.data.data;
+      setAuth(loggedInUser, token);
+      toast.success(t("toast.welcomeBack", { name: loggedInUser.name }));
+      const dest = loggedInUser.role === "trader" ? "/dashboard/trader" : loggedInUser.role === "admin" ? "/dashboard/admin" : "/";
+      console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role);
+      navigate(dest, { replace: true });
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
       const errMsg = err.response?.data?.message || t("toast.loginFailed");
@@ -118,7 +117,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
       const { token, user } = response.data.data;
       setAuth(user, token);
       toast.success(t("toast.signupSuccess"));
-      navigate("/");
+      navigate(user.role === "trader" ? "/dashboard/trader" : user.role === "admin" ? "/dashboard/admin" : "/");
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
       const errMsg = err.response?.data?.message || t("toast.signupFailed");
@@ -157,9 +156,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   </span>
                   <ChevronDown
                     size={20}
-                    className={`transition sm:size-6 ${
-                      open ? "rotate-180" : ""
-                    }`}
+                    className={`transition sm:size-6 ${open ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -240,6 +238,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                           />
                           <button
                             type="button"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute end-[16px] top-1/2 -translate-y-1/2 text-gray-text hover:text-foreground"
                           >
@@ -296,11 +295,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
-                    <button className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button type="button" className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
                       <FaFacebookSquare size={24} color="#1877F2 " />
                       {t("socials.facebook")}
                     </button>
-                    <button className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button type="button" className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
                       <FcGoogle size={24} />
                       {t("socials.google")}
                     </button>
@@ -395,9 +394,6 @@ export default function AuthPage({ mode }: AuthPageProps) {
                         <option value="trader">
                           {t("fields.role.options.trader")}
                         </option>
-                        <option value="admin">
-                          {t("fields.role.options.admin")}
-                        </option>
                       </select>
                       {signupErrors.role && (
                         <p className="text-[13px] text-red-500">
@@ -455,7 +451,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 <div className="flex flex-col items-center gap-[24px]">
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || !agreeTerms}
                     className="flex w-full items-center justify-center rounded-[16px] bg-[#0f1115] py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
                     {isLoading ? t("signup.submitting") : t("signup.submit")}
@@ -469,11 +465,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
-                    <button className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button type='button' className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
                       <FaFacebookSquare size={24} color="#1877F2 " />
                       {t("socials.facebook")}
                     </button>
-                    <button className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button type='button' className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
                       <FcGoogle size={24} />
                       {t("socials.google")}
                     </button>
