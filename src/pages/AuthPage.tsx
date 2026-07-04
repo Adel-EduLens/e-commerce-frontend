@@ -98,10 +98,12 @@ export default function AuthPage({ mode }: AuthPageProps) {
     setIsLoading(true);
     try {
       const response = await api.post("/auth/login", data);
-      const { token, user } = response.data.data;
-      setAuth(user, token);
-      toast.success(t("toast.welcomeBack", { name: user.name }));
-      navigate("/");
+      const { token, user: loggedInUser } = response.data.data;
+      setAuth(loggedInUser, token);
+      toast.success(t("toast.welcomeBack", { name: loggedInUser.name }));
+      const dest = loggedInUser.role === "trader" ? "/dashboard/trader" : loggedInUser.role === "admin" ? "/dashboard/admin" : "/";
+      console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role);
+      navigate(dest, { replace: true });
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
       const errMsg = err.response?.data?.message || t("toast.loginFailed");
@@ -118,7 +120,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
       const { token, user } = response.data.data;
       setAuth(user, token);
       toast.success(t("toast.signupSuccess"));
-      navigate("/");
+      navigate(user.role === "trader" ? "/dashboard/trader" : user.role === "admin" ? "/dashboard/admin" : "/");
     } catch (error) {
       const err = error as AxiosError<ApiErrorResponse>;
       const errMsg = err.response?.data?.message || t("toast.signupFailed");
