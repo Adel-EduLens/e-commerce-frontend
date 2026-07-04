@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Wheel } from "react-custom-roulette";
 import { usePrizes, useSpinPrize } from "../../hooks/queries/prizequery";
+import {toast} from "sonner";
 
 const colors = ["#e0343f", "#f2994a", "#2f80ed"];
 const PrizeWheel = () => {
@@ -28,6 +29,7 @@ const PrizeWheel = () => {
       setMustSpin(true);
     } catch (error) {
       console.error(error);
+      toast.error("Failed to spin the wheel. Please try again.")
     }
   };
   if (isLoading) return <p>Loading...</p>;
@@ -52,14 +54,13 @@ const PrizeWheel = () => {
           perpendicularText={false}
           onStopSpinning={() => {
             setMustSpin(false);
-            alert(`Winner: ${prizes[prizeNumber].name}`);
+            toast.success(`Winner: ${prizes[prizeNumber].name}`);
           }}
         />
       </div>
 
       <button
-        className="px-8 py-3 rounded-2xl cursor-pointer font-bold text-white disabled:opacity-60"
-        style={{ background: "linear-gradient(135deg,#ff8a5c,#e0343f)" }}
+        className="bg-primary text-foreground px-8 py-3 rounded-2xl cursor-pointer font-bold disabled:opacity-60"
         onClick={handleSpin}
         disabled={mustSpin || spinMutation.isPending}
       >

@@ -5,12 +5,12 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 function App() {
-  const { i18n } = useTranslation("auth");
+  const { i18n } = useTranslation();
   const isRTL = i18n.language?.startsWith("ar");
   // Initialize theme from persisted storage on mount
 
   useThemeStore()
-    useEffect(() => {
+  useEffect(() => {
     document.documentElement.dir = isRTL ? "rtl" : "ltr";
     document.documentElement.lang = i18n.language;
   }, [isRTL, i18n.language]);

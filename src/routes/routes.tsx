@@ -1,39 +1,39 @@
-import { createBrowserRouter } from "react-router-dom";
-import StudentLayout from "../layouts/StudentLayout";
-import AccountLayout from "../layouts/AccountLayout";
-import UserLayout from "../layouts/UserLayout";
-import HomePage from "../pages/HomePage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
-import SeasonMustHavesPage from "../pages/SeasonMustHavesPage";
-import MenCollectionPage from "../pages/MenCollectionPage";
-import BagPage from "../pages/BagPage";
-import ContactDetailsPage from "../pages/ContactDetailsPage";
-import NotificationsPage from "../pages/NotificationsPage";
-import NotifyMeListPage from "../pages/NotifyMeListPage";
-import SettingsPage from "../pages/SettingsPage";
-import AuthPage from "../pages/AuthPage";
-import AdminDashboard from "../pages/dashboards/AdminDashboard";
-import PrizeControllerPage from "../pages/dashboards/PrizeControllerPage";
-import TraderDashboard from "../pages/dashboards/TraderDashboard";
-import UserDashboard from "../pages/dashboards/UserDashboard";
-import MyOrdersPage from "../pages/MyOrdersPage";
-import HelpCenterPage from "../pages/HelpCenterPage";
-import WalletRewardsPage from "../pages/WalletRewardsPage";
-import CheckoutPage from "../pages/CheckoutPage";
-import DropshippingPage from "../pages/DropshippingPage";
-import FavoritesPage from "../pages/FavoritesPage";
-import WholesalePage from "../pages/WholesalePage";
-import DesignLabPage from "../pages/DesignLabPage";
-import ProtectedRoute from "../components/ProtectedRoute";
+import { createBrowserRouter } from 'react-router-dom'
+import StudentLayout from '../layouts/StudentLayout'
+import AccountLayout from '../layouts/AccountLayout'
+import UserLayout from '../layouts/UserLayout'
+import HomePage from '../pages/HomePage'
+import ProductDetailsPage from '../pages/ProductDetailsPage'
+import SeasonMustHavesPage from '../pages/SeasonMustHavesPage'
+import MenCollectionPage from '../pages/MenCollectionPage'
+import BagPage from '../pages/BagPage'
+import ContactDetailsPage from '../pages/ContactDetailsPage'
+import NotificationsPage from '../pages/NotificationsPage'
+import NotifyMeListPage from '../pages/NotifyMeListPage'
+import SettingsPage from '../pages/SettingsPage'
+import AuthPage from '../pages/AuthPage'
+import AdminDashboard from '../pages/dashboards/AdminDashboard'
+import PrizeControllerPage from '../pages/dashboards/PrizeControllerPage'
+import TraderDashboard from '../pages/dashboards/TraderDashboard'
+import UserDashboard from '../pages/dashboards/UserDashboard'
+import MyOrdersPage from '../pages/MyOrdersPage'
+import HelpCenterPage from '../pages/HelpCenterPage'
+import WalletRewardsPage from '../pages/WalletRewardsPage'
+import CheckoutPage from '../pages/CheckoutPage'
+import DropshippingPage from '../pages/DropshippingPage'
+import FavoritesPage from '../pages/FavoritesPage'
+import WholesalePage from '../pages/WholesalePage'
+import DesignLabPage from '../pages/DesignLabPage'
+import ProtectedRoute from '../components/ProtectedRoute'
 
-import AdminLoginPage from "../pages/admin/AdminLoginPage";
-import AdminLayout from "../layouts/AdminLayout";
+import AdminLoginPage from '../pages/admin/AdminLoginPage'
+import AdminLayout from '../layouts/AdminLayout'
 
-import PrizeWheel from "../pages/TestPage";
+import TestPage from '../pages/TestPage'
 
 export const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <StudentLayout />,
     children: [
       {
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "product-details",
+        path: 'product-details',
         element: (
           <UserLayout>
             <ProductDetailsPage />
@@ -53,7 +53,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "season-must-haves",
+        path: 'season-must-haves',
         element: (
           <UserLayout>
             <SeasonMustHavesPage />
@@ -61,7 +61,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "collections/:category",
+        path: 'collections/:category',
         element: (
           <UserLayout>
             <MenCollectionPage />
@@ -69,7 +69,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "bag",
+        path: 'bag',
         element: (
           <UserLayout>
             <BagPage />
@@ -84,87 +84,84 @@ export const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "contact-details",
+            path: 'contact-details',
             element: <ContactDetailsPage />,
             handle: {
               footer: {
-                top: "top-0",
+                top: 'top-0',
                 style: { top: 970 },
               },
             },
           },
           {
-            path: "notifications",
+            path: 'notifications',
             element: <NotificationsPage />,
             handle: {
               footer: {
-                top: "top-[863px]",
+                top: 'top-[863px]',
               },
             },
           },
           {
-            path: "notify-me-list",
+            path: 'notify-me-list',
             element: <NotifyMeListPage />,
             handle: {
               footer: {
-                top: "top-[863px]",
+                top: 'top-[863px]',
               },
             },
           },
           {
-            path: "settings",
+            path: 'settings',
             element: <SettingsPage />,
             handle: {
               footer: {
-                top: "top-[917px]",
+                top: 'top-[917px]',
               },
             },
           },
           {
-            path: "my-orders",
+            path: 'my-orders',
             element: <MyOrdersPage />,
             handle: {
               footer: {
-                top: "top-[950px]",
+                top: 'top-[950px]',
               },
             },
           },
           {
-            path: "help-center",
+            path: 'help-center',
             element: <HelpCenterPage />,
             handle: {
               footer: {
-                top: "top-[917px]",
+                top: 'top-[917px]',
               },
             },
           },
           {
-            path: "wallet-rewards",
+            path: 'wallet-rewards',
             element: <WalletRewardsPage />,
             handle: {
               footer: {
-                top: "top-[894px]",
+                top: 'top-[894px]',
               },
             },
           },
         ],
       },
+      ...(import.meta.env.DEV ? [{ path: "random", element: <TestPage /> }] : []),
       {
-        path: "random",
-        element: <PrizeWheel />,
-      },
-      {
-        path: "login",
+        path: 'login',
         element: <AuthPage mode="login" />,
       },
       {
-        path: "signup",
+        path: 'signup',
         element: <AuthPage mode="signup" />,
       },
       {
-        path: "dashboard/admin",
+        path: 'dashboard/admin',
         element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <AdminLayout>
               <AdminDashboard />
             </AdminLayout>
@@ -172,17 +169,13 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/admin/login",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLoginPage />
-          </ProtectedRoute>
-        ),
+        path: 'dashboard/admin/login',
+        element: <AdminLoginPage />,
       },
       {
-        path: "dashboard/admin/prizes",
+        path: 'dashboard/admin/prizes',
         element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={['admin']}>
             <AdminLayout>
               <PrizeControllerPage />
             </AdminLayout>
@@ -190,17 +183,17 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/trader",
+        path: 'dashboard/trader',
         element: (
-          <ProtectedRoute allowedRoles={["trader"]}>
+          <ProtectedRoute allowedRoles={['trader']}>
             <TraderDashboard />
           </ProtectedRoute>
         ),
       },
       {
-        path: "dashboard/user",
+        path: 'dashboard/user',
         element: (
-          <ProtectedRoute allowedRoles={["user"]}>
+          <ProtectedRoute allowedRoles={['user']}>
             <UserLayout>
               <UserDashboard />
             </UserLayout>
@@ -208,7 +201,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "checkout",
+        path: 'checkout',
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -218,7 +211,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "dropshipping",
+        path: 'dropshipping',
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -228,7 +221,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "favorites",
+        path: 'favorites',
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -238,7 +231,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "wholesale",
+        path: 'wholesale',
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -248,7 +241,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "design-lab",
+        path: 'design-lab',
         element: (
           <UserLayout>
             <DesignLabPage />
@@ -257,4 +250,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-]);
+])

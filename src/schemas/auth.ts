@@ -19,6 +19,7 @@ export const signupSchema = z.object({
     .regex(/^01[0125][0-9]{8}$/, {
       message: "Phone number must be a valid Egyptian mobile number",
     })
+    .or(z.literal(""))
     .optional(),
 });
 
