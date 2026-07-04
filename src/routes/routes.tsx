@@ -34,6 +34,7 @@ import AdminLoginPage from '../pages/admin/AdminLoginPage'
 import AdminLayout from '../layouts/AdminLayout'
 
 import TestPage from '../pages/TestPage'
+import AdminHelpCenterPage from '../pages/admin/AdminHelpCenterPage'
 
 export const router = createBrowserRouter([
   {
@@ -153,7 +154,9 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      ...(import.meta.env.DEV ? [{ path: "random", element: <TestPage /> }] : []),
+      ...(import.meta.env.DEV
+        ? [{ path: 'random', element: <TestPage /> }]
+        : []),
       {
         path: 'login',
         element: <AuthPage mode="login" />,
@@ -168,6 +171,16 @@ export const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminLayout>
               <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'dashboard/admin/help-center',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLayout>
+              <AdminHelpCenterPage />
             </AdminLayout>
           </ProtectedRoute>
         ),

@@ -1,9 +1,4 @@
-import {
-  ChevronRight,
-  Mail,
-  MessageSquare,
-  Phone,
-} from "lucide-react";
+import { ChevronRight, Mail, MessageSquare, Phone } from 'lucide-react'
 
 function CategoryCard({ title }: { title: string }) {
   return (
@@ -19,20 +14,20 @@ function CategoryCard({ title }: { title: string }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function HelpCenterPanel() {
   const categoriesRow1 = [
-    "Orders & Shipping",
-    "Payments & Wallet",
-    "Returns & Refunds",
-  ];
+    'Orders & Shipping',
+    'Payments & Wallet',
+    'Returns & Refunds',
+  ]
   const categoriesRow2 = [
-    "Wholesale & Dropshipping",
-    "Account & Profile",
-    "Technical Issues",
-  ];
+    'Wholesale & Dropshipping',
+    'Account & Profile',
+    'Technical Issues',
+  ]
 
   return (
     <>
@@ -85,9 +80,9 @@ function HelpCenterPanel() {
         </div>
       </div>
     </>
-  );
+  )
 }
 
 export default function HelpCenterPage() {
-  return <HelpCenterPanel />;
+  return <HelpCenterPanel />
 }
