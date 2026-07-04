@@ -18,6 +18,7 @@ import TraderDashboard from '../pages/dashboards/TraderDashboard'
 import TraderProductsPage from '../pages/dashboards/TraderProductsPage'
 import TraderCustomersPage from '../pages/dashboards/TraderCustomersPage'
 import TraderOrdersPage from '../pages/dashboards/TraderOrdersPage'
+import TraderInventoryPage from '../pages/dashboards/TraderInventoryPage'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -200,6 +201,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard/trader/orders',
         element: <TraderOrdersPage />,
+      },
+      {
+        path: 'dashboard/trader/inventory',
+        element: <TraderInventoryPage />,
       },
       {
         path: 'dashboard/user',

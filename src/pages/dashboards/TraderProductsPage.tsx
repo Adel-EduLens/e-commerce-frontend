@@ -591,6 +591,7 @@ export default function TraderProductsPage() {
     if (label === "Overview") navigate("/dashboard/trader");
     if (label === "Customers") navigate("/dashboard/trader/customers");
     if (label === "Orders") navigate("/dashboard/trader/orders");
+    if (label === "Inventory") navigate("/dashboard/trader/inventory");
   };
 
   /* Table row selection */

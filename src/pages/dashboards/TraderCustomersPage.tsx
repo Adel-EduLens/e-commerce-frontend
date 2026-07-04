@@ -354,6 +354,7 @@ export default function TraderCustomersPage() {
     if (label === "Overview") navigate("/dashboard/trader");
     if (label === "Products") navigate("/dashboard/trader/products");
     if (label === "Orders") navigate("/dashboard/trader/orders");
+    if (label === "Inventory") navigate("/dashboard/trader/inventory");
   };
 
   const filteredCustomers = customers.filter(

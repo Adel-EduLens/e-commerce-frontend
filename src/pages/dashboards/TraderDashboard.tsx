@@ -456,6 +456,7 @@ export default function TraderDashboard() {
                       if (item.label === "Products") navigate("/dashboard/trader/products");
                       if (item.label === "Customers") navigate("/dashboard/trader/customers");
                       if (item.label === "Orders") navigate("/dashboard/trader/orders");
+                      if (item.label === "Inventory") navigate("/dashboard/trader/inventory");
                     }}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
                       isActive
