@@ -1,31 +1,32 @@
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
-import { ProductCard, CollapsibleFAQ } from "../components/shared";
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/useAuthStore'
+import { ProductCard, CollapsibleFAQ } from '../components/shared'
 
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 type AssetImageProps = {
-  file: string;
-  className: string;
-  alt?: string;
-};
-
-function AssetImage({ file, className, alt = "" }: AssetImageProps) {
-  return (
-    <img
-      className={className}
-      src={asset(file)}
-      alt={alt}
-      draggable={false}
-    />
-  );
+  file: string
+  className: string
+  alt?: string
 }
 
-function FilterButton({ label, compact = false }: { label: string; compact?: boolean }) {
+function AssetImage({ file, className, alt = '' }: AssetImageProps) {
+  return (
+    <img className={className} src={asset(file)} alt={alt} draggable={false} />
+  )
+}
+
+function FilterButton({
+  label,
+  compact = false,
+}: {
+  label: string
+  compact?: boolean
+}) {
   return (
     <div
-      className={`${compact ? "justify-center gap-2" : "w-44 justify-between"} flex items-center rounded-2xl bg-[#EDEDED] p-4`}
+      className={`${compact ? 'justify-center gap-2' : 'w-44 justify-between'} flex items-center rounded-2xl bg-[#EDEDED] p-4`}
     >
       <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
         {label}
@@ -37,7 +38,7 @@ function FilterButton({ label, compact = false }: { label: string; compact?: boo
         />
       </div>
     </div>
-  );
+  )
 }
 
 function FilterBar() {
@@ -68,7 +69,7 @@ function FilterBar() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function ViewAllButton({ onClick }: { onClick?: () => void }) {
@@ -88,7 +89,7 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
         />
       </div>
     </button>
-  );
+  )
 }
 
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
@@ -106,7 +107,7 @@ function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
       </div>
       <ViewAllButton />
     </div>
-  );
+  )
 }
 
 function HeroSection() {
@@ -131,8 +132,8 @@ function HeroSection() {
       <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
         <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-[#F9FAFB] opacity-75">
           <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-[#1A1A1A]">
-            step into the spotilght with our latest drop. each piece is made
-            to turn heads while keeping you comfortable from day to night.
+            step into the spotilght with our latest drop. each piece is made to
+            turn heads while keeping you comfortable from day to night.
             <br />
           </div>
           <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
@@ -144,8 +145,8 @@ function HeroSection() {
         </div>
         <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-[#F9FAFB]">
           <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-            step into the spotilght with our latest drop. each piece is made
-            to turn heads while keeping you comfortable from day to night.
+            step into the spotilght with our latest drop. each piece is made to
+            turn heads while keeping you comfortable from day to night.
             <br />
           </div>
           <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
@@ -164,15 +165,15 @@ function HeroSection() {
       </div>
       <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-[#F9FAFB]">
         <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-          Unlock fresh styles, exclusive drops, and a whole new vibe
-          that&apos;s set to dominarte 2025
+          Unlock fresh styles, exclusive drops, and a whole new vibe that&apos;s
+          set to dominarte 2025
           <br />
           <br />
         </div>
       </div>
       <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-[#1A1A1A]" />
     </div>
-  );
+  )
 }
 
 function CollectionSection() {
@@ -237,11 +238,11 @@ function CollectionSection() {
         </Link>
       </div>
     </div>
-  );
+  )
 }
 
 function MustHavesSection() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   return (
     <div className="mt-16 w-full">
@@ -255,18 +256,33 @@ function MustHavesSection() {
             <ProductCard key={index} />
           ))}
         </div>
-        <ViewAllButton onClick={() => navigate("/season-must-haves")} />
+        <ViewAllButton onClick={() => navigate('/season-must-haves')} />
       </div>
     </div>
-  );
+  )
 }
 
 function CategoriesSection() {
   const categories = [
-    { label: "Men", slug: "men", file: "image 8.png", labelLeft: "left-[96px]" },
-    { label: "Kids", slug: "kids", file: "image 9.png", labelLeft: "left-[96px]" },
-    { label: "Women", slug: "women", file: "image 7.png", labelLeft: "left-[62px]" },
-  ];
+    {
+      label: 'Men',
+      slug: 'men',
+      file: 'image 8.png',
+      labelLeft: 'left-[96px]',
+    },
+    {
+      label: 'Kids',
+      slug: 'kids',
+      file: 'image 9.png',
+      labelLeft: 'left-[96px]',
+    },
+    {
+      label: 'Women',
+      slug: 'women',
+      file: 'image 7.png',
+      labelLeft: 'left-[62px]',
+    },
+  ]
 
   return (
     <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
@@ -295,7 +311,7 @@ function CategoriesSection() {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 function RecommendedSection() {
@@ -306,41 +322,41 @@ function RecommendedSection() {
       </div>
       <ProductGrid />
     </div>
-  );
+  )
 }
 
 function VoteRings() {
   const rings = [
-    ["w-[992.90px] h-[992.90px]", "left-[894px] top-[-479px]"],
-    ["w-[958.66px] h-[958.66px]", "left-[911.12px] top-[-461.88px]"],
-    ["w-[924.42px] h-[924.42px]", "left-[928.24px] top-[-444.76px]"],
-    ["w-[890.19px] h-[890.19px]", "left-[945.36px] top-[-427.64px]"],
-    ["w-[855.95px] h-[855.95px]", "left-[962.48px] top-[-410.52px]"],
-    ["w-[821.71px] h-[821.71px]", "left-[979.59px] top-[-393.41px]"],
-    ["w-[787.47px] h-[787.47px]", "left-[996.71px] top-[-376.29px]"],
-    ["w-[753.23px] h-[753.23px]", "left-[1013.83px] top-[-359.17px]"],
-    ["w-[719px] h-[719px]", "left-[1030.95px] top-[-342.05px]"],
-    ["w-[684.76px] h-[684.76px]", "left-[1048.07px] top-[-324.93px]"],
-    ["w-[650.52px] h-[650.52px]", "left-[1065.19px] top-[-307.81px]"],
-    ["w-[616.28px] h-[616.28px]", "left-[1082.31px] top-[-290.69px]"],
-    ["w-[582.04px] h-[582.04px]", "left-[1099.43px] top-[-273.57px]"],
-    ["w-[547.81px] h-[547.81px]", "left-[1116.55px] top-[-256.45px]"],
-    ["w-[513.57px] h-[513.57px]", "left-[1133.67px] top-[-239.33px]"],
-    ["w-[479.33px] h-[479.33px]", "left-[1150.78px] top-[-222.22px]"],
-    ["h-96 w-96", "left-[1167.90px] top-[-205.10px]"],
-    ["h-96 w-96", "left-[1185.02px] top-[-187.98px]"],
-    ["h-96 w-96", "left-[1202.14px] top-[-170.86px]"],
-    ["h-80 w-80", "left-[1219.26px] top-[-153.74px]"],
-    ["h-80 w-80", "left-[1236.38px] top-[-136.62px]"],
-    ["h-72 w-72", "left-[1253.50px] top-[-119.50px]"],
-    ["h-60 w-60", "left-[1270.62px] top-[-102.38px]"],
-    ["h-52 w-52", "left-[1287.74px] top-[-85.26px]"],
-    ["h-44 w-44", "left-[1304.86px] top-[-68.14px]"],
-    ["h-36 w-36", "left-[1321.97px] top-[-51.03px]"],
-    ["h-24 w-24", "left-[1339.09px] top-[-33.91px]"],
-    ["h-16 w-16", "left-[1356.21px] top-[-16.79px]"],
-    ["h-9 w-9", "left-[1373.33px] top-[0.33px]"],
-  ];
+    ['w-[992.90px] h-[992.90px]', 'left-[894px] top-[-479px]'],
+    ['w-[958.66px] h-[958.66px]', 'left-[911.12px] top-[-461.88px]'],
+    ['w-[924.42px] h-[924.42px]', 'left-[928.24px] top-[-444.76px]'],
+    ['w-[890.19px] h-[890.19px]', 'left-[945.36px] top-[-427.64px]'],
+    ['w-[855.95px] h-[855.95px]', 'left-[962.48px] top-[-410.52px]'],
+    ['w-[821.71px] h-[821.71px]', 'left-[979.59px] top-[-393.41px]'],
+    ['w-[787.47px] h-[787.47px]', 'left-[996.71px] top-[-376.29px]'],
+    ['w-[753.23px] h-[753.23px]', 'left-[1013.83px] top-[-359.17px]'],
+    ['w-[719px] h-[719px]', 'left-[1030.95px] top-[-342.05px]'],
+    ['w-[684.76px] h-[684.76px]', 'left-[1048.07px] top-[-324.93px]'],
+    ['w-[650.52px] h-[650.52px]', 'left-[1065.19px] top-[-307.81px]'],
+    ['w-[616.28px] h-[616.28px]', 'left-[1082.31px] top-[-290.69px]'],
+    ['w-[582.04px] h-[582.04px]', 'left-[1099.43px] top-[-273.57px]'],
+    ['w-[547.81px] h-[547.81px]', 'left-[1116.55px] top-[-256.45px]'],
+    ['w-[513.57px] h-[513.57px]', 'left-[1133.67px] top-[-239.33px]'],
+    ['w-[479.33px] h-[479.33px]', 'left-[1150.78px] top-[-222.22px]'],
+    ['h-96 w-96', 'left-[1167.90px] top-[-205.10px]'],
+    ['h-96 w-96', 'left-[1185.02px] top-[-187.98px]'],
+    ['h-96 w-96', 'left-[1202.14px] top-[-170.86px]'],
+    ['h-80 w-80', 'left-[1219.26px] top-[-153.74px]'],
+    ['h-80 w-80', 'left-[1236.38px] top-[-136.62px]'],
+    ['h-72 w-72', 'left-[1253.50px] top-[-119.50px]'],
+    ['h-60 w-60', 'left-[1270.62px] top-[-102.38px]'],
+    ['h-52 w-52', 'left-[1287.74px] top-[-85.26px]'],
+    ['h-44 w-44', 'left-[1304.86px] top-[-68.14px]'],
+    ['h-36 w-36', 'left-[1321.97px] top-[-51.03px]'],
+    ['h-24 w-24', 'left-[1339.09px] top-[-33.91px]'],
+    ['h-16 w-16', 'left-[1356.21px] top-[-16.79px]'],
+    ['h-9 w-9', 'left-[1373.33px] top-[0.33px]'],
+  ]
 
   return (
     <>
@@ -351,7 +367,7 @@ function VoteRings() {
         />
       ))}
     </>
-  );
+  )
 }
 
 function VoteSection() {
@@ -411,7 +427,7 @@ function VoteSection() {
         className="absolute left-[4px] top-[157px] h-[1085px] w-[665px]"
       />
     </div>
-  );
+  )
 }
 
 function FlashDealsSection() {
@@ -426,7 +442,7 @@ function FlashDealsSection() {
             Ends in
           </div>
           <div className="flex items-center justify-start gap-2">
-            {["08", ":", "30", ":", "48"].map((item, index) => (
+            {['08', ':', '30', ':', '48'].map((item, index) => (
               <div
                 key={`${item}-${index}`}
                 className="font-['Montserrat'] text-3xl font-semibold text-[#1A1A1A]"
@@ -439,29 +455,29 @@ function FlashDealsSection() {
       </div>
       <ProductGrid featuredIndex={2} />
     </div>
-  );
+  )
 }
 
 function FaqSection() {
   const faqs = [
     {
-      question: "Can Cancel at any time ?",
+      question: 'Can Cancel at any time ?',
       answer:
         'You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase. For more details, please visit our "Return Policy" page.',
     },
     {
-      question: "How do I track my order?",
-      answer: "You can track your order from your account page.",
+      question: 'How do I track my order?',
+      answer: 'You can track your order from your account page.',
     },
     {
-      question: "Do you ship internationally?",
-      answer: "Yes, we ship to most countries worldwide.",
+      question: 'Do you ship internationally?',
+      answer: 'Yes, we ship to most countries worldwide.',
     },
     {
-      question: "How can I contact support?",
-      answer: "You can contact us via email or live chat.",
+      question: 'How can I contact support?',
+      answer: 'You can contact us via email or live chat.',
     },
-  ];
+  ]
 
   return (
     <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
@@ -478,21 +494,21 @@ function FaqSection() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function HomePage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuthStore()
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
-      navigate("/login");
+      navigate('/login')
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate])
 
   if (!isAuthenticated || !user) {
-    return null;
+    return null
   }
 
   return (
@@ -506,7 +522,7 @@ export function HomePage() {
       <FlashDealsSection />
       <FaqSection />
     </div>
-  );
+  )
 }
 
-export default HomePage;
+export default HomePage

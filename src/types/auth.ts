@@ -2,11 +2,11 @@ export interface User {
   id: string
   name?: string
   email?: string
-  role?: string
+  role: 'user' | 'trader' | 'admin'
   avatar?: string
-  [key: string]: unknown
+  createdAt: string
+  status: 'active' | 'suspended'
 }
-
 export interface AuthStore {
   user: User | null
   token: string | null

@@ -1,64 +1,151 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
-import { CollapsibleFAQ } from "../components/shared";
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/useAuthStore'
+import { CollapsibleFAQ } from '../components/shared'
 
-
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`
 
 function AssetImage({
   file,
   className,
-  alt = "",
+  alt = '',
 }: {
-  file: string;
-  className: string;
-  alt?: string;
+  file: string
+  className: string
+  alt?: string
 }) {
   return (
-    <img
-      className={className}
-      src={asset(file)}
-      alt={alt}
-      draggable={false}
-    />
-  );
+    <img className={className} src={asset(file)} alt={alt} draggable={false} />
+  )
 }
-
-
 
 function HeroBanner() {
   const outlineRects = [
-    { w: "w-[1245.27px]", h: "h-[1016.09px]", l: "left-[956.49px]", t: "top-[-31.55px]" },
-    { w: "w-[1202.33px]", h: "h-[981.05px]", l: "left-[977.96px]", t: "top-[-14.03px]" },
-    { w: "w-[1159.39px]", h: "h-[946.02px]", l: "left-[999.43px]", t: "top-[3.49px]" },
-    { w: "w-[1116.45px]", h: "h-[910.98px]", l: "left-[1020.90px]", t: "top-[21px]" },
-    { w: "w-[1073.51px]", h: "h-[875.94px]", l: "left-[1042.37px]", t: "top-[38.52px]" },
-    { w: "w-[1030.57px]", h: "h-[840.90px]", l: "left-[1063.84px]", t: "top-[56.04px]" },
-    { w: "w-[987.63px]", h: "h-[805.87px]", l: "left-[1085.31px]", t: "top-[73.56px]" },
-    { w: "w-[944.69px]", h: "h-[770.83px]", l: "left-[1106.78px]", t: "top-[91.08px]" },
-    { w: "w-[901.75px]", h: "h-[735.79px]", l: "left-[1128.25px]", t: "top-[108.60px]" },
-    { w: "w-[858.81px]", h: "h-[700.75px]", l: "left-[1149.72px]", t: "top-[126.12px]" },
-    { w: "w-[815.87px]", h: "h-[665.71px]", l: "left-[1171.19px]", t: "top-[143.64px]" },
-    { w: "w-[772.93px]", h: "h-[630.68px]", l: "left-[1192.66px]", t: "top-[161.16px]" },
-    { w: "w-[729.99px]", h: "h-[595.64px]", l: "left-[1214.13px]", t: "top-[178.68px]" },
-    { w: "w-[687.05px]", h: "h-[560.60px]", l: "left-[1235.60px]", t: "top-[196.20px]" },
-    { w: "w-[644.11px]", h: "h-[525.56px]", l: "left-[1257.07px]", t: "top-[213.71px]" },
-    { w: "w-[601.16px]", h: "h-[490.53px]", l: "left-[1278.54px]", t: "top-[231.23px]" },
-    { w: "w-[558.22px]", h: "h-[455.49px]", l: "left-[1300.01px]", t: "top-[248.75px]" },
-    { w: "w-[515.28px]", h: "h-96", l: "left-[1321.48px]", t: "top-[266.27px]" },
-    { w: "w-[472.34px]", h: "h-96", l: "left-[1342.95px]", t: "top-[283.79px]" },
-    { w: "w-96", h: "h-80", l: "left-[1364.42px]", t: "top-[301.30px]" },
-    { w: "w-96", h: "h-80", l: "left-[1385.89px]", t: "top-[318.82px]" },
-    { w: "w-80", h: "h-72", l: "left-[1407.36px]", t: "top-[336.34px]" },
-    { w: "w-72", h: "h-60", l: "left-[1428.84px]", t: "top-[353.86px]" },
-    { w: "w-64", h: "h-52", l: "left-[1450.31px]", t: "top-[371.38px]" },
-    { w: "w-52", h: "h-44", l: "left-[1471.78px]", t: "top-[388.90px]" },
-    { w: "w-44", h: "h-36", l: "left-[1493.25px]", t: "top-[406.42px]" },
-    { w: "w-32", h: "h-28", l: "left-[1514.72px]", t: "top-[423.94px]" },
-    { w: "w-20", h: "h-16", l: "left-[1536.19px]", t: "top-[441.46px]" },
-    { w: "w-11", h: "h-9", l: "left-[1557.66px]", t: "top-[458.98px]" },
-  ];
+    {
+      w: 'w-[1245.27px]',
+      h: 'h-[1016.09px]',
+      l: 'left-[956.49px]',
+      t: 'top-[-31.55px]',
+    },
+    {
+      w: 'w-[1202.33px]',
+      h: 'h-[981.05px]',
+      l: 'left-[977.96px]',
+      t: 'top-[-14.03px]',
+    },
+    {
+      w: 'w-[1159.39px]',
+      h: 'h-[946.02px]',
+      l: 'left-[999.43px]',
+      t: 'top-[3.49px]',
+    },
+    {
+      w: 'w-[1116.45px]',
+      h: 'h-[910.98px]',
+      l: 'left-[1020.90px]',
+      t: 'top-[21px]',
+    },
+    {
+      w: 'w-[1073.51px]',
+      h: 'h-[875.94px]',
+      l: 'left-[1042.37px]',
+      t: 'top-[38.52px]',
+    },
+    {
+      w: 'w-[1030.57px]',
+      h: 'h-[840.90px]',
+      l: 'left-[1063.84px]',
+      t: 'top-[56.04px]',
+    },
+    {
+      w: 'w-[987.63px]',
+      h: 'h-[805.87px]',
+      l: 'left-[1085.31px]',
+      t: 'top-[73.56px]',
+    },
+    {
+      w: 'w-[944.69px]',
+      h: 'h-[770.83px]',
+      l: 'left-[1106.78px]',
+      t: 'top-[91.08px]',
+    },
+    {
+      w: 'w-[901.75px]',
+      h: 'h-[735.79px]',
+      l: 'left-[1128.25px]',
+      t: 'top-[108.60px]',
+    },
+    {
+      w: 'w-[858.81px]',
+      h: 'h-[700.75px]',
+      l: 'left-[1149.72px]',
+      t: 'top-[126.12px]',
+    },
+    {
+      w: 'w-[815.87px]',
+      h: 'h-[665.71px]',
+      l: 'left-[1171.19px]',
+      t: 'top-[143.64px]',
+    },
+    {
+      w: 'w-[772.93px]',
+      h: 'h-[630.68px]',
+      l: 'left-[1192.66px]',
+      t: 'top-[161.16px]',
+    },
+    {
+      w: 'w-[729.99px]',
+      h: 'h-[595.64px]',
+      l: 'left-[1214.13px]',
+      t: 'top-[178.68px]',
+    },
+    {
+      w: 'w-[687.05px]',
+      h: 'h-[560.60px]',
+      l: 'left-[1235.60px]',
+      t: 'top-[196.20px]',
+    },
+    {
+      w: 'w-[644.11px]',
+      h: 'h-[525.56px]',
+      l: 'left-[1257.07px]',
+      t: 'top-[213.71px]',
+    },
+    {
+      w: 'w-[601.16px]',
+      h: 'h-[490.53px]',
+      l: 'left-[1278.54px]',
+      t: 'top-[231.23px]',
+    },
+    {
+      w: 'w-[558.22px]',
+      h: 'h-[455.49px]',
+      l: 'left-[1300.01px]',
+      t: 'top-[248.75px]',
+    },
+    {
+      w: 'w-[515.28px]',
+      h: 'h-96',
+      l: 'left-[1321.48px]',
+      t: 'top-[266.27px]',
+    },
+    {
+      w: 'w-[472.34px]',
+      h: 'h-96',
+      l: 'left-[1342.95px]',
+      t: 'top-[283.79px]',
+    },
+    { w: 'w-96', h: 'h-80', l: 'left-[1364.42px]', t: 'top-[301.30px]' },
+    { w: 'w-96', h: 'h-80', l: 'left-[1385.89px]', t: 'top-[318.82px]' },
+    { w: 'w-80', h: 'h-72', l: 'left-[1407.36px]', t: 'top-[336.34px]' },
+    { w: 'w-72', h: 'h-60', l: 'left-[1428.84px]', t: 'top-[353.86px]' },
+    { w: 'w-64', h: 'h-52', l: 'left-[1450.31px]', t: 'top-[371.38px]' },
+    { w: 'w-52', h: 'h-44', l: 'left-[1471.78px]', t: 'top-[388.90px]' },
+    { w: 'w-44', h: 'h-36', l: 'left-[1493.25px]', t: 'top-[406.42px]' },
+    { w: 'w-32', h: 'h-28', l: 'left-[1514.72px]', t: 'top-[423.94px]' },
+    { w: 'w-20', h: 'h-16', l: 'left-[1536.19px]', t: 'top-[441.46px]' },
+    { w: 'w-11', h: 'h-9', l: 'left-[1557.66px]', t: 'top-[458.98px]' },
+  ]
 
   return (
     <div className="absolute left-[24px] top-[151px] h-96 w-[1392px] overflow-hidden rounded-3xl bg-[#C4B5FD]">
@@ -77,12 +164,14 @@ function HeroBanner() {
         />
       ))}
     </div>
-  );
+  )
 }
 
 function FilterDropdown({ label, wide }: { label: string; wide?: boolean }) {
   return (
-    <div className={`${wide ? "w-44" : ""} flex items-center ${wide ? "justify-between" : "justify-center gap-2"} rounded-2xl bg-[#EDEDED] p-4`}>
+    <div
+      className={`${wide ? 'w-44' : ''} flex items-center ${wide ? 'justify-between' : 'justify-center gap-2'} rounded-2xl bg-[#EDEDED] p-4`}
+    >
       <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
         {label}
       </div>
@@ -95,7 +184,7 @@ function FilterDropdown({ label, wide }: { label: string; wide?: boolean }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function SearchBar() {
@@ -111,7 +200,7 @@ function SearchBar() {
         />
       </div>
     </div>
-  );
+  )
 }
 
 function FilterBar() {
@@ -130,7 +219,7 @@ function FilterBar() {
         <SearchBar />
       </div>
     </div>
-  );
+  )
 }
 
 function DefaultProductCard() {
@@ -159,7 +248,7 @@ function DefaultProductCard() {
         Min.order: 50 pieces
       </div>
     </div>
-  );
+  )
 }
 
 function Variant2ProductCard() {
@@ -192,7 +281,7 @@ function Variant2ProductCard() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function ViewAllButton() {
@@ -208,12 +297,14 @@ function ViewAllButton() {
         />
       </div>
     </div>
-  );
+  )
 }
 
 function ProductSection({ title, top }: { title: string; top: string }) {
   return (
-    <div className={`absolute left-[24px] ${top} inline-flex w-[1392px] flex-col items-start justify-start gap-10`}>
+    <div
+      className={`absolute left-[24px] ${top} inline-flex w-[1392px] flex-col items-start justify-start gap-10`}
+    >
       <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         {title}
       </div>
@@ -230,15 +321,15 @@ function ProductSection({ title, top }: { title: string; top: string }) {
         <ViewAllButton />
       </div>
     </div>
-  );
+  )
 }
 
 function CategoriesSection() {
   const categories = [
-    { name: "Men", imgTop: "top-0" },
-    { name: "Kids", imgTop: "top-[-84px]" },
-    { name: "Women", imgTop: "top-0" },
-  ];
+    { name: 'Men', imgTop: 'top-0' },
+    { name: 'Kids', imgTop: 'top-[-84px]' },
+    { name: 'Women', imgTop: 'top-0' },
+  ]
 
   return (
     <div className="absolute left-[24px] top-[1462px] inline-flex w-[1392px] flex-col items-center justify-start gap-10">
@@ -247,14 +338,19 @@ function CategoriesSection() {
       </div>
       <div className="inline-flex w-full items-center justify-start gap-6">
         {categories.map((cat) => (
-          <div key={cat.name} className="relative h-[547px] w-96 overflow-hidden bg-white">
+          <div
+            key={cat.name}
+            className="relative h-[547px] w-96 overflow-hidden bg-white"
+          >
             <img
               className={`absolute left-0 ${cat.imgTop} h-[672px] w-96`}
               src="https://placehold.co/448x672"
               alt=""
             />
             <div className="absolute left-[88px] top-[471px] h-14 w-72 overflow-hidden bg-white">
-              <div className={`absolute ${cat.name === "Women" ? "left-[62px]" : "left-[96px]"} top-[7px] font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]`}>
+              <div
+                className={`absolute ${cat.name === 'Women' ? 'left-[62px]' : 'left-[96px]'} top-[7px] font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]`}
+              >
                 {cat.name}
               </div>
             </div>
@@ -262,29 +358,29 @@ function CategoriesSection() {
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 function FAQSection() {
   const faqs = [
     {
-      question: "Can Cancel at any time ?",
+      question: 'Can Cancel at any time ?',
       answer:
-        "You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase.",
+        'You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase.',
     },
     {
-      question: "How do I track my order?",
-      answer: "You can track your order from your account page.",
+      question: 'How do I track my order?',
+      answer: 'You can track your order from your account page.',
     },
     {
-      question: "Do you ship internationally?",
-      answer: "Yes, we ship to most countries worldwide.",
+      question: 'Do you ship internationally?',
+      answer: 'Yes, we ship to most countries worldwide.',
     },
     {
-      question: "How can I contact support?",
-      answer: "You can contact us via email or live chat.",
+      question: 'How can I contact support?',
+      answer: 'You can contact us via email or live chat.',
     },
-  ];
+  ]
 
   return (
     <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
@@ -302,23 +398,21 @@ function FAQSection() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-
-
 export default function WholesalePage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const navigate = useNavigate()
+  const { user, isAuthenticated } = useAuthStore()
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
-      navigate("/login");
+      navigate('/login')
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate])
 
   if (!isAuthenticated || !user) {
-    return null;
+    return null
   }
 
   return (
@@ -330,5 +424,5 @@ export default function WholesalePage() {
       <ProductSection title="Premium Collections" top="top-[3115px]" />
       <FAQSection />
     </div>
-  );
+  )
 }

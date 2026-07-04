@@ -4,29 +4,38 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '../../lib/axios'
 import { useAuthStore } from '../../store/useAuthStore'
+import { AxiosError } from 'axios'
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
-  const { setAuth, isAuthenticated, user } = useAuthStore()
+  const { setAuth, user } = useAuthStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (isAuthenticated && user?.role === 'admin') {
-      navigate('/dashboard/admin', { replace: true })
-    }
-  }, [isAuthenticated, navigate, user?.role])
+    if (user?.role === 'admin') navigate('/dashboard/admin')
+  }, [user, navigate])
+
+  if (user?.role === 'admin') return null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!email.trim() || !password.trim()) {
-      toast.error('Please enter your email and password')
+      toast.error('Please fill in all fields')
       return
     }
-
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
     setIsLoading(true)
 
     try {
@@ -45,8 +54,17 @@ export default function AdminLoginPage() {
       toast.success('Welcome back, admin')
       navigate('/dashboard/admin', { replace: true })
     } catch (error) {
-      console.error('Admin login error:', error)
-      toast.error('Invalid email or password')
+      if (error instanceof AxiosError) {
+        if (!error.response) {
+          toast.error('Network error. Please check your connection.')
+        } else if (error.response.status === 401) {
+          toast.error('Invalid email or password')
+        } else {
+          toast.error('Server error. Please try again later.')
+        }
+      } else {
+        toast.error('An unexpected error occurred')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -103,6 +121,7 @@ export default function AdminLoginPage() {
               />
               <button
                 type="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-text transition hover:text-primary"
               >
