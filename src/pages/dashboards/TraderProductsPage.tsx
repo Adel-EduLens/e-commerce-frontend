@@ -590,6 +590,7 @@ export default function TraderProductsPage() {
     setActiveItem(label);
     if (label === "Overview") navigate("/dashboard/trader");
     if (label === "Customers") navigate("/dashboard/trader/customers");
+    if (label === "Orders") navigate("/dashboard/trader/orders");
   };
 
   /* Table row selection */
