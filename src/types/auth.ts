@@ -4,6 +4,7 @@ export interface User {
   email?: string
   role: 'user' | 'trader' | 'admin'
   avatar?: string
+  phone?: string
   createdAt: string
   status: 'active' | 'suspended'
 }

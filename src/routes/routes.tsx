@@ -19,6 +19,15 @@ import TraderProductsPage from '../pages/dashboards/TraderProductsPage'
 import TraderCustomersPage from '../pages/dashboards/TraderCustomersPage'
 import TraderOrdersPage from '../pages/dashboards/TraderOrdersPage'
 import TraderInventoryPage from '../pages/dashboards/TraderInventoryPage'
+import TraderFinancePage from '../pages/dashboards/TraderFinancePage'
+import TraderAnalyticsPage from '../pages/dashboards/TraderAnalyticsPage'
+import TraderDropshippingPage from '../pages/dashboards/TraderDropshippingPage'
+import TraderWholesalePage from '../pages/dashboards/TraderWholesalePage'
+import TraderBrandPartnersPage from '../pages/dashboards/TraderBrandPartnersPage'
+import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage'
+import TraderStoreSettingsPage from '../pages/dashboards/TraderStoreSettingsPage'
+import TraderRetailPage from '../pages/dashboards/TraderRetailPage'
+import TraderLayout from '../components/layout/TraderLayout'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -201,23 +210,65 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard/trader',
-        element: <TraderDashboard />,
-      },
-      {
-        path: 'dashboard/trader/products',
-        element: <TraderProductsPage />,
-      },
-      {
-        path: 'dashboard/trader/customers',
-        element: <TraderCustomersPage />,
-      },
-      {
-        path: 'dashboard/trader/orders',
-        element: <TraderOrdersPage />,
-      },
-      {
-        path: 'dashboard/trader/inventory',
-        element: <TraderInventoryPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['trader']}>
+            <TraderLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: '',
+            element: <TraderDashboard />,
+          },
+          {
+            path: 'retail',
+            element: <TraderRetailPage />,
+          },
+          {
+            path: 'products',
+            element: <TraderProductsPage />,
+          },
+          {
+            path: 'customers',
+            element: <TraderCustomersPage />,
+          },
+          {
+            path: 'orders',
+            element: <TraderOrdersPage />,
+          },
+          {
+            path: 'inventory',
+            element: <TraderInventoryPage />,
+          },
+          {
+            path: 'finance',
+            element: <TraderFinancePage />,
+          },
+          {
+            path: 'analytics',
+            element: <TraderAnalyticsPage />,
+          },
+          {
+            path: 'dropshipping',
+            element: <TraderDropshippingPage />,
+          },
+          {
+            path: 'wholesale',
+            element: <TraderWholesalePage />,
+          },
+          {
+            path: 'brand-partners',
+            element: <TraderBrandPartnersPage />,
+          },
+          {
+            path: 'notifications',
+            element: <TraderNotificationsPage />,
+          },
+          {
+            path: 'settings',
+            element: <TraderStoreSettingsPage />,
+          },
+        ],
       },
       {
         path: 'dashboard/user',
