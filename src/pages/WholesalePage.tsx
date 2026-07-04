@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
+import FilterComponent from '../components/shared/FilterComponent'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -177,61 +178,6 @@ function HeroBanner() {
   )
 }
 
-function FilterDropdown({ label, wide }: { label: string; wide?: boolean }) {
-  return (
-    <div
-      className={`${wide ? 'w-44' : ''} flex items-center ${wide ? 'justify-between' : 'justify-center gap-2'} rounded-2xl bg-[#EDEDED] p-4`}
-    >
-      <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-        {label}
-      </div>
-      <div className="relative h-8 w-8 overflow-hidden rounded-full bg-white">
-        <div className="absolute left-[28px] top-[10px] h-6 w-0 origin-top-left rotate-90 overflow-hidden">
-          <AssetImage
-            file="weui_arrow-filled-1.svg"
-            className="absolute left-0 top-0 h-6 w-6"
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SearchBar() {
-  return (
-    <div className="flex w-96 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-      <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-        Search
-      </div>
-      <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-        <AssetImage
-          file="mynaui_search.svg"
-          className="absolute left-[8px] top-[8px] h-6 w-6"
-        />
-      </div>
-    </div>
-  )
-}
-
-function FilterBar() {
-  return (
-    <div className="flex w-full flex-col items-start justify-start gap-4">
-      <div className="font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
-        Filter by
-      </div>
-      <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center justify-start gap-3">
-          <FilterDropdown label="Category" />
-          <FilterDropdown label="Size" wide />
-          <FilterDropdown label="Color" wide />
-          <FilterDropdown label="Price" wide />
-        </div>
-        <SearchBar />
-      </div>
-    </div>
-  )
-}
-
 function ViewAllButton() {
   return (
     <div className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4">
@@ -256,7 +202,7 @@ function ProductSection({ title }: { title: string }) {
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
-          <FilterBar />
+          <FilterComponent />
           <div className="grid grid-cols-4 items-start justify-start gap-6">
             <ProductCard />
             <ProductCard />
@@ -286,7 +232,7 @@ export default function WholesalePage() {
   }
 
   return (
-    <div className="w-full pt-8">
+    <div className="w-full pt-8 overflow-hidden">
       <HeroBanner />
       <ProductSection title="Best Deals" />
       <CategoriesSection />
