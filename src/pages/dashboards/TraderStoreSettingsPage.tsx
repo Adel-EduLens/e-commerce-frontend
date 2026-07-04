@@ -1,26 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useAuthStore } from "../../store/useAuthStore";
-
-const traderAsset = (file: string) =>
-  `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
-
-const sidebarItems = [
-  { label: "Overview", icon: "si_dashboard-line.svg", path: "/dashboard/trader" },
-  { label: "Retail", icon: "fluent_building-retail-20-regular.svg", path: "" },
-  { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg", path: "" },
-  { label: "Wholesale", icon: "system-uicons_boxes.svg", path: "/dashboard/trader/wholesale" },
-  { label: "Brand Partners", icon: "mdi_partnership-outline.svg", path: "/dashboard/trader/brand-partners" },
-  { label: "Products", icon: "streamline-ultimate_products-gifts.svg", path: "/dashboard/trader/products" },
-  { label: "Orders", icon: "carbon_follow-up-work-order.svg", path: "/dashboard/trader/orders" },
-  { label: "Inventory", icon: "material-symbols_inventory.svg", path: "/dashboard/trader/inventory" },
-  { label: "Customers", icon: "carbon_customer.svg", path: "/dashboard/trader/customers" },
-  { label: "Finance", icon: "material-symbols_finance-rounded.svg", path: "/dashboard/trader/finance" },
-  { label: "Notifications", icon: "ion_notifications-outline.svg", path: "/dashboard/trader/notifications" },
-  { label: "Analytics", icon: "grommet-icons_analytics.svg", path: "/dashboard/trader/analytics" },
-  { label: "Store Settings", icon: "solar_settings-linear.svg", path: "/dashboard/trader/settings" },
-] as const;
 
 function GeneralInfoTab() {
   return (
@@ -318,24 +296,10 @@ function PlaceholderTab({ title }: { title: string }) {
 }
 
 export default function TraderStoreSettingsPage() {
-  const { user, clearAuth } = useAuthStore();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("General Info");
-
-  const avatar =
-    typeof user?.avatar === "string" && user.avatar
-      ? user.avatar
-      : traderAsset("unsplash_8Vt2haq8NSQ.png");
-
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
 
   const tabs = [
     { name: "General Info", icon: "si_dashboard-line.svg" },
-
     { name: "Shipping Settings", icon: "material-symbols-light_local-shipping-outline.svg" },
     { name: "Tax Settings", icon: "tabler_receipt-tax.svg" },
     { name: "Notification", icon: "tdesign_notification.svg" },
@@ -343,104 +307,35 @@ export default function TraderStoreSettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] p-4 text-[#111827] sm:p-6">
-      <div className="mx-auto flex w-full max-w-[1440px] gap-4 lg:flex-row">
-        {/* ── Sidebar ── */}
-        <aside className="w-full rounded-[32px] bg-[#111827] p-4 text-white shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
-          <div className="flex h-full flex-col">
-            <div className="mb-8">
-              <img className="h-12 w-auto" src={traderAsset("logo gen-z .white 1.png")} alt="Gen-Z" />
+    <div className="flex min-h-[800px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+      {/* Settings Sidebar */}
+      <div className="w-60 shrink-0 border-r-2 border-[#E5E7EB] flex flex-col p-4 gap-2 bg-white">
+        {tabs.map((item) => (
+          <button
+            key={item.name}
+            onClick={() => setActiveTab(item.name)}
+            className={`flex h-14 w-full items-center gap-2 rounded-2xl px-4 py-4 text-left font-['Montserrat'] text-base font-semibold transition ${
+              activeTab === item.name ? "bg-[#BBFF63] text-[#111827]" : "text-[#111827] hover:bg-gray-50"
+            }`}
+          >
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+              <img
+                src={`/store setting/${item.icon}`}
+                alt=""
+                className="h-6 w-6 object-contain"
+              />
             </div>
-            <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-              {sidebarItems.map((item) => {
-                const isActive = item.label === "Store Settings";
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => item.path && navigate(item.path)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive ? "bg-[#BBFF63] text-[#111827]" : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
-                    }`}
-                  >
-                    <img className="h-6 w-6 shrink-0" src={traderAsset(item.icon)} alt="" />
-                    <span className="font-['Montserrat'] text-sm font-semibold sm:text-base">{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-            <div className="mt-8 space-y-4 lg:mt-auto">
-              <div className="rounded-[24px] bg-white/6 p-3">
-                <div className="flex items-center gap-3">
-                  <img className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" src={avatar} alt={user?.name || "Trader"} />
-                  <div className="min-w-0">
-                    <p className="truncate font-['Montserrat'] text-sm font-semibold text-white">{user?.name || "Maan Hassan"}</p>
-                    <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-[#BBFF63]">{user?.role || "trader"}</p>
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full rounded-2xl border border-white/10 px-4 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:border-[#BBFF63]/40 hover:bg-[#BBFF63]/10"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
-        </aside>
-
-        {/* ── Main ── */}
-        <main className="min-w-0 flex-1 space-y-5">
-          {/* Top Header */}
-          <div className="flex h-20 items-center justify-between rounded-3xl border border-[#E5E7EB] bg-white px-6">
-            <h1 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">
-              Store Settings
-            </h1>
-            <div className="flex items-center gap-4">
-              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-gray-50">
-                <svg className="h-5 w-5 text-[#111827]" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" fill="currentColor" />
-                </svg>
-              </button>
-              <img className="h-12 w-12 rounded-full object-cover" src={avatar} alt="Profile" />
-            </div>
-          </div>
-          
-          {/* Main Content Area */}
-          <div className="flex min-h-[800px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-            {/* Settings Sidebar */}
-            <div className="w-60 shrink-0 border-r-2 border-[#E5E7EB] flex flex-col p-4 gap-2 bg-white">
-              {tabs.map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => setActiveTab(item.name)}
-                  className={`flex h-14 w-full items-center gap-2 rounded-2xl px-4 py-4 text-left font-['Montserrat'] text-base font-semibold transition ${
-                    activeTab === item.name ? "bg-[#BBFF63] text-[#111827]" : "text-[#111827] hover:bg-gray-50"
-                  }`}
-                >
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center">
-                    <img
-                      src={`/store setting/${item.icon}`}
-                      alt=""
-                      className="h-6 w-6 object-contain"
-                    />
-                  </div>
-                  {item.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Content Area Rendering */}
-            {activeTab === "General Info" && <GeneralInfoTab />}
-
-            {activeTab === "Shipping Settings" && <ShippingSettingsTab />}
-            {activeTab === "Tax Settings" && <TaxSettingsTab />}
-            {activeTab === "Notification" && <PlaceholderTab title="Notification" />}
-            {activeTab === "Team Members" && <TeamMembersTab />}
-          </div>
-        </main>
+            {item.name}
+          </button>
+        ))}
       </div>
+
+      {/* Content Area Rendering */}
+      {activeTab === "General Info" && <GeneralInfoTab />}
+      {activeTab === "Shipping Settings" && <ShippingSettingsTab />}
+      {activeTab === "Tax Settings" && <TaxSettingsTab />}
+      {activeTab === "Notification" && <PlaceholderTab title="Notification" />}
+      {activeTab === "Team Members" && <TeamMembersTab />}
     </div>
   );
 }

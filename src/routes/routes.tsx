@@ -26,6 +26,8 @@ import TraderWholesalePage from '../pages/dashboards/TraderWholesalePage'
 import TraderBrandPartnersPage from '../pages/dashboards/TraderBrandPartnersPage'
 import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage'
 import TraderStoreSettingsPage from '../pages/dashboards/TraderStoreSettingsPage'
+import TraderRetailPage from '../pages/dashboards/TraderRetailPage'
+import TraderLayout from '../components/layout/TraderLayout'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -195,51 +197,65 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard/trader',
-        element: <TraderDashboard />,
-      },
-      {
-        path: 'dashboard/trader/products',
-        element: <TraderProductsPage />,
-      },
-      {
-        path: 'dashboard/trader/customers',
-        element: <TraderCustomersPage />,
-      },
-      {
-        path: 'dashboard/trader/orders',
-        element: <TraderOrdersPage />,
-      },
-      {
-        path: 'dashboard/trader/inventory',
-        element: <TraderInventoryPage />,
-      },
-      {
-        path: 'dashboard/trader/finance',
-        element: <TraderFinancePage />,
-      },
-      {
-        path: 'dashboard/trader/analytics',
-        element: <TraderAnalyticsPage />,
-      },
-      {
-        path: 'dashboard/trader/dropshipping',
-        element: <TraderDropshippingPage />,
-      },
-      {
-        path: 'dashboard/trader/wholesale',
-        element: <TraderWholesalePage />,
-      },
-      {
-        path: 'dashboard/trader/brand-partners',
-        element: <TraderBrandPartnersPage />,
-      },
-      {
-        path: 'dashboard/trader/notifications',
-        element: <TraderNotificationsPage />,
-      },
-      {
-        path: 'dashboard/trader/settings',
-        element: <TraderStoreSettingsPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['trader']}>
+            <TraderLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            path: '',
+            element: <TraderDashboard />,
+          },
+          {
+            path: 'retail',
+            element: <TraderRetailPage />,
+          },
+          {
+            path: 'products',
+            element: <TraderProductsPage />,
+          },
+          {
+            path: 'customers',
+            element: <TraderCustomersPage />,
+          },
+          {
+            path: 'orders',
+            element: <TraderOrdersPage />,
+          },
+          {
+            path: 'inventory',
+            element: <TraderInventoryPage />,
+          },
+          {
+            path: 'finance',
+            element: <TraderFinancePage />,
+          },
+          {
+            path: 'analytics',
+            element: <TraderAnalyticsPage />,
+          },
+          {
+            path: 'dropshipping',
+            element: <TraderDropshippingPage />,
+          },
+          {
+            path: 'wholesale',
+            element: <TraderWholesalePage />,
+          },
+          {
+            path: 'brand-partners',
+            element: <TraderBrandPartnersPage />,
+          },
+          {
+            path: 'notifications',
+            element: <TraderNotificationsPage />,
+          },
+          {
+            path: 'settings',
+            element: <TraderStoreSettingsPage />,
+          },
+        ],
       },
       {
         path: 'dashboard/user',

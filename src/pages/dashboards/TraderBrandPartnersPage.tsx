@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthStore } from "../../store/useAuthStore";
 
+const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
+
 const asset = (file: string) =>
   `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
 
@@ -331,56 +333,13 @@ export default function TraderBrandPartnersPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] p-4 text-[#111827] sm:p-6">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 lg:flex-row">
+    <>
 
         {/* ── Sidebar ── */}
-        <aside className="w-full rounded-[32px] bg-[#111827] p-4 text-white shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
-          <div className="flex h-full flex-col">
-            <div className="mb-8">
-              <img className="h-12 w-auto" src={traderOverviewAsset("logo gen-z .white 1.png")} alt="Gen-Z" />
-            </div>
-            <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-              {sidebarItems.map((item) => {
-                const isActive = item.label === activeItem;
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => handleSidebarClick(item.label)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive ? "bg-[#BBFF63] text-[#111827]" : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
-                    }`}
-                  >
-                    <img className="h-6 w-6 shrink-0" src={asset(item.icon)} alt="" />
-                    <span className="font-['Montserrat'] text-sm font-semibold sm:text-base">{item.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-            <div className="mt-8 space-y-4 lg:mt-auto">
-              <div className="rounded-[24px] bg-white/6 p-3">
-                <div className="flex items-center gap-3">
-                  <img className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" src={avatar} alt={user?.name || "Trader"} />
-                  <div className="min-w-0">
-                    <p className="truncate font-['Montserrat'] text-sm font-semibold text-white">{user?.name || "Maan Hassan"}</p>
-                    <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-[#BBFF63]">{user?.role || "trader"}</p>
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full rounded-2xl border border-white/10 px-4 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:border-[#BBFF63]/40 hover:bg-[#BBFF63]/10"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
-        </aside>
+        
 
         {/* ── Main ── */}
-        <main className="min-w-0 flex-1 space-y-4">
+        <div className="flex-1 space-y-4">
 
           {/* Top bar */}
           <section className="rounded-[32px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
@@ -575,8 +534,7 @@ export default function TraderBrandPartnersPage() {
             </div>
           </div>
 
-        </main>
-      </div>
-    </div>
+        </div>
+    </>
   );
 }
