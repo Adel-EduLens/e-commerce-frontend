@@ -16,6 +16,23 @@ export type ProductCardProps = {
   imageSrc?: string
   imageAlt?: string
   className?: string
+  rating?: number
+}
+
+function Star({ fill }: { fill: number }) {
+  // fill: 0 -> 1 (0% -> 100% of the star is colored)
+  const isFull = fill >= 0.75
+  const isHalf = fill >= 0.25 && fill < 0.75
+
+  const src = isFull
+    ? asset('material-symbols_star.svg')
+    : isHalf
+      ? asset('material-symbols_star_half.svg')
+      : asset('material-symbols_star_empty.svg')
+
+  return (
+    <img className="h-6 w-6" src={src} alt="" draggable={false} />
+  )
 }
 
 export default function ProductCard({
@@ -28,6 +45,7 @@ export default function ProductCard({
   imageSrc = defaultImage,
   imageAlt,
   className = '',
+  rating = 0,
 }: ProductCardProps) {
   const rootTone = featured ? accentClassName : 'bg-white'
   const mediaTone = featured ? accentClassName : 'bg-[#F9FAFB]'
@@ -66,16 +84,12 @@ export default function ProductCard({
             : 'top-[274px]'
         }`}
       >
-        <div className="absolute left-[170px] top-[8px] inline-flex items-center justify-start gap-1">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <img
-              key={index}
-              className="h-6 w-6"
-              src={asset('material-symbols_star.svg')}
-              alt=""
-              draggable={false}
-            />
-          ))}
+        {/* rating row, anchored to the right edge so it never drifts */}
+        <div className="absolute right-[10px] top-[8px] flex items-center justify-end ">
+          {Array.from({ length: 5 }).map((_, index) => {
+            const fill = Math.min(1, Math.max(0, rating - index))
+            return <Star key={index} fill={fill} />
+          })}
         </div>
 
         <div className="absolute left-[8px] top-[8px] w-40 font-['Montserrat'] text-xl font-medium leading-6 text-[#1A1A1A]">
@@ -84,7 +98,8 @@ export default function ProductCard({
         <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
           {sizeLabel}
         </div>
-        <div className="absolute left-[246px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+        {/* price anchored to the right edge instead of a fixed left px, so long prices don't overflow/drift */}
+        <div className="absolute right-[12px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
           {price}
         </div>
       </div>
