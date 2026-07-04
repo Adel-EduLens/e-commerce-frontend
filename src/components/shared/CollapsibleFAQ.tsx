@@ -58,7 +58,7 @@ export default function CollapsibleFAQ({
 
             <div
               className={`overflow-hidden transition-all duration-300 ${
-                isOpen ? "mt-6 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                isOpen ? "mt-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
               <p className={`text-xl ${isOpen ? "text-white" : "text-[#1A1A1A]"}`}>

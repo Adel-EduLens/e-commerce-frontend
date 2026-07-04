@@ -4,16 +4,14 @@ import { prizeSchema } from "../../schemas";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import type { PrizeFormValues } from "../../schemas";
+import type {ApiErrorResponse} from "../../types/api";
 import {
   usePrizes,
   useAddPrize,
   useDeletePrize,
 } from "../../hooks/queries/prizequery";
 
-interface ApiErrorResponse {
-  message?: string;
-  [key: string]: unknown;
-}
+
 
 const PrizeControllerPage = () => {
   const { data: prizes = [], isLoading } = usePrizes();
@@ -46,7 +44,7 @@ const PrizeControllerPage = () => {
     }
   };
 
-   const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
       await deletePrize.mutateAsync(id);
       toast.success("Prize deleted successfully");
@@ -108,7 +106,11 @@ const PrizeControllerPage = () => {
             </div>
 
             <button
-              onClick={() => handleDelete(prize.id)}
+              onClick={() => {
+                if (window.confirm("Are you sure you want to delete this prize?")) {
+                  handleDelete(prize.id);
+                }
+              }}
               disabled={deletePrize.isPending}
               className="border border-stroke text-foreground hover:bg-gray-light px-3 py-1 rounded-lg transition-colors disabled:opacity-50 cursor-pointer hover:bg-red-300"
             >

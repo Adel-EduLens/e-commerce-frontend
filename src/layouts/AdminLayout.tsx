@@ -1,16 +1,19 @@
-import { Activity, LogOut, Shield ,Award } from "lucide-react";
+import { Activity, LogOut, Shield, Award } from "lucide-react";
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { toast } from "sonner";
-import {  useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
+
   const handleLogout = () => {
     clearAuth();
     toast.success("Logged out successfully");
-    navigate("/auth");
+    navigate("/login");
   };
   return (
     <div className="min-h-screen flex">
@@ -26,16 +29,20 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="space-y-2">
             <button
               onClick={() => navigate("/dashboard/admin")}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left"
-            >
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${isActive("/dashboard/admin")
+                ? "bg-primary/15 text-primary font-semibold"
+                : "text-gray-text hover:bg-gray-light"
+                }`}            >
               <Activity size={18} />
               <span>FAQ</span>
             </button>
             <button
               onClick={() => navigate("/dashboard/admin/prizes")}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-red-600/10 text-red-500 rounded-xl font-medium text-sm text-left"
-            >
-              <Award  size={18} />
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${isActive("/dashboard/admin/prizes")
+                ? "bg-primary/15 text-primary font-semibold"
+                : "text-gray-text hover:bg-gray-light"
+                }`}             >
+              <Award size={18} />
               <span>Prize</span>
             </button>
           </div>

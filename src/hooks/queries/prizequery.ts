@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
-import { toast } from "sonner";
 export interface Prize {
   id: string;
   name: string;
@@ -8,28 +7,24 @@ export interface Prize {
   createdAt: string;
   updatedAt: string;
 }
-// api/prize.api.ts
 
+const getPrizes = async (): Promise<Prize[]> => {
+  const { data } = await api.get("/prizes");
+  return data.data;
+};
 export const usePrizes = () => {
-  const getPrizes = async  () :Promise<Prize[]>=> {
-    const { data } = await api.get("/prizes");
-    return data.data;
-  };
-
   return useQuery({
     queryKey: ["prizes"],
     queryFn: getPrizes,
   });
 };
 
+const addPrize = async (body: { name: string; weight: number }) => {
+  const { data } = await api.post("/prizes", body);
+  return data.data;
+};
 export const useAddPrize = () => {
   const queryClient = useQueryClient();
-
-  const addPrize = async (body: { name: string; weight: number }) => {
-    const { data } = await api.post("/prizes", body);
-    return data.data;
-  };
-
   return useMutation({
     mutationFn: addPrize,
     onSuccess: () => {
@@ -40,13 +35,12 @@ export const useAddPrize = () => {
   });
 };
 
+const deletePrize = async (id: string) => {
+  const { data } = await api.delete(`/prizes/${id}`);
+  return data.data;
+};
 export const useDeletePrize = () => {
   const queryClient = useQueryClient();
-  const deletePrize = async (id: string) => {
-    const { data } = await api.delete(`/prizes/${id}`);
-    return data.data;
-  };
-
   return useMutation({
     mutationFn: deletePrize,
     onSuccess: () => {
@@ -57,11 +51,11 @@ export const useDeletePrize = () => {
   });
 };
 
+const spinPrize = async () => {
+  const { data } = await api.post("/prizes/spin");
+  return data.data;
+};
 export const useSpinPrize = () => {
-  const spinPrize = async () => {
-    const { data } = await api.post("/prizes/spin");
-    return data.data;
-  };
   return useMutation({
     mutationFn: spinPrize,
   });

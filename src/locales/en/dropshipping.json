@@ -1,0 +1,92 @@
+{
+    "hero": {
+        "tagline": "No inventory, no hassle — just profit",
+        "title": "Start Your Online Business with Zero Investment",
+        "cta": "Become a Partner"
+    },
+    "why": {
+        "title": "Why Dropship with Us?",
+        "zeroInventory": {
+            "title": "Zero Inventory",
+            "desc": "No stock needed — we ship directly to your customers."
+        },
+        "fastShipping": {
+            "title": "Fast & Reliable Shipping",
+            "desc": "Quick deliveries with trusted logistics partners."
+        },
+        "earnProfits": {
+            "title": "Earn Profits Easily",
+            "desc": "Set your price, keep the margin."
+        },
+        "wideCatalog": {
+            "title": "Wide Catalog",
+            "desc": "Thousands of products across fashion, accessories, and more."
+        }
+    },
+    "howWeStart": {
+        "title": "Here's How We Start Together",
+        "subtitle": "Joining us is easy and takes only a few moments",
+        "cta": "Get Started",
+        "steps": {
+            "signUp": {
+                "title": "Sign Up",
+                "desc": "Create your free dropshipping account"
+            },
+            "selectProducts": {
+                "title": "Select Products",
+                "desc": "Add items from our catalog to your store"
+            },
+            "promoteAndSell": {
+                "title": "Promote & Sell",
+                "desc": "Share products online and attract customers"
+            },
+            "shipAndEarn": {
+                "title": "We Ship, You Earn",
+                "desc": "We handle delivery, you keep the profit"
+            }
+        }
+    },
+    "everything": {
+        "title": "Everything You Need to Succeed",
+        "cards": {
+            "marketingKit": {
+                "title": "Marketing Kit",
+                "desc": "Ready-to-use product images & videos"
+            },
+            "pricingCalculator": {
+                "title": "Pricing Calculator",
+                "desc": "Estimate your profit margin"
+            },
+            "salesDashboard": {
+                "title": "Sales Dashboard",
+                "desc": "Track orders, earnings, and performance"
+            },
+            "walletIntegration": {
+                "title": "Wallet Integration",
+                "desc": "Easy access to your balance & payouts."
+            }
+        }
+    },
+    "faq": {
+        "title": "Frequently asked questions",
+        "items": {
+            "cancel": {
+                "question": "Can I cancel at any time?",
+                "answer": "You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase."
+            },
+            "trackOrder": {
+                "question": "How do I track my order?",
+                "answer": "You can track your order from your account page."
+            },
+            "internationalShipping": {
+                "question": "Do you ship internationally?",
+                "answer": "Yes, we ship to most countries worldwide."
+            },
+            "contactSupport": {
+                "question": "How can I contact support?",
+                "answer": "You can contact us via email or live chat."
+            }
+        }
+    }
+    
+}

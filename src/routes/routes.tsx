@@ -29,7 +29,7 @@ import ProtectedRoute from '../components/ProtectedRoute'
 import AdminLoginPage from '../pages/admin/AdminLoginPage'
 import AdminLayout from '../layouts/AdminLayout'
 
-import PrizeWheel from '../pages/TestPage'
+import TestPage from '../pages/TestPage'
 
 export const router = createBrowserRouter([
   {
@@ -149,10 +149,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: 'random',
-        element: <PrizeWheel />,
-      },
+      ...(import.meta.env.DEV ? [{ path: "random", element: <TestPage /> }] : []),
       {
         path: 'login',
         element: <AuthPage mode="login" />,
