@@ -1,41 +1,47 @@
-import type { CSSProperties } from "react";
-import { Link } from "react-router-dom";
+import type { CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
 
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 const footerLinks: Record<string, { label: string; path: string }[]> = {
   About: [
-    { label: "About Us", path: "/" },
-    { label: "Design Lab", path: "/" },
-    { label: "Dropship", path: "/dropshipping" },
+    { label: 'About Us', path: '/' },
+    { label: 'Design Lab', path: '/' },
+    { label: 'Dropship', path: '/dropshipping' },
   ],
   Shop: [
-    { label: "Men", path: "/season-must-haves" },
-    { label: "Kids", path: "/season-must-haves" },
-    { label: "Women", path: "/season-must-haves" },
+    { label: 'Men', path: '/season-must-haves' },
+    { label: 'Kids', path: '/season-must-haves' },
+    { label: 'Women', path: '/season-must-haves' },
   ],
   Help: [
-    { label: "FAQ", path: "/help-center" },
-    { label: "Contact", path: "/contact-details" },
-    { label: "Shipping", path: "/help-center" },
-    { label: "Returns", path: "/help-center" },
-    { label: "Track Order", path: "/my-orders" },
+    { label: 'FAQ', path: '/help-center' },
+    { label: 'Contact', path: '/contact-details' },
+    { label: 'Shipping', path: '/help-center' },
+    { label: 'Returns', path: '/help-center' },
+    { label: 'Track Order', path: '/my-orders' },
   ],
   Legal: [
-    { label: "Privacy", path: "/" },
-    { label: "Terms", path: "/" },
-    { label: "Cookies", path: "/" },
+    { label: 'Privacy', path: '/' },
+    { label: 'Terms', path: '/' },
+    { label: 'Cookies', path: '/' },
   ],
-};
+}
 
 const socials = [
-  "prime_twitter.svg",
-  "ri_facebook-fill.svg",
-  "ic_outline-tiktok.svg",
-  "iconoir_instagram.svg",
-];
+  'prime_twitter.svg',
+  'ri_facebook-fill.svg',
+  'ic_outline-tiktok.svg',
+  'iconoir_instagram.svg',
+]
 
-function FooterColumn({ title, items }: { title: string; items: { label: string; path: string }[] }) {
+function FooterColumn({
+  title,
+  items,
+}: {
+  title: string
+  items: { label: string; path: string }[]
+}) {
   return (
     <div className="inline-flex w-48 flex-col items-start justify-center gap-4">
       <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
@@ -51,31 +57,33 @@ function FooterColumn({ title, items }: { title: string; items: { label: string;
         </Link>
       ))}
     </div>
-  );
+  )
 }
 
 type FooterProps = {
-  top?: string;
-  height?: string;
-  innerHeight?: string;
-  style?: CSSProperties;
-};
+  top?: string
+  height?: string
+  innerHeight?: string
+  style?: CSSProperties
+}
 
 export default function Footer({
   top,
-  height = "h-96",
-  innerHeight = "h-96",
+  height = 'h-96',
+  innerHeight = 'h-96',
   style,
 }: FooterProps) {
   return (
     <div
-      className={`relative w-full overflow-hidden border-t border-[#E0E0E0] ${top ? `absolute left-0 ${top} w-[1440px]` : ""} ${height}`}
+      className={`relative w-full overflow-hidden border-t border-[#E0E0E0] ${top ? `absolute left-0 ${top} w-[1440px]` : ''} ${height}`}
       style={style}
     >
       <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20">
         GEN Z
       </div>
-      <div className={`absolute left-[24px] top-[32px] ${innerHeight} w-[1392px]`}>
+      <div
+        className={`absolute left-[24px] top-[32px] ${innerHeight} w-[1392px]`}
+      >
         <div className="absolute left-0 top-[80px] inline-flex items-start justify-start gap-8">
           {Object.entries(footerLinks).map(([title, items]) => (
             <FooterColumn key={title} title={title} items={items} />
@@ -108,7 +116,7 @@ export default function Footer({
           </div>
           <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
             <img
-              src={asset("weui_arrow-filled-3.svg")}
+              src={asset('weui_arrow-filled-3.svg')}
               className="absolute left-[18px] top-[12px] h-6 w-3"
               alt=""
               draggable={false}
@@ -117,5 +125,5 @@ export default function Footer({
         </div>
       </div>
     </div>
-  );
+  )
 }

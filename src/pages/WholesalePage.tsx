@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
-import { CollapsibleFAQ } from '../components/shared'
+import { ProductCard } from '../components/shared'
+import CategoriesSection from '../components/shared/CategorySection'
+import FaqSection from '../components/shared/FaqSection'
 
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`
+const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 function AssetImage({
   file,
@@ -19,7 +21,7 @@ function AssetImage({
   )
 }
 
-function HeroBanner() {
+function HeroOutlineFan() {
   const outlineRects = [
     {
       w: 'w-[1245.27px]',
@@ -148,21 +150,29 @@ function HeroBanner() {
   ]
 
   return (
-    <div className="absolute left-[24px] top-[151px] h-96 w-[1392px] overflow-hidden rounded-3xl bg-[#C4B5FD]">
+    <>
+      {outlineRects.map((r, i) => (
+        <div
+          key={i}
+          className={`${r.w} ${r.h} ${r.l} ${r.t} absolute rounded-full outline outline-2 outline-offset-[-1px] outline-slate-400/50`}
+        />
+      ))}
+    </>
+  )
+}
+
+function HeroBanner() {
+  return (
+    <div className="relative mx-6 h-96 overflow-hidden rounded-3xl bg-[#C4B5FD]">
       <div className="absolute left-[352px] top-[93px] w-[565px] font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
         From Factory to You – Big Quantities, Bigger Profits.
       </div>
       <img
         className="absolute left-[-188px] top-0 h-96 w-[543px]"
-        src="https://placehold.co/543x362"
+        src="/image.png"
         alt=""
       />
-      {outlineRects.map((r, i) => (
-        <div
-          key={i}
-          className={`${r.w} ${r.h} ${r.l} ${r.t} absolute outline outline-2 outline-offset-[-1px] outline-slate-400/50`}
-        />
-      ))}
+      <HeroOutlineFan />
     </div>
   )
 }
@@ -209,76 +219,14 @@ function FilterBar() {
       <div className="font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
         Filter by
       </div>
-      <div className="inline-flex w-full items-center justify-between">
-        <div className="flex items-center justify-start gap-3">
+      <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-start gap-3">
           <FilterDropdown label="Category" />
           <FilterDropdown label="Size" wide />
           <FilterDropdown label="Color" wide />
           <FilterDropdown label="Price" wide />
         </div>
         <SearchBar />
-      </div>
-    </div>
-  )
-}
-
-function DefaultProductCard() {
-  return (
-    <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="absolute left-[8px] top-[8px] h-64 w-80 overflow-hidden rounded-lg bg-[#F9FAFB]">
-        <img
-          className="absolute left-[34px] top-0 h-96 w-60"
-          src="https://placehold.co/247x371"
-          alt=""
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <div className="absolute left-[16px] top-[288px] w-80 font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-        Amber Blaze Classic Tee
-      </div>
-      <div className="absolute left-[16px] top-[320px] w-80 font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-        $250-450
-      </div>
-      <div className="absolute left-[16px] top-[357px] w-80 font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-        Min.order: 50 pieces
-      </div>
-    </div>
-  )
-}
-
-function Variant2ProductCard() {
-  return (
-    <div className="relative h-96 w-80 overflow-hidden rounded-2xl bg-[#C4B5FD] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="absolute left-[8px] top-[8px] h-96 w-80 overflow-hidden rounded-lg bg-[#C4B5FD]">
-        <img
-          className="absolute left-[34px] top-0 h-96 w-60"
-          src="https://placehold.co/247x371"
-          alt=""
-        />
-        <div className="absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
-          <AssetImage
-            file="mdi_heart.svg"
-            className="absolute left-[8px] top-[8px] h-6 w-6"
-          />
-        </div>
-      </div>
-      <div className="absolute left-[8px] top-[280px] h-28 w-80 rounded-lg bg-white">
-        <div className="absolute left-[8px] top-[8px] inline-flex w-72 flex-col items-start justify-start gap-2">
-          <div className="self-stretch font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-            Amber Blaze Classic Tee
-          </div>
-          <div className="self-stretch font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-            $250-450
-          </div>
-          <div className="self-stretch font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-            Min.order: 50 pieces
-          </div>
-        </div>
       </div>
     </div>
   )
@@ -300,102 +248,24 @@ function ViewAllButton() {
   )
 }
 
-function ProductSection({ title, top }: { title: string; top: string }) {
+function ProductSection({ title }: { title: string }) {
   return (
-    <div
-      className={`absolute left-[24px] ${top} inline-flex w-[1392px] flex-col items-start justify-start gap-10`}
-    >
+    <div className="mx-6 mt-24 flex flex-col items-start justify-start gap-10">
       <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         {title}
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
           <FilterBar />
-          <div className="inline-flex w-full items-center justify-start gap-6">
-            <DefaultProductCard />
-            <DefaultProductCard />
-            <Variant2ProductCard />
-            <DefaultProductCard />
+          <div className="grid grid-cols-4 items-start justify-start gap-6">
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
+            <ProductCard />
           </div>
         </div>
         <ViewAllButton />
-      </div>
-    </div>
-  )
-}
-
-function CategoriesSection() {
-  const categories = [
-    { name: 'Men', imgTop: 'top-0' },
-    { name: 'Kids', imgTop: 'top-[-84px]' },
-    { name: 'Women', imgTop: 'top-0' },
-  ]
-
-  return (
-    <div className="absolute left-[24px] top-[1462px] inline-flex w-[1392px] flex-col items-center justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
-        Explore Our Categories
-      </div>
-      <div className="inline-flex w-full items-center justify-start gap-6">
-        {categories.map((cat) => (
-          <div
-            key={cat.name}
-            className="relative h-[547px] w-96 overflow-hidden bg-white"
-          >
-            <img
-              className={`absolute left-0 ${cat.imgTop} h-[672px] w-96`}
-              src="https://placehold.co/448x672"
-              alt=""
-            />
-            <div className="absolute left-[88px] top-[471px] h-14 w-72 overflow-hidden bg-white">
-              <div
-                className={`absolute ${cat.name === 'Women' ? 'left-[62px]' : 'left-[96px]'} top-[7px] font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]`}
-              >
-                {cat.name}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function FAQSection() {
-  const faqs = [
-    {
-      question: 'Can Cancel at any time ?',
-      answer:
-        'You can return items within 14 days of receiving your order, as long as they are in their original condition, unused, and with the receipt or proof of purchase.',
-    },
-    {
-      question: 'How do I track my order?',
-      answer: 'You can track your order from your account page.',
-    },
-    {
-      question: 'Do you ship internationally?',
-      answer: 'Yes, we ship to most countries worldwide.',
-    },
-    {
-      question: 'How can I contact support?',
-      answer: 'You can contact us via email or live chat.',
-    },
-  ]
-
-  return (
-    <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
-        Frequently asked questions
-      </div>
-      <div className="inline-flex w-full items-center justify-between">
-        <img
-          className="h-[721px] w-[566px] rounded-3xl"
-          src="https://placehold.co/566x721"
-          alt=""
-        />
-        <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
-          <CollapsibleFAQ faqs={faqs} />
-        </div>
       </div>
     </div>
   )
@@ -416,13 +286,13 @@ export default function WholesalePage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full pt-8">
       <HeroBanner />
-      <ProductSection title="Best Deals" top="top-[593px]" />
+      <ProductSection title="Best Deals" />
       <CategoriesSection />
-      <ProductSection title="Most Popular" top="top-[2246px]" />
-      <ProductSection title="Premium Collections" top="top-[3115px]" />
-      <FAQSection />
+      <ProductSection title="Most Popular" />
+      <ProductSection title="Premium Collections" />
+      <FaqSection />
     </div>
   )
 }
