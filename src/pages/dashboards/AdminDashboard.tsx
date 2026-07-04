@@ -1,136 +1,90 @@
 import {
-  Activity,
   Ban,
   CheckCircle,
-  DollarSign,
-  LogOut,
   MessageCircleQuestion,
   Pencil,
-  Settings,
-  Shield,
-  Store,
   Trash2,
-  TrendingUp,
-  UserCheck,
-  Users,
 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '../../lib/axios'
-import { useAuthStore } from '../../store/useAuthStore'
-
-interface DemoUser {
-  id: string
-  name: string
-  email: string
-  role: 'user' | 'trader' | 'admin'
-  createdAt: string
-  status: 'active' | 'suspended'
-}
+import useFAQManagment from '../../hooks/useFAQManagment'
+import type { User } from '../../types/auth'
 
 export default function AdminDashboard() {
-  const { user, clearAuth } = useAuthStore()
   const navigate = useNavigate()
-  const [users, setUsers] = useState<DemoUser[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const [users, setUsers] = useState<User[]>([])
   const [faqQuestion, setFaqQuestion] = useState('')
   const [faqAnswer, setFaqAnswer] = useState('')
   const [faqs, setFaqs] = useState<
     Array<{ id: number; question: string; answer: string; createdAt: string }>
   >([])
-  const [faqLoading, setFaqLoading] = useState(false)
-  const [editingFaqId, setEditingFaqId] = useState<number | null>(null)
-  const [editingFaqQuestion, setEditingFaqQuestion] = useState('')
-  const [editingFaqAnswer, setEditingFaqAnswer] = useState('')
-  const [isSavingFaq, setIsSavingFaq] = useState(false)
-  const [deletingFaqId, setDeletingFaqId] = useState<number | null>(null)
-  const [expandedFaqId, setExpandedFaqId] = useState<number | null>(null)
+  const {
+    faqLoading,
+    setFaqLoading,
+    editingFaqId,
+    setEditingFaqId,
+    editingFaqQuestion,
+    setEditingFaqQuestion,
+    editingFaqAnswer,
+    setEditingFaqAnswer,
+    isSavingFaq,
+    setIsSavingFaq,
+    deletingFaqId,
+    setDeletingFaqId,
+    expandedFaqId,
+    setExpandedFaqId,
+  } = useFAQManagment()
+  const fetchFaqs = async () => {
+    setFaqLoading(true)
+    try {
+      const response = await api.get('/admin/faqs/questions')
+      setFaqs(response?.data?.data || [])
+    } catch (error) {
+      console.error('Failed to fetch FAQs:', error)
+      toast.error('Unable to load questions')
+    } finally {
+      setFaqLoading(false)
+    }
+  }
+  const fetchAllUsers = async () => {
+    try {
+      const response = await api.get('/admin/faqs/users')
+      setUsers(response?.data?.data || [])
+    } catch (error) {
+      console.error('Failed to fetch users:', error)
+      toast.error('Unable to load users')
+    }
+  }
+
+  const handleChangeStatus = async (
+    userId: string,
+    newStatus: 'active' | 'suspended'
+  ) => {
+    try {
+      const response = await api.put(`/admin/faqs/users/${userId}/status`, {
+        status: newStatus,
+      })
+      if (response.status === 200) {
+        setUsers((prevUsers) =>
+          prevUsers.map((u) =>
+            u.id === userId ? { ...u, status: newStatus } : u
+          )
+        )
+        toast.success(`User status updated to ${newStatus}`)
+      } else {
+        toast.error('Failed to update user status')
+      }
+    } catch (error) {
+      toast.error('Unable to update user status')
+    }
+  }
 
   useEffect(() => {
-    setUsers([
-      {
-        id: '1',
-        name: 'Alice Johnson',
-        email: 'alice@example.com',
-        role: 'user',
-        createdAt: '2026-06-15',
-        status: 'active',
-      },
-      {
-        id: '2',
-        name: 'David Miller',
-        email: 'david.m@trader.com',
-        role: 'trader',
-        createdAt: '2026-06-10',
-        status: 'active',
-      },
-      {
-        id: '3',
-        name: 'Sophia Stark',
-        email: 'sophia@example.com',
-        role: 'user',
-        createdAt: '2026-06-20',
-        status: 'active',
-      },
-      {
-        id: '4',
-        name: 'Nasu Trader',
-        email: 'trader@nasu.com',
-        role: 'trader',
-        createdAt: '2026-06-23',
-        status: 'active',
-      },
-      {
-        id: '5',
-        name: 'Emma Watson',
-        email: 'emma@example.com',
-        role: 'user',
-        createdAt: '2026-06-01',
-        status: 'suspended',
-      },
-    ])
-
-    const fetchFaqs = async () => {
-      setFaqLoading(true)
-      try {
-        const response = await api.get('/admin/auth/questions')
-        setFaqs(response?.data?.data || [])
-      } catch (error) {
-        console.error('Failed to fetch FAQs:', error)
-        toast.error('Unable to load questions')
-      } finally {
-        setFaqLoading(false)
-      }
-    }
-
     fetchFaqs()
+    fetchAllUsers()
   }, [])
-
-  const toggleUserStatus = (userId: string) => {
-    setUsers(
-      users.map((u) => {
-        if (u.id === userId) {
-          const newStatus = u.status === 'active' ? 'suspended' : 'active'
-          toast.success(`User status updated to ${newStatus}`)
-          return { ...u, status: newStatus }
-        }
-        return u
-      })
-    )
-  }
-
-  const promoteToTrader = (userId: string) => {
-    setUsers(
-      users.map((u) => {
-        if (u.id === userId) {
-          toast.success(`${u.name} has been promoted to Trader!`)
-          return { ...u, role: 'trader' }
-        }
-        return u
-      })
-    )
-  }
 
   const handleCreateFaq = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -143,7 +97,7 @@ export default function AdminDashboard() {
     setIsSavingFaq(true)
 
     try {
-      const response = await api.post('/admin/auth/questions', {
+      const response = await api.post('/admin/faqs/questions', {
         question: faqQuestion.trim(),
         answer: faqAnswer.trim(),
       })
@@ -157,7 +111,6 @@ export default function AdminDashboard() {
       setFaqAnswer('')
       toast.success(response?.data?.message || 'Question added successfully')
     } catch (error) {
-      console.error('Failed to create FAQ:', error)
       toast.error('Unable to add question')
     } finally {
       setIsSavingFaq(false)
@@ -168,7 +121,7 @@ export default function AdminDashboard() {
     setDeletingFaqId(id)
 
     try {
-      await api.delete(`/admin/auth/questions/${id}`)
+      await api.delete(`/admin/faqs/questions/${id}`)
       setFaqs((prev) => prev.filter((faq) => faq.id !== id))
       setExpandedFaqId((prev) => (prev === id ? null : prev))
       toast.success('Question removed successfully')
@@ -206,7 +159,7 @@ export default function AdminDashboard() {
     setIsSavingFaq(true)
 
     try {
-      const response = await api.put(`/admin/auth/questions/${id}`, {
+      const response = await api.put(`/admin/faqs/questions/${id}`, {
         question: editingFaqQuestion.trim(),
         answer: editingFaqAnswer.trim(),
       })
@@ -229,7 +182,6 @@ export default function AdminDashboard() {
       toast.success(response?.data?.message || 'Question updated successfully')
       cancelEditingFaq()
     } catch (error) {
-      console.error('Failed to update FAQ:', error)
       toast.error('Unable to update question')
     } finally {
       setIsSavingFaq(false)
@@ -237,7 +189,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-background text-white font-['Inter'] flex">
+    <div className="min-h-screen bg-background text-foreground font-sans flex">
       {/* Main Content Area */}
       <main className="flex-1 p-8 overflow-y-auto">
         <header className="flex justify-between items-center mb-8">
@@ -249,12 +201,14 @@ export default function AdminDashboard() {
               Platform overview and user privilege logs
             </p>
           </div>
-          <button
-            onClick={() => navigate('/')}
-            className="px-5 py-2.5 bg-white text-dark-background hover:bg-lime-300 font-semibold rounded-xl text-sm transition-all"
+
+          <Link
+            to="/"
+            className="px-5 py-2.5 bg-white text-dark-background hover:bg-lime-300
+          font-semibold rounded-xl text-sm transition-all"
           >
             Back to Storefront
-          </button>
+          </Link>
         </header>
 
         <section className="bg-neutral-900/40 border border-neutral-800 rounded-3xl p-6 mb-8">
@@ -348,6 +302,7 @@ export default function AdminDashboard() {
                       <div className="flex items-center justify-between gap-3">
                         <button
                           type="button"
+                          aria-expanded={expandedFaqId === faq.id}
                           onClick={() =>
                             setExpandedFaqId((prev) =>
                               prev === faq.id ? null : faq.id
@@ -363,6 +318,7 @@ export default function AdminDashboard() {
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
+                            aria-label="Edit question"
                             onClick={() => startEditingFaq(faq)}
                             className="rounded-lg p-2 text-gray-text transition hover:bg-lime-400/10 hover:text-lime-300"
                             title="Edit question"
@@ -371,7 +327,15 @@ export default function AdminDashboard() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDeleteFaq(faq.id)}
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  'Are you sure you want to delete this FAQ?'
+                                )
+                              ) {
+                                handleDeleteFaq(faq.id)
+                              }
+                            }}
                             disabled={deletingFaqId === faq.id}
                             className="rounded-lg p-2 text-gray-text transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-60"
                             title="Delete question"
@@ -501,17 +465,13 @@ export default function AdminDashboard() {
                     </td>
                     <td className="py-4 px-2 text-right">
                       <div className="flex justify-end gap-2">
-                        {u.role === 'user' && (
-                          <button
-                            onClick={() => promoteToTrader(u.id)}
-                            className="p-1.5 bg-neutral-800 hover:bg-amber-500/20 text-gray-text hover:text-amber-500 rounded-lg transition-all"
-                            title="Promote to Trader"
-                          >
-                            <UserCheck size={16} />
-                          </button>
-                        )}
                         <button
-                          onClick={() => toggleUserStatus(u.id)}
+                          onClick={() =>
+                            handleChangeStatus(
+                              u.id,
+                              u.status === 'active' ? 'suspended' : 'active'
+                            )
+                          }
                           className={`p-1.5 bg-neutral-800 rounded-lg transition-all ${
                             u.status === 'active'
                               ? 'hover:bg-red-500/20 text-gray-text hover:text-red-400'

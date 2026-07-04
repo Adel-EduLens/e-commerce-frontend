@@ -7,6 +7,8 @@ interface ProtectedRouteProps {
   allowedRoles?: Array<'user' | 'trader' | 'admin'>
 }
 
+type roles = 'user' | 'trader' | 'admin'
+
 export default function ProtectedRoute({
   children,
   allowedRoles,
@@ -20,7 +22,7 @@ export default function ProtectedRoute({
     return <Navigate to={fallbackRoute} replace />
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role as any)) {
+  if (allowedRoles && !allowedRoles.includes(user.role as roles)) {
     return <Navigate to="/" replace />
   }
 
