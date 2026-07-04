@@ -15,6 +15,8 @@ import AuthPage from '../pages/AuthPage'
 import AdminDashboard from '../pages/dashboards/AdminDashboard'
 import PrizeControllerPage from '../pages/dashboards/PrizeControllerPage'
 import TraderDashboard from '../pages/dashboards/TraderDashboard'
+import TraderProductsPage from '../pages/dashboards/TraderProductsPage'
+import TraderCustomersPage from '../pages/dashboards/TraderCustomersPage'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -184,11 +186,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard/trader',
-        element: (
-          <ProtectedRoute allowedRoles={['trader']}>
-            <TraderDashboard />
-          </ProtectedRoute>
-        ),
+        element: <TraderDashboard />,
+      },
+      {
+        path: 'dashboard/trader/products',
+        element: <TraderProductsPage />,
+      },
+      {
+        path: 'dashboard/trader/customers',
+        element: <TraderCustomersPage />,
       },
       {
         path: 'dashboard/user',
