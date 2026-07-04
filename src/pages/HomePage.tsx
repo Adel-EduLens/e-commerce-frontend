@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
-import { ProductCard, CollapsibleFAQ } from '../components/shared'
+import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
-import FaqSection from '../components/shared/FaqSection';
+import FaqSection from '../components/shared/FaqSection'
+import FilterComponent from '../components/shared/FilterComponent'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -43,37 +44,6 @@ function FilterButton({
   )
 }
 
-function FilterBar() {
-  return (
-    <div className="self-stretch flex flex-col items-start justify-start gap-6">
-      <div className="self-stretch flex flex-col items-start justify-start gap-4">
-        <div className="self-stretch font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
-          Filter by
-        </div>
-        <div className="self-stretch inline-flex items-center justify-between">
-          <div className="flex items-center justify-start gap-3">
-            <FilterButton label="Category" compact />
-            <FilterButton label="Size" />
-            <FilterButton label="Color" />
-            <FilterButton label="Price" />
-          </div>
-          <div className="flex w-96 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-            <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-              Search
-            </div>
-            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-              <AssetImage
-                file="mynaui_search.svg"
-                className="absolute left-[8px] top-[8px] h-6 w-6"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function ViewAllButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
@@ -97,7 +67,7 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
   return (
     <div className="w-full flex flex-col items-center justify-start gap-8">
-      <FilterBar />
+      <FilterComponent />
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
           <ProductCard
@@ -252,7 +222,7 @@ function MustHavesSection() {
         This Season's Must-Haves
       </div>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
-        <FilterBar />
+        <FilterComponent />
         <div className="self-stretch inline-flex items-center justify-start gap-6">
           {Array.from({ length: 4 }).map((_, index) => (
             <ProductCard key={index} />
@@ -408,8 +378,6 @@ function FlashDealsSection() {
   )
 }
 
-
-
 export function HomePage() {
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuthStore()
@@ -433,7 +401,7 @@ export function HomePage() {
       <RecommendedSection />
       <VoteSection />
       <FlashDealsSection />
-      <FaqSection/>
+      <FaqSection />
     </div>
   )
 }
