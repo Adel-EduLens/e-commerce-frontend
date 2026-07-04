@@ -463,6 +463,7 @@ export default function TraderDashboard() {
                       if (item.label === "Wholesale") navigate("/dashboard/trader/wholesale");
                       if (item.label === "Brand Partners") navigate("/dashboard/trader/brand-partners");
                       if (item.label === "Notifications") navigate("/dashboard/trader/notifications");
+                      if (item.label === "Store Settings") navigate("/dashboard/trader/settings");
                     }}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
                       isActive

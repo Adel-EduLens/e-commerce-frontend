@@ -25,6 +25,7 @@ import TraderDropshippingPage from '../pages/dashboards/TraderDropshippingPage'
 import TraderWholesalePage from '../pages/dashboards/TraderWholesalePage'
 import TraderBrandPartnersPage from '../pages/dashboards/TraderBrandPartnersPage'
 import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage'
+import TraderStoreSettingsPage from '../pages/dashboards/TraderStoreSettingsPage'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -235,6 +236,10 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard/trader/notifications',
         element: <TraderNotificationsPage />,
+      },
+      {
+        path: 'dashboard/trader/settings',
+        element: <TraderStoreSettingsPage />,
       },
       {
         path: 'dashboard/user',
