@@ -1,36 +1,36 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
+const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 const defaultImage = asset(
-  "medium-shot-man-posing-with-blue-background-removebg-preview 1.png"
-);
+  'medium-shot-man-posing-with-blue-background-removebg-preview 1.png'
+)
 
 export type ProductCardProps = {
-  title?: string;
-  sizeLabel?: string;
-  price?: string;
-  to?: string;
-  featured?: boolean;
-  accentClassName?: string;
-  imageSrc?: string;
-  imageAlt?: string;
-  className?: string;
-};
+  title?: string
+  sizeLabel?: string
+  price?: string
+  to?: string
+  featured?: boolean
+  accentClassName?: string
+  imageSrc?: string
+  imageAlt?: string
+  className?: string
+}
 
 export default function ProductCard({
-  title = "Amber Blaze Classic Tee",
-  sizeLabel = "XS - XXL",
-  price = "$250",
-  to = "/product-details",
+  title = 'Amber Blaze Classic Tee',
+  sizeLabel = 'XS - XXL',
+  price = '$250',
+  to = '/product-details',
   featured = false,
-  accentClassName = "bg-[#BEA1DF]",
+  accentClassName = 'bg-[#BEA1DF]',
   imageSrc = defaultImage,
   imageAlt,
-  className = "",
+  className = '',
 }: ProductCardProps) {
-  const rootTone = featured ? accentClassName : "bg-white";
-  const mediaTone = featured ? accentClassName : "bg-[#F9FAFB]";
+  const rootTone = featured ? accentClassName : 'bg-white'
+  const mediaTone = featured ? accentClassName : 'bg-[#F9FAFB]'
 
   return (
     <Link
@@ -43,7 +43,7 @@ export default function ProductCard({
       >
         <img
           className={`absolute left-1/2 top-0 -translate-x-1/2 object-contain ${
-            featured ? "h-[392px] w-[269px]" : "h-[371px] w-[247px]"
+            featured ? 'h-[392px] w-[269px]' : 'h-[371px] w-[247px]'
           }`}
           src={imageSrc}
           alt={imageAlt ?? title}
@@ -52,7 +52,7 @@ export default function ProductCard({
         <div className="pointer-events-none absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
           <img
             className="absolute left-[8px] top-[8px] h-6 w-6"
-            src={asset("mdi_heart.svg")}
+            src={asset('mdi_heart.svg')}
             alt=""
             draggable={false}
           />
@@ -62,8 +62,8 @@ export default function ProductCard({
       <div
         className={`absolute left-[8px] h-24 w-80 rounded-lg bg-white ${
           featured
-            ? "top-[282px] outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]"
-            : "top-[274px]"
+            ? 'top-[282px] outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]'
+            : 'top-[274px]'
         }`}
       >
         <div className="absolute left-[170px] top-[8px] inline-flex items-center justify-start gap-1">
@@ -71,7 +71,7 @@ export default function ProductCard({
             <img
               key={index}
               className="h-6 w-6"
-              src={asset("material-symbols_star.svg")}
+              src={asset('material-symbols_star.svg')}
               alt=""
               draggable={false}
             />
@@ -89,5 +89,5 @@ export default function ProductCard({
         </div>
       </div>
     </Link>
-  );
+  )
 }
