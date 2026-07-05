@@ -44,6 +44,7 @@ import AdminLayout from '../layouts/AdminLayout'
 
 import TestPage from '../pages/TestPage'
 import AdminHelpCenterPage from '../pages/admin/AdminHelpCenterPage'
+import HelpCenterCategorie from '../pages/HelpCenterCategorie'
 
 export const router = createBrowserRouter([
   {
@@ -145,12 +146,16 @@ export const router = createBrowserRouter([
           },
           {
             path: 'help-center',
-            element: <HelpCenterPage />,
-            handle: {
-              footer: {
-                top: 'top-[917px]',
+            children: [
+              {
+                index: true,
+                element: <HelpCenterPage />,
               },
-            },
+              {
+                path: ':category',
+                element: <HelpCenterCategorie />,
+              },
+            ],
           },
           {
             path: 'wallet-rewards',
