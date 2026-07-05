@@ -13,6 +13,7 @@ const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 type AssetImageProps = {
   file: string
+
   className: string
   alt?: string
 }
@@ -371,54 +372,57 @@ function VoteSection() {
               disabled={voting}
               className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4 disabled:opacity-60"
             >
-              {voting ? (
-                <span className="h-8 w-8 animate-spin rounded-full border-4 border-[#1A1A1A]/20 border-t-[#1A1A1A]" />
-              ) : (
-                <div className="font-['Montserrat'] text-3xl font-medium text-[#1A1A1A] flex gap-1">
-                  <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
-                  Vote
-                </div>
-              )}
+              {current &&
+                (voting ? (
+                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-[#1A1A1A]/20 border-t-[#1A1A1A]" />
+                ) : (
+                  <div className="font-['Montserrat'] text-3xl font-medium text-[#1A1A1A] flex gap-1">
+                    <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
+                    Vote
+                  </div>
+                ))}
             </button>
           </>
         )}
 
-        <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white">
-          <div className="absolute left-[12px] top-[12px] inline-flex items-center justify-start gap-4">
-            <button
-              type="button"
-              onClick={goToPrevious}
-              aria-label="Previous design"
-              className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
-            >
-              <AssetImage
-                file="weui_arrow-filled-2.svg"
-                className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
-              />
-            </button>
-            <div className="flex items-center justify-start gap-1">
-              {designs.map((design, index) => (
-                <div
-                  key={design.id}
-                  className={`h-2 w-2 rounded-full ${
-                    index === currentIndex ? 'bg-[#BBFF63]' : 'bg-[#E0E0E0]'
-                  }`}
+        {current && (
+          <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white">
+            <div className="absolute left-[12px] top-[12px] inline-flex items-center justify-start gap-4">
+              <button
+                type="button"
+                onClick={goToPrevious}
+                aria-label="Previous design"
+                className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+              >
+                <AssetImage
+                  file="weui_arrow-filled-2.svg"
+                  className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
                 />
-              ))}
+              </button>
+              <div className="flex items-center justify-start gap-1">
+                {designs.map((design, index) => (
+                  <div
+                    key={design.id}
+                    className={`h-2 w-2 rounded-full ${
+                      index === currentIndex ? 'bg-[#BBFF63]' : 'bg-[#E0E0E0]'
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={goToNext}
+                aria-label="Next design"
+                className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+              >
+                <AssetImage
+                  file="weui_arrow-filled.svg"
+                  className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
+                />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={goToNext}
-              aria-label="Next design"
-              className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
-            >
-              <AssetImage
-                file="weui_arrow-filled.svg"
-                className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
-              />
-            </button>
           </div>
-        </div>
+        )}
       </div>
       {current ? (
         <img

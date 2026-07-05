@@ -1,30 +1,30 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate, Link } from "react-router-dom";
-import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
-import { FaFacebookSquare } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { useAuthStore } from "../store/useAuthStore";
-import { api } from "../lib/axios";
-import { loginSchema, signupSchema } from "../schemas";
-import type { LoginFormValues, SignupFormValues } from "../schemas";
-import { useTranslation } from "react-i18next";
-import { Globe, ChevronDown } from "lucide-react";
-import { AxiosError } from "axios";
-import type { ApiErrorResponse } from "../types/api";
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate, Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { Eye, EyeOff } from 'lucide-react'
+import { FaFacebookSquare } from 'react-icons/fa'
+import { FcGoogle } from 'react-icons/fc'
+import { useAuthStore } from '../store/useAuthStore'
+import { api } from '../lib/axios'
+import { loginSchema, signupSchema } from '../schemas'
+import type { LoginFormValues, SignupFormValues } from '../schemas'
+import { useTranslation } from 'react-i18next'
+import { Globe, ChevronDown } from 'lucide-react'
+import { AxiosError } from 'axios'
+import type { ApiErrorResponse } from '../types/api'
 
 interface AuthPageProps {
-  mode: "login" | "signup";
+  mode: 'login' | 'signup'
 }
 
 function Toggle({
   checked,
   onChange,
 }: {
-  checked: boolean;
-  onChange: (v: boolean) => void;
+  checked: boolean
+  onChange: (v: boolean) => void
 }) {
   return (
     <button
@@ -33,8 +33,8 @@ function Toggle({
       className="relative h-[20px] w-[40px] shrink-0 cursor-pointer overflow-hidden rounded-[36.5px] border-[0.5px] border-gray-light transition-colors"
       style={{
         backgroundColor: checked
-          ? "var(--primary, #bbff63)"
-          : "var(--gray-light, #ededed)",
+          ? 'var(--primary, #bbff63)'
+          : 'var(--gray-light, #ededed)',
       }}
     >
       <div
@@ -46,31 +46,23 @@ function Toggle({
         <div className="absolute inset-[10%] rounded-[12px] bg-card shadow-[1px_1px_2px_-1px_rgba(51,51,51,0.3)]" />
       </div>
     </button>
-  );
+  )
 }
 
 export default function AuthPage({ mode }: AuthPageProps) {
-  const isLogin = mode === "login";
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
-  const navigate = useNavigate();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const { t, i18n } = useTranslation("auth");
-  const isRTL = i18n.language?.startsWith("ar");
+  const isLogin = mode === 'login'
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const navigate = useNavigate()
+  const setAuth = useAuthStore((state) => state.setAuth)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const { t, i18n } = useTranslation('auth')
+  const isRTL = i18n.language?.startsWith('ar')
 
-  const [open, setOpen] = useState(false);
-  const lang = isRTL ? "AR" : "EN";
-
-
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+  const [open, setOpen] = useState(false)
+  const lang = isRTL ? 'AR' : 'EN'
 
   const {
     register: registerLogin,
@@ -78,7 +70,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
     formState: { errors: loginErrors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-  });
+  })
 
   const {
     register: registerSignup,
@@ -87,49 +79,61 @@ export default function AuthPage({ mode }: AuthPageProps) {
   } = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      role: "user",
+      role: 'user',
     },
-  });
+  })
 
   const onLogin = async (data: LoginFormValues) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await api.post("/auth/login", data);
-      const { token, user: loggedInUser } = response.data.data;
-      setAuth(loggedInUser, token);
-      toast.success(t("toast.welcomeBack", { name: loggedInUser.name }));
-      const dest = loggedInUser.role === "trader" ? "/dashboard/trader" : loggedInUser.role === "admin" ? "/dashboard/admin" : "/";
-      console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role);
-      navigate(dest, { replace: true });
+      const response = await api.post('/auth/login', data)
+      const { token, user: loggedInUser } = response.data.data
+      setAuth(loggedInUser, token)
+      toast.success(t('toast.welcomeBack', { name: loggedInUser.name }))
+      const dest =
+        loggedInUser.role === 'trader'
+          ? '/dashboard/trader'
+          : loggedInUser.role === 'admin'
+            ? '/dashboard/admin'
+            : '/'
+      console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role)
+      navigate(dest, { replace: true })
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const errMsg = err.response?.data?.message || t("toast.loginFailed");
-      toast.error(errMsg);
+      const err = error as AxiosError<ApiErrorResponse>
+      const errMsg = err.response?.data?.message || t('toast.loginFailed')
+      toast.error(errMsg)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const onSignup = async (data: SignupFormValues) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await api.post("/auth/signup", data);
-      const { token, user } = response.data.data;
-      setAuth(user, token);
-      toast.success(t("toast.signupSuccess"));
-      navigate(user.role === "trader" ? "/dashboard/trader" : user.role === "admin" ? "/dashboard/admin" : "/");
+      const response = await api.post('/auth/signup', data)
+      const { token, user } = response.data.data
+      console.log(user)
+      setAuth(user, token)
+      toast.success(t('toast.signupSuccess'))
+      navigate(
+        user.role === 'trader'
+          ? '/dashboard/trader'
+          : user.role === 'admin'
+            ? '/dashboard/admin'
+            : '/'
+      )
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const errMsg = err.response?.data?.message || t("toast.signupFailed");
-      toast.error(errMsg);
+      const err = error as AxiosError<ApiErrorResponse>
+      const errMsg = err.response?.data?.message || t('toast.signupFailed')
+      toast.error(errMsg)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div
-      dir={isRTL ? "rtl" : "ltr"}
+      dir={isRTL ? 'rtl' : 'ltr'}
       className="flex min-h-screen w-full items-center justify-center    px-0 py-6 font-['Inter'] sm:px-4 lg:px-6"
     >
       {/* Main container — fluid, capped at desktop size */}
@@ -156,8 +160,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   </span>
                   <ChevronDown
                     size={20}
-                    className={`transition sm:size-6 ${open ? "rotate-180" : ""
-                      }`}
+                    className={`transition sm:size-6 ${
+                      open ? 'rotate-180' : ''
+                    }`}
                   />
                 </button>
 
@@ -165,8 +170,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   <div className="absolute mt-2 w-full overflow-hidden rounded-xl bg-zinc-800 shadow-lg z-10">
                     <button
                       onClick={() => {
-                        setOpen(false);
-                        i18n.changeLanguage("en");
+                        setOpen(false)
+                        i18n.changeLanguage('en')
                       }}
                       className="block w-full px-4 py-3 text-left hover:bg-zinc-700"
                     >
@@ -175,8 +180,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
 
                     <button
                       onClick={() => {
-                        setOpen(false);
-                        i18n.changeLanguage("ar");
+                        setOpen(false)
+                        i18n.changeLanguage('ar')
                       }}
                       className="block w-full px-4 py-3 text-left hover:bg-zinc-700"
                     >
@@ -195,10 +200,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 {/* Header */}
                 <div className="flex flex-col gap-[14px]">
                   <h1 className="font-['Montserrat'] text-[28px] font-semibold leading-normal text-foreground sm:text-[36px]">
-                    {t("login.title")}
+                    {t('login.title')}
                   </h1>
                   <p className="font-['Montserrat'] text-[15px] font-medium leading-normal text-gray-text sm:text-[16px]">
-                    {t("login.subtitle")}
+                    {t('login.subtitle')}
                   </p>
                 </div>
 
@@ -208,13 +213,13 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Email */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.email.label")}
+                        {t('fields.email.label')}
                       </label>
                       <input
                         type="email"
-                        placeholder={t("fields.email.placeholder")}
+                        placeholder={t('fields.email.placeholder')}
                         className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                        {...registerLogin("email")}
+                        {...registerLogin('email')}
                       />
                       {loginErrors.email && (
                         <p className="text-[13px] text-red-500">
@@ -226,19 +231,21 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Password */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.password.label")}
+                        {t('fields.password.label')}
                       </label>
                       <div className="flex flex-col gap-[16px]">
                         <div className="relative h-[56px] w-full">
                           <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder={t("fields.password.placeholder")}
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder={t('fields.password.placeholder')}
                             className="h-full w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                            {...registerLogin("password")}
+                            {...registerLogin('password')}
                           />
                           <button
                             type="button"
-                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            aria-label={
+                              showPassword ? 'Hide password' : 'Show password'
+                            }
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute end-[16px] top-1/2 -translate-y-1/2 text-gray-text hover:text-foreground"
                           >
@@ -262,14 +269,14 @@ export default function AuthPage({ mode }: AuthPageProps) {
                               onChange={setRememberMe}
                             />
                             <span className="font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-foreground">
-                              {t("rememberMe")}
+                              {t('rememberMe')}
                             </span>
                           </div>
                           <Link
                             to="#"
                             className="flex-1 text-end font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-[#007aff]"
                           >
-                            {t("forgotPassword")}
+                            {t('forgotPassword')}
                           </Link>
                         </div>
                       </div>
@@ -284,24 +291,30 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     disabled={isLoading}
                     className="flex w-full items-center justify-center rounded-[16px] bg-[#0f1115] py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
-                    {isLoading ? t("login.submitting") : t("login.submit")}
+                    {isLoading ? t('login.submitting') : t('login.submit')}
                   </button>
                   <div className="flex flex-wrap items-end justify-center gap-[8px] font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px]">
                     <span className="text-foreground">
-                      {t("login.noAccount")}
+                      {t('login.noAccount')}
                     </span>
                     <Link to="/signup" className="text-[#007aff] text-end">
-                      {t("login.signupLink")}
+                      {t('login.signupLink')}
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
-                    <button type="button" className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button
+                      type="button"
+                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                    >
                       <FaFacebookSquare size={24} color="#1877F2 " />
-                      {t("socials.facebook")}
+                      {t('socials.facebook')}
                     </button>
-                    <button type="button" className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button
+                      type="button"
+                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                    >
                       <FcGoogle size={24} />
-                      {t("socials.google")}
+                      {t('socials.google')}
                     </button>
                   </div>
                 </div>
@@ -315,10 +328,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 {/* Header */}
                 <div className="flex flex-col gap-[14px]">
                   <h1 className="font-['Montserrat'] text-[28px] font-semibold leading-normal text-foreground sm:text-[36px]">
-                    {t("signup.title")}
+                    {t('signup.title')}
                   </h1>
                   <p className="font-['Montserrat'] text-[15px] font-medium leading-normal text-gray-text sm:text-[16px]">
-                    {t("signup.subtitle")}
+                    {t('signup.subtitle')}
                   </p>
                 </div>
 
@@ -328,13 +341,13 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Email */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.email.label")}
+                        {t('fields.email.label')}
                       </label>
                       <input
                         type="email"
-                        placeholder={t("fields.email.placeholder")}
+                        placeholder={t('fields.email.placeholder')}
                         className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                        {...registerSignup("email")}
+                        {...registerSignup('email')}
                       />
                       {signupErrors.email && (
                         <p className="text-[13px] text-red-500">
@@ -346,13 +359,13 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Phone */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.phone.label")}
+                        {t('fields.phone.label')}
                       </label>
                       <input
                         type="text"
-                        placeholder={t("fields.phone.placeholder")}
+                        placeholder={t('fields.phone.placeholder')}
                         className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                        {...registerSignup("phone")}
+                        {...registerSignup('phone')}
                       />
                       {signupErrors.phone && (
                         <p className="text-[13px] text-red-500">
@@ -364,13 +377,13 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Name */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.name.label")}
+                        {t('fields.name.label')}
                       </label>
                       <input
                         type="text"
-                        placeholder={t("fields.name.placeholder")}
+                        placeholder={t('fields.name.placeholder')}
                         className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                        {...registerSignup("name")}
+                        {...registerSignup('name')}
                       />
                       {signupErrors.name && (
                         <p className="text-[13px] text-red-500">
@@ -382,17 +395,17 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Role */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.role.label")}
+                        {t('fields.role.label')}
                       </label>
                       <select
                         className="h-[56px] w-full cursor-pointer appearance-none rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none"
-                        {...registerSignup("role")}
+                        {...registerSignup('role')}
                       >
                         <option value="user">
-                          {t("fields.role.options.user")}
+                          {t('fields.role.options.user')}
                         </option>
                         <option value="trader">
-                          {t("fields.role.options.trader")}
+                          {t('fields.role.options.trader')}
                         </option>
                       </select>
                       {signupErrors.role && (
@@ -405,15 +418,15 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     {/* Password */}
                     <div className="flex flex-col gap-[8px]">
                       <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t("fields.password.label")}
+                        {t('fields.password.label')}
                       </label>
                       <div className="flex flex-col gap-[16px]">
                         <div className="relative h-[56px] w-full">
                           <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder={t("fields.password.placeholder")}
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder={t('fields.password.placeholder')}
                             className="h-full w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
-                            {...registerSignup("password")}
+                            {...registerSignup('password')}
                           />
                           <button
                             type="button"
@@ -439,7 +452,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                             onChange={setAgreeTerms}
                           />
                           <span className="font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-foreground">
-                            {t("agreeTerms")}
+                            {t('agreeTerms')}
                           </span>
                         </div>
                       </div>
@@ -454,24 +467,30 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     disabled={isLoading || !agreeTerms}
                     className="flex w-full items-center justify-center rounded-[16px] bg-[#0f1115] py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
-                    {isLoading ? t("signup.submitting") : t("signup.submit")}
+                    {isLoading ? t('signup.submitting') : t('signup.submit')}
                   </button>
                   <div className="flex flex-wrap items-end justify-center gap-[8px] font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px]">
                     <span className="text-foreground">
-                      {t("signup.hasAccount")}
+                      {t('signup.hasAccount')}
                     </span>
                     <Link to="/login" className="text-[#007aff] text-end">
-                      {t("signup.loginLink")}
+                      {t('signup.loginLink')}
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
-                    <button type='button' className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button
+                      type="button"
+                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                    >
                       <FaFacebookSquare size={24} color="#1877F2 " />
-                      {t("socials.facebook")}
+                      {t('socials.facebook')}
                     </button>
-                    <button type='button' className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center">
+                    <button
+                      type="button"
+                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                    >
                       <FcGoogle size={24} />
-                      {t("socials.google")}
+                      {t('socials.google')}
                     </button>
                   </div>
                 </div>
@@ -486,8 +505,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
             <img
               src={
                 isLogin
-                  ? "/images/auth/login-hero.png"
-                  : "/images/auth/signup-hero.png"
+                  ? '/images/auth/login-hero.png'
+                  : '/images/auth/signup-hero.png'
               }
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
@@ -496,5 +515,5 @@ export default function AuthPage({ mode }: AuthPageProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
