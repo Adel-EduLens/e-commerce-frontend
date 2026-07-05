@@ -1,10 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import FilterComponent from '../components/shared/FilterComponent'
+import { api } from '../lib/axios'
+import { AxiosError } from 'axios'
+import { toast } from 'sonner'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -17,30 +20,6 @@ type AssetImageProps = {
 function AssetImage({ file, className, alt = '' }: AssetImageProps) {
   return (
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
-  )
-}
-
-function FilterButton({
-  label,
-  compact = false,
-}: {
-  label: string
-  compact?: boolean
-}) {
-  return (
-    <div
-      className={`${compact ? 'justify-center gap-2' : 'w-44 justify-between'} flex items-center rounded-2xl bg-[#EDEDED] p-4`}
-    >
-      <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-        {label}
-      </div>
-      <div className="relative h-8 w-8 overflow-hidden rounded-full bg-white">
-        <AssetImage
-          file="weui_arrow-filled-1.svg"
-          className="absolute left-[4px] top-[10px] h-3 w-6"
-        />
-      </div>
-    </div>
   )
 }
 
@@ -290,62 +269,169 @@ function VoteRings() {
   )
 }
 
+type VoteDesign = {
+  id: string
+  title: string
+  imagePath: string
+  votes?: number
+}
+
 function VoteSection() {
+  const [designs, setDesigns] = useState<VoteDesign[]>([])
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [voting, setVoting] = useState(false)
+  const fetchDesigns = async () => {
+    try {
+      const res = await api.get('/upload/images')
+      if (res.status === 200) {
+        setDesigns(res.data?.data ?? [])
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message ?? 'Failed to load designs')
+      } else {
+        toast.error('An unexpected error occurred')
+      }
+    }
+  }
+  useEffect(() => {
+    fetchDesigns()
+  }, [])
+
+  const current = designs[currentIndex]
+
+  function goToPrevious() {
+    setCurrentIndex((i) => {
+      if (designs.length === 0) return i
+      return (i - 1 + designs.length) % designs.length
+    })
+  }
+
+  function goToNext() {
+    setCurrentIndex((i) => {
+      if (designs.length === 0) return i
+      return (i + 1) % designs.length
+    })
+  }
+
+  async function handleVote() {
+    if (!current || voting) return
+    setVoting(true)
+    try {
+      const res = await api.put(`/upload/vote/${current.id}`)
+      if (res.status === 200) {
+        toast.success('Your vote has been counted!')
+        setDesigns((prev) =>
+          prev.map((design) =>
+            design.id === current.id
+              ? { ...design, votes: (design.votes ?? 0) + 1 }
+              : design
+          )
+        )
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message ?? 'Failed to submit vote')
+      } else {
+        toast.error('An unexpected error occurred')
+      }
+    } finally {
+      setVoting(false)
+    }
+  }
+
   return (
     <div className="mt-16 relative h-[1242px] w-full">
       <div className="absolute left-0 top-0 w-[646px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
         Vote for next design
       </div>
       <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-[#BBFF63]">
-        <div className="absolute left-[604px] top-[672px] h-16 w-52 rounded-2xl bg-white">
+        <VoteRings />
+
+        {!current ? (
+          <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-[#1A1A1A]">
+            No designs to vote on yet.
+          </div>
+        ) : (
+          <>
+            <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
+              {current.title?.trim() || 'Untitled design'}
+            </div>
+            <div className="absolute left-[714px] top-[350px] inline-flex flex-col items-start justify-start gap-4">
+              <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A]">
+                Votes
+              </div>
+              <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-[#1A1A1A]">
+                {(current.votes ?? 0).toLocaleString()}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleVote}
+              disabled={voting}
+              className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4 disabled:opacity-60"
+            >
+              {voting ? (
+                <span className="h-8 w-8 animate-spin rounded-full border-4 border-[#1A1A1A]/20 border-t-[#1A1A1A]" />
+              ) : (
+                <div className="font-['Montserrat'] text-3xl font-medium text-[#1A1A1A] flex gap-1">
+                  <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
+                  Vote
+                </div>
+              )}
+            </button>
+          </>
+        )}
+
+        <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white">
           <div className="absolute left-[12px] top-[12px] inline-flex items-center justify-start gap-4">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]">
+            <button
+              type="button"
+              onClick={goToPrevious}
+              aria-label="Previous design"
+              className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+            >
               <AssetImage
                 file="weui_arrow-filled-2.svg"
-                className="absolute left-[16px] top-[8px] h-8 w-4"
+                className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
               />
-            </div>
+            </button>
             <div className="flex items-center justify-start gap-1">
-              <div className="h-2 w-2 rounded-full bg-[#E0E0E0]" />
-              <div className="h-2 w-2 rounded-full bg-[#BBFF63]" />
-              <div className="h-2 w-2 rounded-full bg-[#E0E0E0]" />
-              <div className="h-2 w-2 rounded-full bg-[#E0E0E0]" />
-              <div className="h-2 w-2 rounded-full bg-[#E0E0E0]" />
+              {designs.map((design, index) => (
+                <div
+                  key={design.id}
+                  className={`h-2 w-2 rounded-full ${
+                    index === currentIndex ? 'bg-[#BBFF63]' : 'bg-[#E0E0E0]'
+                  }`}
+                />
+              ))}
             </div>
-            <div className="relative h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]">
+            <button
+              type="button"
+              onClick={goToNext}
+              aria-label="Next design"
+              className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+            >
               <AssetImage
                 file="weui_arrow-filled.svg"
-                className="absolute left-[16px] top-[8px] h-8 w-4"
+                className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
               />
-            </div>
-          </div>
-        </div>
-        <VoteRings />
-        <div className="absolute left-[714px] top-[196px] w-[539px] font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
-          Streetwear Oversized Jacket – SS2025
-        </div>
-        <div className="absolute left-[714px] top-[330px] w-[496px] font-['Montserrat'] text-4xl font-normal text-[#1A1A1A]">
-          Willy Bogner
-        </div>
-        <div className="absolute left-[714px] top-[390px] inline-flex w-24 flex-col items-start justify-start gap-4">
-          <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A]">
-            Vote
-          </div>
-          <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-[#1A1A1A]">
-            1,200
-          </div>
-        </div>
-        <div className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4">
-          <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
-          <div className="font-['Montserrat'] text-3xl font-medium text-[#1A1A1A]">
-            Vote
+            </button>
           </div>
         </div>
       </div>
-      <AssetImage
-        file="image 11.png"
-        className="absolute left-[4px] top-[157px] h-[1085px] w-[665px]"
-      />
+      {current ? (
+        <img
+          src={current.imagePath}
+          alt={current.title}
+          className="absolute left-[4px] top-[157px] h-[1085px] w-[665px] rounded-3xl object-cover"
+        />
+      ) : (
+        <AssetImage
+          file="image 11.png"
+          className="absolute left-[4px] top-[157px] h-[1085px] w-[665px]"
+        />
+      )}
     </div>
   )
 }

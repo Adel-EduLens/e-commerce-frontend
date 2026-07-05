@@ -39,9 +39,9 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               <span>FAQ</span>
             </button>
             <button
-              onClick={() => navigate('/dashboard/admin/prizes')}
+              onClick={() => navigate('/dashboard/admin/analytics')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${
-                isActive('/dashboard/admin/prizes')
+                isActive('/dashboard/admin/analytics')
                   ? 'bg-primary/15 text-primary font-semibold'
                   : 'text-gray-text hover:bg-gray-light'
               }`}
@@ -70,6 +70,17 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             >
               <Award size={18} />
               <span>Help Center</span>
+            </button>
+            <button
+              onClick={() => navigate('/dashboard/admin/designs')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${
+                isActive('/dashboard/admin/designs')
+                  ? 'bg-primary/15 text-primary font-semibold'
+                  : 'text-gray-text hover:bg-gray-light'
+              }`}
+            >
+              <Award size={18} />
+              <span>Designs</span>
             </button>
           </div>
         </div>

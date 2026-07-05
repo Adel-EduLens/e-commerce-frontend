@@ -45,6 +45,7 @@ import AdminLayout from '../layouts/AdminLayout'
 import TestPage from '../pages/TestPage'
 import AdminHelpCenterPage from '../pages/admin/AdminHelpCenterPage'
 import HelpCenterCategorie from '../pages/HelpCenterCategorie'
+import AdminDesignPage from '../pages/admin/AdminDesignPage'
 
 export const router = createBrowserRouter([
   {
@@ -209,6 +210,16 @@ export const router = createBrowserRouter([
           <ProtectedRoute allowedRoles={['admin']}>
             <AdminLayout>
               <PrizeControllerPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'dashboard/admin/designs',
+        element: (
+          <ProtectedRoute allowedRoles={['admin']}>
+            <AdminLayout>
+              <AdminDesignPage />
             </AdminLayout>
           </ProtectedRoute>
         ),
