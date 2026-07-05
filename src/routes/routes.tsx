@@ -66,7 +66,7 @@ export const router = createBrowserRouter([
         element: <TraderLoginPage />,
       },
       {
-        path: 'product-details',
+        path: 'product-details/:id',
         element: (
           <UserLayout>
             <ProductDetailsPage />

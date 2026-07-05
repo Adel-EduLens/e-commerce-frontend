@@ -14,6 +14,10 @@
   --color-light-card: var(--card);
   --color-light-Text: var(--foreground);
   --color-Stroke-light: var(--stroke);
+
+  --color-ink: var(--ink);
+  --color-info: var(--info);
+  --color-urgent: var(--urgent);
 }
 
 :root {
@@ -25,6 +29,10 @@
   --gray-light: #ededed;
   --gray-text: #6b7280;
   --shadow: #1e252d1a;
+
+  --ink: #0f1115;
+  --info: #87c3ff;
+  --urgent: #d6001c;
 
   font-family: 'Inter', sans-serif;
 }
