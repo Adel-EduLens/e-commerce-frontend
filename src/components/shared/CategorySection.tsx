@@ -44,7 +44,7 @@ function CategoriesSection() {
         {categories.map((category) => (
           <Link
             key={category.label}
-            to={`/collections/${category.slug}`}
+            to={`/wholesale?category=${category.slug}`}
             className="relative h-[547px] w-[448px] overflow-hidden bg-white no-underline"
           >
             <AssetImage

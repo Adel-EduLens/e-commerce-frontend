@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useTraderWholesales } from "../../hooks/queries/wholesaleQuery";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
 
@@ -62,13 +63,13 @@ const recentAlerts = [
   { title: "Payment Overdue", desc: "Delta Traders payment of $5,200 is 3 days overdue.", time: "1 day ago", color: "bg-rose-400" },
 ];
 
-const topSellingProducts = [
+const topSellingProductsFallback = [
   { name: "Classic White Tee", sku: "SKU-001", units: "3,200 pcs", revenue: "$28,800" },
   { name: "Slim Fit Chinos", sku: "SKU-002", units: "2,100 pcs", revenue: "$37,800" },
   { name: "Hooded Sweatshirt", sku: "SKU-003", units: "1,800 pcs", revenue: "$32,400" },
 ];
 
-const wholesaleOrders = [
+const wholesaleOrdersFallback = [
   { id: "#WS-1021", client: "Alpha Retail Co.", items: 5, qty: 500, spent: "$12,400", date: "Oct 10, 2025", status: "Active" },
   { id: "#WS-1022", client: "Beta Goods Ltd.", items: 3, qty: 320, spent: "$9,870", date: "Oct 8, 2025", status: "Pending" },
   { id: "#WS-1023", client: "Gamma Supplies", items: 4, qty: 210, spent: "$7,500", date: "Sep 29, 2025", status: "Active" },
@@ -248,6 +249,28 @@ export default function TraderWholesalePage() {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState<SidebarLabel>("Wholesale");
   const [search, setSearch] = useState("");
+  const { data: traderWholesales = [], isLoading: wholesalesLoading } = useTraderWholesales();
+
+  const topSellingProducts = traderWholesales.length > 0
+    ? traderWholesales.slice(0, 3).map((w, idx) => ({
+        name: w.name,
+        sku: `SKU-${String(idx + 1).padStart(3, '0')}`,
+        units: `${w.minOrder} pcs min`,
+        revenue: `$${w.price}`,
+      }))
+    : topSellingProductsFallback;
+
+  const wholesaleOrders = traderWholesales.length > 0
+    ? traderWholesales.map((w, idx) => ({
+        id: `#WS-${String(idx + 1).padStart(4, '0')}`,
+        client: w.brand,
+        items: w.sizes.length,
+        qty: w.minOrder,
+        spent: `$${w.price}`,
+        date: new Date(w.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: "Active",
+      }))
+    : wholesaleOrdersFallback;
 
   const avatar =
     typeof user?.avatar === "string" && user.avatar
