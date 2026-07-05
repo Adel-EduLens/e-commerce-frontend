@@ -15,7 +15,15 @@ function AssetImage({
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
   )
 }
-const FILTER_OPTIONS = {
+export interface FilterValues {
+  category: string | null
+  size: string | null
+  color: string | null
+  price: string | null
+  search: string
+}
+
+const DEFAULT_FILTER_OPTIONS = {
   category: ['T-Shirts', 'Hoodies', 'Jackets', 'Accessories'],
   size: ['XS', 'S', 'M', 'L', 'XL'],
   color: ['Black', 'White', 'Amber', 'Slate'],
@@ -47,12 +55,18 @@ function SearchBar({
     </div>
   )
 }
-function FilterBar() {
+function FilterBar({ onFilterChange, filterOptions }: { onFilterChange?: (filters: FilterValues) => void; filterOptions?: typeof DEFAULT_FILTER_OPTIONS }) {
+  const options = filterOptions || DEFAULT_FILTER_OPTIONS
   const [category, setCategory] = useState<string | null>(null)
   const [size, setSize] = useState<string | null>(null)
   const [color, setColor] = useState<string | null>(null)
   const [price, setPrice] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+
+  const notify = (updates: Partial<FilterValues>) => {
+    const values = { category, size, color, price, search, ...updates }
+    onFilterChange?.(values)
+  }
 
   return (
     <div className="flex w-full flex-col items-start justify-start gap-4">
@@ -63,33 +77,33 @@ function FilterBar() {
         <div className="flex flex-wrap items-center justify-start gap-3">
           <FilterDropdown
             label="Category"
-            options={FILTER_OPTIONS.category}
+            options={options.category}
             value={category}
-            onChange={setCategory}
+            onChange={(v) => { setCategory(v); notify({ category: v }) }}
           />
           <FilterDropdown
             label="Size"
-            options={FILTER_OPTIONS.size}
+            options={options.size}
             value={size}
-            onChange={setSize}
+            onChange={(v) => { setSize(v); notify({ size: v }) }}
             wide
           />
           <FilterDropdown
             label="Color"
-            options={FILTER_OPTIONS.color}
+            options={options.color}
             value={color}
-            onChange={setColor}
+            onChange={(v) => { setColor(v); notify({ color: v }) }}
             wide
           />
           <FilterDropdown
             label="Price"
-            options={FILTER_OPTIONS.price}
+            options={options.price}
             value={price}
-            onChange={setPrice}
+            onChange={(v) => { setPrice(v); notify({ price: v }) }}
             wide
           />
         </div>
-        <SearchBar value={search} onChange={setSearch} />
+        <SearchBar value={search} onChange={(v) => { setSearch(v); notify({ search: v }) }} />
       </div>
     </div>
   )
@@ -166,8 +180,8 @@ function FilterDropdown({
     </div>
   )
 }
-const FilterComponent = () => {
-  return <FilterBar />
+const FilterComponent = ({ onFilterChange, filterOptions }: { onFilterChange?: (filters: FilterValues) => void; filterOptions?: typeof DEFAULT_FILTER_OPTIONS }) => {
+  return <FilterBar onFilterChange={onFilterChange} filterOptions={filterOptions} />
 }
 
 export default FilterComponent

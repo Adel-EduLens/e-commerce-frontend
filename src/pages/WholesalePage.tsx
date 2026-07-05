@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
-import FilterComponent from '../components/shared/FilterComponent'
+import FilterComponent, { type FilterValues } from '../components/shared/FilterComponent'
+import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -178,9 +179,9 @@ function HeroBanner() {
   )
 }
 
-function ViewAllButton() {
+function ViewAllButton({ to }: { to: string }) {
   return (
-    <div className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4">
+    <Link to={to} className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4 no-underline">
       <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
         View All
       </div>
@@ -190,11 +191,43 @@ function ViewAllButton() {
           className="absolute left-[14px] top-[8px] h-6 w-3"
         />
       </div>
-    </div>
+    </Link>
   )
 }
 
-function ProductSection({ title }: { title: string }) {
+function ProductSection({ title, products, isLoading, viewAllLink }: { title: string; products: Wholesale[]; isLoading: boolean; viewAllLink?: string }) {
+  const [filters, setFilters] = useState<FilterValues>({ category: null, size: null, color: null, price: null, search: '' })
+
+  const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
+  const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
+  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
+
+  const filterOptions = {
+    category: allCategories,
+    size: allSizes,
+    color: allColors,
+    price: ['Under $10', '$10-20', '$20-30', '$30+'],
+  }
+
+  const handleFilter = useCallback((f: FilterValues) => setFilters(f), [])
+
+  const filtered = useMemo(() => {
+    return products.filter((item) => {
+      if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
+      if (filters.category && item.category.name !== filters.category) return false
+      if (filters.size && !item.sizes.some((s) => s.size === filters.size)) return false
+      if (filters.color && !item.colors.some((c) => c.color === filters.color)) return false
+      if (filters.price) {
+        const p = item.price
+        if (filters.price === 'Under $10' && p >= 10) return false
+        if (filters.price === '$10-20' && (p < 10 || p > 20)) return false
+        if (filters.price === '$20-30' && (p < 20 || p > 30)) return false
+        if (filters.price === '$30+' && p < 30) return false
+      }
+      return true
+    })
+  }, [products, filters])
+
   return (
     <div className="mx-6 mt-24 flex flex-col items-start justify-start gap-10">
       <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
@@ -202,16 +235,32 @@ function ProductSection({ title }: { title: string }) {
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
-          <FilterComponent />
-          <div className="grid grid-cols-4 items-start justify-start gap-6">
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-          </div>
+          <FilterComponent onFilterChange={handleFilter} filterOptions={filterOptions} />
+          {isLoading ? (
+            <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
+          ) : (
+            <div className="grid grid-cols-4 items-start justify-start gap-6">
+              {filtered.length > 0 ? (
+                filtered.map((item) => (
+                  <ProductCard
+                    key={item.id}
+                    title={item.name}
+                    price={`$${item.price}`}
+                    imageSrc={item.images[0]?.url}
+                    rating={item.rating}
+                    sizeLabel={item.sizes.map((s) => s.size).join(', ')}
+                    to={`/wholesale?category=${item.category.name}`}
+                  />
+                ))
+              ) : (
+                <p className="col-span-4 text-center font-['Montserrat'] text-lg text-[#6B7280]">
+                  No wholesale products available yet.
+                </p>
+              )}
+            </div>
+          )}
         </div>
-        <ViewAllButton />
+        {filtered.length > 0 && viewAllLink && <ViewAllButton to={viewAllLink} />}
       </div>
     </div>
   )
@@ -219,7 +268,32 @@ function ProductSection({ title }: { title: string }) {
 
 export default function WholesalePage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { user, isAuthenticated } = useAuthStore()
+
+  const categoryFilter = searchParams.get('category')
+  const filterParam = searchParams.get('filter')
+  const categoryName = categoryFilter
+    ? categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1).toLowerCase()
+    : null
+
+  const filterMap: Record<string, { label: string; filters: Parameters<typeof useWholesales>[0] }> = {
+    'best-deals': { label: 'Best Deals', filters: { isBestDeal: true } },
+    'most-popular': { label: 'Most Popular', filters: { isMostPopular: true } },
+    'premium-collections': { label: 'Premium Collections', filters: { isPremiumCollection: true } },
+  }
+  const activeFilter = filterParam ? filterMap[filterParam] : null
+
+  const { data: filteredProducts = [], isLoading: filteredLoading } = useWholesales(
+    categoryName ? { category: categoryName } : activeFilter ? activeFilter.filters : undefined
+  )
+  const { data: bestDeals = [], isLoading: bestDealsLoading } = useWholesales({ isBestDeal: true })
+  const { data: mostPopular = [], isLoading: popularLoading } = useWholesales({ isMostPopular: true })
+  const { data: premium = [], isLoading: premiumLoading } = useWholesales({ isPremiumCollection: true })
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [categoryFilter, filterParam])
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -231,13 +305,27 @@ export default function WholesalePage() {
     return null
   }
 
+  if (categoryName || activeFilter) {
+    return (
+      <div className="w-full pt-8 overflow-hidden">
+        <HeroBanner />
+        <ProductSection
+          title={categoryName || activeFilter!.label}
+          products={filteredProducts}
+          isLoading={filteredLoading}
+        />
+        <FaqSection />
+      </div>
+    )
+  }
+
   return (
     <div className="w-full pt-8 overflow-hidden">
       <HeroBanner />
-      <ProductSection title="Best Deals" />
+      <ProductSection title="Best Deals" products={bestDeals} isLoading={bestDealsLoading} viewAllLink="/wholesale?filter=best-deals" />
       <CategoriesSection />
-      <ProductSection title="Most Popular" />
-      <ProductSection title="Premium Collections" />
+      <ProductSection title="Most Popular" products={mostPopular} isLoading={popularLoading} viewAllLink="/wholesale?filter=most-popular" />
+      <ProductSection title="Premium Collections" products={premium} isLoading={premiumLoading} viewAllLink="/wholesale?filter=premium-collections" />
       <FaqSection />
     </div>
   )
