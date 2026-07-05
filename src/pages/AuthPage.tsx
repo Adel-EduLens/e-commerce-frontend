@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate, Link } from 'react-router-dom'
@@ -57,13 +57,11 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [agreeTerms, setAgreeTerms] = useState(false)
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const { t, i18n } = useTranslation('auth')
   const isRTL = i18n.language?.startsWith('ar')
 
   const [open, setOpen] = useState(false)
   const lang = isRTL ? 'AR' : 'EN'
-
   const {
     register: registerLogin,
     handleSubmit: handleLoginSubmit,
@@ -299,6 +297,15 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     </span>
                     <Link to="/signup" className="text-[#007aff] text-end">
                       {t('login.signupLink')}
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap items-end justify-center gap-[8px] font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px]">
+                    <span className="text-foreground">Are you a seller?</span>
+                    <Link
+                      to="/trader/login"
+                      className="text-[#007aff] text-end"
+                    >
+                      login
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">

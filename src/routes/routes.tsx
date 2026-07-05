@@ -46,6 +46,7 @@ import TestPage from '../pages/TestPage'
 import AdminHelpCenterPage from '../pages/admin/AdminHelpCenterPage'
 import HelpCenterCategorie from '../pages/HelpCenterCategorie'
 import AdminDesignPage from '../pages/admin/AdminDesignPage'
+import TraderLoginPage from '../pages/TraderLoginPage'
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
             <HomePage />
           </UserLayout>
         ),
+      },
+      {
+        path: 'trader/login',
+        element: <TraderLoginPage />,
       },
       {
         path: 'product-details',
@@ -233,7 +238,7 @@ export const router = createBrowserRouter([
         ),
         children: [
           {
-            path: '',
+            index: true,
             element: <TraderDashboard />,
           },
           {
