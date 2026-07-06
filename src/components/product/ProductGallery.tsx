@@ -1,52 +1,30 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useProduct } from "../../hooks/queries/productsQuery";
 import { ArrowCircle } from "./ui/ArrowCircle";
+import type { DetailItem } from "../../types/DetailItem";
 
 type ProductGalleryProps = {
   selectedColor: string;
+  item: DetailItem;
 };
 
-export function ProductGallery({ selectedColor }: ProductGalleryProps) {
-  const { id } = useParams();
-
-  const { data: product, isPending, isError } = useProduct(id);
-
+export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const images = product?.images || [];
+  const images = item.images;
 
   useEffect(() => {
-    const func = async () => {
-      if (!selectedColor || images.length === 0) return;
+    if (!selectedColor || images.length === 0) return;
 
-      const matchingIndex = images.findIndex(
-        (image) =>
-          image.color &&
-          image.color.toLowerCase() === selectedColor.toLowerCase(),
-      );
+    const matchingIndex = images.findIndex(
+      (image) =>
+        image.color &&
+        image.color.toLowerCase() === selectedColor.toLowerCase(),
+    );
 
-      if (matchingIndex !== -1) {
-        setSelectedImageIndex(matchingIndex);
-      }
-    };
-    func();
+    if (matchingIndex !== -1) {
+      setSelectedImageIndex(matchingIndex);
+    }
   }, [selectedColor, images]);
-
-  if (isPending) {
-    return (
-      <div className="flex flex-3 w-full items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
-  if (isError || !product) {
-    return (
-      <div className="flex flex-3 w-full items-center justify-center">
-        Product not found.
-      </div>
-    );
-  }
 
   const handleGalleryStep = (direction: "previous" | "next") => {
     setSelectedImageIndex((currentIndex) => {
@@ -65,7 +43,7 @@ export function ProductGallery({ selectedColor }: ProductGalleryProps) {
         <div className="order-1 relative w-full overflow-hidden rounded-3xl lg:flex-1">
           <img
             src={images[selectedImageIndex]?.url}
-            alt={product.name}
+            alt={item.name}
             className="aspect-[3/4] w-full object-cover z-0"
           />
         </div>
@@ -87,7 +65,7 @@ export function ProductGallery({ selectedColor }: ProductGalleryProps) {
               >
                 <img
                   src={image.url}
-                  alt={`${product.name} ${index + 1}`}
+                  alt={`${item.name} ${index + 1}`}
                   className="absolute left-0 top-0 h-full w-full object-cover"
                 />
               </button>

@@ -4,7 +4,14 @@ import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
-import FilterComponent from '../components/shared/FilterComponent'
+import CatalogFilters from '../components/shared/CatalogFilters'
+
+const defaultDropdownFilters = {
+  category: ['T-Shirts', 'Hoodies', 'Jackets', 'Accessories'],
+  size: ['XS', 'S', 'M', 'L', 'XL'],
+  color: ['Black', 'White', 'Amber', 'Slate'],
+  price: ['Under $250', '$250-450', '$450-700', '$700+'],
+}
 import { api } from '../lib/axios'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
@@ -47,7 +54,7 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
   return (
     <div className="w-full flex flex-col items-center justify-start gap-8">
-      <FilterComponent />
+      <CatalogFilters dropdownFilters={defaultDropdownFilters} />
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
           <ProductCard
@@ -202,7 +209,7 @@ function MustHavesSection() {
         This Season's Must-Haves
       </div>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
-        <FilterComponent />
+        <CatalogFilters dropdownFilters={defaultDropdownFilters} />
         <div className="self-stretch inline-flex items-center justify-start gap-6">
           {Array.from({ length: 4 }).map((_, index) => (
             <ProductCard key={index} />

@@ -1,24 +1,18 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
-
-import { useProduct } from "../hooks/queries/productsQuery";
-import { useParams } from "react-router-dom";
+import { useWholesale } from "../hooks/queries/wholesaleQuery";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
-import { ReviewsSection } from "../components/product/ReviewsSection";
-
 import { RecommedProducts } from "../components/product/recommedProducts";
-import { useReviews } from "../hooks/queries/reviewQuery";
 import type { DetailItem } from "../types/DetailItem";
 
-export default function ProductDetailsPage() {
+export default function WholesaleDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, isAuthenticated } = useAuthStore();
-  const { data: product, isPending, isError } = useProduct(id);
-  const { data: reviews = [] } = useReviews(id);
+  const { data: wholesale, isPending, isError } = useWholesale(id);
 
   const [selectedColor, setSelectedColor] = useState("");
 
@@ -29,29 +23,29 @@ export default function ProductDetailsPage() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    if (product && product.colors.length > 0 && !selectedColor) {
-      setSelectedColor(product.colors[0].color);
+    if (wholesale && wholesale.colors.length > 0 && !selectedColor) {
+      setSelectedColor(wholesale.colors[0].color);
     }
-  }, [product, selectedColor]);
+  }, [wholesale, selectedColor]);
 
   if (!isAuthenticated || !user) {
     return null;
   }
   if (isPending) return <div className="p-10 text-center">Loading...</div>;
-  if (isError || !product)
-    return <div className="p-10 text-center">Product not found.</div>;
+  if (isError || !wholesale)
+    return <div className="p-10 text-center">Wholesale product not found.</div>;
 
   const item: DetailItem = {
-    ...product,
-    brandName: product.brand?.name ?? null,
-    sizeguide: product.sizeguide,
+    ...wholesale,
+    brandName: wholesale.brand ?? null,
+    minOrder: wholesale.minOrder,
   };
 
   return (
     <div className="w-full bg-background">
       <div className="mx-auto flex w-full max-w-[1428px] flex-col gap-12 px-4 py-6 sm:px-6 sm:py-8 lg:gap-20 lg:px-8 lg:py-10">
         <div className="font-['Montserrat'] text-sm font-normal text-gray-text sm:text-base">
-          Home / {product.category.name} / {product.name}
+          Home / Wholesale / {wholesale.category.name} / {wholesale.name}
         </div>
 
         <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
@@ -61,10 +55,8 @@ export default function ProductDetailsPage() {
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
             item={item}
-            reviewCount={reviews.length}
           />
         </div>
-        <ReviewsSection />
         <RecommedProducts />
       </div>
     </div>

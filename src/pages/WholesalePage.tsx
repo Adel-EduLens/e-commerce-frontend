@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
-import FilterComponent, { type FilterValues } from '../components/shared/FilterComponent'
+import CatalogFilters, { type DropdownFilterValues } from '../components/shared/CatalogFilters'
 import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
@@ -196,7 +196,7 @@ function ViewAllButton({ to }: { to: string }) {
 }
 
 function ProductSection({ title, products, isLoading, viewAllLink }: { title: string; products: Wholesale[]; isLoading: boolean; viewAllLink?: string }) {
-  const [filters, setFilters] = useState<FilterValues>({ category: null, size: null, color: null, price: null, search: '' })
+  const [filters, setFilters] = useState<DropdownFilterValues>({ category: null, size: null, color: null, price: null, brand: null, search: '' })
 
   const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
   const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
@@ -209,7 +209,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
     price: ['Under $10', '$10-20', '$20-30', '$30+'],
   }
 
-  const handleFilter = useCallback((f: FilterValues) => setFilters(f), [])
+  const handleFilter = useCallback((f: DropdownFilterValues) => setFilters(f), [])
 
   const filtered = useMemo(() => {
     return products.filter((item) => {
@@ -235,7 +235,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
-          <FilterComponent onFilterChange={handleFilter} filterOptions={filterOptions} />
+          <CatalogFilters onDropdownFilterChange={handleFilter} dropdownFilters={filterOptions} />
           {isLoading ? (
             <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
           ) : (
@@ -249,7 +249,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                     imageSrc={item.images[0]?.url}
                     rating={item.rating}
                     sizeLabel={item.sizes.map((s) => s.size).join(', ')}
-                    to={`/wholesale?category=${item.category.name}`}
+                    to={`/wholesale/${item.id}`}
                   />
                 ))
               ) : (
