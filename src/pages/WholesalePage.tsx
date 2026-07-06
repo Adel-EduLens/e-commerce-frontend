@@ -166,16 +166,20 @@ function HeroOutlineFan() {
 
 function HeroBanner() {
   return (
-    <div className="relative mx-6 h-96 overflow-hidden rounded-3xl bg-[#C4B5FD]">
-      <div className="absolute left-[352px] top-[93px] w-[565px] font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
-        From Factory to You – Big Quantities, Bigger Profits.
+    <div className="relative mx-4 sm:mx-6 overflow-hidden rounded-3xl bg-[#C4B5FD]">
+      <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-12 lg:py-16 lg:px-[352px] lg:min-h-[384px]">
+        <div className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-5xl font-semibold text-[#1A1A1A] max-w-lg">
+          From Factory to You – Big Quantities, Bigger Profits.
+        </div>
       </div>
       <img
-        className="absolute left-[-188px] top-0 h-96 w-[543px]"
+        className="hidden lg:block absolute left-[-188px] top-0 h-96 w-[543px]"
         src="/image.png"
         alt=""
       />
-      <HeroOutlineFan />
+      <div className="hidden lg:block">
+        <HeroOutlineFan />
+      </div>
     </div>
   )
 }
@@ -221,8 +225,8 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
   }, [products, filterState])
 
   return (
-    <div className="mx-6 mt-24 flex flex-col items-start justify-start gap-10">
-      <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-foreground">
+    <div className="mx-4 sm:mx-6 mt-24 flex flex-col items-start justify-start gap-10">
+      <div className="self-stretch font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
         {title}
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
@@ -231,7 +235,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
           {isLoading ? (
             <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
           ) : (
-            <div className="grid grid-cols-4 items-start justify-start gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start justify-start gap-6">
               {filtered.length > 0 ? (
                 filtered.map((item) => (
                   <ProductCard

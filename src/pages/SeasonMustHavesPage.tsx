@@ -97,7 +97,7 @@ export default function SeasonMustHavesPage() {
 
   return (
     <div className="w-full">
-      <div className="font-['Montserrat'] text-8xl font-bold text-foreground">
+      <div className="font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
         This Season's Must-Haves
       </div>
 

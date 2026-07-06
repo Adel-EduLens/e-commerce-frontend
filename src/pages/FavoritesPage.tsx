@@ -28,7 +28,7 @@ function AssetImage({
 
 function ProductRow() {
   return (
-    <div className="inline-flex w-full items-center justify-start gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
       <ProductCard />
       <ProductCard featured accentClassName="bg-[#C4B5FD]" />
       <ProductCard />
@@ -43,7 +43,7 @@ function FilterSection() {
       <div className="self-stretch font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
         Filter by
       </div>
-      <div className="inline-flex items-center justify-between self-stretch">
+      <div className="flex flex-wrap items-center gap-4 self-stretch">
         <div className="flex items-center justify-start gap-4">
           {/* Sort by */}
           <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#EDEDED] p-4">
@@ -58,7 +58,7 @@ function FilterSection() {
             </div>
           </div>
           {/* Filter by */}
-          <div className="flex w-44 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
+          <div className="flex w-auto items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
             <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
               Filter by
             </div>
@@ -71,7 +71,7 @@ function FilterSection() {
           </div>
         </div>
         {/* Search */}
-        <div className="flex w-96 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
+        <div className="flex w-full sm:w-96 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
           <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
             Search
           </div>
@@ -105,7 +105,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="w-full">
-      <div className="font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-4xl font-bold text-foreground">
         Favorites
       </div>
       <FilterSection />

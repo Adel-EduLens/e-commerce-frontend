@@ -67,7 +67,7 @@ export default function ProductsSection({
 
   return (
     <section className="mt-16 flex w-full flex-col items-center gap-10">
-      <h2 className="text-center font-['Montserrat'] text-8xl font-bold text-foreground">
+      <h2 className="text-center font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
         {title}
       </h2>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
@@ -86,7 +86,7 @@ export default function ProductsSection({
             </div>
           </div>
         )}
-        {!isPending && !isError && <div className="flex w-full flex-wrap justify-center gap-6">
+        {!isPending && !isError && <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {data?.products.map((product) => (
             <ProductCard
               key={product.id}
