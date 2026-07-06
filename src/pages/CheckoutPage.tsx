@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import GoogleMapPicker from "../components/GoogleMap";
@@ -71,46 +71,81 @@ function DropdownArrow() {
   );
 }
 
-function FormInput({ placeholder, className = "" }: { placeholder: string; className?: string }) {
+function FormInput({ placeholder, value, onChange, className = "" }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; className?: string }) {
   return (
-    <div className={`flex h-14 sm:h-16 items-center rounded-lg bg-white pl-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] ${className}`}>
-      <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#6B7280]">{placeholder}</span>
+    <div className={`flex h-14 sm:h-16 items-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] overflow-hidden ${className}`}>
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        className="w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A] placeholder:text-[#6B7280] outline-none"
+      />
     </div>
   );
 }
 
-function FormSelect({ placeholder, className = "" }: { placeholder: string; className?: string }) {
+function FormSelect({ placeholder, value, onChange, options = [], className = "" }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void; options?: string[]; className?: string }) {
   return (
-    <div className={`flex h-14 sm:h-16 items-center justify-between rounded-lg bg-white px-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] ${className}`}>
-      <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#6B7280]">{placeholder}</span>
-      <DropdownArrow />
+    <div className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] overflow-hidden ${className}`}>
+      <select
+        value={value}
+        onChange={onChange}
+        className="w-full h-full px-4 appearance-none bg-transparent font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A] outline-none z-10"
+      >
+        <option value="" disabled className="text-[#6B7280]">{placeholder}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>{opt}</option>
+        ))}
+        {value && !options.includes(value) && <option value={value}>{value}</option>}
+      </select>
+      <div className="absolute right-4 z-0 pointer-events-none">
+        <DropdownArrow />
+      </div>
     </div>
   );
 }
 
 function DeliverySection() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [country, setCountry] = useState("Egypt");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [apartment, setApartment] = useState("");
+
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
       <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-[#1A1A1A]">DELIVERY</h2>
       <div className="flex flex-col gap-4 sm:gap-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormInput placeholder="First name" />
-          <FormInput placeholder="Last name" />
+          <FormInput placeholder="First name" value={firstName} onChange={e => setFirstName(e.target.value)} />
+          <FormInput placeholder="Last name" value={lastName} onChange={e => setLastName(e.target.value)} />
         </div>
-        <FormInput placeholder="Phone Number" />
-        <FormInput placeholder="Email Address" />
+        <FormInput placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} />
+        <FormInput placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormSelect placeholder="Country" />
-          <FormSelect placeholder="City" />
+          <FormSelect placeholder="Country" value={country} onChange={e => setCountry(e.target.value)} options={["Egypt", "Saudi Arabia", "UAE"]} />
+          <FormSelect placeholder="City" value={city} onChange={e => setCity(e.target.value)} options={["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"]} />
         </div>
-        <FormSelect placeholder="Area" />
+        <FormInput placeholder="Area" value={area} onChange={e => setArea(e.target.value)} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormInput placeholder="Street Address" />
-          <FormInput placeholder="Apartment" />
+          <FormInput placeholder="Street Address" value={streetAddress} onChange={e => setStreetAddress(e.target.value)} />
+          <FormInput placeholder="Apartment" value={apartment} onChange={e => setApartment(e.target.value)} />
         </div>
         <div className="flex flex-col gap-4">
           <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">Select on Map</div>
-          <GoogleMapPicker onLocationPick={() => { }} />
+          <GoogleMapPicker
+            onLocationPick={(loc) => {
+              if (loc.city) setCity(loc.city);
+              if (loc.area) setArea(loc.area);
+              if (loc.streetAddress) setStreetAddress(loc.streetAddress);
+            }}
+            searchQuery={[streetAddress, area, city, country].filter(Boolean).join(", ")}
+          />
         </div>
       </div>
     </div>
