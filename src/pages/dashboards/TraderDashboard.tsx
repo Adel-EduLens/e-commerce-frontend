@@ -1,27 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
 
 
-
-const sidebarItems = [
-  { label: "Overview", icon: "si_dashboard-line.svg" },
-  { label: "Retail", icon: "fluent_building-retail-20-regular.svg" },
-  { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg" },
-  { label: "Wholesale", icon: "system-uicons_boxes.svg" },
-  { label: "Brand Partners", icon: "mdi_partnership-outline.svg" },
-  { label: "Products", icon: "streamline-ultimate_products-gifts.svg" },
-  { label: "Orders", icon: "carbon_follow-up-work-order.svg" },
-  { label: "Inventory", icon: "material-symbols_inventory.svg" },
-  { label: "Customers", icon: "carbon_customer.svg" },
-  { label: "Finance", icon: "material-symbols_finance-rounded.svg" },
-  { label: "Notifications", icon: "ion_notifications-outline.svg" },
-  { label: "Analytics", icon: "grommet-icons_analytics.svg" },
-  { label: "Store Settings", icon: "solar_settings-linear.svg" },
-] as const;
 
 const dateRanges = ["29 Oct - 11 Nov", "Last 30 days", "This quarter"] as const;
 
@@ -415,62 +398,15 @@ function getStatusPill(status: string) {
 }
 
 export default function TraderDashboard() {
-  const { user, clearAuth } = useAuthStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [activeItem, setActiveItem] = useState<(typeof sidebarItems)[number]["label"]>("Overview");
   const [dateRange, setDateRange] = useState<(typeof dateRanges)[number]>(dateRanges[0]);
 
   const firstName = user?.name?.trim().split(/\s+/)[0] || "Maan";
-  const avatar = typeof user?.avatar === "string" && user.avatar
-    ? user.avatar
-    : traderAsset("unsplash_8Vt2haq8NSQ.png");
-
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
 
   return (
     <>
-        
-
-        <div className="flex-1 space-y-6">
-          <section className="rounded-[32px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-6">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="font-['Montserrat'] text-xl font-semibold text-[#111827] sm:text-2xl">
-                  Dashboard Overview
-                </p>
-                <p className="mt-1 text-sm text-[#6B7280]">
-                  Daily performance summary for your retail and wholesale operations.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => navigate("/notifications")}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#111827] bg-[#111827] transition hover:bg-[#1F2937]"
-                >
-                  <img
-                    className="h-5 w-5"
-                    src={traderAsset("ion_notifications-outline.svg")}
-                    alt=""
-                  />
-                </button>
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white">
-                  <img className="h-5 w-5" src={traderAsset("hugeicons_moon-01.svg")} alt="" />
-                </div>
-                <img
-                  className="h-12 w-12 rounded-full object-cover"
-                  src={avatar}
-                  alt={user?.name || "Trader avatar"}
-                />
-              </div>
-            </div>
-          </section>
-
+        <div className="space-y-6">
           <section className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <h1 className="font-['Montserrat'] text-3xl font-semibold text-[#111827] sm:text-4xl">

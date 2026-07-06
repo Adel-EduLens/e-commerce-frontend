@@ -1,33 +1,6 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useAuthStore } from "../../store/useAuthStore";
-
-const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
-
 const asset = (file: string) =>
   `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
 
-const traderOverviewAsset = (file: string) =>
-  `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
-
-const sidebarItems = [
-  { label: "Overview", icon: "si_dashboard-line.svg" },
-  { label: "Retail", icon: "fluent_building-retail-20-regular.svg" },
-  { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg" },
-  { label: "Wholesale", icon: "system-uicons_boxes.svg" },
-  { label: "Brand Partners", icon: "mdi_partnership-outline.svg" },
-  { label: "Products", icon: "streamline-ultimate_products-gifts.svg" },
-  { label: "Orders", icon: "carbon_follow-up-work-order.svg" },
-  { label: "Inventory", icon: "material-symbols_inventory.svg" },
-  { label: "Customers", icon: "carbon_customer.svg" },
-  { label: "Finance", icon: "material-symbols_finance-rounded.svg" },
-  { label: "Notifications", icon: "ion_notifications-outline.svg" },
-  { label: "Analytics", icon: "grommet-icons_analytics.svg" },
-  { label: "Store Settings", icon: "solar_settings-linear.svg" },
-] as const;
-
-type SidebarLabel = (typeof sidebarItems)[number]["label"];
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
@@ -233,62 +206,11 @@ function OrdersDonutChart() {
 // ─── Page ──────────────────────────────────────────────────────────────────
 
 export default function TraderDropshippingPage() {
-  const { user, clearAuth } = useAuthStore();
-  const navigate = useNavigate();
-  const [activeItem, setActiveItem] = useState<SidebarLabel>("Dropshipping");
-
-  const avatar =
-    typeof user?.avatar === "string" && user.avatar
-      ? user.avatar
-      : traderOverviewAsset("unsplash_8Vt2haq8NSQ.png");
-
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
-
-  const handleSidebarClick = (label: SidebarLabel) => {
-    setActiveItem(label);
-    if (label === "Overview") navigate("/dashboard/trader");
-    if (label === "Products") navigate("/dashboard/trader/products");
-    if (label === "Orders") navigate("/dashboard/trader/orders");
-    if (label === "Inventory") navigate("/dashboard/trader/inventory");
-    if (label === "Customers") navigate("/dashboard/trader/customers");
-    if (label === "Finance") navigate("/dashboard/trader/finance");
-    if (label === "Analytics") navigate("/dashboard/trader/analytics");
-    if (label === "Dropshipping") navigate("/dashboard/trader/dropshipping");
-  };
-
   return (
     <>
+        <div className="space-y-5">
 
-        {/* ── Sidebar ── */}
-        
-
-        {/* ── Main ── */}
-        <div className="flex-1 space-y-5">
-
-          {/* 1. Header bar */}
-          <div className="rounded-[32px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-            <div className="flex items-center justify-between gap-4">
-              <p className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Dropshipping</p>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#111827] bg-[#111827] transition hover:bg-[#1F2937]"
-                >
-                  <img className="h-5 w-5" src={asset("ion_notifications-outline.svg")} alt="" />
-                </button>
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white">
-                  <img className="h-5 w-5" src={asset("hugeicons_moon-01.svg")} alt="" />
-                </div>
-                <img className="h-12 w-12 rounded-full object-cover" src={avatar} alt={user?.name || "Trader"} />
-              </div>
-            </div>
-          </div>
-
-          {/* 2. Stats cards row */}
+          {/* Stats cards row */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {statsCards.map((card) => (
               <div
