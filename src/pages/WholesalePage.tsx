@@ -235,7 +235,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
           {isLoading ? (
             <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-start justify-start gap-6">
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filtered.length > 0 ? (
                 filtered.map((item) => (
                   <ProductCard
