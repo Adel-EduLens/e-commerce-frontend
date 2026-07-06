@@ -1,30 +1,44 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import { useCartStore } from "../store/useCartStore";
 import GoogleMapPicker from "../components/GoogleMap";
 
 function OrderSummary() {
+  const items = useCartStore((state) => state.items);
+  const subtotal = useMemo(
+    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+    [items]
+  );
+  const shipping = 50; // Flat shipping rate
+  const total = subtotal + shipping;
+
+  const formatCurrency = (v: number) => `$${v.toFixed(2)}`;
+
   return (
     <div className="w-full flex flex-col gap-8 rounded-2xl bg-white px-4 py-6 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-      <div className="flex flex-col gap-4 border-b border-[#E0E0E0] pb-4">
-        {[1, 2].map((i) => (
-          <div key={i} className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2">
+      <div className="flex flex-col gap-4 border-b border-[#E0E0E0] pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+        {items.map((item) => (
+          <div key={item.id} className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2">
             <div className="relative shrink-0">
               <img
-                className="h-24 w-20 sm:h-28 sm:w-24 rounded object-cover"
-                src="/checkout/Rectangle%203.png"
-                alt=""
+                className="h-24 w-20 sm:h-28 sm:w-24 rounded object-cover bg-gray-100"
+                src={item.imageSrc || "/checkout/Rectangle%203.png"}
+                alt={item.title}
               />
               <div className="absolute -right-2 -top-1 h-6 w-6 overflow-hidden rounded-lg bg-[#0F1115] flex items-center justify-center">
-                <span className="font-['Montserrat'] text-sm font-semibold text-[#BBFF63]">1</span>
+                <span className="font-['Montserrat'] text-sm font-semibold text-[#BBFF63]">{item.quantity}</span>
               </div>
             </div>
             <div className="flex flex-col gap-2 py-1">
               <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-[#1A1A1A]">
-                Amber Blaze Classic Tee
+                {item.title}
+              </div>
+              <div className="font-['Montserrat'] text-sm font-medium text-gray-500">
+                Size: {item.size} &middot; Color: {item.color}
               </div>
               <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-[#1A1A1A]">
-                $250
+                {formatCurrency(item.unitPrice * item.quantity)}
               </div>
             </div>
           </div>
@@ -43,20 +57,20 @@ function OrderSummary() {
         <div className="flex flex-col gap-3 border-b border-[#E0E0E0] pb-4">
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">Subtotal</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">$235.00</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">{formatCurrency(subtotal)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">Estimated Shipping</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">Calculated at Checkout</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">{formatCurrency(shipping)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">Estimated Taxes</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">Calculated at Checkout</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">Included</span>
           </div>
         </div>
         <div className="flex items-center justify-between">
           <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-[#1A1A1A]">Total</span>
-          <span className="font-['Montserrat'] text-lg sm:text-xl font-bold text-[#1A1A1A]">$235.00</span>
+          <span className="font-['Montserrat'] text-lg sm:text-xl font-bold text-[#1A1A1A]">{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

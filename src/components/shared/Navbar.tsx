@@ -19,7 +19,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const items = useCartStore((state) => state.items)
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0)
+  const itemCount = items.length
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()

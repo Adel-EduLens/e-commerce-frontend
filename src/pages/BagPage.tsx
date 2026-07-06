@@ -318,8 +318,8 @@ function FavoritesSection({
           type="button"
           onClick={() => onSelectTab("favorites")}
           className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "favorites"
-              ? "border-b-[3px] border-foreground text-foreground"
-              : "text-gray-text hover:text-foreground"
+            ? "border-b-[3px] border-foreground text-foreground"
+            : "text-gray-text hover:text-foreground"
             }`}
         >
           Favorites
@@ -328,8 +328,8 @@ function FavoritesSection({
           type="button"
           onClick={() => onSelectTab("recent")}
           className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "recent"
-              ? "border-b-[3px] border-foreground text-foreground"
-              : "text-gray-text hover:text-foreground"
+            ? "border-b-[3px] border-foreground text-foreground"
+            : "text-gray-text hover:text-foreground"
             }`}
         >
           Recently Viewed
@@ -383,10 +383,7 @@ export default function BagPage() {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCouponType | null>(null);
   const [selectedTab, setSelectedTab] = useState<BagTab>("favorites");
-  const itemCount = useMemo(
-    () => items.reduce((total, item) => total + item.quantity, 0),
-    [items]
-  );
+  const itemCount = useMemo(() => items.length, [items]);
   const subtotal = useMemo(
     () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
     [items]
