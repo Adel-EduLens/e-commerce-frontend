@@ -54,6 +54,9 @@ export type ProductsQuery = {
   categoryId?: string;
   brandId?: string;
   filter?: string;
+  size?: string;
+  color?: string;
+  price? : string;
   sortBy?: "name" | "price" | "rating";
   sortOrder?: "asc" | "desc";
 

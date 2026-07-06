@@ -4,7 +4,6 @@ import AccountLayout from "../layouts/AccountLayout";
 import UserLayout from "../layouts/UserLayout";
 import HomePage from "../pages/HomePage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
-import SeasonMustHavesPage from "../pages/SeasonMustHavesPage";
 import MenCollectionPage from "../pages/MenCollectionPage";
 import BagPage from "../pages/BagPage";
 import ContactDetailsPage from "../pages/ContactDetailsPage";
@@ -40,6 +39,7 @@ import WholesalePage from "../pages/WholesalePage";
 import WholesaleDetailsPage from "../pages/WholesaleDetailsPage";
 import DesignLabPage from "../pages/DesignLabPage";
 import ProtectedRoute from "../components/ProtectedRoute";
+
 import AdminLoginPage from "../pages/admin/AdminLoginPage";
 import AdminLayout from "../layouts/AdminLayout";
 

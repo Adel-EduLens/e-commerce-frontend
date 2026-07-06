@@ -5,7 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 import { ProductCard, CatalogFilters } from "../components/shared";
 import Pagination from "../components/shared/Pagination";
-
+import { buildPriceRanges } from "../utils/priceRanges";
 import { useProducts } from "../hooks/queries/productsQuery";
 import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
@@ -24,37 +24,106 @@ const CATEGORY_LABELS: Record<string, string> = {
   women: "Women",
 };
 
+function useHomeFilters() {
+  const { data } = useProducts({ limit: 100 });
+
+  const products = data?.products ?? [];
+  const allCategories = useMemo(
+    () => [...new Set(products.map((p) => p.category.name))],
+    [products],
+  );
+  const allBrands = useMemo(
+    () => [
+      ...new Set(
+        products.map((p) => p.brand?.name).filter(Boolean) as string[],
+      ),
+    ],
+    [products],
+  );
+  const allSizes = useMemo(
+    () => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))],
+    [products],
+  );
+  const allColors = useMemo(
+    () => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))],
+    [products],
+  );
+  const priceRanges = useMemo(
+    () => buildPriceRanges(products.map((p) => p.price)),
+    [products],
+  );
+
+  return useMemo(
+    () => [
+      { key: "category", label: "Category", options: allCategories },
+      { key: "brand", label: "Brand", options: allBrands },
+      { key: "size", label: "Size", options: allSizes },
+      { key: "color", label: "Color", options: allColors },
+      ...(priceRanges.length > 1
+        ? [{ key: "price", label: "Price", options: priceRanges }]
+        : []),
+    ],
+    [allCategories, allBrands, allSizes, allColors, priceRanges],
+  );
+}
+
 export default function ProductsPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const filter2 = useHomeFilters();
+
+  const [filters, setFilters] = useState({
+    search: "",
+    category: null as string | null,
+    brand: null as string | null,
+    size: null as string | null,
+    color: null as string | null,
+    price: null as string | null,
+  });
+
+  // Sorting isn't wired to any UI control yet — sensible defaults for now.
+  const [sortBy] = useState<string>("createdAt");
+  const [sortOrder] = useState<"asc" | "desc">("desc");
+
+  const [searchParams] = useSearchParams();
 
   const { user, isAuthenticated } = useAuthStore();
 
-  const categoryName = searchParams.get("category") ?? "";
+  const urlCategoryName = searchParams.get("category") ?? "";
   const filter = searchParams.get("filter") ?? "";
 
-  const [search, setSearch] = useState("");
-  const [brandId, setBrandId] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "price" | "rating">("name");
-  const [sortOrder] = useState<"asc" | "desc">("asc");
+  
+  const effectiveCategoryName = filters.category ?? urlCategoryName;
+
   const [page, setPage] = useState(1);
 
   const { data: categories = [] } = useCategories();
   const { data: brands = [] } = useBrands();
 
   const categoryId = useMemo(() => {
+    if (!effectiveCategoryName) return "";
     const matchedId = categories.find(
-      (c) => c.name.toLowerCase() === categoryName.toLowerCase(),
+      (c) => c.name.toLowerCase() === effectiveCategoryName.toLowerCase(),
     )?.id;
-    if (matchedId) return matchedId;
-    return categoryName.length > 0 ? "0000000" : "";
-  }, [categories, categoryName]);
+
+    return matchedId ?? "0000000";
+  }, [categories, effectiveCategoryName]);
+
+  const brandId = useMemo(() => {
+    if (!filters.brand) return "";
+    const matchedId = brands.find(
+      (b) => b.name.toLowerCase() === filters.brand!.toLowerCase(),
+    )?.id;
+    return matchedId ?? "0000000";
+  }, [brands, filters.brand]);
+
   const { data, isLoading, isError } = useProducts({
-    search,
+    search: filters.search,
     categoryId,
     brandId,
+    size: filters.size ?? "",
+    color: filters.color ?? "",
+    price: filters.price ?? "",
     filter,
-    sortBy,
     sortOrder,
     page,
     limit: 8,
@@ -71,35 +140,33 @@ export default function ProductsPage() {
       setPage(1);
     };
     func();
-  }, [search, categoryId, brandId, filter, sortBy, sortOrder]);
+  }, [
+    filters.search,
+    categoryId,
+    brandId,
+    filters.size,
+    filters.color,
+    filters.price,
+    filter,
+    sortBy,
+    sortOrder,
+  ]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
-  const handleCategoryChange = (id: string) => {
-    const name = categories.find((c) => c.id === id)?.name ?? "";
-
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (name) next.set("category", name);
-        else next.delete("category");
-        return next;
-      },
-      { replace: true },
-    );
-  };
-
   const pageTitle = useMemo(() => {
     if (filter) return FILTER_LABELS[filter] ?? "Products";
 
-    if (categoryName) {
-      return CATEGORY_LABELS[categoryName.toLowerCase()] ?? "All Products";
+    if (effectiveCategoryName) {
+      return (
+        CATEGORY_LABELS[effectiveCategoryName.toLowerCase()] ?? "All Products"
+      );
     }
 
     return "All Products";
-  }, [filter, categoryName]);
+  }, [filter, effectiveCategoryName]);
 
   if (!isAuthenticated || !user) return null;
 
@@ -118,17 +185,7 @@ export default function ProductsPage() {
       </div>
 
       <div className="mt-8">
-        <CatalogFilters
-          onSearchChange={setSearch}
-          categoryId={categoryId}
-          onCategoryChange={handleCategoryChange}
-          brandId={brandId}
-          onBrandChange={setBrandId}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          categories={categories}
-          brands={brands}
-        />
+        <CatalogFilters filters={filter2} onFilterChange={setFilters} />
       </div>
 
       {isLoading && (
