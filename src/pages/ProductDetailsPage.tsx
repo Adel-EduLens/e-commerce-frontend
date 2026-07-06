@@ -10,37 +10,16 @@ import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
 import { ReviewsSection } from "../components/product/ReviewsSection";
 import { RecommedProducts } from "../components/product/recommedProducts";
-<<<<<<< HEAD
-import { useRecentStore } from "../store/useRecentStore";
-=======
 import { useReviews } from "../hooks/queries/reviewQuery";
 import type { DetailItem } from "../types/DetailItem";
->>>>>>> cf5bacdfdf50f5279493d03d0d4f5eb163a1e6d2
 
 export default function ProductDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, isAuthenticated } = useAuthStore();
   const { data: product, isPending, isError } = useProduct(id);
-<<<<<<< HEAD
-  const addRecent = useRecentStore((state) => state.addProduct);
-
-  useEffect(() => {
-    if (product) {
-      addRecent({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        images: product.images,
-        sizes: product.sizes,
-        rating: product.rating,
-      });
-    }
-  }, [product, addRecent]);
-=======
   const { data: reviews = [] } = useReviews(id);
   const addSignal = useRecommendationStore((s) => s.addSignal);
->>>>>>> cf5bacdfdf50f5279493d03d0d4f5eb163a1e6d2
 
   const [selectedColor, setSelectedColor] = useState("");
 
