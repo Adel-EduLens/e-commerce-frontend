@@ -5,7 +5,6 @@ import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters from '../components/shared/CatalogFilters'
-import { buildPriceRanges } from '../utils/priceRanges'
 import { useProducts } from '../hooks/queries/productsQuery'
 import { api } from '../lib/axios'
 import { AxiosError } from 'axios'
@@ -54,15 +53,12 @@ function useHomeFilters() {
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])], [products])
   const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
   const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
-  const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
-
   return useMemo(() => [
     { key: 'category', label: 'Category', options: allCategories },
     { key: 'brand', label: 'Brand', options: allBrands },
     { key: 'size', label: 'Size', options: allSizes },
     { key: 'color', label: 'Color', options: allColors },
-    ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
-  ], [allCategories, allBrands, allSizes, allColors, priceRanges])
+  ], [allCategories, allBrands, allSizes, allColors])
 }
 
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {

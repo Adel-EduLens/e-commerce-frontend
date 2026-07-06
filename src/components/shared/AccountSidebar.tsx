@@ -1,11 +1,13 @@
 import {
   Bell,
   Clock,
+  Gift,
   HelpCircle,
   LayoutDashboard,
   LogOut,
   Settings,
   ShoppingBag,
+  Smile,
   User,
   Wallet,
 } from "lucide-react";
@@ -26,8 +28,9 @@ const items: SidebarItem[] = [
   { icon: User, label: "My Info", path: "/contact-details" },
   { icon: Bell, label: "Notifications", path: "/notifications" },
   { icon: Clock, label: "Notify Me List", path: "/notify-me-list" },
+  { icon: Gift, label: "Gift Cards", path: "/gift-cards" },
+  { icon: Smile, label: "Avatar", path: "/avatar" },
   { icon: Settings, label: "Settings", path: "/settings" },
-  { icon: HelpCircle, label: "Help Center", path: "/help-center" },
 ];
 
 function SidebarRow({

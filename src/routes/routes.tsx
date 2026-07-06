@@ -116,6 +116,10 @@ export const router = createBrowserRouter([
         ),
         children: [
           {
+            path: "dashboard/user",
+            element: <UserDashboard />,
+          },
+          {
             path: "contact-details",
             element: <ContactDetailsPage />,
             handle: {
@@ -304,16 +308,6 @@ export const router = createBrowserRouter([
             element: <TraderStoreSettingsPage />,
           },
         ],
-      },
-      {
-        path: "dashboard/user",
-        element: (
-          <ProtectedRoute allowedRoles={["user"]}>
-            <UserLayout>
-              <UserDashboard />
-            </UserLayout>
-          </ProtectedRoute>
-        ),
       },
       {
         path: "checkout",

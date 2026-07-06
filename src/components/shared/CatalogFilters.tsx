@@ -117,7 +117,7 @@ function PriceRangeInput({
           inputMode="numeric"
           value={min}
           onChange={(e) => onMinChange(e.target.value)}
-          placeholder="Min"
+          placeholder="Min Price"
           className={inputClasses}
         />
       </div>
@@ -129,7 +129,7 @@ function PriceRangeInput({
           inputMode="numeric"
           value={max}
           onChange={(e) => onMaxChange(e.target.value)}
-          placeholder="Max"
+          placeholder="Max Price"
           className={inputClasses}
         />
       </div>
