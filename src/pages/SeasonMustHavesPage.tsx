@@ -7,40 +7,33 @@ import {
   ProductCard,
   CatalogFilters,
 } from "../components/shared";
-import type { DropdownFilterValues } from "../components/shared/CatalogFilters";
+import type { FilterValues } from "../components/shared/CatalogFilters";
 import Pagination from "../components/shared/Pagination";
 
 import { useProducts } from "../hooks/queries/productsQuery";
-import { useCategories } from "../hooks/queries/categoriesQuery";
-import { useBrands } from "../hooks/queries/brandsQuery";
+import { buildPriceRanges } from "../utils/priceRanges";
 
 export default function SeasonMustHavesPage() {
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuthStore();
 
-  const [filters, setFilters] = useState<DropdownFilterValues>({
-    category: null,
-    size: null,
-    color: null,
-    price: null,
-    brand: null,
-    search: "",
-  });
+  const [filterState, setFilterState] = useState<FilterValues>({ search: "" });
 
   const [page, setPage] = useState(1);
 
-  const { data: categories = [] } = useCategories();
-  const { data: brands = [] } = useBrands();
+  // Fetch all products (no filters) for building filter options from real data
+  const { data: allData } = useProducts({ limit: 100 });
+  const allProducts = allData?.products ?? [];
 
-  // Map selected name back to ID for the API
+  // Map selected name back to ID for the API query
   const categoryId = useMemo(
-    () => categories.find((c) => c.name === filters.category)?.id ?? "",
-    [categories, filters.category],
+    () => allProducts.find((p) => p.category.name === filterState.category)?.category.id ?? "",
+    [allProducts, filterState.category],
   );
   const brandId = useMemo(
-    () => brands.find((b) => b.name === filters.brand)?.id ?? "",
-    [brands, filters.brand],
+    () => allProducts.find((p) => p.brand?.name === filterState.brand)?.brand?.id ?? "",
+    [allProducts, filterState.brand],
   );
 
   const {
@@ -48,7 +41,7 @@ export default function SeasonMustHavesPage() {
     isLoading,
     isError,
   } = useProducts({
-    search: filters.search,
+    search: filterState.search,
     categoryId,
     brandId,
     sortBy: "name",
@@ -57,27 +50,24 @@ export default function SeasonMustHavesPage() {
     limit: 4,
   });
 
-  const allSizes = useMemo(
-    () => [...new Set(data?.products.flatMap((p) => p.sizes.map((s) => s.size)) ?? [])],
-    [data],
-  );
-  const allColors = useMemo(
-    () => [...new Set(data?.products.flatMap((p) => p.colors.map((c) => c.color)) ?? [])],
-    [data],
+  const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category.name))], [allProducts]);
+  const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
+  const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.sizes.map((s) => s.size)))], [allProducts]);
+  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors.map((c) => c.color)))], [allProducts]);
+  const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
+
+  const filterConfigs = useMemo(
+    () => [
+      { key: "category", label: "Category", options: allCategories },
+      { key: "brand", label: "Brand", options: allBrands },
+      { key: "size", label: "Size", options: allSizes },
+      { key: "color", label: "Color", options: allColors },
+      ...(priceRanges.length > 1 ? [{ key: "price", label: "Price", options: priceRanges }] : []),
+    ],
+    [allCategories, allBrands, allSizes, allColors, priceRanges],
   );
 
-  const dropdownFilters = useMemo(
-    () => ({
-      category: categories.map((c) => c.name),
-      brand: brands.map((b) => b.name),
-      size: allSizes,
-      color: allColors,
-      price: ['Under $50', '$50-100', '$100-250', '$250+'],
-    }),
-    [categories, brands, allSizes, allColors],
-  );
-
-  const handleFilter = useCallback((f: DropdownFilterValues) => setFilters(f), []);
+  const handleFilter = useCallback((f: FilterValues) => setFilterState(f), []);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -87,7 +77,7 @@ export default function SeasonMustHavesPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [filters]);
+  }, [filterState]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -113,8 +103,8 @@ export default function SeasonMustHavesPage() {
 
       <div className="mt-8">
         <CatalogFilters
-          dropdownFilters={dropdownFilters}
-          onDropdownFilterChange={handleFilter}
+          filters={filterConfigs}
+          onFilterChange={handleFilter}
         />
       </div>
 

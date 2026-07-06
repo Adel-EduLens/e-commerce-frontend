@@ -1,31 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { ChevronDown } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
-type DropdownFilterKey = "category" | "size" | "color" | "price" | "brand";
-
-/** Values emitted by the dropdown-style filters. */
-export type DropdownFilterValues = {
-  category: string | null;
-  size: string | null;
-  color: string | null;
-  price: string | null;
-  brand: string | null;
-  search: string;
+export type FilterConfig = {
+  key: string;
+  label: string;
+  options: string[];
 };
+
+export type FilterValues = Record<string, string | null> & { search: string };
 
 type CatalogFiltersProps = {
   className?: string;
-
-  /** Which dropdown pills to show and their options. Only provided keys are rendered. */
-  dropdownFilters?: Partial<Record<DropdownFilterKey, string[]>>;
-  /** Called whenever any dropdown pill or the search input changes. */
-  onDropdownFilterChange?: (values: DropdownFilterValues) => void;
+  filters?: FilterConfig[];
+  onFilterChange?: (values: FilterValues) => void;
 };
 
-// ── Sub-components ─────────────────────────────────────────────────────
+// ── FilterDropdown ─────────────────────────────────────────────────────
 
 function FilterDropdown({
   label,
@@ -47,10 +40,10 @@ function FilterDropdown({
         onClick={() => setOpen((o) => !o)}
         className="flex w-44 items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
       >
-        <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
+        <div className="truncate font-['Montserrat'] text-xl font-medium text-[#6B7280]">
           {value ?? label}
         </div>
-        <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
+        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
           <ChevronDown
             className={`h-5 w-5 text-[#6B7280] transition-transform ${open ? "rotate-180" : ""}`}
           />
@@ -60,7 +53,7 @@ function FilterDropdown({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex min-w-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
+          <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex max-h-64 min-w-full flex-col overflow-y-auto overflow-x-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
             {value !== null && (
               <button
                 type="button"
@@ -97,132 +90,76 @@ function FilterDropdown({
 
 // ── Main component ─────────────────────────────────────────────────────
 
+function buildInitialValues(filters: FilterConfig[]): FilterValues {
+  const values: FilterValues = { search: "" };
+  for (const f of filters) {
+    values[f.key] = null;
+  }
+  return values;
+}
+
 export default function CatalogFilters({
   className = "",
-  dropdownFilters,
-  onDropdownFilterChange,
+  filters = [],
+  onFilterChange,
 }: CatalogFiltersProps) {
-  const [searchValue, setSearchValue] = useState("");
+  const [values, setValues] = useState<FilterValues>(() =>
+    buildInitialValues(filters),
+  );
 
-  // Dropdown pill state
-  const [ddCategory, setDdCategory] = useState<string | null>(null);
-  const [ddSize, setDdSize] = useState<string | null>(null);
-  const [ddColor, setDdColor] = useState<string | null>(null);
-  const [ddPrice, setDdPrice] = useState<string | null>(null);
-  const [ddBrand, setDdBrand] = useState<string | null>(null);
+  // Reset state when filter config changes (e.g. new keys from API)
+  const prevKeysRef = useRef("");
+  const currentKeys = filters.map((f) => f.key).join(",");
+  if (currentKeys !== prevKeysRef.current) {
+    prevKeysRef.current = currentKeys;
+  }
 
-  // Debounced search
+  // Debounced search notification
   useEffect(() => {
-    if (!onDropdownFilterChange) return;
-    const timer = setTimeout(() => {
-      onDropdownFilterChange({
-        category: ddCategory,
-        size: ddSize,
-        color: ddColor,
-        price: ddPrice,
-        brand: ddBrand,
-        search: searchValue,
-      });
-    }, 500);
+    if (!onFilterChange) return;
+    const timer = setTimeout(() => onFilterChange(values), 400);
     return () => clearTimeout(timer);
-  }, [searchValue]);
+  }, [values.search]);
 
-  // Notify dropdown filter changes
-  const notifyDropdown = (updates: Partial<DropdownFilterValues>) => {
-    const values: DropdownFilterValues = {
-      category: ddCategory,
-      size: ddSize,
-      color: ddColor,
-      price: ddPrice,
-      brand: ddBrand,
-      search: searchValue,
-      ...updates,
-    };
-    onDropdownFilterChange?.(values);
+  const updateFilter = (key: string, value: string | null) => {
+    setValues((prev) => {
+      const next = { ...prev, [key]: value };
+      onFilterChange?.(next);
+      return next;
+    });
   };
 
-  const hasDropdownFilters = dropdownFilters && Object.keys(dropdownFilters).length > 0;
+  const updateSearch = (value: string) => {
+    setValues((prev) => ({ ...prev, search: value }));
+  };
 
   return (
-    <div className={`flex w-full flex-col items-start justify-start gap-4 ${className}`}>
+    <div
+      className={`flex w-full flex-col items-start justify-start gap-4 ${className}`}
+    >
       <div className="font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
         Filter by
       </div>
 
       <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center justify-start gap-3">
-          {hasDropdownFilters && (
-            <>
-              {dropdownFilters.category && (
-                <FilterDropdown
-                  label="Category"
-                  options={dropdownFilters.category}
-                  value={ddCategory}
-                  onChange={(v) => {
-                    setDdCategory(v);
-                    notifyDropdown({ category: v });
-                  }}
-                />
-              )}
-              {dropdownFilters.size && (
-                <FilterDropdown
-                  label="Size"
-                  options={dropdownFilters.size}
-                  value={ddSize}
-                  onChange={(v) => {
-                    setDdSize(v);
-                    notifyDropdown({ size: v });
-                  }}
-                />
-              )}
-              {dropdownFilters.color && (
-                <FilterDropdown
-                  label="Color"
-                  options={dropdownFilters.color}
-                  value={ddColor}
-                  onChange={(v) => {
-                    setDdColor(v);
-                    notifyDropdown({ color: v });
-                  }}
-                />
-              )}
-              {dropdownFilters.price && (
-                <FilterDropdown
-                  label="Price"
-                  options={dropdownFilters.price}
-                  value={ddPrice}
-                  onChange={(v) => {
-                    setDdPrice(v);
-                    notifyDropdown({ price: v });
-                  }}
-                />
-              )}
-              {dropdownFilters.brand && (
-                <FilterDropdown
-                  label="Brand"
-                  options={dropdownFilters.brand}
-                  value={ddBrand}
-                  onChange={(v) => {
-                    setDdBrand(v);
-                    notifyDropdown({ brand: v });
-                  }}
-                />
-              )}
-            </>
-          )}
+          {filters.map((filter) => (
+            <FilterDropdown
+              key={filter.key}
+              label={filter.label}
+              options={filter.options}
+              value={values[filter.key] ?? null}
+              onChange={(v) => updateFilter(filter.key, v)}
+            />
+          ))}
         </div>
 
         {/* Search bar */}
         <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-3 sm:w-96">
           <input
             type="text"
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              if (!onDropdownFilterChange) return;
-              // Immediate notify for dropdown mode (debounce handled above for search-only)
-              notifyDropdown({ search: e.target.value });
-            }}
+            value={values.search}
+            onChange={(e) => updateSearch(e.target.value)}
             placeholder="Search..."
             className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
           />

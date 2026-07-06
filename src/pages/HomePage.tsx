@@ -1,17 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters from '../components/shared/CatalogFilters'
-
-const defaultDropdownFilters = {
-  category: ['T-Shirts', 'Hoodies', 'Jackets', 'Accessories'],
-  size: ['XS', 'S', 'M', 'L', 'XL'],
-  color: ['Black', 'White', 'Amber', 'Slate'],
-  price: ['Under $250', '$250-450', '$450-700', '$700+'],
-}
+import { buildPriceRanges } from '../utils/priceRanges'
+import { useProducts } from '../hooks/queries/productsQuery'
 import { api } from '../lib/axios'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
@@ -51,10 +46,31 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
   )
 }
 
+function useHomeFilters() {
+  const { data } = useProducts({ limit: 100 })
+
+  const products = data?.products ?? []
+  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
+  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])], [products])
+  const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
+  const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
+  const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
+
+  return useMemo(() => [
+    { key: 'category', label: 'Category', options: allCategories },
+    { key: 'brand', label: 'Brand', options: allBrands },
+    { key: 'size', label: 'Size', options: allSizes },
+    { key: 'color', label: 'Color', options: allColors },
+    ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
+  ], [allCategories, allBrands, allSizes, allColors, priceRanges])
+}
+
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
+  const filters = useHomeFilters()
+
   return (
     <div className="w-full flex flex-col items-center justify-start gap-8">
-      <CatalogFilters dropdownFilters={defaultDropdownFilters} />
+      <CatalogFilters filters={filters} />
       <div className="self-stretch inline-flex items-center justify-start gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
           <ProductCard
@@ -202,6 +218,7 @@ function CollectionSection() {
 
 function MustHavesSection() {
   const navigate = useNavigate()
+  const filters = useHomeFilters()
 
   return (
     <div className="mt-16 w-full">
@@ -209,7 +226,7 @@ function MustHavesSection() {
         This Season's Must-Haves
       </div>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
-        <CatalogFilters dropdownFilters={defaultDropdownFilters} />
+        <CatalogFilters filters={filters} />
         <div className="self-stretch inline-flex items-center justify-start gap-6">
           {Array.from({ length: 4 }).map((_, index) => (
             <ProductCard key={index} />

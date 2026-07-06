@@ -4,8 +4,9 @@ import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
-import CatalogFilters, { type DropdownFilterValues } from '../components/shared/CatalogFilters'
+import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
 import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
+import { buildPriceRanges, matchesPriceRange } from '../utils/priceRanges'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -196,37 +197,34 @@ function ViewAllButton({ to }: { to: string }) {
 }
 
 function ProductSection({ title, products, isLoading, viewAllLink }: { title: string; products: Wholesale[]; isLoading: boolean; viewAllLink?: string }) {
-  const [filters, setFilters] = useState<DropdownFilterValues>({ category: null, size: null, color: null, price: null, brand: null, search: '' })
+  const [filterState, setFilterState] = useState<FilterValues>({ search: '' })
 
+  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
+  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
   const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
   const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
-  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
+  const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
 
-  const filterOptions = {
-    category: allCategories,
-    size: allSizes,
-    color: allColors,
-    price: ['Under $10', '$10-20', '$20-30', '$30+'],
-  }
+  const filterConfigs = useMemo(() => [
+    { key: 'category', label: 'Category', options: allCategories },
+    { key: 'brand', label: 'Brand', options: allBrands },
+    { key: 'size', label: 'Size', options: allSizes },
+    { key: 'color', label: 'Color', options: allColors },
+    ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
+  ], [allCategories, allBrands, allSizes, allColors, priceRanges])
 
-  const handleFilter = useCallback((f: DropdownFilterValues) => setFilters(f), [])
+  const handleFilter = useCallback((f: FilterValues) => setFilterState(f), [])
 
   const filtered = useMemo(() => {
     return products.filter((item) => {
-      if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
-      if (filters.category && item.category.name !== filters.category) return false
-      if (filters.size && !item.sizes.some((s) => s.size === filters.size)) return false
-      if (filters.color && !item.colors.some((c) => c.color === filters.color)) return false
-      if (filters.price) {
-        const p = item.price
-        if (filters.price === 'Under $10' && p >= 10) return false
-        if (filters.price === '$10-20' && (p < 10 || p > 20)) return false
-        if (filters.price === '$20-30' && (p < 20 || p > 30)) return false
-        if (filters.price === '$30+' && p < 30) return false
-      }
+      if (filterState.search && !item.name.toLowerCase().includes(filterState.search.toLowerCase())) return false
+      if (filterState.category && item.category.name !== filterState.category) return false
+      if (filterState.size && !item.sizes.some((s) => s.size === filterState.size)) return false
+      if (filterState.color && !item.colors.some((c) => c.color === filterState.color)) return false
+      if (filterState.price && !matchesPriceRange(item.price, filterState.price)) return false
       return true
     })
-  }, [products, filters])
+  }, [products, filterState])
 
   return (
     <div className="mx-6 mt-24 flex flex-col items-start justify-start gap-10">
@@ -235,7 +233,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
-          <CatalogFilters onDropdownFilterChange={handleFilter} dropdownFilters={filterOptions} />
+          <CatalogFilters filters={filterConfigs} onFilterChange={handleFilter} />
           {isLoading ? (
             <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
           ) : (
