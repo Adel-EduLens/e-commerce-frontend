@@ -1,0 +1,11 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectTheme": "Select Theme",
+    "lightMode": "Light Mode",
+    "darkMode": "Dark Mode",
+    "english": "English",
+    "arabic": "Arabic"
+  }
+}

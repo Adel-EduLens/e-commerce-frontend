@@ -2,18 +2,20 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '../../store/useCartStore'
+import { useTranslation } from 'react-i18next'
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 const navLinks = [
-  { label: 'Home', path: '/' },
-  { label: 'Shop', path: '/products' },
-  { label: 'Wholesale', path: '/wholesale' },
-  { label: 'Design Lab', path: '/design-lab' },
-  { label: 'Dropshipping', path: '/dropshipping' },
+  { label: 'home', path: '/' },
+  { label: 'shop', path: '/products' },
+  { label: 'wholesale', path: '/wholesale' },
+  { label: 'designLab', path: '/design-lab' },
+  { label: 'dropshipping', path: '/dropshipping' },
 ]
 
 export default function Navbar() {
+  const { t } = useTranslation("navbar");
   const location = useLocation()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
@@ -40,7 +42,7 @@ export default function Navbar() {
             draggable={false}
           />
         </Link>
-        <div className="ml-6 hidden lg:inline-flex items-center justify-start gap-4">
+        <div className="ms-6 hidden lg:inline-flex items-center justify-start gap-4">
           {navLinks.map((item) => {
             const isActive =
               item.label === 'Home'
@@ -59,12 +61,12 @@ export default function Navbar() {
                   : 'text-foreground hover:text-primary'
                   }`}
               >
-                {item.label}
+                {t(item.label)}
               </Link>
             )
           })}
         </div>
-        <div className="ml-auto flex items-center gap-3 lg:gap-4">
+        <div className="ms-auto flex items-center gap-3 lg:gap-4">
           <form onSubmit={handleSearchSubmit} className="hidden lg:inline-flex w-64 xl:w-96 items-center justify-start gap-2 rounded-3xl bg-background p-2 outline outline-1 outline-offset-[-1px] outline-stroke">
             <button type="submit" className="focus:outline-none">
               <Search className="h-6 w-6 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
@@ -73,15 +75,15 @@ export default function Navbar() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
-              className="flex-1 bg-transparent font-['Montserrat'] text-base font-semibold text-foreground placeholder:text-gray-text focus:outline-none"
+              placeholder={t("searchPlaceholder")}
+              className="flex-1 bg-transparent font-['Montserrat'] text-base font-semibold text-foreground placeholder:text-gray-text focus:outline-none text-start"
             />
           </form>
           <div className="inline-flex items-center justify-start gap-4 lg:gap-6">
             <Link to="/bag" className="relative flex items-center justify-center">
               <ShoppingBag className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-2 bg-red-500 text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center border border-background">
+                <span className="absolute -top-1 -end-2 bg-red-500 text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center border border-background">
                   {itemCount}
                 </span>
               )}
@@ -109,7 +111,7 @@ export default function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 flex flex-col gap-2 rounded-2xl bg-card p-4 shadow-lg outline outline-1 outline-stroke lg:hidden">
+        <div className="absolute start-0 end-0 top-[calc(100%+4px)] z-50 flex flex-col gap-2 rounded-2xl bg-card p-4 shadow-lg outline outline-1 outline-stroke lg:hidden">
           <form onSubmit={handleSearchSubmit} className="flex w-full items-center gap-2 rounded-2xl bg-background p-2 outline outline-1 outline-stroke">
             <button type="submit" className="focus:outline-none">
               <Search className="h-5 w-5 text-foreground" strokeWidth={1.5} />
@@ -119,7 +121,7 @@ export default function Navbar() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="flex-1 bg-transparent font-['Montserrat'] text-sm font-semibold text-foreground placeholder:text-gray-text focus:outline-none"
+              className="flex-1 bg-transparent font-['Montserrat'] text-sm font-semibold text-foreground placeholder:text-gray-text focus:outline-none text-start"
             />
           </form>
           {navLinks.map((item) => {

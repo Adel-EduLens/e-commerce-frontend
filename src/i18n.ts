@@ -11,6 +11,15 @@ import authAr from "./locales/ar/auth.json"
 import dropshippingEn from "./locales/en/dropshipping.json";
 import dropshippingAr from "./locales/ar/dropshipping.json"
 
+import settingEn from "./locales/en/setting.json";
+import settingAr from "./locales/ar/setting.json";
+
+import accountSidebarEn from "./locales/en/accountSidebar.json";
+import accountSidebarAr from "./locales/ar/accountSidebar.json";
+
+import navbarEn from "./locales/en/navbar.json";
+import navbarAr from "./locales/ar/navbar.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -19,11 +28,17 @@ i18n
       en: {
         dropshipping: dropshippingEn,
         auth: authEn,
+        setting: settingEn,
+        accountSidebar: accountSidebarEn,
+        navbar: navbarEn,
         translation: en,
       },
       ar: {
         dropshipping: dropshippingAr,
         auth: authAr,
+        setting: settingAr,
+        accountSidebar: accountSidebarAr,
+        navbar: navbarAr,
         translation: ar,
       },
     },

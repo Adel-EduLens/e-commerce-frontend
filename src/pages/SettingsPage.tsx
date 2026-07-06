@@ -1,31 +1,80 @@
 import { CheckCircle, ChevronDown } from "lucide-react";
 import { useThemeStore } from "../store/useThemeStore";
-
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
 function LanguageField() {
+  const { t, i18n } = useTranslation("setting");
+  const [open, setOpen] = useState(false);
+
+  const currentLanguage = i18n.language.startsWith("ar")
+    ? "العربية"
+    : "English";
+
+  const changeLanguage = (lang: "en" | "ar") => {
+    i18n.changeLanguage(lang);
+    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+    document.documentElement.lang = lang;
+    setOpen(false);
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
-      <div className="font-['Montserrat'] text-base font-medium leading-4 tracking-tight text-foreground">
-        Language
+    <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-6">
+      <div className="font-['Montserrat'] text-base font-medium tracking-tight text-foreground">
+        {t("language")}
       </div>
-      <div className="relative h-14 w-full sm:w-80 lg:w-96 overflow-hidden rounded-xl outline outline-1 outline-offset-[-1px] outline-stroke">
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex w-[calc(100%-32px)] items-center justify-between">
-          <div className="font-['Poppins'] text-base font-normal leading-4 tracking-tight text-gray-text">
-            EN
-          </div>
+
+      <div className="relative w-full sm:w-80 lg:w-96">
+        <button
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          className="flex h-14 w-full items-center justify-between rounded-xl border border-stroke bg-card px-4 text-foreground transition-colors hover:border-primary"
+        >
+          <span className="font-['Poppins'] text-base">{currentLanguage}</span>
+
           <ChevronDown
-            className="h-6 w-6 text-gray-text"
-            strokeWidth={2}
+            className={`h-5 w-5 text-gray-text transition-transform ${
+              open ? "rotate-180" : ""
+            }`}
           />
-        </div>
+        </button>
+
+        {open && (
+          <div className="absolute left-0 right-0 top-16 z-20 overflow-hidden rounded-xl border border-stroke bg-card shadow-lg">
+            <button
+              onClick={() => changeLanguage("en")}
+              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${
+                i18n.language.startsWith("en")
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground hover:bg-primary/60"
+              }`}
+            >
+              English
+            </button>
+
+            <button
+              onClick={() => changeLanguage("ar")}
+              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${
+                i18n.language.startsWith("ar")
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground hover:bg-primary/60"
+              }`}
+            >
+              العربية
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
 function ThemeMockup({ isDark = false }: { isDark?: boolean }) {
   return (
-    <div className={`h-36 w-full overflow-hidden ${isDark ? "bg-[#0f1115]" : "bg-white"}`}>
-      <div className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-[#1c1b2e]" : "bg-[#F9FAFB]"}`}>
+    <div
+      className={`h-36 w-full overflow-hidden ${isDark ? "bg-[#0f1115]" : "bg-white"}`}
+    >
+      <div
+        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-[#1c1b2e]" : "bg-[#F9FAFB]"}`}
+      >
         <div className="grid grid-cols-2 gap-2 p-2">
           <div className="h-10 bg-[#BBFF63]" />
           <div className="h-10 bg-[#BBFF63]" />
@@ -43,7 +92,7 @@ function ThemeCard({
   isDark = false,
   onClick,
 }: {
-  label: "Light Mode " | "Dark Mode ";
+  label: string;
   selected?: boolean;
   isDark?: boolean;
   onClick?: () => void;
@@ -69,28 +118,29 @@ function ThemeCard({
 }
 
 function SettingsPanel() {
+  const { t } = useTranslation("setting");
   const { theme, setTheme } = useThemeStore();
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-        Settings
+        {t("title")}
       </div>
       <div className="flex flex-col gap-6">
         <LanguageField />
         <div className="flex flex-col gap-4">
           <div className="font-['Montserrat'] text-base font-medium leading-4 tracking-tight text-foreground">
-            Select Theme
+            {t("selectTheme")}
           </div>
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             <ThemeCard
-              label="Light Mode "
+              label={t("lightMode")}
               selected={theme === "light"}
               isDark={false}
               onClick={() => setTheme("light")}
             />
             <ThemeCard
-              label="Dark Mode "
+              label={t("darkMode")}
               selected={theme === "dark"}
               isDark={true}
               onClick={() => setTheme("dark")}
