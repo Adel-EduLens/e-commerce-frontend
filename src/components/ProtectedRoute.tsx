@@ -13,6 +13,8 @@ export default function ProtectedRoute({
   children,
   allowedRoles,
 }: ProtectedRouteProps) {
+  console.log('ProtectedRoute rendered')
+
   const { isAuthenticated, user, _hasHydrated } = useAuthStore()
 
   if (!_hasHydrated) return null

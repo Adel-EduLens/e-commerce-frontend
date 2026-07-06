@@ -6,13 +6,18 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  brand: string;
   rating: number;
   traderId: number;
   categoryId: string;
   createdAt: string;
   updatedAt: string;
-
+  sizeguide?: string;
+  brand: {
+    id: string;
+    name: string;
+    createdAt: string;
+    updatedAt: string;
+  };
   category: {
     id: string;
     name: string;
@@ -23,6 +28,7 @@ export interface Product {
   images: {
     id: string;
     url: string;
+    color?: string;
     productId: string;
   }[];
 
@@ -39,14 +45,54 @@ export interface Product {
   }[];
 }
 
-const getProducts = async (): Promise<Product[]> => {
-  const { data } = await api.get("/products");
+export type ProductsQuery = {
+  search?: string;
+  categoryId?: string;
+  brandId?: string;
+
+  sortBy?: "name" | "price" | "rating";
+  sortOrder?: "asc" | "desc";
+
+  page?: number;
+  limit?: number;
+};
+
+
+type ProductsResponse = {
+  products: Product[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+const getProducts = async (
+  params: ProductsQuery
+): Promise<ProductsResponse> => {
+  const { data } = await api.get("/products", {
+    params,
+  });
+
   return data.data;
 };
 
-export const useProducts = () => {
+export const useProducts = (params: ProductsQuery) => {
   return useQuery({
-    queryKey: ["products"],
-    queryFn: getProducts,
+    queryKey: ["products", params],
+    queryFn: () => getProducts(params),
+  });
+};
+const getProduct = async (id: string): Promise<Product> => {
+  const { data } = await api.get(`/products/${id}`);
+  return data.data;
+};
+
+export const useProduct = (id?: string) => {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProduct(id!),
+    enabled: !!id,
   });
 };
