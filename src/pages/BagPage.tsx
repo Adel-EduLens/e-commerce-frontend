@@ -197,7 +197,7 @@ function BagItemCard({
       </button>
 
       {/* Image */}
-      <div className="h-44 w-36 overflow-hidden rounded-xl bg-background-hover flex-shrink-0 flex items-center justify-center">
+      <div className="h-44 w-36 overflow-hidden rounded-xl bg-background-hover flex-shrink-0 flex items-center justify-center self-center sm:self-auto">
         <img
           src={item.imageSrc}
           className="h-full w-full object-contain"
@@ -207,9 +207,9 @@ function BagItemCard({
       </div>
 
       {/* Info */}
-      <div className="flex-1 flex flex-col justify-between py-1">
-        <div className="flex flex-col gap-2">
-          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground pr-10">
+      <div className="flex-1 flex flex-col justify-between py-1 items-center sm:items-start text-center sm:text-left">
+        <div className="flex flex-col gap-2 items-center sm:items-start">
+          <h3 className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground pr-10">
             {item.title}
           </h3>
           <div className="flex items-center gap-3">
@@ -247,7 +247,7 @@ function BagItemCard({
         </div>
 
         {/* Quantity and Line Total */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 pt-4 border-t border-stroke">
+        <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 mt-4 pt-4 border-t border-stroke w-full">
           <div className="flex items-center gap-3 border border-stroke rounded-full px-3 py-1.5 bg-card w-max">
             <button
               type="button"
@@ -317,7 +317,7 @@ function FavoritesSection({
         <button
           type="button"
           onClick={() => onSelectTab("favorites")}
-          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${selectedTab === "favorites"
+          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "favorites"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
             }`}
@@ -327,7 +327,7 @@ function FavoritesSection({
         <button
           type="button"
           onClick={() => onSelectTab("recent")}
-          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${selectedTab === "recent"
+          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "recent"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
             }`}
