@@ -44,13 +44,15 @@ export default function AccountLayout() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-[1440px] flex-col bg-background">
-      <div className="sticky top-0 z-20 px-12 pt-4.5 pb-3">
+    <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col bg-background">
+      <div className="sticky top-0 z-20 px-4 sm:px-6 lg:px-12 pt-4.5 pb-3">
         <Navbar />
       </div>
-      <div className="flex flex-1 gap-6 px-6 py-3">
-        <AccountSidebar />
-        <div className="flex-1">
+      <div className="flex flex-1 flex-col lg:flex-row gap-6 px-4 sm:px-6 py-3">
+        <div className="hidden lg:block">
+          <AccountSidebar />
+        </div>
+        <div className="flex-1 min-w-0">
           <Outlet context={{ setFooterConfig }} />
         </div>
       </div>

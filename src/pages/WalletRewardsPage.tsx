@@ -13,16 +13,16 @@ function TransactionRow({
   amount: string;
 }) {
   return (
-    <div className="w-[497px] inline-flex items-start justify-between">
-      <div className="inline-flex flex-col items-start justify-start gap-2">
-        <div className="whitespace-nowrap font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
+    <div className="flex w-full items-start justify-between py-3 border-b border-[#E0E0E0] last:border-b-0">
+      <div className="flex flex-col gap-1">
+        <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
           {label}
         </div>
         <div className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">
           {date}
         </div>
       </div>
-      <div className="whitespace-nowrap font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
         {amount}
       </div>
     </div>
@@ -39,104 +39,83 @@ function WalletPanel() {
     { key: "rewards", label: "Rewards" },
   ];
 
-
   return (
-    <>
-      {/* Title */}
-      <div className="absolute left-[378px] top-[122px] justify-start font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+    <div className="flex w-full max-w-2xl flex-col gap-6">
+      <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
         Wallet &amp; Rewards
       </div>
 
-      {/* Balance / Points + Action Buttons */}
-      <div className="absolute left-[378px] top-[177px] inline-flex items-start justify-end gap-72">
-        <div className="flex items-center justify-start gap-6">
-          <div className="w-24 inline-flex flex-col items-start justify-start gap-2">
-            <div className="self-stretch justify-start font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-2">
+            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               Balance
             </div>
-            <div className="self-stretch justify-start font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               $120.00
             </div>
           </div>
-          <div className="w-24 inline-flex flex-col items-start justify-start gap-2">
-            <div className="self-stretch justify-start font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+          <div className="flex flex-col gap-2">
+            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               Points
             </div>
-            <div className="self-stretch justify-start font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               250
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-start gap-4">
-          <div className="flex items-center justify-start gap-2 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-            <CreditCard className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-            <div className="justify-end font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+            <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               Link Card
             </div>
           </div>
-          <div className="flex items-center justify-start gap-2 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-            <Gift className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-            <div className="justify-end font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+            <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               Redeem Points
             </div>
           </div>
-          <div className="flex items-center justify-start gap-2 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-            <PlusCircle className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-            <div className="justify-end font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+            <PlusCircle className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               Add Funds
             </div>
           </div>
         </div>
       </div>
 
-      {/* Transactions Title */}
-      <div className="absolute left-[378px] top-[287px] justify-start font-['Montserrat'] text-xl font-bold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
         Transactions
       </div>
 
-      {/* Tabs */}
-      <div className="absolute left-[378px] top-[327px] w-64 inline-flex items-center justify-start gap-4 border-b border-[#E0E0E0]">
+      <div className="flex items-center gap-3 sm:gap-4 border-b border-[#E0E0E0]">
         {tabs.map((tab) => (
-          <div
+          <button
             key={tab.key}
+            type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`flex cursor-pointer items-center justify-center py-4 ${
+            className={`cursor-pointer py-3 sm:py-4 font-['Montserrat'] text-sm sm:text-base font-bold ${
               activeTab === tab.key
-                ? "border-b-[3px] border-[#1A1A1A]"
-                : ""
+                ? "border-b-[3px] border-foreground text-foreground"
+                : "text-[#6B7280]"
             }`}
           >
-            <div
-              className={`justify-start font-['Montserrat'] text-base font-bold ${
-                activeTab === tab.key ? "text-[#1A1A1A]" : "text-[#6B7280]"
-              }`}
-            >
-              {tab.label}
-            </div>
-          </div>
+            {tab.label}
+          </button>
         ))}
       </div>
 
-      {/* Transaction Rows */}
-      <div className="absolute left-[378px] top-[403px]">
+      <div className="flex flex-col">
         <TransactionRow label="Order #2345" date="12 Sep 2025" amount="-$59.99" />
-      </div>
-      <div className="absolute left-[378px] top-[471px]">
+        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
+        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
+        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
+        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
         <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
       </div>
-      <div className="absolute left-[378px] top-[531px]">
-        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
-      </div>
-      <div className="absolute left-[378px] top-[591px]">
-        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
-      </div>
-      <div className="absolute left-[378px] top-[651px]">
-        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
-      </div>
-      <div className="absolute left-[378px] top-[711px]">
-        <TransactionRow label="Reward Earned" date="12 Sep 2025" amount="+50 Pts" />
-      </div>
-    </>
+    </div>
   );
 }
 

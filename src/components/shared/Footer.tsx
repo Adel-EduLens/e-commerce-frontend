@@ -43,15 +43,15 @@ function FooterColumn({
   items: { label: string; path: string }[]
 }) {
   return (
-    <div className="inline-flex w-48 flex-col items-start justify-center gap-4">
-      <div className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
+    <div className="flex flex-col items-start gap-3">
+      <div className="font-['Montserrat'] text-lg sm:text-xl lg:text-2xl font-medium text-[#1A1A1A]">
         {title}
       </div>
       {items.map((item) => (
         <Link
           key={item.label}
           to={item.path}
-          className="self-stretch font-['Montserrat'] text-2xl font-medium text-[#6B7280] hover:text-[#1A1A1A]"
+          className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#6B7280] hover:text-[#1A1A1A]"
         >
           {item.label}
         </Link>
@@ -68,60 +68,59 @@ type FooterProps = {
 }
 
 export default function Footer({
-  top,
-  height = 'h-96',
-  innerHeight = 'h-96',
   style,
 }: FooterProps) {
   return (
     <div
-      className={`relative w-full overflow-hidden border-t border-[#E0E0E0] ${top ? `absolute left-0 ${top} w-[1440px]` : ''} ${height}`}
+      className="relative w-full overflow-hidden border-t border-[#E0E0E0] py-8 px-4 sm:px-6 lg:px-8"
       style={style}
     >
-      <div className="absolute left-[323px] top-[69px] font-['Montserrat'] text-[250px] font-medium text-gray-500/20">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Montserrat'] text-[80px] sm:text-[120px] lg:text-[200px] xl:text-[250px] font-medium text-gray-500/20 whitespace-nowrap select-none">
         GEN Z
       </div>
-      <div
-        className={`absolute left-[24px] top-[32px] ${innerHeight} w-[1392px]`}
-      >
-        <div className="absolute left-0 top-[80px] inline-flex items-start justify-start gap-8">
-          {Object.entries(footerLinks).map(([title, items]) => (
-            <FooterColumn key={title} title={title} items={items} />
-          ))}
-        </div>
-        <div className="absolute left-[1096px] top-0 inline-flex items-center justify-start gap-6">
-          {socials.map((social) => (
-            <div
-              key={social}
-              className="relative h-14 w-14 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
-            >
-              <img
-                src={asset(social)}
-                className="absolute left-[12px] top-[12px] h-8 w-8"
-                alt=""
-                draggable={false}
-              />
+      <div className="relative z-10 flex flex-col gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 lg:gap-8 flex-1">
+            {Object.entries(footerLinks).map(([title, items]) => (
+              <FooterColumn key={title} title={title} items={items} />
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 lg:w-[460px]">
+            <div className="flex items-center gap-4">
+              {socials.map((social) => (
+                <div
+                  key={social}
+                  className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+                >
+                  <img
+                    src={asset(social)}
+                    className="h-5 w-5 sm:h-8 sm:w-8"
+                    alt=""
+                    draggable={false}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
+            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#1A1A1A]">
+              SIGN UP FOR DISCOUNTS + UPDATES
+            </div>
+            <div className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-3 sm:p-4">
+              <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
+                Phone Number or Email
+              </div>
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white">
+                <img
+                  src={asset('weui_arrow-filled-3.svg')}
+                  className="h-4 w-2 sm:h-6 sm:w-3"
+                  alt=""
+                  draggable={false}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="absolute left-[932px] top-[72px] font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-          SIGN UP FOR DISCOUNTS + UPDATES
-        </div>
-        <div className="absolute left-0 top-[358px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
           © 2025 GenZ, LLC. All Rights Reserved.
-        </div>
-        <div className="absolute left-[932px] top-[117px] inline-flex w-[460px] items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-          <div className="font-['Montserrat'] text-xl font-medium text-[#6B7280]">
-            Phone Number or Email
-          </div>
-          <div className="relative h-12 w-12 overflow-hidden rounded-full bg-white">
-            <img
-              src={asset('weui_arrow-filled-3.svg')}
-              className="absolute left-[18px] top-[12px] h-6 w-3"
-              alt=""
-              draggable={false}
-            />
-          </div>
         </div>
       </div>
     </div>

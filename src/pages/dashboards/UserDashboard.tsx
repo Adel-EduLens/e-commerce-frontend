@@ -27,7 +27,7 @@ export default function UserDashboard() {
   return (
     <div className="flex min-h-[860px] w-full overflow-hidden rounded-[32px] bg-dark-background font-['Inter'] text-white shadow-[0px_20px_60px_-24px_rgba(30,37,45,0.55)]">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-neutral-800 bg-neutral-950 p-6 flex flex-col justify-between">
+      <aside className="hidden lg:flex w-64 border-r border-neutral-800 bg-neutral-950 p-6 flex-col justify-between">
         <div>
           <div className="flex items-center gap-2 mb-8">
             <UserIcon className="text-lime-300" size={28} />
@@ -95,7 +95,7 @@ export default function UserDashboard() {
         </header>
 
         {/* Perks Grid */}
-        <section className="grid grid-cols-3 gap-6 mb-8">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-gradient-to-br from-lime-300/10 to-neutral-900 border border-lime-300/20 rounded-2xl p-6">
             <div className="flex justify-between items-start mb-4">
               <span className="text-lime-300 text-xs font-bold uppercase tracking-wider">
@@ -135,7 +135,7 @@ export default function UserDashboard() {
           <h3 className="text-xl font-bold font-['Montserrat'] mb-6">Recent Orders</h3>
           
           <div className="space-y-4">
-            <div className="p-4 bg-neutral-900/80 border border-neutral-800 rounded-2xl flex justify-between items-center hover:border-neutral-700 transition-all">
+            <div className="p-4 bg-neutral-900/80 border border-neutral-800 rounded-2xl flex flex-wrap justify-between items-center gap-4 hover:border-neutral-700 transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-neutral-800 rounded-xl flex items-center justify-center font-bold text-white text-sm">
                   #928
@@ -145,7 +145,7 @@ export default function UserDashboard() {
                   <p className="text-xs text-gray-text">Ordered on June 21, 2026</p>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <p className="font-extrabold font-['Montserrat'] text-lime-300">$295.00</p>
                 <span className="px-3 py-1 bg-lime-300/10 text-lime-300 text-xs font-bold rounded-full border border-lime-300/20">
                   Shipped
@@ -154,7 +154,7 @@ export default function UserDashboard() {
               </div>
             </div>
 
-            <div className="p-4 bg-neutral-900/80 border border-neutral-800 rounded-2xl flex justify-between items-center hover:border-neutral-700 transition-all">
+            <div className="p-4 bg-neutral-900/80 border border-neutral-800 rounded-2xl flex flex-wrap justify-between items-center gap-4 hover:border-neutral-700 transition-all">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-neutral-800 rounded-xl flex items-center justify-center font-bold text-white text-sm">
                   #871
@@ -164,7 +164,7 @@ export default function UserDashboard() {
                   <p className="text-xs text-gray-text">Ordered on May 15, 2026</p>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <p className="font-extrabold font-['Montserrat'] text-lime-300">$120.00</p>
                 <span className="px-3 py-1 bg-neutral-800 text-gray-text text-xs font-bold rounded-full">
                   Delivered

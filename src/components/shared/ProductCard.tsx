@@ -87,24 +87,20 @@ export default function ProductCard({
     <Link
       to={to}
       aria-label={`Open details for ${title}`}
-      className={`group relative block h-96 w-80 overflow-hidden rounded-2xl bg-card shadow-[0px_6px_20px_-2px_var(--shadow)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 ${rootTone} ${className}`}
+      className={`group relative block w-full overflow-hidden rounded-2xl shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#BBFF63]/60 ${rootTone} ${className}`}
     >
-      <div
-        className={`absolute left-[8px] top-[8px] overflow-hidden rounded-lg ${featured ? `h-96 w-80 ${mediaTone}` : `h-64 w-80 ${mediaTone}`}`}
-      >
+      <div className={`relative mx-2 mt-2 overflow-hidden rounded-lg ${mediaTone} aspect-[4/5]`}>
         <img
-          className={`absolute left-1/2 top-0 -translate-x-1/2 object-contain ${
-            featured ? 'h-[392px] w-[269px]' : 'h-[371px] w-[247px]'
-          }`}
+          className="absolute inset-0 h-full w-full object-contain"
           src={imageSrc}
           alt={imageAlt ?? title}
           draggable={false}
         />
 
-        {/* Flash deal countdown badge - top left */}
+        {/* Flash deal countdown badge */}
         {showFlashDeal && countdownLabel && (
           <div
-            className={`absolute left-[8px] top-[8px] flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white ${
+            className={`absolute left-2 top-2 flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white ${
               expired ? 'bg-gray-text' : 'bg-urgent'
             }`}
           >
@@ -127,9 +123,9 @@ export default function ProductCard({
           </div>
         )}
 
-        <div className="pointer-events-none absolute left-[266px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED]">
+        <div className="absolute right-2 top-2 h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED] flex items-center justify-center">
           <img
-            className="absolute left-[8px] top-[8px] h-6 w-6"
+            className="h-6 w-6"
             src={asset('mdi_heart.svg')}
             alt=""
             draggable={false}
@@ -137,43 +133,41 @@ export default function ProductCard({
         </div>
       </div>
 
-      <div
-        className={`absolute left-[8px] h-24 w-80 rounded-lg bg-white ${
-          featured
-            ? 'top-[282px] outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]'
-            : 'top-[274px]'
-        }`}
-      >
-        {/* rating row, anchored to the right edge so it never drifts */}
-        <div className="absolute right-[10px] top-[8px] flex items-center justify-end ">
-          {Array.from({ length: 5 }).map((_, index) => {
-            const fill = Math.min(1, Math.max(0, rating - index))
-            return <Star key={index} fill={fill} />
-          })}
+      <div className={`mx-2 mb-2 mt-1 rounded-lg bg-white p-2 ${
+        featured
+          ? 'outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]'
+          : ''
+      }`}>
+        <div className="flex items-start justify-between gap-2">
+          <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium leading-tight text-[#1A1A1A] line-clamp-2 flex-1">
+            {title}
+          </div>
+          <div className="flex items-center shrink-0">
+            {Array.from({ length: 5 }).map((_, index) => {
+              const fill = Math.min(1, Math.max(0, rating - index))
+              return <Star key={index} fill={fill} />
+            })}
+          </div>
         </div>
-
-        <div className="absolute left-[8px] top-[8px] w-40 font-['Montserrat'] text-xl font-medium leading-6 text-[#1A1A1A]">
-          {title}
-        </div>
-        <div className="absolute left-[8px] top-[66.50px] font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          {sizeLabel}
-        </div>
-
-        {/* price block anchored to the right edge */}
-        {showFlashDeal ? (
-          <div className="absolute right-[12px] top-[54px] flex flex-col items-end">
-            <span className="font-['Montserrat'] text-xs font-medium text-gray-text line-through">
+        <div className="mt-2 flex items-center justify-between">
+          <div className="font-['Montserrat'] text-xs sm:text-sm lg:text-base font-medium text-[#1A1A1A]">
+            {sizeLabel}
+          </div>
+          {showFlashDeal ? (
+            <div className="flex flex-col items-end">
+              <span className="font-['Montserrat'] text-xs font-medium text-gray-text line-through">
+                {price}
+              </span>
+              <span className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-urgent">
+                ${flashDealPrice!.toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-[#1A1A1A]">
               {price}
-            </span>
-            <span className="font-['Montserrat'] text-2xl font-semibold text-urgent">
-              ${flashDealPrice!.toFixed(2)}
-            </span>
-          </div>
-        ) : (
-          <div className="absolute right-[12px] top-[62px] font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-            {price}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   )

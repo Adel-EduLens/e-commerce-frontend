@@ -45,7 +45,7 @@ function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (t
           </button>
         ))}
       </div>
-      <div className="absolute bottom-0 left-0 w-80 h-px bg-[#E0E0E0]" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-[#E0E0E0]" />
     </div>
   );
 }
@@ -103,7 +103,7 @@ function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
 
 function OrderStatus() {
   return (
-    <div className="w-80 shrink-0 rounded-lg bg-[#1A1A1A] p-4 self-start">
+    <div className="w-full lg:w-80 shrink-0 rounded-lg bg-[#1A1A1A] p-4 self-start">
       <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">Order Status</span>
 
       <div className="mt-8 flex flex-col">
@@ -168,10 +168,10 @@ export default function MyOrdersPage() {
   const [activeTab, setActiveTab] = useState<Tab>("active");
 
   return (
-    <div className="absolute left-[378px] top-[122px] right-[24px]">
+    <div className="w-full">
       <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-      <div className="mt-6 flex gap-6">
+      <div className="mt-6 flex flex-col lg:flex-row gap-6">
         <div className="flex-1 flex flex-col gap-4">
           <OrderHeader />
           {orderItems.map((item) => (

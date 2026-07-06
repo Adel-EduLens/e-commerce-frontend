@@ -161,7 +161,7 @@ function AddressCard({
   onDraftChange: (value: AddressItem) => void;
 }) {
   return (
-    <div className="flex w-[537px] flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
+    <div className="flex w-full max-w-xl flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
       <div className="inline-flex w-full items-center justify-between">
         <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
           {isEditing ? "Editing Address" : address.label}
@@ -349,7 +349,7 @@ export default function ContactDetailsPage() {
   };
 
   return (
-    <div className="absolute left-[378px] top-[122px] inline-flex w-[658px] flex-col items-start justify-start gap-8">
+    <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-8">
       <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
       <div className="flex self-stretch flex-col items-start justify-start gap-6">
         <DetailField
@@ -418,7 +418,7 @@ export default function ContactDetailsPage() {
           Add Address
         </button>
       </SectionHeader>
-      <div className="flex w-[658px] flex-col items-start justify-start gap-6">
+      <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-6">
         {addresses.map((address) => (
           <AddressCard
             key={address.id}
