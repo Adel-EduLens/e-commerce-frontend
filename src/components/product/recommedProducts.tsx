@@ -1,5 +1,6 @@
 import { ProductCard } from "../shared";
-import { toast } from "sonner";
+
+import { ViewAllButton } from "../ui/ViewAllButton";
 
 export function RecommedProducts() {
   return (
@@ -14,15 +15,7 @@ export function RecommedProducts() {
           <ProductCard featured />
           <ProductCard />
         </div>
-        <button
-          type="button"
-          onClick={() => toast.message("Coming soon")}
-          className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-3 sm:p-4 cursor-pointer"
-        >
-          <div className="font-['Montserrat'] text-base font-semibold text-foreground sm:text-xl">
-            View All
-          </div>
-        </button>
+        <ViewAllButton />
       </div>
     </section>
   );
