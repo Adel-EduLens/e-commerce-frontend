@@ -1,16 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
-import { ProductCard } from "../components/shared";
 import CategoriesSection from "../components/shared/CategorySection";
 import FaqSection from "../components/shared/FaqSection";
-import CatalogFilters from "../components/shared/CatalogFilters";
-import { buildPriceRanges } from "../utils/priceRanges";
-import { useProducts } from "../hooks/queries/productsQuery";
 import { api } from "../lib/axios";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { ViewAllButton } from "../components/ui/ViewAllButton";
+import ProductsSection from "../components/shared/ProductsSection";
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`;
 
@@ -26,71 +22,6 @@ function AssetImage({ file, className, alt = "" }: AssetImageProps) {
   );
 }
 
-function useHomeFilters() {
-  const { data } = useProducts({ limit: 100 });
-
-  const products = data?.products ?? [];
-  const allCategories = useMemo(
-    () => [...new Set(products.map((p) => p.category.name))],
-    [products],
-  );
-  const allBrands = useMemo(
-    () => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])],
-    [products],
-  );
-  const allSizes = useMemo(
-    () => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))],
-    [products],
-  );
-  const allColors = useMemo(
-    () => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))],
-    [products],
-  );
-  const priceRanges = useMemo(
-    () => buildPriceRanges(products.map((p) => p.price)),
-    [products],
-  );
-
-  return useMemo(
-    () => [
-      { key: "category", label: "Category", options: allCategories },
-      { key: "brand", label: "Brand", options: allBrands },
-      { key: "size", label: "Size", options: allSizes },
-      { key: "color", label: "Color", options: allColors },
-      ...(priceRanges.length > 1
-        ? [{ key: "price", label: "Price", options: priceRanges }]
-        : []),
-    ],
-    [allCategories, allBrands, allSizes, allColors, priceRanges],
-  );
-}
-
-function ProductGrid({
-  featuredIndex,
-  navigate,
-}: {
-  featuredIndex?: number;
-  navigate?: string;
-}) {
-  const filters = useHomeFilters();
-  const nav = useNavigate();
-
-  return (
-    <div className="w-full flex flex-col items-center justify-start gap-8">
-      <CatalogFilters filters={filters} />
-      <div className="self-stretch inline-flex items-center justify-start gap-6">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <ProductCard
-            key={index}
-            featured={featuredIndex === index}
-            accentClassName="bg-violet-300"
-          />
-        ))}
-      </div>
-      <ViewAllButton onClick={() => nav(navigate ? navigate : "")} />
-    </div>
-  );
-}
 
 function HeroSection() {
   return (
@@ -223,38 +154,6 @@ function CollectionSection() {
   );
 }
 
-function MustHavesSection() {
-  const navigate = useNavigate();
-  const filters = useHomeFilters();
-
-  return (
-    <div className="mt-16 w-full">
-      <div className="w-[909px] font-['Montserrat'] text-8xl font-bold text-foreground">
-        This Season's Must-Haves
-      </div>
-      <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
-        <CatalogFilters filters={filters} />
-        <div className="self-stretch inline-flex items-center justify-start gap-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ProductCard key={index} />
-          ))}
-        </div>
-        <ViewAllButton onClick={() => navigate("/products?filter=must-have")} />
-      </div>
-    </div>
-  );
-}
-
-function RecommendedSection() {
-  return (
-    <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-foreground">
-        Recommended for You
-      </div>
-      <ProductGrid navigate={""} />
-    </div>
-  );
-}
 
 function VoteRings() {
   const rings = [
@@ -471,33 +370,6 @@ function VoteSection() {
   );
 }
 
-function FlashDealsSection() {
-  return (
-    <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
-      <div className="inline-flex items-center justify-center gap-11">
-        <div className="font-['Montserrat'] text-8xl font-bold text-foreground">
-          Flash Deals
-        </div>
-        <div className="flex items-center justify-start gap-6">
-          <div className="font-['Montserrat'] text-3xl font-semibold text-[#1A1A1A]">
-            Ends in
-          </div>
-          <div className="flex items-center justify-start gap-2">
-            {["08", ":", "30", ":", "48"].map((item, index) => (
-              <div
-                key={`${item}-${index}`}
-                className="font-['Montserrat'] text-3xl font-semibold text-[#1A1A1A]"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <ProductGrid featuredIndex={2} navigate={"/products?filter=flash-deals"} />
-    </div>
-  );
-}
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -517,11 +389,29 @@ export function HomePage() {
     <div className="w-full overflow-hidden">
       <HeroSection />
       <CollectionSection />
-      <MustHavesSection />
+      <ProductsSection
+        title="This Season's Must-Haves"
+        navigateTo="/products?filter=must-have"
+        query={{
+          filter: "must-have",
+        }}
+      />
       <CategoriesSection />
-      <RecommendedSection />
+      <ProductsSection
+        title="Recommended for You"
+        navigateTo="/products?filter=flash-deals"
+        query={{
+          filter: "flash-deals",
+        }}
+      />
       <VoteSection />
-      <FlashDealsSection />
+      <ProductsSection
+        title="Flash Deals"
+        navigateTo="/products?filter=flash-deals"
+        query={{
+          filter: "flash-deals",
+        }}
+      />
       <FaqSection />
     </div>
   );

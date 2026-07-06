@@ -5,10 +5,11 @@ import { useAuthStore } from "../store/useAuthStore";
 
 import { ProductCard, CatalogFilters } from "../components/shared";
 import Pagination from "../components/shared/Pagination";
-import { buildPriceRanges } from "../utils/priceRanges";
 import { useProducts } from "../hooks/queries/productsQuery";
 import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
+import type { FilterValues } from "../components/shared/CatalogFilters";
+import { useHomeFilters } from "../hooks/utils/HomeFilters";
 
 const FILTER_LABELS: Record<string, string> = {
   "best-deal": "Best Deals",
@@ -24,65 +25,21 @@ const CATEGORY_LABELS: Record<string, string> = {
   women: "Women",
 };
 
-function useHomeFilters() {
-  const { data } = useProducts({ limit: 100 });
 
-  const products = data?.products ?? [];
-  const allCategories = useMemo(
-    () => [...new Set(products.map((p) => p.category.name))],
-    [products],
-  );
-  const allBrands = useMemo(
-    () => [
-      ...new Set(
-        products.map((p) => p.brand?.name).filter(Boolean) as string[],
-      ),
-    ],
-    [products],
-  );
-  const allSizes = useMemo(
-    () => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))],
-    [products],
-  );
-  const allColors = useMemo(
-    () => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))],
-    [products],
-  );
-  const priceRanges = useMemo(
-    () => buildPriceRanges(products.map((p) => p.price)),
-    [products],
-  );
-
-  return useMemo(
-    () => [
-      { key: "category", label: "Category", options: allCategories },
-      { key: "brand", label: "Brand", options: allBrands },
-      { key: "size", label: "Size", options: allSizes },
-      { key: "color", label: "Color", options: allColors },
-      ...(priceRanges.length > 1
-        ? [{ key: "price", label: "Price", options: priceRanges }]
-        : []),
-    ],
-    [allCategories, allBrands, allSizes, allColors, priceRanges],
-  );
-}
 
 export default function ProductsPage() {
   const navigate = useNavigate();
   const filter2 = useHomeFilters();
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterValues>({
     search: "",
-    category: null as string | null,
-    brand: null as string | null,
-    size: null as string | null,
-    color: null as string | null,
-    price: null as string | null,
+    category: null,
+    brand: null,
+    size: null,
+    color: null,
+    priceMin: null,
+    priceMax: null,
   });
-
-  // Sorting isn't wired to any UI control yet — sensible defaults for now.
-  const [sortBy] = useState<string>("createdAt");
-  const [sortOrder] = useState<"asc" | "desc">("desc");
 
   const [searchParams] = useSearchParams();
 
@@ -91,7 +48,6 @@ export default function ProductsPage() {
   const urlCategoryName = searchParams.get("category") ?? "";
   const filter = searchParams.get("filter") ?? "";
 
-  
   const effectiveCategoryName = filters.category ?? urlCategoryName;
 
   const [page, setPage] = useState(1);
@@ -122,11 +78,11 @@ export default function ProductsPage() {
     brandId,
     size: filters.size ?? "",
     color: filters.color ?? "",
-    price: filters.price ?? "",
+    priceMin: filters.priceMin ?? "",
+    priceMax: filters.priceMax ?? "",
     filter,
-    sortOrder,
     page,
-    limit: 8,
+    limit: 16,
   });
 
   useEffect(() => {
@@ -146,10 +102,9 @@ export default function ProductsPage() {
     brandId,
     filters.size,
     filters.color,
-    filters.price,
+    filters.priceMin,
+    filters.priceMax,
     filter,
-    sortBy,
-    sortOrder,
   ]);
 
   useEffect(() => {

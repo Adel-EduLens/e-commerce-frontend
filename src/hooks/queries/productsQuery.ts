@@ -56,14 +56,14 @@ export type ProductsQuery = {
   filter?: string;
   size?: string;
   color?: string;
-  price? : string;
+  priceMin?: string;
+  priceMax?: string;
   sortBy?: "name" | "price" | "rating";
   sortOrder?: "asc" | "desc";
 
   page?: number;
   limit?: number;
 };
-
 
 type ProductsResponse = {
   products: Product[];
