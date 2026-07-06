@@ -40,7 +40,7 @@ const HelpCenterCategorie = () => {
 
   return (
     <div className="flex w-full flex-col gap-10 px-6 py-10">
-      <div className="font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
         {category}
       </div>
 
@@ -49,16 +49,16 @@ const HelpCenterCategorie = () => {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="flex flex-col gap-3 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+              className="flex flex-col gap-3 rounded-2xl bg-card p-4 outline outline-1 outline-offset-[-1px] outline-stroke"
             >
-              <div className="aspect-video w-full animate-pulse rounded-lg bg-[#EDEDED]" />
-              <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDEDED]" />
+              <div className="aspect-video w-full animate-pulse rounded-lg bg-[#EDEDED] dark:bg-gray-light" />
+              <div className="h-5 w-3/4 animate-pulse rounded bg-[#EDEDED] dark:bg-gray-light" />
             </div>
           ))}
         </div>
       ) : videos.length === 0 ? (
-        <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-[#F9FAFB] p-10 text-center">
-          <div className="font-['Montserrat'] text-base font-medium text-[#6B7280]">
+        <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-card p-10 text-center outline outline-1 outline-offset-[-1px] outline-stroke">
+          <div className="font-['Montserrat'] text-base font-medium text-gray-text">
             No videos available in this category yet.
           </div>
         </div>
@@ -67,7 +67,7 @@ const HelpCenterCategorie = () => {
           {videos.map((video) => (
             <div
               key={video.id}
-              className="flex flex-col gap-3 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+              className="flex flex-col gap-3 rounded-2xl bg-card p-4 outline outline-1 outline-offset-[-1px] outline-stroke"
             >
               <div className="aspect-video w-full overflow-hidden rounded-lg">
                 <iframe
@@ -78,7 +78,7 @@ const HelpCenterCategorie = () => {
                   allowFullScreen
                 />
               </div>
-              <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+              <div className="font-['Montserrat'] text-lg font-semibold text-foreground">
                 {video.title}
               </div>
             </div>

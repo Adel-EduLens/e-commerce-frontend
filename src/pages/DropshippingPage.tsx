@@ -90,7 +90,7 @@ function WhyDropshipSection() {
 
   return (
     <div className="mt-16 flex flex-col gap-10">
-      <h2 className="max-w-full font-['Montserrat'] text-4xl font-bold text-[#1A1A1A] sm:text-5xl lg:w-[774px] lg:text-6xl">
+      <h2 className="max-w-full font-['Montserrat'] text-4xl font-bold text-foreground sm:text-5xl lg:w-[774px] lg:text-6xl">
         {t("why.title")}
       </h2>
 
@@ -98,15 +98,15 @@ function WhyDropshipSection() {
         {cards.map((card) => (
           <div
             key={card.key}
-            className={`relative h-auto min-h-[288px] w-full overflow-hidden rounded-2xl bg-white p-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] lg:absolute lg:h-72 lg:w-[566px] lg:p-0 ${card.position}`}
+            className={`relative h-auto min-h-[288px] w-full overflow-hidden rounded-2xl bg-card p-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke lg:absolute lg:h-72 lg:w-[566px] lg:p-0 ${card.position}`}
           >
             <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-[#BBFF63] lg:absolute lg:start-[24px] lg:top-[24px]">
               <AssetImage file={card.icon} className="h-11 w-11" />
             </div>
-            <div className="mt-6 font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A] sm:text-3xl lg:absolute lg:start-[24px] lg:top-[148px] lg:mt-0 lg:text-4xl">
+            <div className="mt-6 font-['Montserrat'] text-2xl font-semibold text-foreground sm:text-3xl lg:absolute lg:start-[24px] lg:top-[148px] lg:mt-0 lg:text-4xl">
               {t(`why.${card.key}.title`)}
             </div>
-            <div className="mt-3 max-w-md font-['Montserrat'] text-lg font-medium text-[#6B7280] sm:text-xl lg:absolute lg:start-[24px] lg:top-[208px] lg:mt-0 lg:w-[518px] lg:text-2xl">
+            <div className="mt-3 max-w-md font-['Montserrat'] text-lg font-medium text-gray-text sm:text-xl lg:absolute lg:start-[24px] lg:top-[208px] lg:mt-0 lg:w-[518px] lg:text-2xl">
               {t(`why.${card.key}.desc`)}
             </div>
           </div>
@@ -158,7 +158,7 @@ function HowWeStartSection() {
   return (
     <div className="mt-16 flex w-full flex-col items-start justify-start gap-10">
       <div className="flex w-full flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-        <h2 className="max-w-full font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A] sm:text-5xl lg:w-[594px] lg:text-6xl">
+        <h2 className="max-w-full font-['Montserrat'] text-4xl font-semibold text-foreground sm:text-5xl lg:w-[594px] lg:text-6xl">
           {t("howWeStart.title")}
         </h2>
         <div className="flex w-full flex-col items-start justify-start gap-6 sm:w-72">
@@ -177,7 +177,7 @@ function HowWeStartSection() {
         {steps.map((step, i) => (
           <div
             key={step.key}
-            className="relative h-56 w-full overflow-hidden rounded-3xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
+            className="relative h-56 w-full overflow-hidden rounded-3xl bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
             <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#BBFF63] px-2 py-0.5">
               <div className="text-center font-['Outfit'] text-base font-medium text-[#1A1A1A]">
@@ -185,7 +185,7 @@ function HowWeStartSection() {
               </div>
             </div>
             <div className="absolute start-[16px] top-[128px] inline-flex w-[calc(100%-32px)] flex-col items-start justify-start gap-2">
-              <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+              <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-foreground">
                 {t(`howWeStart.steps.${step.key}.title`)}
               </div>
               <div className="self-stretch font-['Montserrat'] text-base font-normal text-[#6B7280]">
@@ -218,14 +218,14 @@ function EverythingYouNeedSection() {
 
   return (
     <div className="mt-16 flex w-full flex-col items-start justify-start gap-10">
-      <h2 className="max-w-full font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A] sm:text-5xl lg:w-[594px] lg:text-6xl">
+      <h2 className="max-w-full font-['Montserrat'] text-4xl font-semibold text-foreground sm:text-5xl lg:w-[594px] lg:text-6xl">
         {t("everything.title")}
       </h2>
       <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <div
             key={card}
-            className="relative h-auto w-full overflow-hidden rounded-3xl bg-white pb-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
+            className="relative h-auto w-full overflow-hidden rounded-3xl bg-card pb-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
             <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#BBFF63] px-2 py-0.5">
               <div className="text-center font-['Outfit'] text-base font-medium text-[#1A1A1A]">
@@ -233,7 +233,7 @@ function EverythingYouNeedSection() {
               </div>
             </div>
             <div className="ms-4 me-4 mt-14 flex flex-col items-start justify-start gap-2">
-              <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+              <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-foreground">
                 {t(`everything.cards.${card}.title`)}
               </div>
               <div className="self-stretch font-['Montserrat'] text-base font-normal text-[#6B7280]">
@@ -271,7 +271,7 @@ function FAQSection() {
 
   return (
     <div className="mb-16 mt-16 flex w-full flex-col items-start justify-start gap-10">
-      <h2 className="w-full text-center font-['Montserrat'] text-4xl font-bold text-[#1A1A1A] sm:text-6xl lg:text-8xl">
+      <h2 className="w-full text-center font-['Montserrat'] text-4xl font-bold text-foreground sm:text-6xl lg:text-8xl">
         {t("faq.title")}
       </h2>
       <div className="flex w-full flex-col items-center justify-between gap-10 lg:flex-row lg:items-start">

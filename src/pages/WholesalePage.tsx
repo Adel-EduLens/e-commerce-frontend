@@ -230,7 +230,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
 
   return (
     <div className="mx-6 mt-24 flex flex-col items-start justify-start gap-10">
-      <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="self-stretch font-['Montserrat'] text-8xl font-bold text-foreground">
         {title}
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">

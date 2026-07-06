@@ -3,6 +3,9 @@
 
 @theme {
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -22,6 +25,9 @@
 
 :root {
   --primary: #bbff63;
+  --primary-foreground: #1a1a1a;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ffffff;
   --background: #f9fafb;
   --foreground: #1a1a1a;
   --card: #ffffff;
@@ -29,7 +35,6 @@
   --gray-light: #ededed;
   --gray-text: #6b7280;
   --shadow: #1e252d1a;
-
   --ink: #0f1115;
   --info: #87c3ff;
   --urgent: #d6001c;
@@ -38,6 +43,9 @@
 }
 
 .dark {
+  --primary-foreground: #1a1a1a;
+  --secondary: #ffffff;
+  --secondary-foreground: #1a1a1a;
   --background: #0f1115;
   --foreground: #ffffff;
   --card: #1c1b2e;
@@ -45,6 +53,51 @@
   --gray-light: #1c1f24;
   --gray-text: #9ca3af;
   --shadow: #0000004d;
+}
+
+/* Dark mode text color overrides for section headers and other dark text */
+.dark .text-\[\#1A1A1A\],
+.dark .text-\[\#111827\] {
+  color: var(--foreground) !important;
+}
+
+.dark .text-\[\#6B7280\] {
+  color: var(--gray-text) !important;
+}
+
+/* Maintain contrast for dark text on explicitly light or accent backgrounds in dark mode */
+.dark .bg-primary.text-\[\#1A1A1A\],
+.dark .bg-primary .text-\[\#1A1A1A\],
+.dark .bg-\[\#BBFF63\].text-\[\#1A1A1A\],
+.dark .bg-\[\#BBFF63\] .text-\[\#1A1A1A\],
+.dark .bg-\[\#C4B5FD\].text-\[\#1A1A1A\],
+.dark .bg-\[\#C4B5FD\] .text-\[\#1A1A1A\] {
+  color: #1A1A1A !important;
+}
+
+/* Dark mode layout and structural color overrides */
+.dark .bg-white {
+  background-color: var(--card) !important;
+}
+
+.dark .bg-\[\#EDEDED\] {
+  background-color: var(--gray-light) !important;
+}
+
+.dark .bg-\[\#F9FAFB\] {
+  background-color: var(--background) !important;
+}
+
+.dark .bg-\[\#F5F7FA\] {
+  background-color: var(--background) !important;
+}
+
+.dark .outline-\[\#E0E0E0\],
+.dark .outline-\[\#EDEDED\],
+.dark .border-\[\#E5E7EB\],
+.dark .border-\[\#E0E0E0\] {
+  outline-color: var(--stroke) !important;
+  border-color: var(--stroke) !important;
 }
 
 * {
@@ -77,9 +130,11 @@ body {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -95,10 +150,12 @@ body {
     transform: scale(0.95);
     opacity: 0.8;
   }
+
   50% {
     transform: scale(1.05);
     opacity: 0.4;
   }
+
   100% {
     transform: scale(0.95);
     opacity: 0.8;
@@ -112,4 +169,24 @@ body {
 /* Smooth transitons for interactions */
 .interactive-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Invert elements with dark:invert when .dark class is present on root */
+.dark .dark\:invert {
+  filter: invert(1) !important;
+}
+
+/* Invert black/dark SVG icons in dark mode for correct visibility */
+.dark img[src$=".svg"] {
+  filter: invert(1);
+}
+
+/* Exclude colored SVGs, rating stars, active hearts, and those on explicitly dark/primary backgrounds from inversion */
+.dark .bg-primary img[src$=".svg"],
+.dark .bg-\[\#BBFF63\] img[src$=".svg"],
+.dark .bg-\[\#1A1A1A\] img[src$=".svg"],
+.dark .bg-black img[src$=".svg"],
+.dark img[src*="mdi_heart.svg"],
+.dark img[src*="star"] {
+  filter: none !important;
 }

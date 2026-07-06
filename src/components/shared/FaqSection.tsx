@@ -39,7 +39,7 @@ function FaqSection() {
 
   return (
     <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-foreground">
         Frequently asked questions
       </div>
       <div className="self-stretch inline-flex items-center justify-between">

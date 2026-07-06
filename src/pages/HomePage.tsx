@@ -198,7 +198,7 @@ function MustHavesSection() {
 
   return (
     <div className="mt-16 w-full">
-      <div className="w-[909px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="w-[909px] font-['Montserrat'] text-8xl font-bold text-foreground">
         This Season's Must-Haves
       </div>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
@@ -217,7 +217,7 @@ function MustHavesSection() {
 function RecommendedSection() {
   return (
     <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-foreground">
         Recommended for You
       </div>
       <ProductGrid />
@@ -343,7 +343,7 @@ function VoteSection() {
 
   return (
     <div className="mt-16 relative h-[1242px] w-full">
-      <div className="absolute left-0 top-0 w-[646px] font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="absolute left-0 top-0 w-[646px] font-['Montserrat'] text-8xl font-bold text-foreground">
         Vote for next design
       </div>
       <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-[#BBFF63]">
@@ -444,7 +444,7 @@ function FlashDealsSection() {
   return (
     <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
       <div className="inline-flex items-center justify-center gap-11">
-        <div className="font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-8xl font-bold text-foreground">
           Flash Deals
         </div>
         <div className="flex items-center justify-start gap-6">

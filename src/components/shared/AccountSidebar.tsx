@@ -46,12 +46,12 @@ function SidebarRow({
       onClick={onClick}
       className={`inline-flex cursor-pointer items-center justify-start gap-4 rounded-lg p-4 transition-shadow ${
         active
-          ? "self-stretch bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-          : "self-stretch hover:bg-white/50"
+          ? "self-stretch bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] border border-stroke"
+          : "self-stretch hover:bg-card/50"
       }`}
     >
-      <Icon className="h-6 w-6 text-[#1A1A1A]" strokeWidth={1.5} />
-      <div className="whitespace-nowrap font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
+      <Icon className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+      <div className="whitespace-nowrap font-['Montserrat'] text-lg font-medium text-foreground">
         {item.label}
       </div>
     </div>

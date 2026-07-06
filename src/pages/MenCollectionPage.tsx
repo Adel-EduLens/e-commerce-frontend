@@ -48,7 +48,7 @@ export default function MenCollectionPage() {
 
   return (
     <div className="w-full">
-      <div className="w-full font-['Montserrat'] text-8xl font-bold text-[#1A1A1A]">
+      <div className="w-full font-['Montserrat'] text-8xl font-bold text-foreground">
         {categoryTitle}
       </div>
       <div className="mt-8 w-full">
