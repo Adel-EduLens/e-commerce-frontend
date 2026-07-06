@@ -260,9 +260,9 @@ function DeliverySection({
             — click to auto-fill your address
           </span>
         </div>
-        <GoogleMapPicker 
-          onLocationPick={onLocationPick} 
-          searchQuery={[streetAddress, area, city, country].filter(Boolean).join(", ")} 
+        <GoogleMapPicker
+          onLocationPick={onLocationPick}
+          searchQuery={[streetAddress, area, city, country].filter(Boolean).join(", ")}
         />
       </div>
     </div>
