@@ -236,7 +236,7 @@ function BagItemCard({
               Size: <strong className="font-bold">{item.size}</strong>
             </span>
             <span className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-3 py-1 font-['Montserrat'] text-sm text-foreground">
-              Color: 
+              Color:
               <span
                 className="h-4 w-4 rounded-full border border-stroke"
                 style={{ backgroundColor: item.colorHex }}
@@ -317,22 +317,20 @@ function FavoritesSection({
         <button
           type="button"
           onClick={() => onSelectTab("favorites")}
-          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${
-            selectedTab === "favorites"
+          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${selectedTab === "favorites"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
-          }`}
+            }`}
         >
           Favorites
         </button>
         <button
           type="button"
           onClick={() => onSelectTab("recent")}
-          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${
-            selectedTab === "recent"
+          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${selectedTab === "recent"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
-          }`}
+            }`}
         >
           Recently Viewed
         </button>
@@ -409,7 +407,7 @@ export default function BagPage() {
 
   const discount = useMemo(() => {
     if (!appliedCoupon) return 0;
-    
+
     return items.reduce((total, item) => {
       let applies = false;
       if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
@@ -419,7 +417,7 @@ export default function BagPage() {
       } else if (appliedCoupon.categoryId && item.categoryId === appliedCoupon.categoryId) {
         applies = true;
       }
-      
+
       if (applies) {
         return total + (item.unitPrice * (appliedCoupon.discount / 100)) * item.quantity;
       }

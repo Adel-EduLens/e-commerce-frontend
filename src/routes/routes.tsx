@@ -234,7 +234,7 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard/trader',
         element: (
-            <TraderLayout />
+          <TraderLayout />
         ),
         children: [
           {
