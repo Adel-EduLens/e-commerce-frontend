@@ -1,19 +1,30 @@
-const placeholderAvatar =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect width='60' height='60' fill='%23D9D9D9'/%3E%3C/svg%3E";
+import { useState } from "react";
 
 function NotificationSwitch() {
+const [enabled, setEnabled] = useState(false);
+
   return (
-    <div className="relative h-9 w-14 overflow-hidden rounded-full">
-      <div className="absolute left-0 top-0 h-9 w-14 bg-[#BBFF63]" />
-    </div>
+    <button
+      type="button"
+      onClick={() => setEnabled((prev) => !prev)}
+      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${
+        enabled ? "bg-primary" : "bg-stroke"
+      }`}
+    >
+      <span
+        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${
+          enabled ? "translate-x-6" : "translate-x-1"
+        }`}
+      />
+    </button>
   );
 }
 
-function NotificationRow({ label }: { label: string }) {
+function NotificationRow({ label , src }: { label: string  ,src:string}) {
   return (
     <div className="flex items-center gap-4 sm:gap-5">
       <img
-        src={placeholderAvatar}
+        src={src}
         className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover object-top shrink-0"
         alt={label}
         draggable={false}
@@ -35,9 +46,9 @@ function NotificationsPanel() {
         NOTIFICATIONS
       </div>
       <div className="flex flex-col gap-4 sm:gap-6">
-        <NotificationRow label="Men" />
-        <NotificationRow label="Women" />
-        <NotificationRow label="Kids" />
+        <NotificationRow label="Men" src="/home-page/image%208.png" />
+        <NotificationRow label="Women" src="/home-page/image%207.png"/>
+        <NotificationRow label="Kids"   src="/home-page/image%209.png"  />
       </div>
     </div>
   );
