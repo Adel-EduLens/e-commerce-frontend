@@ -15,6 +15,7 @@ const sidebarItems = [
   { label: "Orders", icon: "carbon_follow-up-work-order.svg", path: "/dashboard/trader/orders" },
   { label: "Inventory", icon: "material-symbols_inventory.svg", path: "/dashboard/trader/inventory" },
   { label: "Customers", icon: "carbon_customer.svg", path: "/dashboard/trader/customers" },
+  { label: "Coupons", icon: "dashicons_money-alt.svg", path: "/dashboard/trader/coupons" },
   { label: "Finance", icon: "material-symbols_finance-rounded.svg", path: "/dashboard/trader/finance" },
   { label: "Notifications", icon: "ion_notifications-outline.svg", path: "/dashboard/trader/notifications" },
   { label: "Analytics", icon: "grommet-icons_analytics.svg", path: "/dashboard/trader/analytics" },

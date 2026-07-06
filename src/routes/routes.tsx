@@ -28,6 +28,7 @@ import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage
 import TraderStoreSettingsPage from '../pages/dashboards/TraderStoreSettingsPage'
 import TraderRetailPage from '../pages/dashboards/TraderRetailPage'
 import TraderLayout from '../components/layout/TraderLayout'
+import TraderCouponsPage from '../pages/dashboards/TraderCouponsPage'
 import UserDashboard from '../pages/dashboards/UserDashboard'
 import MyOrdersPage from '../pages/MyOrdersPage'
 import HelpCenterPage from '../pages/HelpCenterPage'
@@ -246,6 +247,10 @@ export const router = createBrowserRouter([
           {
             path: 'products',
             element: <TraderProductsPage />,
+          },
+          {
+            path: 'coupons',
+            element: <TraderCouponsPage />,
           },
           {
             path: 'customers',

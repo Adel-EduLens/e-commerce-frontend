@@ -8,14 +8,28 @@ import { useParams } from "react-router-dom";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
 import { ReviewsSection } from "../components/product/ReviewsSection";
-
 import { RecommedProducts } from "../components/product/recommedProducts";
+import { useRecentStore } from "../store/useRecentStore";
 
 export default function ProductDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, isAuthenticated } = useAuthStore();
   const { data: product, isPending, isError } = useProduct(id);
+  const addRecent = useRecentStore((state) => state.addProduct);
+
+  useEffect(() => {
+    if (product) {
+      addRecent({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        images: product.images,
+        sizes: product.sizes,
+        rating: product.rating,
+      });
+    }
+  }, [product, addRecent]);
 
   const [selectedColor, setSelectedColor] = useState("");
 

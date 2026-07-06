@@ -98,6 +98,7 @@ export function ProductInfoPanel({
     addItem({
       id: `${product.id}-${selectedSize}-${selectedColor}`,
       productId: product.id,
+      categoryId: product.category.id,
       title: product.name,
       unitPrice: product.price,
       currency: "EGP",

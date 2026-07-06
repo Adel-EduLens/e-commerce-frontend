@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
 import { useAuthStore } from "../store/useAuthStore";
 import { type CartItem, useCartStore } from "../store/useCartStore";
+import { api } from "../lib/axios";
+import { useRecentStore } from "../store/useRecentStore";
 
 type BagTab = "favorites" | "recent";
 
@@ -35,10 +37,10 @@ function PlusIcon({ size = 24 }: { size?: 14 | 24 }) {
   return (
     <div className={`relative ${size === 24 ? "h-6 w-6" : "h-3.5 w-3.5"}`}>
       <div
-        className={`absolute left-1/2 top-1/2 ${line} -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1A1A1A]`}
+        className={`absolute left-1/2 top-1/2 ${line} -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground`}
       />
       <div
-        className={`absolute left-1/2 top-1/2 ${cross} -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1A1A1A]`}
+        className={`absolute left-1/2 top-1/2 ${cross} -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground`}
       />
     </div>
   );
@@ -47,16 +49,25 @@ function PlusIcon({ size = 24 }: { size?: 14 | 24 }) {
 function MinusIcon() {
   return (
     <div className="relative h-6 w-6">
-      <div className="absolute left-[5px] top-[11px] h-0.5 w-3.5 rounded-full bg-[#1A1A1A]" />
+      <div className="absolute left-[5px] top-[11px] h-0.5 w-3.5 rounded-full bg-foreground" />
     </div>
   );
 }
+
+type AppliedCouponType = {
+  id: string;
+  code: string;
+  discount: number;
+  categoryId: string | null;
+  productId: string | null;
+};
 
 function SummaryCard({
   subtotal,
   discount,
   couponCode,
   isCouponApplied,
+  appliedCouponDetails,
   onCouponChange,
   onApplyCoupon,
   onCheckout,
@@ -66,6 +77,7 @@ function SummaryCard({
   discount: number;
   couponCode: string;
   isCouponApplied: boolean;
+  appliedCouponDetails: AppliedCouponType | null;
   onCouponChange: (value: string) => void;
   onApplyCoupon: () => void;
   onCheckout: () => void;
@@ -74,154 +86,74 @@ function SummaryCard({
   const total = Math.max(subtotal - discount, 0);
 
   return (
-    <div className="absolute left-[968px] top-[232px] h-[476px] w-[424px] overflow-hidden rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-      <div className="absolute left-[35px] top-[20px] inline-flex items-center justify-start gap-1">
-        <div className="font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
-          Get 20% off 99+ Orders With Code:
+    <div className="rounded-2xl bg-card p-6 border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col gap-6">
+      <div className="bg-background-hover p-4 rounded-xl border border-stroke flex flex-col gap-2">
+        <div className="font-['Montserrat'] text-xs font-semibold text-foreground">
+          Enter an active coupon code to apply:
         </div>
-        <div className="flex items-center justify-center rounded-2xl bg-[#DC2626] px-2 py-1">
-          <div className="font-['Montserrat'] text-base font-semibold text-white">
-            FREE20
-          </div>
+        <div className="flex flex-wrap gap-1.5">
+          <span className="inline-flex items-center rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-red-600 dark:bg-red-950 dark:border-red-900 dark:text-red-400">
+            DYNAMIC DISCOUNTS ACTIVE
+          </span>
         </div>
       </div>
-      <input
-        value={couponCode}
-        onChange={(event) => onCouponChange(event.target.value)}
-        placeholder="Enter discount code"
-        className="absolute left-[16px] top-[68px] h-14 w-96 rounded-lg px-4 py-5 pr-28 font-['Montserrat'] text-base font-medium text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] placeholder:text-[#6B7280]"
-      />
-      <button
-        type="button"
-        onClick={onApplyCoupon}
-        className="absolute left-[317px] top-[68px] inline-flex h-14 w-[91px] items-center justify-center rounded-br-lg rounded-tr-lg bg-[#1A1A1A] p-2.5"
-      >
-        <div className="font-['Montserrat'] text-base font-semibold text-white">
+
+      <div className="flex gap-2">
+        <input
+          value={couponCode}
+          onChange={(event) => onCouponChange(event.target.value)}
+          placeholder="Enter discount code"
+          className="flex-1 h-12 rounded-xl px-4 border border-stroke bg-background text-foreground font-['Montserrat'] text-sm focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-text"
+        />
+        <button
+          type="button"
+          onClick={onApplyCoupon}
+          className="h-12 px-6 rounded-xl bg-foreground text-background font-['Montserrat'] text-sm font-semibold hover:opacity-90 transition"
+        >
           {isCouponApplied ? "Applied" : "Apply"}
-        </div>
-      </button>
-      <div className="absolute left-0 top-[152px] h-0 w-96 outline outline-1 outline-offset-[-0.50px] outline-[#E0E0E0]" />
-      <div className="absolute left-[16px] top-[176px] inline-flex w-96 items-center justify-between">
-        <div className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          Subtotal
-        </div>
-        <div className="font-['Montserrat'] text-base font-bold text-[#1A1A1A]">
-          {formatCurrency(subtotal)}
-        </div>
+        </button>
       </div>
-      {discount > 0 ? (
-        <div className="absolute left-[16px] top-[212px] inline-flex w-96 items-center justify-between">
-          <div className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-            Discount (FREE20)
+
+      <hr className="border-stroke" />
+
+      <div className="flex flex-col gap-3">
+        <div className="flex justify-between font-['Montserrat'] text-base text-foreground">
+          <span>Subtotal</span>
+          <span className="font-bold">{formatCurrency(subtotal)}</span>
+        </div>
+
+        {discount > 0 && appliedCouponDetails && (
+          <div className="flex justify-between font-['Montserrat'] text-base text-green-600 font-medium">
+            <span>Discount ({appliedCouponDetails.code})</span>
+            <span className="font-bold">-{formatCurrency(discount)}</span>
           </div>
-          <div className="font-['Montserrat'] text-base font-bold text-[#16A34A]">
-            -{formatCurrency(discount)}
-          </div>
+        )}
+
+        <div className="flex justify-between font-['Montserrat'] text-sm text-gray-text">
+          <span>Estimated Shipping</span>
+          <span>Calculated at Checkout</span>
         </div>
-      ) : null}
-      <div className="absolute left-[16px] top-[248px] inline-flex w-96 items-center justify-between">
-        <div className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          Estimated Shipping
-        </div>
-        <div className="font-['Montserrat'] text-base font-bold text-[#1A1A1A]">
-          Calculated at Checkout
-        </div>
-      </div>
-      <div className="absolute left-[16px] top-[284px] inline-flex w-96 items-center justify-between">
-        <div className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-          Estimated Taxes
-        </div>
-        <div className="font-['Montserrat'] text-base font-bold text-[#1A1A1A]">
-          Calculated at Checkout
+
+        <div className="flex justify-between font-['Montserrat'] text-sm text-gray-text">
+          <span>Estimated Taxes</span>
+          <span>Calculated at Checkout</span>
         </div>
       </div>
-      <div className="absolute left-0 top-[356px] h-0 w-96 outline outline-1 outline-offset-[-0.50px] outline-[#E0E0E0]" />
-      <div className="absolute left-[16px] top-[380px] inline-flex w-96 items-center justify-between">
-        <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
-          Total
-        </div>
-        <div className="font-['Montserrat'] text-xl font-bold text-[#1A1A1A]">
-          {formatCurrency(total)}
-        </div>
+
+      <hr className="border-stroke" />
+
+      <div className="flex justify-between items-center font-['Montserrat'] text-xl font-bold text-foreground">
+        <span>Total</span>
+        <span>{formatCurrency(total)}</span>
       </div>
+
       <button
         type="button"
         onClick={onCheckout}
         disabled={checkoutDisabled}
-        className="absolute left-[16px] top-[420px] inline-flex h-14 w-96 items-center justify-center rounded-lg bg-[#1A1A1A] p-2.5 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full h-14 rounded-xl bg-foreground text-background font-['Montserrat'] text-base font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
       >
-        <div className="font-['Montserrat'] text-xl font-semibold text-white">
-          Proceed to Checkout
-        </div>
-      </button>
-    </div>
-  );
-}
-
-function BagHeader({
-  itemCount,
-  onAddItems,
-}: {
-  itemCount: number;
-  onAddItems: () => void;
-}) {
-  return (
-    <div className="absolute left-[24px] top-[162px] inline-flex w-[920px] items-center justify-between">
-      <div className="flex items-center justify-start gap-6">
-        <div className="font-['Montserrat'] text-4xl font-bold text-[#1A1A1A]">
-          MY BAG
-        </div>
-        <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          ({itemCount} item{itemCount === 1 ? "" : "s"})
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={onAddItems}
-        className="flex items-center justify-start gap-2 rounded-2xl bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
-      >
-        <PlusIcon />
-        <div className="font-['Montserrat'] text-base font-semibold text-[#1A1A1A]">
-          Add Items
-        </div>
-      </button>
-    </div>
-  );
-}
-
-function QuantityControl({
-  quantity,
-  onDecrease,
-  onIncrease,
-}: {
-  quantity: number;
-  onDecrease: () => void;
-  onIncrease: () => void;
-}) {
-  return (
-    <div className="absolute left-0 top-[142px] inline-flex w-32 items-center justify-start gap-4 rounded-3xl bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-      <button
-        type="button"
-        onClick={onDecrease}
-        className="relative h-10 w-10 overflow-hidden rounded-full bg-[#EDEDED]"
-        aria-label="Decrease item quantity"
-      >
-        <div className="absolute left-[8px] top-[8px] h-6 w-6 overflow-hidden">
-          <MinusIcon />
-        </div>
-      </button>
-      <div className="text-end font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-        {quantity}
-      </div>
-      <button
-        type="button"
-        onClick={onIncrease}
-        className="relative h-10 w-10 overflow-hidden rounded-full bg-[#EDEDED]"
-        aria-label="Increase item quantity"
-      >
-        <div className="absolute left-[8px] top-[8px] h-6 w-6 overflow-hidden">
-          <PlusIcon />
-        </div>
+        Proceed to Checkout
       </button>
     </div>
   );
@@ -229,72 +161,120 @@ function QuantityControl({
 
 function BagItemCard({
   item,
-  top,
   onRemove,
   onIncrease,
   onDecrease,
+  appliedCoupon,
 }: {
   item: CartItem;
-  top: number;
   onRemove: () => void;
   onIncrease: () => void;
   onDecrease: () => void;
+  appliedCoupon: AppliedCouponType | null;
 }) {
+  const hasDiscount = useMemo(() => {
+    if (!appliedCoupon) return false;
+    if (!appliedCoupon.categoryId && !appliedCoupon.productId) return true;
+    if (appliedCoupon.productId && item.productId === appliedCoupon.productId) return true;
+    if (appliedCoupon.categoryId && item.categoryId === appliedCoupon.categoryId) return true;
+    return false;
+  }, [appliedCoupon, item]);
+
+  const discountedPrice = hasDiscount
+    ? item.unitPrice * (1 - appliedCoupon!.discount / 100)
+    : item.unitPrice;
+
   return (
-    <div
-      className="absolute left-[24px] h-60 w-[920px] rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]"
-      style={{ top }}
-    >
+    <div className="flex flex-col sm:flex-row gap-6 rounded-2xl bg-card p-6 border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] relative group">
+      {/* Remove Button */}
       <button
         type="button"
         onClick={onRemove}
-        className="absolute left-[864px] top-[8px] h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+        className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-background-hover transition text-foreground"
         aria-label={`Remove ${item.title} from bag`}
       >
-        <Trash2
-          className="absolute left-[8px] top-[8px] h-6 w-6 text-[#1A1A1A]"
-          strokeWidth={1.5}
-        />
+        <Trash2 className="h-5 w-5" strokeWidth={1.5} />
       </button>
-      <div className="absolute left-0 top-0 h-60 w-48 overflow-hidden rounded-l-lg bg-[#F9FAFB]">
+
+      {/* Image */}
+      <div className="h-44 w-36 overflow-hidden rounded-xl bg-background-hover flex-shrink-0 flex items-center justify-center">
         <img
           src={item.imageSrc}
-          className="absolute left-[8px] top-0 h-[284px] w-[176px] object-contain"
+          className="h-full w-full object-contain"
           alt={item.title}
           draggable={false}
         />
       </div>
-      <div className="absolute left-[221px] top-[8px] h-48 w-72">
-        <div className="absolute left-0 top-0 w-72 whitespace-nowrap font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
-          {item.title}
-        </div>
-        <div className="absolute left-0 top-[40px] w-72 font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
-          {formatCurrency(item.unitPrice)}
-        </div>
-        <div className="absolute left-0 top-[85px] inline-flex items-center justify-start gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-          <div className="font-['Montserrat'] text-base text-[#1A1A1A]">
-            <span className="font-medium">Size: </span>
-            <span className="font-bold">{item.size}</span>
+
+      {/* Info */}
+      <div className="flex-1 flex flex-col justify-between py-1">
+        <div className="flex flex-col gap-2">
+          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground pr-10">
+            {item.title}
+          </h3>
+          <div className="flex items-center gap-3">
+            {hasDiscount ? (
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-['Montserrat'] text-2xl font-bold text-red-500">
+                  {formatCurrency(discountedPrice)}
+                </span>
+                <span className="font-['Montserrat'] text-base text-gray-text line-through">
+                  {formatCurrency(item.unitPrice)}
+                </span>
+                <span className="rounded-full bg-red-100 dark:bg-red-950 px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-red-600 dark:text-red-400">
+                  {appliedCoupon!.discount}% OFF
+                </span>
+              </div>
+            ) : (
+              <span className="font-['Montserrat'] text-2xl font-bold text-foreground">
+                {formatCurrency(item.unitPrice)}
+              </span>
+            )}
           </div>
-          <div className="flex items-center justify-start gap-2">
-            <div className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-              Color:
-            </div>
-            <div
-              className="h-6 w-6 rounded-full"
-              style={{ backgroundColor: item.colorHex }}
-              aria-label={item.color}
-            />
+          <div className="flex flex-wrap gap-4 mt-2">
+            <span className="rounded-xl border border-stroke bg-card px-3 py-1 font-['Montserrat'] text-sm text-foreground">
+              Size: <strong className="font-bold">{item.size}</strong>
+            </span>
+            <span className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-3 py-1 font-['Montserrat'] text-sm text-foreground">
+              Color: 
+              <span
+                className="h-4 w-4 rounded-full border border-stroke"
+                style={{ backgroundColor: item.colorHex }}
+                aria-label={item.color}
+              />
+            </span>
           </div>
         </div>
-        <QuantityControl
-          quantity={item.quantity}
-          onDecrease={onDecrease}
-          onIncrease={onIncrease}
-        />
-      </div>
-      <div className="absolute left-[676px] top-[183px] font-['Montserrat'] text-base font-semibold text-[#6B7280]">
-        Line total: {formatCurrency(item.unitPrice * item.quantity)}
+
+        {/* Quantity and Line Total */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 pt-4 border-t border-stroke">
+          <div className="flex items-center gap-3 border border-stroke rounded-full px-3 py-1.5 bg-card w-max">
+            <button
+              type="button"
+              onClick={onDecrease}
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-background-hover hover:bg-stroke transition text-foreground"
+            >
+              <MinusIcon />
+            </button>
+            <span className="w-8 text-center font-['Montserrat'] text-lg font-medium text-foreground">
+              {item.quantity}
+            </span>
+            <button
+              type="button"
+              onClick={onIncrease}
+              className="h-8 w-8 flex items-center justify-center rounded-full bg-background-hover hover:bg-stroke transition text-foreground"
+            >
+              <PlusIcon size={14} />
+            </button>
+          </div>
+
+          <div className="font-['Montserrat'] text-base font-semibold text-gray-text text-right">
+            Line total:{" "}
+            <span className={hasDiscount ? "text-green-600 dark:text-green-400 font-bold" : "text-foreground"}>
+              {formatCurrency(discountedPrice * item.quantity)}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -302,18 +282,18 @@ function BagItemCard({
 
 function EmptyBagState({ onAddItems }: { onAddItems: () => void }) {
   return (
-    <div className="absolute left-[24px] top-[232px] flex h-60 w-[920px] flex-col items-center justify-center gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+    <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-card border border-stroke p-12 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+      <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
         Your bag is empty
       </div>
-      <div className="w-[520px] text-center font-['Montserrat'] text-base font-medium text-[#6B7280]">
+      <div className="max-w-md text-center font-['Montserrat'] text-base font-medium text-gray-text">
         Add a few pieces you love and they&apos;ll show up here with editable quantities,
         discount codes, and checkout totals.
       </div>
       <button
         type="button"
         onClick={onAddItems}
-        className="rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A]"
+        className="rounded-2xl bg-primary px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground hover:bg-[#a8e854] transition"
       >
         Browse Products
       </button>
@@ -322,30 +302,25 @@ function EmptyBagState({ onAddItems }: { onAddItems: () => void }) {
 }
 
 function FavoritesSection({
-  top,
   selectedTab,
   onSelectTab,
 }: {
-  top: number;
   selectedTab: BagTab;
   onSelectTab: (tab: BagTab) => void;
 }) {
-  const products = selectedTab === "favorites" ? FAVORITE_PRODUCTS : RECENT_PRODUCTS;
+  const recentProducts = useRecentStore((state) => state.products);
+  const products = selectedTab === "favorites" ? FAVORITE_PRODUCTS : recentProducts;
 
   return (
-    <div
-      className="absolute left-[24px] inline-flex w-[1392px] flex-col items-start justify-start gap-8"
-      style={{ top }}
-    >
-      <div className="relative h-16 w-[920px]">
-        <div className="absolute left-0 top-[71px] h-0 w-[920px] outline outline-1 outline-offset-[-0.50px] outline-[#E0E0E0]" />
+    <div className="w-full">
+      <div className="flex gap-8 border-b border-stroke mb-8">
         <button
           type="button"
           onClick={() => onSelectTab("favorites")}
-          className={`absolute left-0 top-0 inline-flex items-center justify-center py-4 font-['Montserrat'] text-3xl font-bold ${
+          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${
             selectedTab === "favorites"
-              ? "border-b-[3px] border-[#1A1A1A] text-[#1A1A1A]"
-              : "text-[#6B7280]"
+              ? "border-b-[3px] border-foreground text-foreground"
+              : "text-gray-text hover:text-foreground"
           }`}
         >
           Favorites
@@ -353,25 +328,48 @@ function FavoritesSection({
         <button
           type="button"
           onClick={() => onSelectTab("recent")}
-          className={`absolute left-[185px] top-[16px] font-['Montserrat'] text-3xl font-bold ${
-            selectedTab === "recent" ? "text-[#1A1A1A]" : "text-[#6B7280]"
+          className={`pb-4 font-['Montserrat'] text-3xl font-bold transition-all ${
+            selectedTab === "recent"
+              ? "border-b-[3px] border-foreground text-foreground"
+              : "text-gray-text hover:text-foreground"
           }`}
         >
           Recently Viewed
         </button>
       </div>
-      <div className="self-stretch inline-flex items-center justify-start gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={`${selectedTab}-${product.title}`}
-            title={product.title}
-            sizeLabel={product.sizeLabel}
-            price={product.price}
-            featured={"featured" in product && Boolean(product.featured)}
-            accentClassName="bg-[#BBFF63]"
-          />
-        ))}
-      </div>
+
+      {products.length === 0 ? (
+        <div className="py-12 text-center text-gray-text font-['Montserrat'] text-base font-semibold">
+          No recently viewed items yet.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product) => {
+            const title = "title" in product ? product.title : product.name;
+            const price = "price" in product
+              ? (typeof product.price === "number" ? `${product.price} EGP` : product.price)
+              : "";
+            const sizeLabel = "sizeLabel" in product
+              ? product.sizeLabel
+              : product.sizes.map((s) => s.size).join(" - ");
+            const imageSrc = "imageSrc" in product
+              ? product.imageSrc
+              : product.images?.[0]?.url;
+
+            return (
+              <ProductCard
+                key={`${selectedTab}-${title}`}
+                title={title}
+                sizeLabel={sizeLabel}
+                price={price}
+                imageSrc={imageSrc}
+                featured={"featured" in product && Boolean(product.featured)}
+                accentClassName="bg-primary"
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -385,7 +383,7 @@ export default function BagPage() {
   const decrementQuantity = useCartStore((state) => state.decrementQuantity);
 
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCouponType | null>(null);
   const [selectedTab, setSelectedTab] = useState<BagTab>("favorites");
   const itemCount = useMemo(
     () => items.reduce((total, item) => total + item.quantity, 0),
@@ -410,27 +408,34 @@ export default function BagPage() {
   }, [appliedCoupon, subtotal]);
 
   const discount = useMemo(() => {
-    if (appliedCoupon === "FREE20" && subtotal >= 99) {
-      return subtotal * 0.2;
-    }
-
-    return 0;
-  }, [appliedCoupon, subtotal]);
+    if (!appliedCoupon) return 0;
+    
+    return items.reduce((total, item) => {
+      let applies = false;
+      if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
+        applies = true;
+      } else if (appliedCoupon.productId && item.productId === appliedCoupon.productId) {
+        applies = true;
+      } else if (appliedCoupon.categoryId && item.categoryId === appliedCoupon.categoryId) {
+        applies = true;
+      }
+      
+      if (applies) {
+        return total + (item.unitPrice * (appliedCoupon.discount / 100)) * item.quantity;
+      }
+      return total;
+    }, 0);
+  }, [appliedCoupon, items]);
 
   if (!isAuthenticated || !user) {
     return null;
   }
 
-  const extraItems = Math.max(items.length - 1, 0);
-  const favoritesTop = 965 + extraItems * 264;
-  const footerTop = 1507 + extraItems * 264;
-  const pageHeight = 1949 + extraItems * 264;
-
   const handleAddItems = () => {
     navigate("/season-must-haves");
   };
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     const normalizedCode = couponCode.trim().toUpperCase();
 
     if (!normalizedCode) {
@@ -438,19 +443,29 @@ export default function BagPage() {
       return;
     }
 
-    if (normalizedCode !== "FREE20") {
-      toast.error("That discount code is not valid");
-      return;
-    }
+    try {
+      const { data } = await api.get(`/coupons/validate/${normalizedCode}`);
+      const coupon = data.data;
 
-    if (subtotal < 99) {
-      toast.error("FREE20 requires at least 99 EGP in your bag");
-      return;
-    }
+      const appliesToSomeItem = items.some((item) => {
+        if (!coupon.categoryId && !coupon.productId) return true;
+        if (coupon.productId && item.productId === coupon.productId) return true;
+        if (coupon.categoryId && item.categoryId === coupon.categoryId) return true;
+        return false;
+      });
 
-    setAppliedCoupon(normalizedCode);
-    setCouponCode(normalizedCode);
-    toast.success("Discount code applied");
+      if (!appliesToSomeItem) {
+        toast.error("This coupon code does not apply to any items in your bag");
+        return;
+      }
+
+      setAppliedCoupon(coupon);
+      setCouponCode(coupon.code);
+      toast.success("Discount code applied successfully");
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "Invalid coupon code";
+      toast.error(errorMsg);
+    }
   };
 
   const handleCheckout = () => {
@@ -469,40 +484,66 @@ export default function BagPage() {
   };
 
   return (
-    <div
-      className="relative w-full overflow-hidden"
-      style={{ minHeight: pageHeight }}
-    >
-      <SummaryCard
-        subtotal={subtotal}
-        discount={discount}
-        couponCode={couponCode}
-        isCouponApplied={Boolean(appliedCoupon && discount > 0)}
-        onCouponChange={setCouponCode}
-        onApplyCoupon={handleApplyCoupon}
-        onCheckout={handleCheckout}
-        checkoutDisabled={!items.length}
-      />
-      <BagHeader itemCount={itemCount} onAddItems={handleAddItems} />
-      {items.length ? (
-        items.map((item, index) => (
-          <BagItemCard
-            key={item.id}
-            item={item}
-            top={232 + index * 264}
-            onRemove={() => handleRemoveItem(item)}
-            onIncrease={() => incrementQuantity(item.id)}
-            onDecrease={() => decrementQuantity(item.id)}
+    <div className="w-full max-w-[1440px] mx-auto px-4 py-8 bg-background min-h-screen">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-6">
+          <h1 className="font-['Montserrat'] text-4xl font-bold text-foreground">
+            MY BAG
+          </h1>
+          <span className="font-['Montserrat'] text-xl font-medium text-gray-text">
+            ({itemCount} item{itemCount === 1 ? "" : "s"})
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={handleAddItems}
+          className="flex items-center gap-2 rounded-2xl bg-card border border-stroke px-4 py-2 shadow-sm hover:bg-background-hover transition"
+        >
+          <PlusIcon />
+          <span className="font-['Montserrat'] text-base font-semibold text-foreground">
+            Add Items
+          </span>
+        </button>
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-8 items-start mb-16">
+        {/* Left Side: Bag Items */}
+        <div className="flex-1 w-full flex flex-col gap-6">
+          {items.length ? (
+            items.map((item) => (
+              <BagItemCard
+                key={item.id}
+                item={item}
+                onRemove={() => handleRemoveItem(item)}
+                onIncrease={() => incrementQuantity(item.id)}
+                onDecrease={() => decrementQuantity(item.id)}
+                appliedCoupon={appliedCoupon}
+              />
+            ))
+          ) : (
+            <EmptyBagState onAddItems={handleAddItems} />
+          )}
+        </div>
+
+        {/* Right Side: Summary Card */}
+        <div className="w-full lg:w-[424px] shrink-0">
+          <SummaryCard
+            subtotal={subtotal}
+            discount={discount}
+            couponCode={couponCode}
+            isCouponApplied={Boolean(appliedCoupon)}
+            appliedCouponDetails={appliedCoupon}
+            onCouponChange={setCouponCode}
+            onApplyCoupon={handleApplyCoupon}
+            onCheckout={handleCheckout}
+            checkoutDisabled={!items.length}
           />
-        ))
-      ) : (
-        <EmptyBagState onAddItems={handleAddItems} />
-      )}
-      <FavoritesSection
-        top={favoritesTop}
-        selectedTab={selectedTab}
-        onSelectTab={setSelectedTab}
-      />
+        </div>
+      </div>
+
+      {/* Favorites tab */}
+      <FavoritesSection selectedTab={selectedTab} onSelectTab={setSelectedTab} />
     </div>
   );
 }
