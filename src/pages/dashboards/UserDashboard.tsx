@@ -22,8 +22,8 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
 
 function ProductGallery({ title }: { title: string }) {
   return (
-    <div className="flex flex-col items-start gap-8 flex-1 min-w-0">
-      <div className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
+    <div className="flex flex-col items-center gap-6 flex-1 min-w-0 max-w-md">
+      <div className="self-start font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
         {title}
       </div>
       <div className="w-full overflow-hidden rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-foreground">
