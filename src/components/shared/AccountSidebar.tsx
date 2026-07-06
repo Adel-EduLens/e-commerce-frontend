@@ -1,7 +1,6 @@
 import {
   Bell,
   Clock,
-  Gift,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -28,7 +27,6 @@ const items: SidebarItem[] = [
   { icon: User, label: "My Info", path: "/contact-details" },
   { icon: Bell, label: "Notifications", path: "/notifications" },
   { icon: Clock, label: "Notify Me List", path: "/notify-me-list" },
-  { icon: Gift, label: "Gift Cards", path: "/gift-cards" },
   { icon: Smile, label: "Avatar", path: "/avatar" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
