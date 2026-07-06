@@ -1,58 +1,59 @@
-import { createBrowserRouter } from 'react-router-dom'
-import StudentLayout from '../layouts/StudentLayout'
-import AccountLayout from '../layouts/AccountLayout'
-import UserLayout from '../layouts/UserLayout'
-import HomePage from '../pages/HomePage'
-import ProductDetailsPage from '../pages/ProductDetailsPage'
-import SeasonMustHavesPage from '../pages/SeasonMustHavesPage'
-import MenCollectionPage from '../pages/MenCollectionPage'
-import BagPage from '../pages/BagPage'
-import ContactDetailsPage from '../pages/ContactDetailsPage'
-import NotificationsPage from '../pages/NotificationsPage'
-import NotifyMeListPage from '../pages/NotifyMeListPage'
-import SettingsPage from '../pages/SettingsPage'
-import AuthPage from '../pages/AuthPage'
-import AdminDashboard from '../pages/dashboards/AdminDashboard'
-import PrizeControllerPage from '../pages/dashboards/PrizeControllerPage'
-import TraderDashboard from '../pages/dashboards/TraderDashboard'
-import TraderProductsPage from '../pages/dashboards/TraderProductsPage'
-import TraderCustomersPage from '../pages/dashboards/TraderCustomersPage'
-import TraderOrdersPage from '../pages/dashboards/TraderOrdersPage'
-import TraderInventoryPage from '../pages/dashboards/TraderInventoryPage'
-import TraderFinancePage from '../pages/dashboards/TraderFinancePage'
-import TraderAnalyticsPage from '../pages/dashboards/TraderAnalyticsPage'
-import TraderDropshippingPage from '../pages/dashboards/TraderDropshippingPage'
-import TraderWholesalePage from '../pages/dashboards/TraderWholesalePage'
-import TraderBrandPartnersPage from '../pages/dashboards/TraderBrandPartnersPage'
-import TraderNotificationsPage from '../pages/dashboards/TraderNotificationsPage'
-import TraderStoreSettingsPage from '../pages/dashboards/TraderStoreSettingsPage'
-import TraderRetailPage from '../pages/dashboards/TraderRetailPage'
-import TraderLayout from '../components/layout/TraderLayout'
-import TraderCouponsPage from '../pages/dashboards/TraderCouponsPage'
-import UserDashboard from '../pages/dashboards/UserDashboard'
-import MyOrdersPage from '../pages/MyOrdersPage'
-import HelpCenterPage from '../pages/HelpCenterPage'
-import WalletRewardsPage from '../pages/WalletRewardsPage'
-import CheckoutPage from '../pages/CheckoutPage'
-import DropshippingPage from '../pages/DropshippingPage'
-import FavoritesPage from '../pages/FavoritesPage'
-import WholesalePage from '../pages/WholesalePage'
-import WholesaleDetailsPage from '../pages/WholesaleDetailsPage'
-import DesignLabPage from '../pages/DesignLabPage'
-import ProtectedRoute from '../components/ProtectedRoute'
+import { createBrowserRouter } from "react-router-dom";
+import StudentLayout from "../layouts/StudentLayout";
+import AccountLayout from "../layouts/AccountLayout";
+import UserLayout from "../layouts/UserLayout";
+import HomePage from "../pages/HomePage";
+import ProductDetailsPage from "../pages/ProductDetailsPage";
+import SeasonMustHavesPage from "../pages/SeasonMustHavesPage";
+import MenCollectionPage from "../pages/MenCollectionPage";
+import BagPage from "../pages/BagPage";
+import ContactDetailsPage from "../pages/ContactDetailsPage";
+import NotificationsPage from "../pages/NotificationsPage";
+import NotifyMeListPage from "../pages/NotifyMeListPage";
+import SettingsPage from "../pages/SettingsPage";
+import AuthPage from "../pages/AuthPage";
+import AdminDashboard from "../pages/dashboards/AdminDashboard";
+import PrizeControllerPage from "../pages/dashboards/PrizeControllerPage";
+import TraderDashboard from "../pages/dashboards/TraderDashboard";
+import TraderProductsPage from "../pages/dashboards/TraderProductsPage";
+import TraderCustomersPage from "../pages/dashboards/TraderCustomersPage";
+import TraderOrdersPage from "../pages/dashboards/TraderOrdersPage";
+import TraderInventoryPage from "../pages/dashboards/TraderInventoryPage";
+import TraderFinancePage from "../pages/dashboards/TraderFinancePage";
+import TraderAnalyticsPage from "../pages/dashboards/TraderAnalyticsPage";
+import TraderDropshippingPage from "../pages/dashboards/TraderDropshippingPage";
+import TraderWholesalePage from "../pages/dashboards/TraderWholesalePage";
+import TraderBrandPartnersPage from "../pages/dashboards/TraderBrandPartnersPage";
+import TraderNotificationsPage from "../pages/dashboards/TraderNotificationsPage";
+import TraderStoreSettingsPage from "../pages/dashboards/TraderStoreSettingsPage";
+import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
+import TraderLayout from "../components/layout/TraderLayout";
+import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
+import UserDashboard from "../pages/dashboards/UserDashboard";
+import MyOrdersPage from "../pages/MyOrdersPage";
+import HelpCenterPage from "../pages/HelpCenterPage";
+import WalletRewardsPage from "../pages/WalletRewardsPage";
+import CheckoutPage from "../pages/CheckoutPage";
+import DropshippingPage from "../pages/DropshippingPage";
+import FavoritesPage from "../pages/FavoritesPage";
+import WholesalePage from "../pages/WholesalePage";
+import WholesaleDetailsPage from "../pages/WholesaleDetailsPage";
+import DesignLabPage from "../pages/DesignLabPage";
+import ProtectedRoute from "../components/ProtectedRoute";
+import AdminLoginPage from "../pages/admin/AdminLoginPage";
+import AdminLayout from "../layouts/AdminLayout";
 
-import AdminLoginPage from '../pages/admin/AdminLoginPage'
-import AdminLayout from '../layouts/AdminLayout'
+import TestPage from "../pages/TestPage";
+import AdminHelpCenterPage from "../pages/admin/AdminHelpCenterPage";
+import HelpCenterCategorie from "../pages/HelpCenterCategorie";
+import AdminDesignPage from "../pages/admin/AdminDesignPage";
+import TraderLoginPage from "../pages/TraderLoginPage";
 
-import TestPage from '../pages/TestPage'
-import AdminHelpCenterPage from '../pages/admin/AdminHelpCenterPage'
-import HelpCenterCategorie from '../pages/HelpCenterCategorie'
-import AdminDesignPage from '../pages/admin/AdminDesignPage'
-import TraderLoginPage from '../pages/TraderLoginPage'
+import ProductsPage from "../pages/ProductsPage";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <StudentLayout />,
     children: [
       {
@@ -64,27 +65,35 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'trader/login',
+        path: "trader/login",
         element: <TraderLoginPage />,
       },
       {
-        path: 'product-details/:id',
+        path: "product-details/:id",
         element: (
           <UserLayout>
             <ProductDetailsPage />
           </UserLayout>
         ),
       },
+      // {
+      //   path: "season-must-haves",
+      //   element: (
+      //     <UserLayout>
+      //       <SeasonMustHavesPage />
+      //     </UserLayout>
+      //   ),
+      // },
       {
-        path: 'season-must-haves',
+        path: "products",
         element: (
           <UserLayout>
-            <SeasonMustHavesPage />
+            <ProductsPage />
           </UserLayout>
         ),
       },
       {
-        path: 'collections/:category',
+        path: "collections/:category",
         element: (
           <UserLayout>
             <MenCollectionPage />
@@ -92,7 +101,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'bag',
+        path: "bag",
         element: (
           <UserLayout>
             <BagPage />
@@ -107,90 +116,90 @@ export const router = createBrowserRouter([
         ),
         children: [
           {
-            path: 'contact-details',
+            path: "contact-details",
             element: <ContactDetailsPage />,
             handle: {
               footer: {
-                top: 'top-0',
+                top: "top-0",
                 style: { top: 970 },
               },
             },
           },
           {
-            path: 'notifications',
+            path: "notifications",
             element: <NotificationsPage />,
             handle: {
               footer: {
-                top: 'top-[863px]',
+                top: "top-[863px]",
               },
             },
           },
           {
-            path: 'notify-me-list',
+            path: "notify-me-list",
             element: <NotifyMeListPage />,
             handle: {
               footer: {
-                top: 'top-[863px]',
+                top: "top-[863px]",
               },
             },
           },
           {
-            path: 'settings',
+            path: "settings",
             element: <SettingsPage />,
             handle: {
               footer: {
-                top: 'top-[917px]',
+                top: "top-[917px]",
               },
             },
           },
           {
-            path: 'my-orders',
+            path: "my-orders",
             element: <MyOrdersPage />,
             handle: {
               footer: {
-                top: 'top-[950px]',
+                top: "top-[950px]",
               },
             },
           },
           {
-            path: 'help-center',
+            path: "help-center",
             children: [
               {
                 index: true,
                 element: <HelpCenterPage />,
               },
               {
-                path: ':category',
+                path: ":category",
                 element: <HelpCenterCategorie />,
               },
             ],
           },
           {
-            path: 'wallet-rewards',
+            path: "wallet-rewards",
             element: <WalletRewardsPage />,
             handle: {
               footer: {
-                top: 'top-[894px]',
+                top: "top-[894px]",
               },
             },
           },
         ],
       },
       ...(import.meta.env.DEV
-        ? [{ path: 'random', element: <TestPage /> }]
+        ? [{ path: "random", element: <TestPage /> }]
         : []),
       {
-        path: 'login',
+        path: "login",
         element: <AuthPage mode="login" />,
       },
       {
-        path: 'signup',
+        path: "signup",
         element: <AuthPage mode="signup" />,
       },
       {
-        path: 'dashboard/admin',
+        path: "dashboard/admin",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <AdminLayout>
               <AdminDashboard />
             </AdminLayout>
@@ -198,9 +207,9 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/admin/help-center',
+        path: "dashboard/admin/help-center",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <AdminLayout>
               <AdminHelpCenterPage />
             </AdminLayout>
@@ -208,13 +217,13 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/admin/login',
+        path: "dashboard/admin/login",
         element: <AdminLoginPage />,
       },
       {
-        path: 'dashboard/admin/prizes',
+        path: "dashboard/admin/prizes",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <AdminLayout>
               <PrizeControllerPage />
             </AdminLayout>
@@ -222,9 +231,9 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/admin/designs',
+        path: "dashboard/admin/designs",
         element: (
-          <ProtectedRoute allowedRoles={['admin']}>
+          <ProtectedRoute allowedRoles={["admin"]}>
             <AdminLayout>
               <AdminDesignPage />
             </AdminLayout>
@@ -232,21 +241,19 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/trader',
-        element: (
-            <TraderLayout />
-        ),
+        path: "dashboard/trader",
+        element: <TraderLayout />,
         children: [
           {
             index: true,
             element: <TraderDashboard />,
           },
           {
-            path: 'retail',
+            path: "retail",
             element: <TraderRetailPage />,
           },
           {
-            path: 'products',
+            path: "products",
             element: <TraderProductsPage />,
           },
           {
@@ -255,50 +262,51 @@ export const router = createBrowserRouter([
           },
           {
             path: 'customers',
+
             element: <TraderCustomersPage />,
           },
           {
-            path: 'orders',
+            path: "orders",
             element: <TraderOrdersPage />,
           },
           {
-            path: 'inventory',
+            path: "inventory",
             element: <TraderInventoryPage />,
           },
           {
-            path: 'finance',
+            path: "finance",
             element: <TraderFinancePage />,
           },
           {
-            path: 'analytics',
+            path: "analytics",
             element: <TraderAnalyticsPage />,
           },
           {
-            path: 'dropshipping',
+            path: "dropshipping",
             element: <TraderDropshippingPage />,
           },
           {
-            path: 'wholesale',
+            path: "wholesale",
             element: <TraderWholesalePage />,
           },
           {
-            path: 'brand-partners',
+            path: "brand-partners",
             element: <TraderBrandPartnersPage />,
           },
           {
-            path: 'notifications',
+            path: "notifications",
             element: <TraderNotificationsPage />,
           },
           {
-            path: 'settings',
+            path: "settings",
             element: <TraderStoreSettingsPage />,
           },
         ],
       },
       {
-        path: 'dashboard/user',
+        path: "dashboard/user",
         element: (
-          <ProtectedRoute allowedRoles={['user']}>
+          <ProtectedRoute allowedRoles={["user"]}>
             <UserLayout>
               <UserDashboard />
             </UserLayout>
@@ -306,7 +314,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'checkout',
+        path: "checkout",
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -316,7 +324,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dropshipping',
+        path: "dropshipping",
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -326,7 +334,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'favorites',
+        path: "favorites",
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -336,7 +344,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'wholesale',
+        path: "wholesale",
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -365,4 +373,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-])
+]);

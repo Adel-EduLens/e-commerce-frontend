@@ -7,7 +7,7 @@ const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
 const navLinks = [
   { label: 'Home', path: '/' },
-  { label: 'Shop', path: '/season-must-haves' },
+  { label: 'Shop', path: '/products' },
   { label: 'Wholesale', path: '/wholesale' },
   { label: 'Design Lab', path: '/design-lab' },
   { label: 'Dropshipping', path: '/dropshipping' },

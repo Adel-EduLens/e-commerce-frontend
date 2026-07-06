@@ -1,72 +1,79 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/useAuthStore'
-import { ProductCard } from '../components/shared'
-import CategoriesSection from '../components/shared/CategorySection'
-import FaqSection from '../components/shared/FaqSection'
-import CatalogFilters from '../components/shared/CatalogFilters'
-import { buildPriceRanges } from '../utils/priceRanges'
-import { useProducts } from '../hooks/queries/productsQuery'
-import { api } from '../lib/axios'
-import { AxiosError } from 'axios'
-import { toast } from 'sonner'
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+import { ProductCard } from "../components/shared";
+import CategoriesSection from "../components/shared/CategorySection";
+import FaqSection from "../components/shared/FaqSection";
+import CatalogFilters from "../components/shared/CatalogFilters";
+import { buildPriceRanges } from "../utils/priceRanges";
+import { useProducts } from "../hooks/queries/productsQuery";
+import { api } from "../lib/axios";
+import { AxiosError } from "axios";
+import { toast } from "sonner";
+import { ViewAllButton } from "../components/ui/ViewAllButton";
 
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`;
 
 type AssetImageProps = {
-  file: string
+  file: string;
+  className: string;
+  alt?: string;
+};
 
-  className: string
-  alt?: string
-}
-
-function AssetImage({ file, className, alt = '' }: AssetImageProps) {
+function AssetImage({ file, className, alt = "" }: AssetImageProps) {
   return (
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
-  )
-}
-
-function ViewAllButton({ onClick }: { onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4"
-    >
-      <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
-        View All
-      </div>
-      <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-        <AssetImage
-          file="weui_arrow-filled-3.svg"
-          className="absolute left-[14px] top-[8px] h-6 w-3"
-        />
-      </div>
-    </button>
-  )
+  );
 }
 
 function useHomeFilters() {
-  const { data } = useProducts({ limit: 100 })
+  const { data } = useProducts({ limit: 100 });
 
-  const products = data?.products ?? []
-  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
-  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])], [products])
-  const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
-  const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
-  const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
+  const products = data?.products ?? [];
+  const allCategories = useMemo(
+    () => [...new Set(products.map((p) => p.category.name))],
+    [products],
+  );
+  const allBrands = useMemo(
+    () => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])],
+    [products],
+  );
+  const allSizes = useMemo(
+    () => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))],
+    [products],
+  );
+  const allColors = useMemo(
+    () => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))],
+    [products],
+  );
+  const priceRanges = useMemo(
+    () => buildPriceRanges(products.map((p) => p.price)),
+    [products],
+  );
 
-  return useMemo(() => [
-    { key: 'category', label: 'Category', options: allCategories },
-    { key: 'brand', label: 'Brand', options: allBrands },
-    { key: 'size', label: 'Size', options: allSizes },
-    { key: 'color', label: 'Color', options: allColors },
-    ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
-  ], [allCategories, allBrands, allSizes, allColors, priceRanges])
+  return useMemo(
+    () => [
+      { key: "category", label: "Category", options: allCategories },
+      { key: "brand", label: "Brand", options: allBrands },
+      { key: "size", label: "Size", options: allSizes },
+      { key: "color", label: "Color", options: allColors },
+      ...(priceRanges.length > 1
+        ? [{ key: "price", label: "Price", options: priceRanges }]
+        : []),
+    ],
+    [allCategories, allBrands, allSizes, allColors, priceRanges],
+  );
 }
 
-function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
-  const filters = useHomeFilters()
+function ProductGrid({
+  featuredIndex,
+  navigate,
+}: {
+  featuredIndex?: number;
+  navigate?: string;
+}) {
+  const filters = useHomeFilters();
+  const nav = useNavigate();
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-8">
@@ -80,9 +87,9 @@ function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
           />
         ))}
       </div>
-      <ViewAllButton />
+      <ViewAllButton onClick={() => nav(navigate ? navigate : "")} />
     </div>
-  )
+  );
 }
 
 function HeroSection() {
@@ -148,7 +155,7 @@ function HeroSection() {
       </div>
       <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-[#1A1A1A]" />
     </div>
-  )
+  );
 }
 
 function CollectionSection() {
@@ -213,12 +220,12 @@ function CollectionSection() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
 
 function MustHavesSection() {
-  const navigate = useNavigate()
-  const filters = useHomeFilters()
+  const navigate = useNavigate();
+  const filters = useHomeFilters();
 
   return (
     <div className="mt-16 w-full">
@@ -232,10 +239,10 @@ function MustHavesSection() {
             <ProductCard key={index} />
           ))}
         </div>
-        <ViewAllButton onClick={() => navigate('/season-must-haves')} />
+        <ViewAllButton onClick={() => navigate("/products?filter=must-have")} />
       </div>
     </div>
-  )
+  );
 }
 
 function RecommendedSection() {
@@ -244,43 +251,43 @@ function RecommendedSection() {
       <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-foreground">
         Recommended for You
       </div>
-      <ProductGrid />
+      <ProductGrid navigate={""} />
     </div>
-  )
+  );
 }
 
 function VoteRings() {
   const rings = [
-    ['w-[992.90px] h-[992.90px]', 'left-[894px] top-[-479px]'],
-    ['w-[958.66px] h-[958.66px]', 'left-[911.12px] top-[-461.88px]'],
-    ['w-[924.42px] h-[924.42px]', 'left-[928.24px] top-[-444.76px]'],
-    ['w-[890.19px] h-[890.19px]', 'left-[945.36px] top-[-427.64px]'],
-    ['w-[855.95px] h-[855.95px]', 'left-[962.48px] top-[-410.52px]'],
-    ['w-[821.71px] h-[821.71px]', 'left-[979.59px] top-[-393.41px]'],
-    ['w-[787.47px] h-[787.47px]', 'left-[996.71px] top-[-376.29px]'],
-    ['w-[753.23px] h-[753.23px]', 'left-[1013.83px] top-[-359.17px]'],
-    ['w-[719px] h-[719px]', 'left-[1030.95px] top-[-342.05px]'],
-    ['w-[684.76px] h-[684.76px]', 'left-[1048.07px] top-[-324.93px]'],
-    ['w-[650.52px] h-[650.52px]', 'left-[1065.19px] top-[-307.81px]'],
-    ['w-[616.28px] h-[616.28px]', 'left-[1082.31px] top-[-290.69px]'],
-    ['w-[582.04px] h-[582.04px]', 'left-[1099.43px] top-[-273.57px]'],
-    ['w-[547.81px] h-[547.81px]', 'left-[1116.55px] top-[-256.45px]'],
-    ['w-[513.57px] h-[513.57px]', 'left-[1133.67px] top-[-239.33px]'],
-    ['w-[479.33px] h-[479.33px]', 'left-[1150.78px] top-[-222.22px]'],
-    ['h-96 w-96', 'left-[1167.90px] top-[-205.10px]'],
-    ['h-96 w-96', 'left-[1185.02px] top-[-187.98px]'],
-    ['h-96 w-96', 'left-[1202.14px] top-[-170.86px]'],
-    ['h-80 w-80', 'left-[1219.26px] top-[-153.74px]'],
-    ['h-80 w-80', 'left-[1236.38px] top-[-136.62px]'],
-    ['h-72 w-72', 'left-[1253.50px] top-[-119.50px]'],
-    ['h-60 w-60', 'left-[1270.62px] top-[-102.38px]'],
-    ['h-52 w-52', 'left-[1287.74px] top-[-85.26px]'],
-    ['h-44 w-44', 'left-[1304.86px] top-[-68.14px]'],
-    ['h-36 w-36', 'left-[1321.97px] top-[-51.03px]'],
-    ['h-24 w-24', 'left-[1339.09px] top-[-33.91px]'],
-    ['h-16 w-16', 'left-[1356.21px] top-[-16.79px]'],
-    ['h-9 w-9', 'left-[1373.33px] top-[0.33px]'],
-  ]
+    ["w-[992.90px] h-[992.90px]", "left-[894px] top-[-479px]"],
+    ["w-[958.66px] h-[958.66px]", "left-[911.12px] top-[-461.88px]"],
+    ["w-[924.42px] h-[924.42px]", "left-[928.24px] top-[-444.76px]"],
+    ["w-[890.19px] h-[890.19px]", "left-[945.36px] top-[-427.64px]"],
+    ["w-[855.95px] h-[855.95px]", "left-[962.48px] top-[-410.52px]"],
+    ["w-[821.71px] h-[821.71px]", "left-[979.59px] top-[-393.41px]"],
+    ["w-[787.47px] h-[787.47px]", "left-[996.71px] top-[-376.29px]"],
+    ["w-[753.23px] h-[753.23px]", "left-[1013.83px] top-[-359.17px]"],
+    ["w-[719px] h-[719px]", "left-[1030.95px] top-[-342.05px]"],
+    ["w-[684.76px] h-[684.76px]", "left-[1048.07px] top-[-324.93px]"],
+    ["w-[650.52px] h-[650.52px]", "left-[1065.19px] top-[-307.81px]"],
+    ["w-[616.28px] h-[616.28px]", "left-[1082.31px] top-[-290.69px]"],
+    ["w-[582.04px] h-[582.04px]", "left-[1099.43px] top-[-273.57px]"],
+    ["w-[547.81px] h-[547.81px]", "left-[1116.55px] top-[-256.45px]"],
+    ["w-[513.57px] h-[513.57px]", "left-[1133.67px] top-[-239.33px]"],
+    ["w-[479.33px] h-[479.33px]", "left-[1150.78px] top-[-222.22px]"],
+    ["h-96 w-96", "left-[1167.90px] top-[-205.10px]"],
+    ["h-96 w-96", "left-[1185.02px] top-[-187.98px]"],
+    ["h-96 w-96", "left-[1202.14px] top-[-170.86px]"],
+    ["h-80 w-80", "left-[1219.26px] top-[-153.74px]"],
+    ["h-80 w-80", "left-[1236.38px] top-[-136.62px]"],
+    ["h-72 w-72", "left-[1253.50px] top-[-119.50px]"],
+    ["h-60 w-60", "left-[1270.62px] top-[-102.38px]"],
+    ["h-52 w-52", "left-[1287.74px] top-[-85.26px]"],
+    ["h-44 w-44", "left-[1304.86px] top-[-68.14px]"],
+    ["h-36 w-36", "left-[1321.97px] top-[-51.03px]"],
+    ["h-24 w-24", "left-[1339.09px] top-[-33.91px]"],
+    ["h-16 w-16", "left-[1356.21px] top-[-16.79px]"],
+    ["h-9 w-9", "left-[1373.33px] top-[0.33px]"],
+  ];
 
   return (
     <>
@@ -291,77 +298,77 @@ function VoteRings() {
         />
       ))}
     </>
-  )
+  );
 }
 
 type VoteDesign = {
-  id: string
-  title: string
-  imagePath: string
-  votes?: number
-}
+  id: string;
+  title: string;
+  imagePath: string;
+  votes?: number;
+};
 
 function VoteSection() {
-  const [designs, setDesigns] = useState<VoteDesign[]>([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [voting, setVoting] = useState(false)
+  const [designs, setDesigns] = useState<VoteDesign[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [voting, setVoting] = useState(false);
   const fetchDesigns = async () => {
     try {
-      const res = await api.get('/upload/images')
+      const res = await api.get("/upload/images");
       if (res.status === 200) {
-        setDesigns(res.data?.data ?? [])
+        setDesigns(res.data?.data ?? []);
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to load designs')
+        toast.error(error.response?.data?.message ?? "Failed to load designs");
       } else {
-        toast.error('An unexpected error occurred')
+        toast.error("An unexpected error occurred");
       }
     }
-  }
+  };
   useEffect(() => {
-    fetchDesigns()
-  }, [])
+    fetchDesigns();
+  }, []);
 
-  const current = designs[currentIndex]
+  const current = designs[currentIndex];
 
   function goToPrevious() {
     setCurrentIndex((i) => {
-      if (designs.length === 0) return i
-      return (i - 1 + designs.length) % designs.length
-    })
+      if (designs.length === 0) return i;
+      return (i - 1 + designs.length) % designs.length;
+    });
   }
 
   function goToNext() {
     setCurrentIndex((i) => {
-      if (designs.length === 0) return i
-      return (i + 1) % designs.length
-    })
+      if (designs.length === 0) return i;
+      return (i + 1) % designs.length;
+    });
   }
 
   async function handleVote() {
-    if (!current || voting) return
-    setVoting(true)
+    if (!current || voting) return;
+    setVoting(true);
     try {
-      const res = await api.put(`/upload/vote/${current.id}`)
+      const res = await api.put(`/upload/vote/${current.id}`);
       if (res.status === 200) {
-        toast.success('Your vote has been counted!')
+        toast.success("Your vote has been counted!");
         setDesigns((prev) =>
           prev.map((design) =>
             design.id === current.id
               ? { ...design, votes: (design.votes ?? 0) + 1 }
-              : design
-          )
-        )
+              : design,
+          ),
+        );
       }
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to submit vote')
+        toast.error(error.response?.data?.message ?? "Failed to submit vote");
       } else {
-        toast.error('An unexpected error occurred')
+        toast.error("An unexpected error occurred");
       }
     } finally {
-      setVoting(false)
+      setVoting(false);
     }
   }
 
@@ -380,7 +387,7 @@ function VoteSection() {
         ) : (
           <>
             <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
-              {current.title?.trim() || 'Untitled design'}
+              {current.title?.trim() || "Untitled design"}
             </div>
             <div className="absolute left-[714px] top-[350px] inline-flex flex-col items-start justify-start gap-4">
               <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A]">
@@ -428,7 +435,7 @@ function VoteSection() {
                   <div
                     key={design.id}
                     className={`h-2 w-2 rounded-full ${
-                      index === currentIndex ? 'bg-[#BBFF63]' : 'bg-[#E0E0E0]'
+                      index === currentIndex ? "bg-[#BBFF63]" : "bg-[#E0E0E0]"
                     }`}
                   />
                 ))}
@@ -461,7 +468,7 @@ function VoteSection() {
         />
       )}
     </div>
-  )
+  );
 }
 
 function FlashDealsSection() {
@@ -476,7 +483,7 @@ function FlashDealsSection() {
             Ends in
           </div>
           <div className="flex items-center justify-start gap-2">
-            {['08', ':', '30', ':', '48'].map((item, index) => (
+            {["08", ":", "30", ":", "48"].map((item, index) => (
               <div
                 key={`${item}-${index}`}
                 className="font-['Montserrat'] text-3xl font-semibold text-[#1A1A1A]"
@@ -487,23 +494,23 @@ function FlashDealsSection() {
           </div>
         </div>
       </div>
-      <ProductGrid featuredIndex={2} />
+      <ProductGrid featuredIndex={2} navigate={"/products?filter=flash-deals"} />
     </div>
-  )
+  );
 }
 
 export function HomePage() {
-  const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuthStore()
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
-      navigate('/login')
+      navigate("/login");
     }
-  }, [isAuthenticated, user, navigate])
+  }, [isAuthenticated, user, navigate]);
 
   if (!isAuthenticated || !user) {
-    return null
+    return null;
   }
 
   return (
@@ -517,7 +524,7 @@ export function HomePage() {
       <FlashDealsSection />
       <FaqSection />
     </div>
-  )
+  );
 }
 
-export default HomePage
+export default HomePage;
