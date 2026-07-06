@@ -30,9 +30,12 @@ export default function ProductDetailsPage() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    if (product && product.colors.length > 0 && !selectedColor) {
-      setSelectedColor(product.colors[0].color);
+    const func = ()=>{
+      if (product && product.colors.length > 0 && !selectedColor) {
+        setSelectedColor(product.colors[0].color);
+      }
     }
+    func()
   }, [product, selectedColor]);
 
   useEffect(() => {
