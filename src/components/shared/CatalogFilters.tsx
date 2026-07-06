@@ -4,11 +4,9 @@ import { ChevronDown } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
-type IdName = { id: string; name: string };
-
 type DropdownFilterKey = "category" | "size" | "color" | "price" | "brand";
 
-/** Values emitted by the dropdown-style filters (category / size / color / price). */
+/** Values emitted by the dropdown-style filters. */
 export type DropdownFilterValues = {
   category: string | null;
   size: string | null;
@@ -20,27 +18,6 @@ export type DropdownFilterValues = {
 
 type CatalogFiltersProps = {
   className?: string;
-
-  /** Debounced search callback (500 ms). */
-  onSearchChange?: (value: string) => void;
-
-  // ── Select-based filters (SeasonMustHaves / MenCollection style) ──
-
-  /** Sort select – only rendered when provided. */
-  sortBy?: "name" | "price" | "rating";
-  onSortChange?: (value: "name" | "price" | "rating") => void;
-
-  /** Category select – only rendered when `categories` is provided. */
-  categoryId?: string;
-  onCategoryChange?: (value: string) => void;
-  categories?: IdName[];
-
-  /** Brand select – only rendered when `brands` is provided. */
-  brandId?: string;
-  onBrandChange?: (value: string) => void;
-  brands?: IdName[];
-
-  // ── Dropdown-pill filters (HomePage / Wholesale style) ─────────────
 
   /** Which dropdown pills to show and their options. Only provided keys are rendered. */
   dropdownFilters?: Partial<Record<DropdownFilterKey, string[]>>;
@@ -122,15 +99,6 @@ function FilterDropdown({
 
 export default function CatalogFilters({
   className = "",
-  onSearchChange,
-  sortBy,
-  onSortChange,
-  categoryId,
-  onCategoryChange,
-  categories,
-  brandId,
-  onBrandChange,
-  brands,
   dropdownFilters,
   onDropdownFilterChange,
 }: CatalogFiltersProps) {
@@ -143,12 +111,21 @@ export default function CatalogFilters({
   const [ddPrice, setDdPrice] = useState<string | null>(null);
   const [ddBrand, setDdBrand] = useState<string | null>(null);
 
-  // Debounced search for select-style mode
+  // Debounced search
   useEffect(() => {
-    if (!onSearchChange) return;
-    const timer = setTimeout(() => onSearchChange(searchValue), 500);
+    if (!onDropdownFilterChange) return;
+    const timer = setTimeout(() => {
+      onDropdownFilterChange({
+        category: ddCategory,
+        size: ddSize,
+        color: ddColor,
+        price: ddPrice,
+        brand: ddBrand,
+        search: searchValue,
+      });
+    }, 500);
     return () => clearTimeout(timer);
-  }, [searchValue, onSearchChange]);
+  }, [searchValue]);
 
   // Notify dropdown filter changes
   const notifyDropdown = (updates: Partial<DropdownFilterValues>) => {
@@ -164,7 +141,6 @@ export default function CatalogFilters({
     onDropdownFilterChange?.(values);
   };
 
-  const hasSelectFilters = sortBy !== undefined || categories || brands;
   const hasDropdownFilters = dropdownFilters && Object.keys(dropdownFilters).length > 0;
 
   return (
@@ -175,56 +151,6 @@ export default function CatalogFilters({
 
       <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center justify-start gap-3">
-          {/* Select-based filters */}
-          {hasSelectFilters && (
-            <>
-              {sortBy !== undefined && onSortChange && (
-                <select
-                  value={sortBy}
-                  onChange={(e) =>
-                    onSortChange(e.target.value as "name" | "price" | "rating")
-                  }
-                  className="rounded-2xl bg-[#EDEDED] px-5 py-4 text-lg outline-none"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="price">Sort by Price</option>
-                  <option value="rating">Sort by Rating</option>
-                </select>
-              )}
-
-              {categories && onCategoryChange && (
-                <select
-                  value={categoryId ?? ""}
-                  onChange={(e) => onCategoryChange(e.target.value)}
-                  className="rounded-2xl bg-[#EDEDED] px-5 py-4 text-lg outline-none"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              {brands && onBrandChange && (
-                <select
-                  value={brandId ?? ""}
-                  onChange={(e) => onBrandChange(e.target.value)}
-                  className="rounded-2xl bg-[#EDEDED] px-5 py-4 text-lg outline-none"
-                >
-                  <option value="">All Brands</option>
-                  {brands.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </>
-          )}
-
-          {/* Dropdown-pill filters */}
           {hasDropdownFilters && (
             <>
               {dropdownFilters.category && (
@@ -293,9 +219,9 @@ export default function CatalogFilters({
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
-              if (hasDropdownFilters) {
-                notifyDropdown({ search: e.target.value });
-              }
+              if (!onDropdownFilterChange) return;
+              // Immediate notify for dropdown mode (debounce handled above for search-only)
+              notifyDropdown({ search: e.target.value });
             }}
             placeholder="Search..."
             className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"

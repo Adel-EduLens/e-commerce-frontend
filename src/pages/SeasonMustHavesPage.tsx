@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
@@ -7,6 +7,7 @@ import {
   ProductCard,
   CatalogFilters,
 } from "../components/shared";
+import type { DropdownFilterValues } from "../components/shared/CatalogFilters";
 import Pagination from "../components/shared/Pagination";
 
 import { useProducts } from "../hooks/queries/productsQuery";
@@ -18,41 +19,65 @@ export default function SeasonMustHavesPage() {
 
   const { user, isAuthenticated } = useAuthStore();
 
-  const [search, setSearch] = useState("");
-
-  const [categoryId, setCategoryId] = useState("");
-
-  const [brandId, setBrandId] = useState("");
-
-  const [sortBy, setSortBy] = useState<
-    "name" | "price" | "rating"
-  >("name");
-
-  const [sortOrder] = useState<"asc" | "desc">("asc");
+  const [filters, setFilters] = useState<DropdownFilterValues>({
+    category: null,
+    size: null,
+    color: null,
+    price: null,
+    brand: null,
+    search: "",
+  });
 
   const [page, setPage] = useState(1);
+
+  const { data: categories = [] } = useCategories();
+  const { data: brands = [] } = useBrands();
+
+  // Map selected name back to ID for the API
+  const categoryId = useMemo(
+    () => categories.find((c) => c.name === filters.category)?.id ?? "",
+    [categories, filters.category],
+  );
+  const brandId = useMemo(
+    () => brands.find((b) => b.name === filters.brand)?.id ?? "",
+    [brands, filters.brand],
+  );
 
   const {
     data,
     isLoading,
     isError,
   } = useProducts({
-    search,
+    search: filters.search,
     categoryId,
     brandId,
-    sortBy,
-    sortOrder,
+    sortBy: "name",
+    sortOrder: "asc",
     page,
     limit: 4,
   });
 
-  const {
-    data: categories = [],
-  } = useCategories();
+  const allSizes = useMemo(
+    () => [...new Set(data?.products.flatMap((p) => p.sizes.map((s) => s.size)) ?? [])],
+    [data],
+  );
+  const allColors = useMemo(
+    () => [...new Set(data?.products.flatMap((p) => p.colors.map((c) => c.color)) ?? [])],
+    [data],
+  );
 
-  const {
-    data: brands = [],
-  } = useBrands();
+  const dropdownFilters = useMemo(
+    () => ({
+      category: categories.map((c) => c.name),
+      brand: brands.map((b) => b.name),
+      size: allSizes,
+      color: allColors,
+      price: ['Under $50', '$50-100', '$100-250', '$250+'],
+    }),
+    [categories, brands, allSizes, allColors],
+  );
+
+  const handleFilter = useCallback((f: DropdownFilterValues) => setFilters(f), []);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -61,11 +86,8 @@ export default function SeasonMustHavesPage() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      setPage(1);
-    }
-    asyncFunc();
-  }, [search, categoryId, brandId, sortBy, sortOrder]);
+    setPage(1);
+  }, [filters]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -86,31 +108,19 @@ export default function SeasonMustHavesPage() {
   return (
     <div className="w-full">
       <div className="font-['Montserrat'] text-8xl font-bold text-foreground">
-        This Season’s Must-Haves
+        This Season's Must-Haves
       </div>
 
       <div className="mt-8">
         <CatalogFilters
-          onSearchChange={setSearch}
-          categoryId={categoryId}
-          onCategoryChange={setCategoryId}
-          brandId={brandId}
-          onBrandChange={setBrandId}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          categories={categories}
-          brands={brands}
+          dropdownFilters={dropdownFilters}
+          onDropdownFilterChange={handleFilter}
         />
       </div>
-            {isLoading && (
+
+      {isLoading && (
         <div className="mt-8 w-full py-2 text-center text-gray-text">
           Loading...
-        </div>
-      )}
-
-      {isError && (
-        <div className="mt-8 w-full py-2 text-center text-gray-text">
-          Something went wrong. Please try again later.
         </div>
       )}
 
