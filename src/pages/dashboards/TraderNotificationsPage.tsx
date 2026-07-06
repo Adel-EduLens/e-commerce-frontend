@@ -1,27 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useAuthStore } from "../../store/useAuthStore";
-
-const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
-
-
-
-const sidebarItems = [
-  { label: "Overview", icon: "si_dashboard-line.svg", path: "/dashboard/trader" },
-  { label: "Retail", icon: "fluent_building-retail-20-regular.svg", path: "" },
-  { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg", path: "" },
-  { label: "Wholesale", icon: "system-uicons_boxes.svg", path: "/dashboard/trader/wholesale" },
-  { label: "Brand Partners", icon: "mdi_partnership-outline.svg", path: "/dashboard/trader/brand-partners" },
-  { label: "Products", icon: "streamline-ultimate_products-gifts.svg", path: "/dashboard/trader/products" },
-  { label: "Orders", icon: "carbon_follow-up-work-order.svg", path: "/dashboard/trader/orders" },
-  { label: "Inventory", icon: "material-symbols_inventory.svg", path: "/dashboard/trader/inventory" },
-  { label: "Customers", icon: "carbon_customer.svg", path: "/dashboard/trader/customers" },
-  { label: "Finance", icon: "material-symbols_finance-rounded.svg", path: "/dashboard/trader/finance" },
-  { label: "Notifications", icon: "ion_notifications-outline.svg", path: "/dashboard/trader/notifications" },
-  { label: "Analytics", icon: "grommet-icons_analytics.svg", path: "/dashboard/trader/analytics" },
-  { label: "Store Settings", icon: "solar_settings-linear.svg", path: "" },
-] as const;
 
 const notificationsData = Array(8).fill({
   title: "Low Stock Alert",
@@ -30,43 +7,10 @@ const notificationsData = Array(8).fill({
 });
 
 export default function TraderNotificationsPage() {
-  const { user, clearAuth } = useAuthStore();
-  const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
-  const avatar =
-    typeof user?.avatar === "string" && user.avatar
-      ? user.avatar
-      : traderAsset("unsplash_8Vt2haq8NSQ.png");
-
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
-
   return (
-    <>
-        {/* ── Sidebar ── */}
-        
-
-        {/* ── Main ── */}
-        <div className="flex-1 space-y-5">
-          {/* Top Header */}
-          <div className="flex h-20 items-center justify-between rounded-3xl border border-[#E5E7EB] bg-white px-6">
-            <h1 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">
-              Notification
-            </h1>
-            <div className="flex items-center gap-4">
-              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-gray-50">
-                <svg className="h-5 w-5 text-[#111827]" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" fill="currentColor" />
-                </svg>
-              </button>
-              <img className="h-12 w-12 rounded-full object-cover" src={avatar} alt="Profile" />
-            </div>
-          </div>
-
+    <div className="space-y-5">
           {/* Search + filters */}
           <div className="flex flex-wrap items-center gap-3.5">
             <label className="relative flex w-80 items-center">
@@ -128,7 +72,6 @@ export default function TraderNotificationsPage() {
             </div>
           </div>
 
-        </div>
-    </>
+    </div>
   );
 }

@@ -1,31 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { useAuthStore } from "../../store/useAuthStore";
-
-const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
 
 const asset = (file: string) =>
   `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
 
-const traderOverviewAsset = (file: string) =>
-  `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
-
-const sidebarItems = [
-  { label: "Overview", icon: "si_dashboard-line.svg" },
-  { label: "Retail", icon: "fluent_building-retail-20-regular.svg" },
-  { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg" },
-  { label: "Wholesale", icon: "system-uicons_boxes.svg" },
-  { label: "Brand Partners", icon: "mdi_partnership-outline.svg" },
-  { label: "Products", icon: "streamline-ultimate_products-gifts.svg" },
-  { label: "Orders", icon: "carbon_follow-up-work-order.svg" },
-  { label: "Inventory", icon: "material-symbols_inventory.svg" },
-  { label: "Customers", icon: "carbon_customer.svg" },
-  { label: "Finance", icon: "material-symbols_finance-rounded.svg" },
-  { label: "Notifications", icon: "ion_notifications-outline.svg" },
-  { label: "Analytics", icon: "grommet-icons_analytics.svg" },
-  { label: "Store Settings", icon: "solar_settings-linear.svg" },
-] as const;
 
 type InventoryStatus = "Active" | "Low Stock" | "Out of Stock";
 
@@ -69,33 +46,9 @@ function statusPill(status: InventoryStatus) {
 }
 
 export default function TraderInventoryPage() {
-  const { user, clearAuth } = useAuthStore();
-  const navigate = useNavigate();
-  const [activeItem, setActiveItem] =
-    useState<(typeof sidebarItems)[number]["label"]>("Inventory");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-
-  const avatar =
-    typeof user?.avatar === "string" && user.avatar
-      ? user.avatar
-      : traderOverviewAsset("unsplash_8Vt2haq8NSQ.png");
-
-  const handleLogout = () => {
-    clearAuth();
-    toast.success("Logged out successfully");
-    navigate("/login");
-  };
-
-  const handleSidebarClick = (label: (typeof sidebarItems)[number]["label"]) => {
-    setActiveItem(label);
-    if (label === "Overview") navigate("/dashboard/trader");
-    if (label === "Products") navigate("/dashboard/trader/products");
-    if (label === "Orders") navigate("/dashboard/trader/orders");
-    if (label === "Customers") navigate("/dashboard/trader/customers");
-    if (label === "Finance") navigate("/dashboard/trader/finance");
-  };
 
   const toggleRow = (id: number) => {
     setSelected((prev) => {
@@ -132,35 +85,7 @@ export default function TraderInventoryPage() {
 
   return (
     <>
-        {/* ── Sidebar ── */}
-        
-
-        {/* ── Main ── */}
-        <div className="flex-1 space-y-4">
-          {/* Top bar */}
-          <section className="rounded-[32px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
-            <div className="flex items-center justify-between gap-4">
-              <p className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Inventory</p>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => navigate("/notifications")}
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-[#111827] bg-[#111827] transition hover:bg-[#1F2937]"
-                >
-                  <img className="h-5 w-5" src={asset("ion_notifications-outline.svg")} alt="" />
-                </button>
-                <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white">
-                  <img className="h-5 w-5" src={asset("hugeicons_moon-01.svg")} alt="" />
-                </div>
-                <img
-                  className="h-12 w-12 rounded-full object-cover"
-                  src={avatar}
-                  alt={user?.name || "Trader avatar"}
-                />
-              </div>
-            </div>
-          </section>
-
+        <div className="space-y-4">
           {/* Summary Cards */}
           <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {summaryCards.map((card) => (

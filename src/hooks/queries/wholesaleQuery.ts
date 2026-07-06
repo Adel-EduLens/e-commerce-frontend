@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 
 export interface Wholesale {
@@ -70,5 +70,65 @@ export const useTraderWholesales = () => {
   return useQuery({
     queryKey: ["trader-wholesales"],
     queryFn: getTraderWholesales,
+  });
+};
+
+export interface WholesaleFormData {
+  name: string;
+  description: string;
+  price: number;
+  minOrder: number;
+  brand: string;
+  categoryId: string;
+  isBestDeal: boolean;
+  isMostPopular: boolean;
+  isPremiumCollection: boolean;
+  images: string[];
+  sizes: string[];
+  colors: string[];
+}
+
+const createWholesale = async (body: WholesaleFormData) => {
+  const { data } = await api.post("/wholesales", body);
+  return data.data;
+};
+export const useCreateWholesale = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createWholesale,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+    },
+  });
+};
+
+const updateWholesale = async ({ id, ...body }: WholesaleFormData & { id: string }) => {
+  const { data } = await api.patch(`/wholesales/${id}`, body);
+  return data.data;
+};
+export const useUpdateWholesale = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateWholesale,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+    },
+  });
+};
+
+const deleteWholesale = async (id: string) => {
+  const { data } = await api.delete(`/wholesales/${id}`);
+  return data.data;
+};
+export const useDeleteWholesale = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteWholesale,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+    },
   });
 };

@@ -149,7 +149,7 @@ export function ProductInfoPanel({
         <Tag className="h-6 w-6 text-foreground" strokeWidth={1.5} />
 
         <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-          {product.brand.name}
+          {product.brand?.name ?? 'No Brand'}
         </div>
       </div>
 
