@@ -191,6 +191,9 @@ function DeliverySection({
           className="w-full h-14 rounded-xl border border-stroke bg-background px-4 font-['Montserrat'] text-base text-foreground placeholder:text-gray-text focus:outline-none focus:border-foreground transition"
         />
 
+        {/* Map picker — click a location and the fields below get filled in automatically */}
+        <GoogleMapPicker onSelect={onLocationPick} />
+
         {/* Country / City */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="relative">
@@ -217,6 +220,9 @@ function DeliverySection({
               <option value="Giza">Giza</option>
               <option value="Mansoura">Mansoura</option>
               <option value="Tanta">Tanta</option>
+              {city && !["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"].includes(city) && (
+                <option value={city}>{city}</option>
+              )}
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text pointer-events-none" />
           </div>
@@ -250,20 +256,6 @@ function DeliverySection({
             className="h-14 rounded-xl border border-stroke bg-background px-4 font-['Montserrat'] text-base text-foreground placeholder:text-gray-text focus:outline-none focus:border-foreground transition"
           />
         </div>
-      </div>
-
-      {/* Interactive Map */}
-      <div className="space-y-3">
-        <div className="font-['Montserrat'] text-base font-bold text-foreground flex items-center gap-2">
-          📍 Select on Map
-          <span className="font-['Montserrat'] text-xs font-normal text-gray-text">
-            — click to auto-fill your address
-          </span>
-        </div>
-        <GoogleMapPicker 
-          onLocationPick={onLocationPick} 
-          searchQuery={[streetAddress, area, city, country].filter(Boolean).join(", ")} 
-        />
       </div>
     </div>
   );

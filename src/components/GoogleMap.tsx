@@ -34,13 +34,17 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<PickedL
     const data = await res.json();
     const addr = data.address ?? {};
 
-    const city = addr.city || addr.town || addr.village || addr.county;
-    const area = addr.suburb || addr.neighbourhood || addr.quarter;
-    const road = addr.road;
-    const houseNumber = addr.house_number;
+    const city = addr.city || addr.town || addr.village || addr.county || addr.state || addr.region || "Unknown City";
+    const area = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || addr.district || "Unknown Area";
+    const road = addr.road || addr.pedestrian || addr.path || "";
+    const houseNumber = addr.house_number || "";
     const streetAddress = [houseNumber, road].filter(Boolean).join(" ");
 
-    return { city, area, streetAddress: streetAddress || undefined };
+    return { 
+      city, 
+      area, 
+      streetAddress: streetAddress || "Unknown Street" 
+    };
   } catch {
     // Reverse geocoding is best-effort; the pin itself is still captured either way.
     return {};
@@ -66,28 +70,21 @@ async function forwardGeocode(query: string): Promise<[number, number] | null> {
   return null;
 }
 
-function ClickHandler({
-  onPick,
+function MapCenterTracker({
+  onMove,
 }: {
-  onPick: (lat: number, lng: number) => void;
+  onMove: (lat: number, lng: number) => void;
 }) {
   useMapEvents({
-    click(e) {
-      onPick(e.latlng.lat, e.latlng.lng);
+    moveend(e) {
+      const center = e.target.getCenter();
+      onMove(center.lat, center.lng);
     },
   });
   return null;
 }
 
-function MapUpdater({ center }: { center: [number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (center) {
-      map.flyTo(center, 15);
-    }
-  }, [center, map]);
-  return null;
-}
+// Removed MapUpdater to prevent flyTo loops on drag
 
 export default function GoogleMapPicker({
   onLocationPick,
@@ -96,28 +93,32 @@ export default function GoogleMapPicker({
   onLocationPick: (loc: PickedLocation) => void;
   searchQuery?: string;
 }) {
-  const [marker, setMarker] = useState<[number, number] | null>(null);
+  const [pendingMarker, setPendingMarker] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const lastClickTime = useRef<number>(0);
+  const mapRef = useRef<L.Map | null>(null);
 
-  const handlePick = useCallback(
-    async (lat: number, lng: number) => {
-      lastClickTime.current = Date.now();
-      setMarker([lat, lng]);
-      const address = await reverseGeocode(lat, lng);
-      onLocationPick({ lat, lng, ...address });
-    },
-    [onLocationPick]
-  );
+  const commitLocation = async () => {
+    if (!pendingMarker) return;
+    setIsConfirming(true);
+    const [lat, lng] = pendingMarker;
+    lastClickTime.current = Date.now();
+    const address = await reverseGeocode(lat, lng);
+    onLocationPick({ lat, lng, ...address });
+    setIsConfirming(false);
+  };
 
   const handleSearch = async () => {
     if (!searchInput.trim()) return;
     setIsSearching(true);
     const coords = await forwardGeocode(searchInput);
     if (coords) {
-      await handlePick(coords[0], coords[1]);
+      setPendingMarker(coords);
     }
     setIsSearching(false);
   };
@@ -131,7 +132,8 @@ export default function GoogleMapPicker({
       if (res.ok) {
         const data = await res.json();
         if (data.latitude && data.longitude) {
-          await handlePick(data.latitude, data.longitude);
+          setPendingMarker([data.latitude, data.longitude]);
+          mapRef.current?.flyTo([data.latitude, data.longitude], 15);
           setIsLocating(false);
           return;
         }
@@ -148,14 +150,39 @@ export default function GoogleMapPicker({
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        handlePick(pos.coords.latitude, pos.coords.longitude).finally(() =>
-          setIsLocating(false)
-        );
+        setPendingMarker([pos.coords.latitude, pos.coords.longitude]);
+        mapRef.current?.flyTo([pos.coords.latitude, pos.coords.longitude], 15);
+        setIsLocating(false);
       },
       () => setIsLocating(false),
       { enableHighAccuracy: true, timeout: 8000 }
     );
   };
+
+  // Fetch autocomplete suggestions when typing
+  useEffect(() => {
+    if (searchInput.trim().length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    
+    const delay = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(searchInput)}&limit=5`,
+          { headers: { Accept: "application/json" } }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setSuggestions(data || []);
+        }
+      } catch (e) {
+        setSuggestions([]);
+      }
+    }, 500);
+    
+    return () => clearTimeout(delay);
+  }, [searchInput]);
 
   // Automatically request location on component mount
   useEffect(() => {
@@ -173,7 +200,8 @@ export default function GoogleMapPicker({
       
       const coords = await forwardGeocode(searchQuery);
       if (coords) {
-        setMarker(coords);
+        setPendingMarker(coords);
+        mapRef.current?.flyTo(coords, 15);
       }
     }, 1200);
 
@@ -203,46 +231,97 @@ export default function GoogleMapPicker({
           type="text"
           placeholder="Search for a specific place..."
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          onChange={(e) => {
+            setSearchInput(e.target.value);
+            setShowSuggestions(true);
+          }}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               handleSearch();
+              setShowSuggestions(false);
             }
           }}
           className="w-full h-11 rounded-xl border border-stroke bg-background px-4 pr-12 font-['Montserrat'] text-sm text-foreground placeholder:text-gray-text focus:outline-none focus:border-foreground transition"
         />
         <button
           type="button"
-          onClick={handleSearch}
+          onClick={() => {
+            handleSearch();
+            setShowSuggestions(false);
+          }}
           disabled={isSearching}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-text hover:text-foreground transition disabled:opacity-50"
         >
           {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
         </button>
+
+        {/* Suggestions Dropdown */}
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-stroke rounded-xl shadow-lg z-50 overflow-hidden max-h-60 overflow-y-auto">
+            {suggestions.map((s, idx) => (
+              <div
+                key={idx}
+                onClick={() => {
+                  setSearchInput(s.display_name);
+                  setShowSuggestions(false);
+                  const lat = parseFloat(s.lat);
+                  const lng = parseFloat(s.lon);
+                  setPendingMarker([lat, lng]);
+                  mapRef.current?.flyTo([lat, lng], 15);
+                }}
+                className="px-4 py-3 border-b border-stroke last:border-0 hover:bg-gray-light cursor-pointer transition font-['Montserrat'] text-sm text-foreground"
+              >
+                {s.display_name}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="rounded-xl overflow-hidden border border-stroke">
+      <div className="relative rounded-xl overflow-hidden border border-stroke h-[280px]">
         <MapContainer
-          center={marker ?? DEFAULT_CENTER}
+          ref={mapRef}
+          center={pendingMarker ?? DEFAULT_CENTER}
           zoom={DEFAULT_ZOOM}
-          style={{ height: "280px", width: "100%", zIndex: 0 }}
+          style={{ height: "100%", width: "100%", zIndex: 0 }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapUpdater center={marker} />
-          <ClickHandler onPick={handlePick} />
-          {marker && <Marker position={marker} />}
+          <MapCenterTracker onMove={(lat, lng) => setPendingMarker([lat, lng])} />
         </MapContainer>
+
+        {/* Fixed Central Marker */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-[1000] pointer-events-none pb-1">
+          <div className="flex flex-col items-center drop-shadow-md">
+            <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center shadow-lg border-2 border-[#BBFF63]">
+              <LocateFixed className="h-5 w-5 text-[#BBFF63]" />
+            </div>
+            <div className="w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-foreground" />
+          </div>
+        </div>
       </div>
 
-      <p className="font-['Montserrat'] text-xs text-gray-text">
-        {marker
-          ? `Selected: ${marker[0].toFixed(5)}, ${marker[1].toFixed(5)}`
-          : "Click anywhere on the map to drop a pin, or use your current location."}
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <p className="font-['Montserrat'] text-xs text-gray-text">
+          {pendingMarker
+            ? `Pin dropped at: ${pendingMarker[0].toFixed(5)}, ${pendingMarker[1].toFixed(5)}`
+            : "Click anywhere on the map to drop a pin."}
+        </p>
+
+        <button
+          type="button"
+          onClick={commitLocation}
+          disabled={!pendingMarker || isConfirming}
+          className="flex-shrink-0 h-10 px-5 rounded-xl bg-foreground text-background font-['Montserrat'] text-sm font-semibold hover:bg-foreground/90 transition disabled:opacity-50 flex items-center justify-center"
+        >
+          {isConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Location"}
+        </button>
+      </div>
     </div>
   );
 }
