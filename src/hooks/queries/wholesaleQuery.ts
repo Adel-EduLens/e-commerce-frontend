@@ -27,21 +27,24 @@ export interface Wholesale {
   images: {
     id: string;
     url: string;
+    color?: string;
     wholesaleId: string;
   }[];
 
-  sizes: {
-    id: string;
-    size: string;
-    wholesaleId: string;
-  }[];
-
-  colors: {
-    id: string;
-    color: string;
-    wholesaleId: string;
-  }[];
 }
+
+const getWholesale = async (id: string): Promise<Wholesale> => {
+  const { data } = await api.get(`/wholesales/${id}`);
+  return data.data;
+};
+
+export const useWholesale = (id?: string) => {
+  return useQuery({
+    queryKey: ["wholesale", id],
+    queryFn: () => getWholesale(id!),
+    enabled: !!id,
+  });
+};
 
 const getWholesales = async (filters?: { isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }): Promise<Wholesale[]> => {
   const params: Record<string, string> = {};
@@ -83,9 +86,7 @@ export interface WholesaleFormData {
   isBestDeal: boolean;
   isMostPopular: boolean;
   isPremiumCollection: boolean;
-  images: string[];
-  sizes: string[];
-  colors: string[];
+  images: { url: string; color?: string }[];
 }
 
 const createWholesale = async (body: WholesaleFormData) => {

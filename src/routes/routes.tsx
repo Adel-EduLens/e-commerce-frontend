@@ -37,6 +37,7 @@ import CheckoutPage from '../pages/CheckoutPage'
 import DropshippingPage from '../pages/DropshippingPage'
 import FavoritesPage from '../pages/FavoritesPage'
 import WholesalePage from '../pages/WholesalePage'
+import WholesaleDetailsPage from '../pages/WholesaleDetailsPage'
 import DesignLabPage from '../pages/DesignLabPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 
@@ -340,6 +341,16 @@ export const router = createBrowserRouter([
           <ProtectedRoute>
             <UserLayout>
               <WholesalePage />
+            </UserLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'wholesale/:id',
+        element: (
+          <ProtectedRoute>
+            <UserLayout>
+              <WholesaleDetailsPage />
             </UserLayout>
           </ProtectedRoute>
         ),

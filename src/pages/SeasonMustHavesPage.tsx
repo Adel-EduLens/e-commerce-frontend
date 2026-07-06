@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
@@ -7,52 +7,67 @@ import {
   ProductCard,
   CatalogFilters,
 } from "../components/shared";
+import type { FilterValues } from "../components/shared/CatalogFilters";
 import Pagination from "../components/shared/Pagination";
 
 import { useProducts } from "../hooks/queries/productsQuery";
-import { useCategories } from "../hooks/queries/categoriesQuery";
-import { useBrands } from "../hooks/queries/brandsQuery";
+import { buildPriceRanges } from "../utils/priceRanges";
 
 export default function SeasonMustHavesPage() {
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuthStore();
 
-  const [search, setSearch] = useState("");
-
-  const [categoryId, setCategoryId] = useState("");
-
-  const [brandId, setBrandId] = useState("");
-
-  const [sortBy, setSortBy] = useState<
-    "name" | "price" | "rating"
-  >("name");
-
-  const [sortOrder] = useState<"asc" | "desc">("asc");
+  const [filterState, setFilterState] = useState<FilterValues>({ search: "" });
 
   const [page, setPage] = useState(1);
+
+  // Fetch all products (no filters) for building filter options from real data
+  const { data: allData } = useProducts({ limit: 100 });
+  const allProducts = allData?.products ?? [];
+
+  // Map selected name back to ID for the API query
+  const categoryId = useMemo(
+    () => allProducts.find((p) => p.category.name === filterState.category)?.category.id ?? "",
+    [allProducts, filterState.category],
+  );
+  const brandId = useMemo(
+    () => allProducts.find((p) => p.brand?.name === filterState.brand)?.brand?.id ?? "",
+    [allProducts, filterState.brand],
+  );
 
   const {
     data,
     isLoading,
     isError,
   } = useProducts({
-    search,
+    search: filterState.search,
     categoryId,
     brandId,
-    sortBy,
-    sortOrder,
+    sortBy: "name",
+    sortOrder: "asc",
     page,
     limit: 4,
   });
 
-  const {
-    data: categories = [],
-  } = useCategories();
+  const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category.name))], [allProducts]);
+  const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
+  const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.sizes.map((s) => s.size)))], [allProducts]);
+  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors.map((c) => c.color)))], [allProducts]);
+  const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
 
-  const {
-    data: brands = [],
-  } = useBrands();
+  const filterConfigs = useMemo(
+    () => [
+      { key: "category", label: "Category", options: allCategories },
+      { key: "brand", label: "Brand", options: allBrands },
+      { key: "size", label: "Size", options: allSizes },
+      { key: "color", label: "Color", options: allColors },
+      ...(priceRanges.length > 1 ? [{ key: "price", label: "Price", options: priceRanges }] : []),
+    ],
+    [allCategories, allBrands, allSizes, allColors, priceRanges],
+  );
+
+  const handleFilter = useCallback((f: FilterValues) => setFilterState(f), []);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -61,11 +76,8 @@ export default function SeasonMustHavesPage() {
   }, [isAuthenticated, user, navigate]);
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      setPage(1);
-    }
-    asyncFunc();
-  }, [search, categoryId, brandId, sortBy, sortOrder]);
+    setPage(1);
+  }, [filterState]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -86,31 +98,19 @@ export default function SeasonMustHavesPage() {
   return (
     <div className="w-full">
       <div className="font-['Montserrat'] text-8xl font-bold text-foreground">
-        This Season’s Must-Haves
+        This Season's Must-Haves
       </div>
 
       <div className="mt-8">
         <CatalogFilters
-          onSearchChange={setSearch}
-          categoryId={categoryId}
-          onCategoryChange={setCategoryId}
-          brandId={brandId}
-          onBrandChange={setBrandId}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          categories={categories}
-          brands={brands}
+          filters={filterConfigs}
+          onFilterChange={handleFilter}
         />
       </div>
-            {isLoading && (
+
+      {isLoading && (
         <div className="mt-8 w-full py-2 text-center text-gray-text">
           Loading...
-        </div>
-      )}
-
-      {isError && (
-        <div className="mt-8 w-full py-2 text-center text-gray-text">
-          Something went wrong. Please try again later.
         </div>
       )}
 

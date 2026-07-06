@@ -230,6 +230,8 @@ const emptyForm: WholesaleFormData = {
   colors: [],
 };
 
+type ImageEntry = { url: string; color?: string };
+
 function WholesaleModal({
   open,
   onClose,
@@ -254,16 +256,15 @@ function WholesaleModal({
         isBestDeal: editItem.isBestDeal,
         isMostPopular: editItem.isMostPopular,
         isPremiumCollection: editItem.isPremiumCollection,
-        images: editItem.images.map((i) => i.url),
-        sizes: editItem.sizes.map((s) => s.size),
-        colors: editItem.colors.map((c) => c.color),
+        images: editItem.images.map((i) => ({ url: i.url, color: i.color })),
+        sizes: [],
+        colors: [],
       }
     : emptyForm;
 
   const [form, setForm] = useState<WholesaleFormData>(initial);
   const [imageInput, setImageInput] = useState("");
-  const [sizeInput, setSizeInput] = useState("");
-  const [colorInput, setColorInput] = useState("");
+  const [imageColorInput, setImageColorInput] = useState("");
 
   // Reset form when modal opens with different item
   const [prevEditId, setPrevEditId] = useState<string | null>(null);
@@ -271,8 +272,7 @@ function WholesaleModal({
     setPrevEditId(editItem?.id ?? null);
     setForm(initial);
     setImageInput("");
-    setSizeInput("");
-    setColorInput("");
+    setImageColorInput("");
   }
 
   if (!open) return null;
@@ -287,14 +287,6 @@ function WholesaleModal({
     }
     if (form.images.length === 0) {
       toast.error("Please add at least one image URL");
-      return;
-    }
-    if (form.sizes.length === 0) {
-      toast.error("Please add at least one size");
-      return;
-    }
-    if (form.colors.length === 0) {
-      toast.error("Please add at least one color");
       return;
     }
 
@@ -312,15 +304,17 @@ function WholesaleModal({
     }
   };
 
-  const addToList = (field: "images" | "sizes" | "colors", value: string, clear: () => void) => {
-    const trimmed = value.trim();
-    if (!trimmed || form[field].includes(trimmed)) return;
-    setForm((f) => ({ ...f, [field]: [...f[field], trimmed] }));
-    clear();
+  const addImage = () => {
+    const url = imageInput.trim();
+    if (!url) return;
+    const color = imageColorInput.trim() || undefined;
+    setForm((f) => ({ ...f, images: [...f.images, { url, color }] }));
+    setImageInput("");
+    setImageColorInput("");
   };
 
-  const removeFromList = (field: "images" | "sizes" | "colors", idx: number) => {
-    setForm((f) => ({ ...f, [field]: f[field].filter((_, i) => i !== idx) }));
+  const removeImage = (idx: number) => {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== idx) }));
   };
 
   const inputClass =
@@ -401,54 +395,23 @@ function WholesaleModal({
 
           {/* Images */}
           <div>
-            <label className={labelClass}>Images (URLs) *</label>
+            <label className={labelClass}>Images (URL + Color) *</label>
             <div className="flex gap-2">
-              <input className={inputClass} placeholder="https://..." value={imageInput} onChange={(e) => setImageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addToList("images", imageInput, () => setImageInput("")); } }} />
-              <button type="button" onClick={() => addToList("images", imageInput, () => setImageInput(""))} className="shrink-0 rounded-lg bg-[#BBFF63] px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#a8e854]">Add</button>
+              <input className={inputClass} placeholder="https://..." value={imageInput} onChange={(e) => setImageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
+              <input className={inputClass + " max-w-[120px]"} placeholder="Color" value={imageColorInput} onChange={(e) => setImageColorInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
+              <button type="button" onClick={addImage} className="shrink-0 rounded-lg bg-[#BBFF63] px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#a8e854]">Add</button>
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              {form.images.map((url, i) => (
+              {form.images.map((img, i) => (
                 <span key={i} className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1 font-['Montserrat'] text-xs text-[#111827]">
-                  {url.length > 40 ? url.slice(0, 40) + "..." : url}
-                  <button type="button" onClick={() => removeFromList("images", i)} className="ml-1 text-[#6B7280] hover:text-red-500">&times;</button>
+                  {img.url.length > 30 ? img.url.slice(0, 30) + "..." : img.url}
+                  {img.color && <span className="text-[#6B7280]">({img.color})</span>}
+                  <button type="button" onClick={() => removeImage(i)} className="ml-1 text-[#6B7280] hover:text-red-500">&times;</button>
                 </span>
               ))}
             </div>
           </div>
 
-          {/* Sizes */}
-          <div>
-            <label className={labelClass}>Sizes *</label>
-            <div className="flex gap-2">
-              <input className={inputClass} placeholder="e.g. S, M, L" value={sizeInput} onChange={(e) => setSizeInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addToList("sizes", sizeInput, () => setSizeInput("")); } }} />
-              <button type="button" onClick={() => addToList("sizes", sizeInput, () => setSizeInput(""))} className="shrink-0 rounded-lg bg-[#BBFF63] px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#a8e854]">Add</button>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {form.sizes.map((s, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1 font-['Montserrat'] text-xs text-[#111827]">
-                  {s}
-                  <button type="button" onClick={() => removeFromList("sizes", i)} className="ml-1 text-[#6B7280] hover:text-red-500">&times;</button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Colors */}
-          <div>
-            <label className={labelClass}>Colors *</label>
-            <div className="flex gap-2">
-              <input className={inputClass} placeholder="e.g. Black, White" value={colorInput} onChange={(e) => setColorInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addToList("colors", colorInput, () => setColorInput("")); } }} />
-              <button type="button" onClick={() => addToList("colors", colorInput, () => setColorInput(""))} className="shrink-0 rounded-lg bg-[#BBFF63] px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#a8e854]">Add</button>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {form.colors.map((c, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1 font-['Montserrat'] text-xs text-[#111827]">
-                  {c}
-                  <button type="button" onClick={() => removeFromList("colors", i)} className="ml-1 text-[#6B7280] hover:text-red-500">&times;</button>
-                </span>
-              ))}
-            </div>
-          </div>
 
           {/* Submit */}
           <div className="flex justify-end gap-3 pt-2">
