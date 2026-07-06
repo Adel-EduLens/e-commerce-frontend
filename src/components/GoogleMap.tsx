@@ -122,36 +122,59 @@ export default function GoogleMapPicker({
     setIsSearching(false);
   };
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = async (explicit = false) => {
     setIsLocating(true);
-
-    try {
-      const res = await fetch("https://ipapi.co/json/");
-      if (res.ok) {
-        const data = await res.json();
-        if (data.latitude && data.longitude) {
-          setPendingMarker([data.latitude, data.longitude]);
-          mapRef.current?.flyTo([data.latitude, data.longitude], 15);
-          setIsLocating(false);
-          return;
-        }
-      }
-    } catch (e) {
-      console.error("IP Geolocation failed", e);
-    }
 
     if (!navigator.geolocation) {
       setIsLocating(false);
+      if (explicit) alert("Geolocation is not supported by your browser.");
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setPendingMarker([pos.coords.latitude, pos.coords.longitude]);
-        mapRef.current?.flyTo([pos.coords.latitude, pos.coords.longitude], 15);
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setPendingMarker([lat, lng]);
+        mapRef.current?.flyTo([lat, lng], 15);
+        
+        // Auto-fill checkout fields immediately
+        const address = await reverseGeocode(lat, lng);
+        onLocationPick({ lat, lng, ...address });
+        
         setIsLocating(false);
       },
-      () => setIsLocating(false),
+      async (error) => {
+        if (explicit) {
+          setIsLocating(false);
+          if (error.code === error.PERMISSION_DENIED) {
+            alert("Location access was denied. Please enable location permissions for this site in your browser settings (usually the lock icon in the address bar).");
+          } else {
+            alert("Unable to retrieve your location. Please ensure your GPS is enabled.");
+          }
+        } else {
+          // Silent fallback to IP on mount if GPS is blocked/fails
+          try {
+            const res = await fetch("https://ipapi.co/json/");
+            if (res.ok) {
+              const data = await res.json();
+              if (data.latitude && data.longitude) {
+                const lat = data.latitude;
+                const lng = data.longitude;
+                setPendingMarker([lat, lng]);
+                mapRef.current?.flyTo([lat, lng], 15);
+                
+                // Auto-fill checkout fields immediately
+                const address = await reverseGeocode(lat, lng);
+                onLocationPick({ lat, lng, ...address });
+              }
+            }
+          } catch (e) {
+            console.error("IP Geolocation fallback failed", e);
+          }
+          setIsLocating(false);
+        }
+      },
       { enableHighAccuracy: true, timeout: 8000 }
     );
   };
@@ -204,7 +227,7 @@ export default function GoogleMapPicker({
         </span>
         <button
           type="button"
-          onClick={handleUseCurrentLocation}
+          onClick={() => handleUseCurrentLocation(true)}
           disabled={isLocating}
           className="flex items-center gap-1.5 rounded-lg border border-stroke px-3 py-1.5 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
         >
