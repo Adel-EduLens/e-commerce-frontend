@@ -3,8 +3,10 @@ import { useParams } from "react-router-dom";
 import { ThumbsUp } from "lucide-react";
 
 import { useReviews } from "../../hooks/queries/reviewQuery";
+import { useAuthStore } from "../../store/useAuthStore";
 
 import { Star } from "../ui/star";
+import { ReviewForm } from "./ReviewForm";
 
 type ReviewFilterValue = "all" | "5" | "4" | "3" | "2" | "1";
 type ReviewSortValue = "newest" | "oldest" | "highest" | "lowest";
@@ -33,6 +35,7 @@ const SORT_OPTIONS: {
 
 export function ReviewsSection() {
   const { id } = useParams();
+  const { user } = useAuthStore();
 
   const { data: reviews = [], isPending, isError } = useReviews(id);
 
@@ -40,6 +43,12 @@ export function ReviewsSection() {
   const [sortValue, setSortValue] = useState<ReviewSortValue>("newest");
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [helpfulReviewIds, setHelpfulReviewIds] = useState<string[]>([]);
+  const [showForm, setShowForm] = useState(false);
+
+  const myReview = useMemo(
+    () => reviews.find((review) => review.userId === Number(user?.id)),
+    [reviews, user?.id],
+  );
 
   const visibleReviews = useMemo(() => {
     let data = [...reviews];
@@ -167,37 +176,59 @@ export function ReviewsSection() {
       <div className="flex justify-center py-10">Could not load reviews.</div>
     );
   }
+
   return (
     <section className="flex w-full flex-col items-start gap-6">
-      <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6">
-        <h2 className="font-['Montserrat'] text-3xl font-bold text-foreground sm:text-5xl">
-          Reviews
-        </h2>
+      <div className="flex w-full flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6">
+          <h2 className="font-['Montserrat'] text-3xl font-bold text-foreground sm:text-5xl">
+            Reviews
+          </h2>
 
-        {reviews.length > 0 && (
-          <div className="flex items-center justify-start gap-2">
-            <div className="font-['Montserrat'] text-base font-semibold text-foreground">
-              {averageRating}
-            </div>
+          {reviews.length > 0 && (
+            <div className="flex items-center justify-start gap-2">
+              <div className="font-['Montserrat'] text-base font-semibold text-foreground">
+                {averageRating}
+              </div>
 
-            <div className="flex">
-              {Array.from({ length: 5 }).map((_, index) => {
-                const fill = Math.min(
-                  1,
-                  Math.max(0, Number(averageRating) - index),
-                );
-                return <Star key={index} fill={fill} />;
-              })}
-            </div>
+              <div className="flex">
+                {Array.from({ length: 5 }).map((_, index) => {
+                  const fill = Math.min(
+                    1,
+                    Math.max(0, Number(averageRating) - index),
+                  );
+                  return <Star key={index} fill={fill} />;
+                })}
+              </div>
 
-            <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-              ({reviews.length} Reviews)
+              <div className="font-['Montserrat'] text-base font-medium text-gray-text">
+                ({reviews.length} Reviews)
+              </div>
             </div>
-          </div>
+          )}
+        </div>
+
+        {!showForm && (
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="rounded-2xl bg-primary px-5 py-3 font-['Montserrat'] text-base font-semibold text-foreground"
+          >
+            {myReview ? "Edit Your Review" : "Write a Review"}
+          </button>
         )}
       </div>
+
+      {showForm && (
+        <ReviewForm
+          productId={id!}
+          existingReview={myReview}
+          onDone={() => setShowForm(false)}
+        />
+      )}
+
       {reviews.length === 0 && (
-        <div className="flex justify-center w-full py-10">
+        <div className="flex w-full justify-center py-10">
           No reviews found. Be the first to review this product!
         </div>
       )}
