@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import GoogleMapPicker from "../components/GoogleMap";
 
 function OrderSummary() {
   return (
@@ -109,11 +110,7 @@ function DeliverySection() {
         </div>
         <div className="flex flex-col gap-4">
           <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-[#1A1A1A]">Select on Map</div>
-          <img
-            className="h-48 sm:h-72 lg:h-96 w-full rounded-lg object-cover"
-            src="/checkout/%F0%9F%8C%8E%20Map%20Maker_%20Cairo%2C%20Cairo%2C%20Egypt%20(Standard).png"
-            alt=""
-          />
+          <GoogleMapPicker onLocationPick={() => { }} />
         </div>
       </div>
     </div>
@@ -156,9 +153,10 @@ function PaymentMethodSection() {
             <img src="/checkout/ri_radio-button-line.svg" className="h-5 w-5 sm:h-6 sm:w-6" alt="" />
             <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-[#1A1A1A]">Cash on Delivery</span>
           </div>
-          <img src="/checkout/iconoir_hand-cash.svg" className="h-8 w-8 sm:h-10 sm:w-10" alt="" />
+
         </div>
       </div>
+
     </div>
   );
 }
