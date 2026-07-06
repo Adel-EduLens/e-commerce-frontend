@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Heart, Search, ShoppingBag, User } from 'lucide-react'
+import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '../../store/useCartStore'
 
@@ -17,6 +17,7 @@ export default function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const items = useCartStore((state) => state.items)
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0)
 
@@ -24,73 +25,138 @@ export default function Navbar() {
     e.preventDefault()
     if (searchQuery.trim()) {
       navigate(`/season-must-haves?search=${encodeURIComponent(searchQuery.trim())}`)
+      setMobileMenuOpen(false)
     }
   }
 
   return (
-    <div className="relative flex h-20 w-full items-center rounded-2xl bg-card px-4 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke">
-      <Link to="/" className="shrink-0">
-        <img
-          className="h-12 w-[90px] logo-theme"
-          src={asset('logo gen-z 2 copy 1.png')}
-          alt="Gen Z"
-          draggable={false}
-        />
-      </Link>
-      <div className="ml-8 inline-flex items-center justify-start gap-4">
-        {navLinks.map((item) => {
-          const isActive =
-            item.label === 'Home'
-              ? location.pathname === '/'
-              : item.label === 'Shop'
-                ? location.pathname === item.path ||
-                location.pathname.startsWith('/collections/')
-                : location.pathname === item.path
-
-          return (
-            <Link
-              key={item.label}
-              to={item.path}
-              className={`font-['Montserrat'] text-lg font-semibold transition-colors ${isActive
-                ? 'flex items-center justify-center gap-2.5 rounded-lg bg-primary px-4 py-2 text-[#1A1A1A]'
-                : 'text-foreground hover:text-primary'
-                }`}
-            >
-              {item.label}
-            </Link>
-          )
-        })}
-      </div>
-      <div className="ml-auto flex items-center gap-4">
-        <form onSubmit={handleSearchSubmit} className="inline-flex w-96 items-center justify-start gap-2 rounded-3xl bg-background p-2 outline outline-1 outline-offset-[-1px] outline-stroke">
-          <button type="submit" className="focus:outline-none">
-            <Search className="h-6 w-6 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
-          </button>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className="flex-1 bg-transparent font-['Montserrat'] text-base font-semibold text-foreground placeholder:text-gray-text focus:outline-none"
+    <div className="relative">
+      <div className="relative flex h-16 lg:h-20 w-full items-center rounded-2xl bg-card px-4 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke">
+        <Link to="/" className="shrink-0">
+          <img
+            className="h-10 w-[75px] lg:h-12 lg:w-[90px] logo-theme"
+            src={asset('logo gen-z 2 copy 1.png')}
+            alt="Gen Z"
+            draggable={false}
           />
-        </form>
-        <div className="inline-flex items-center justify-start gap-6">
-          <Link to="/bag" className="relative flex items-center justify-center">
-            <ShoppingBag className="h-8 w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-2 bg-red-500 text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center border border-background">
-                {itemCount}
-              </span>
+        </Link>
+        <div className="ml-6 hidden lg:inline-flex items-center justify-start gap-4">
+          {navLinks.map((item) => {
+            const isActive =
+              item.label === 'Home'
+                ? location.pathname === '/'
+                : item.label === 'Shop'
+                  ? location.pathname === item.path ||
+                  location.pathname.startsWith('/collections/')
+                  : location.pathname === item.path
+
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                className={`font-['Montserrat'] text-base xl:text-lg font-semibold transition-colors ${isActive
+                  ? 'flex items-center justify-center gap-2.5 rounded-lg bg-primary px-4 py-2 text-[#1A1A1A]'
+                  : 'text-foreground hover:text-primary'
+                  }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
+        </div>
+        <div className="ml-auto flex items-center gap-3 lg:gap-4">
+          <form onSubmit={handleSearchSubmit} className="hidden lg:inline-flex w-64 xl:w-96 items-center justify-start gap-2 rounded-3xl bg-background p-2 outline outline-1 outline-offset-[-1px] outline-stroke">
+            <button type="submit" className="focus:outline-none">
+              <Search className="h-6 w-6 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
+            </button>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              className="flex-1 bg-transparent font-['Montserrat'] text-base font-semibold text-foreground placeholder:text-gray-text focus:outline-none"
+            />
+          </form>
+          <div className="inline-flex items-center justify-start gap-4 lg:gap-6">
+            <Link to="/bag" className="relative flex items-center justify-center">
+              <ShoppingBag className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white rounded-full text-xs font-bold w-5 h-5 flex items-center justify-center border border-background">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+            <Link to="/favorites" className="hidden sm:block">
+              <Heart className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
+            </Link>
+            <Link to="/settings" className="hidden sm:block">
+              <User className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
+            </Link>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden flex items-center justify-center"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6 text-foreground" strokeWidth={1.5} />
+            ) : (
+              <Menu className="h-6 w-6 text-foreground" strokeWidth={1.5} />
             )}
-          </Link>
-          <Link to="/favorites">
-            <Heart className="h-8 w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
-          </Link>
-          <Link to="/settings">
-            <User className="h-8 w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
-          </Link>
+          </button>
         </div>
       </div>
+
+      {mobileMenuOpen && (
+        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 flex flex-col gap-2 rounded-2xl bg-card p-4 shadow-lg outline outline-1 outline-stroke lg:hidden">
+          <form onSubmit={handleSearchSubmit} className="flex w-full items-center gap-2 rounded-2xl bg-background p-2 outline outline-1 outline-stroke">
+            <button type="submit" className="focus:outline-none">
+              <Search className="h-5 w-5 text-foreground" strokeWidth={1.5} />
+            </button>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              className="flex-1 bg-transparent font-['Montserrat'] text-sm font-semibold text-foreground placeholder:text-gray-text focus:outline-none"
+            />
+          </form>
+          {navLinks.map((item) => {
+            const isActive =
+              item.label === 'Home'
+                ? location.pathname === '/'
+                : item.label === 'Shop'
+                  ? location.pathname === item.path ||
+                  location.pathname.startsWith('/collections/')
+                  : location.pathname === item.path
+
+            return (
+              <Link
+                key={item.label}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`rounded-lg px-4 py-3 font-['Montserrat'] text-base font-semibold transition-colors ${isActive
+                  ? 'bg-primary text-[#1A1A1A]'
+                  : 'text-foreground hover:bg-background'
+                  }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
+          <div className="flex items-center gap-4 border-t border-stroke pt-3 sm:hidden">
+            <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">
+              <Heart className="h-5 w-5" strokeWidth={1.5} />
+              <span className="font-['Montserrat'] text-sm font-medium">Favorites</span>
+            </Link>
+            <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">
+              <User className="h-5 w-5" strokeWidth={1.5} />
+              <span className="font-['Montserrat'] text-sm font-medium">Account</span>
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

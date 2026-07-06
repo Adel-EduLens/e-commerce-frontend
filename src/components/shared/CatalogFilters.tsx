@@ -44,7 +44,7 @@ function FilterDropdown({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
       >
-        <div className="truncate font-['Montserrat'] text-xl font-medium text-[#6B7280]">
+        <div className="truncate font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
           {value ?? label}
         </div>
         <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
@@ -106,30 +106,30 @@ function PriceRangeInput({
   onMaxChange: (value: string) => void;
 }) {
   const inputClasses =
-    "w-full bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+    "w-full bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
   return (
-    <div className="flex w-full flex-wrap gap-3 sm:w-auto">
-      <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+    <div className="col-span-2 grid grid-cols-2 gap-3 sm:col-span-1 sm:flex sm:w-auto">
+      <div className="flex items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
         <input
           type="number"
           min={0}
           inputMode="numeric"
           value={min}
           onChange={(e) => onMinChange(e.target.value)}
-          placeholder="Min Price"
+          placeholder="Min"
           className={inputClasses}
         />
       </div>
 
-      <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+      <div className="flex items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
         <input
           type="number"
           min={0}
           inputMode="numeric"
           value={max}
           onChange={(e) => onMaxChange(e.target.value)}
-          placeholder="Max Price"
+          placeholder="Max"
           className={inputClasses}
         />
       </div>
@@ -211,8 +211,8 @@ export default function CatalogFilters({
         Filter by
       </div>
 
-      <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
-        <div className="flex w-full flex-wrap items-center justify-start gap-3 sm:w-auto">
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
+        <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-start sm:w-auto">
           {filters.map((filter) => (
             <FilterDropdown
               key={filter.key}
@@ -238,7 +238,7 @@ export default function CatalogFilters({
             value={values.search}
             onChange={(e) => updateSearch(e.target.value)}
             placeholder="Search..."
-            className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
           />
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
             <CiSearch size={24} />

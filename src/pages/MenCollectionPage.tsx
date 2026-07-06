@@ -14,7 +14,7 @@ const featuredIndexes = new Set([2, 6, 10, 14]);
 
 function ProductRow({ indexes }: { indexes: number[] }) {
   return (
-    <div className="inline-flex w-full items-center justify-start gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
       {indexes.map((index) => (
         <ProductCard
           key={index}
@@ -48,7 +48,7 @@ export default function MenCollectionPage() {
 
   return (
     <div className="w-full">
-      <div className="w-full font-['Montserrat'] text-8xl font-bold text-foreground">
+      <div className="w-full font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
         {categoryTitle}
       </div>
       <div className="mt-8 w-full">

@@ -84,6 +84,7 @@ function MapCenterTracker({
   return null;
 }
 
+
 export default function GoogleMapPicker({
   onLocationPick,
   searchQuery,
@@ -117,7 +118,9 @@ export default function GoogleMapPicker({
     const coords = await forwardGeocode(searchInput);
     if (coords) {
       setPendingMarker(coords);
+
       mapRef.current?.flyTo(coords, 15);
+
     }
     setIsSearching(false);
   };
@@ -165,6 +168,7 @@ export default function GoogleMapPicker({
       return;
     }
 
+
     const delay = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -179,7 +183,6 @@ export default function GoogleMapPicker({
         setSuggestions([]);
       }
     }, 500);
-
     return () => clearTimeout(delay);
   }, [searchInput]);
 
@@ -259,7 +262,7 @@ export default function GoogleMapPicker({
 
         {/* Suggestions Dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-stroke rounded-xl shadow-lg z-50 overflow-hidden max-h-60 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-stroke rounded-xl shadow-lg z-50 overflow-hidden max-h-60 overflow-y-auto">
             {suggestions.map((s, idx) => (
               <div
                 key={idx}

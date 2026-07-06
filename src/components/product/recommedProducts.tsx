@@ -1,10 +1,12 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { ProductCard } from "../shared";
+import { ViewAllButton } from "../ui/ViewAllButton";
 
 import { useProducts } from "../../hooks/queries/productsQuery";
 import { useRecommendationStore } from "../../store/useRecommendationStore";
-import { ViewAllButton } from "../ui/ViewAllButton";
-import { useNavigate } from "react-router-dom";
+
 type RecommedProductsProps = {
   currentProductId?: string;
   currentCategoryId?: string;
@@ -15,12 +17,31 @@ export function RecommedProducts({
   currentCategoryId,
 }: RecommedProductsProps) {
   const navigate = useNavigate();
-  const topCategories = useRecommendationStore((s) => s.getTopCategories(3));
+
+  const signals = useRecommendationStore((s) => s.signals);
+
+  const topCategories = useMemo(() => {
+    const weights = new Map<string, number>();
+
+    for (const signal of signals) {
+      const weight = signal.type === "purchase" ? 3 : 1;
+
+      weights.set(
+        signal.categoryId,
+        (weights.get(signal.categoryId) ?? 0) + weight,
+      );
+    }
+
+    return [...weights.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([categoryId]) => categoryId);
+  }, [signals]);
 
   // Pick the best category to fetch from: top weighted category (excluding current if possible)
   const targetCategoryId = useMemo(() => {
     const filtered = topCategories.filter((id) => id !== currentCategoryId);
-    // Prefer a different category; fall back to top category; fall back to current
+
     return filtered[0] ?? topCategories[0] ?? currentCategoryId;
   }, [topCategories, currentCategoryId]);
 
@@ -34,9 +55,8 @@ export function RecommedProducts({
 
   const products = useMemo(() => {
     const all = data?.products ?? [];
-    return all
-      .filter((p) => p.id !== currentProductId)
-      .slice(0, 4);
+
+    return all.filter((p) => p.id !== currentProductId).slice(0, 4);
   }, [data, currentProductId]);
 
   if (isLoading) {
@@ -45,19 +65,21 @@ export function RecommedProducts({
         <h2 className="w-full font-['Montserrat'] text-xl font-bold text-foreground md:text-3xl sm:text-5xl">
           Recommended for You
         </h2>
-        <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
+        <p className="font-['Montserrat'] text-lg text-[#6B7280]">
+          Loading...
+        </p>
       </section>
     );
   }
 
   if (products.length === 0) return null;
 
-
   return (
     <section className="flex flex-col items-center justify-start gap-6 sm:gap-10">
       <h2 className="w-full font-['Montserrat'] text-xl font-bold text-foreground md:text-3xl sm:text-5xl">
         Recommended for You
       </h2>
+
       <div className="flex w-full flex-col items-center justify-center gap-6 sm:gap-8">
         <div className="grid w-full grid-cols-1 items-start gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
           {products.map((product) => (
@@ -73,7 +95,12 @@ export function RecommedProducts({
             />
           ))}
         </div>
-        <ViewAllButton onClick={() => navigate(`/products?category=${encodeURIComponent("kids")}`)} />
+
+        <ViewAllButton
+          onClick={() =>
+            navigate(`/products?category=${encodeURIComponent("kids")}`)
+          }
+        />
       </div>
     </section>
   );
