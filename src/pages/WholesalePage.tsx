@@ -201,17 +201,13 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
 
   const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
-  const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
-  const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
   const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
 
   const filterConfigs = useMemo(() => [
     { key: 'category', label: 'Category', options: allCategories },
     { key: 'brand', label: 'Brand', options: allBrands },
-    { key: 'size', label: 'Size', options: allSizes },
-    { key: 'color', label: 'Color', options: allColors },
     ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
-  ], [allCategories, allBrands, allSizes, allColors, priceRanges])
+  ], [allCategories, allBrands, priceRanges])
 
   const handleFilter = useCallback((f: FilterValues) => setFilterState(f), [])
 
@@ -219,8 +215,6 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
     return products.filter((item) => {
       if (filterState.search && !item.name.toLowerCase().includes(filterState.search.toLowerCase())) return false
       if (filterState.category && item.category.name !== filterState.category) return false
-      if (filterState.size && !item.sizes.some((s) => s.size === filterState.size)) return false
-      if (filterState.color && !item.colors.some((c) => c.color === filterState.color)) return false
       if (filterState.price && !matchesPriceRange(item.price, filterState.price)) return false
       return true
     })
@@ -246,7 +240,6 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                     price={`$${item.price}`}
                     imageSrc={item.images[0]?.url}
                     rating={item.rating}
-                    sizeLabel={item.sizes.map((s) => s.size).join(', ')}
                     to={`/wholesale/${item.id}`}
                   />
                 ))

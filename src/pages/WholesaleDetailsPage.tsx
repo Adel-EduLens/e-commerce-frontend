@@ -22,12 +22,6 @@ export default function WholesaleDetailsPage() {
     }
   }, [isAuthenticated, user, navigate]);
 
-  useEffect(() => {
-    if (wholesale && wholesale.colors.length > 0 && !selectedColor) {
-      setSelectedColor(wholesale.colors[0].color);
-    }
-  }, [wholesale, selectedColor]);
-
   if (!isAuthenticated || !user) {
     return null;
   }
@@ -39,6 +33,8 @@ export default function WholesaleDetailsPage() {
     ...wholesale,
     brandName: wholesale.brand ?? null,
     minOrder: wholesale.minOrder,
+    colors: [],
+    sizes: [],
   };
 
   return (

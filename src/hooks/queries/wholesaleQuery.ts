@@ -31,17 +31,6 @@ export interface Wholesale {
     wholesaleId: string;
   }[];
 
-  sizes: {
-    id: string;
-    size: string;
-    wholesaleId: string;
-  }[];
-
-  colors: {
-    id: string;
-    color: string;
-    wholesaleId: string;
-  }[];
 }
 
 const getWholesale = async (id: string): Promise<Wholesale> => {
@@ -98,8 +87,6 @@ export interface WholesaleFormData {
   isMostPopular: boolean;
   isPremiumCollection: boolean;
   images: { url: string; color?: string }[];
-  sizes: string[];
-  colors: string[];
 }
 
 const createWholesale = async (body: WholesaleFormData) => {
