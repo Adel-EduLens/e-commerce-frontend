@@ -1,8 +1,10 @@
 import { useMemo } from "react";
 import { ProductCard } from "../shared";
+
 import { useProducts } from "../../hooks/queries/productsQuery";
 import { useRecommendationStore } from "../../store/useRecommendationStore";
-
+import { ViewAllButton } from "../ui/ViewAllButton";
+import { useNavigate } from "react-router-dom";
 type RecommedProductsProps = {
   currentProductId?: string;
   currentCategoryId?: string;
@@ -12,6 +14,7 @@ export function RecommedProducts({
   currentProductId,
   currentCategoryId,
 }: RecommedProductsProps) {
+  const navigate = useNavigate();
   const topCategories = useRecommendationStore((s) => s.getTopCategories(3));
 
   // Pick the best category to fetch from: top weighted category (excluding current if possible)
@@ -49,6 +52,7 @@ export function RecommedProducts({
 
   if (products.length === 0) return null;
 
+
   return (
     <section className="flex flex-col items-center justify-start gap-6 sm:gap-10">
       <h2 className="w-full font-['Montserrat'] text-xl font-bold text-foreground md:text-3xl sm:text-5xl">
@@ -69,6 +73,7 @@ export function RecommedProducts({
             />
           ))}
         </div>
+        <ViewAllButton onClick={() => navigate(`/products?category=${encodeURIComponent("kids")}`)} />
       </div>
     </section>
   );

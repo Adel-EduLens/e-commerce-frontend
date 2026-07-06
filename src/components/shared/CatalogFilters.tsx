@@ -10,7 +10,11 @@ export type FilterConfig = {
   options: string[];
 };
 
-export type FilterValues = Record<string, string | null> & { search: string };
+export type FilterValues = Record<string, string | null> & {
+  search: string;
+  priceMin: string | null;
+  priceMax: string | null;
+};
 
 type CatalogFiltersProps = {
   className?: string;
@@ -34,11 +38,11 @@ function FilterDropdown({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative w-full sm:w-44">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-44 items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
+        className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
       >
         <div className="truncate font-['Montserrat'] text-xl font-medium text-[#6B7280]">
           {value ?? label}
@@ -88,10 +92,55 @@ function FilterDropdown({
   );
 }
 
+// ── PriceRangeInput ────────────────────────────────────────────────────
+
+function PriceRangeInput({
+  min,
+  max,
+  onMinChange,
+  onMaxChange,
+}: {
+  min: string;
+  max: string;
+  onMinChange: (value: string) => void;
+  onMaxChange: (value: string) => void;
+}) {
+  const inputClasses =
+    "w-full bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+
+  return (
+    <div className="flex w-full flex-wrap gap-3 sm:w-auto">
+      <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+        <input
+          type="number"
+          min={0}
+          inputMode="numeric"
+          value={min}
+          onChange={(e) => onMinChange(e.target.value)}
+          placeholder="Min Price"
+          className={inputClasses}
+        />
+      </div>
+
+      <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+        <input
+          type="number"
+          min={0}
+          inputMode="numeric"
+          value={max}
+          onChange={(e) => onMaxChange(e.target.value)}
+          placeholder="Max Price"
+          className={inputClasses}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────
 
 function buildInitialValues(filters: FilterConfig[]): FilterValues {
-  const values: FilterValues = { search: "" };
+  const values: FilterValues = { search: "", priceMin: null, priceMax: null };
   for (const f of filters) {
     values[f.key] = null;
   }
@@ -107,19 +156,18 @@ export default function CatalogFilters({
     buildInitialValues(filters),
   );
 
-  // Reset state when filter config changes (e.g. new keys from API)
   const prevKeysRef = useRef("");
   const currentKeys = filters.map((f) => f.key).join(",");
   if (currentKeys !== prevKeysRef.current) {
     prevKeysRef.current = currentKeys;
   }
 
-  // Debounced search notification
+  // Debounced notification for free-typed fields (search + price)
   useEffect(() => {
     if (!onFilterChange) return;
     const timer = setTimeout(() => onFilterChange(values), 400);
     return () => clearTimeout(timer);
-  }, [values.search]);
+  }, [values.search, values.priceMin, values.priceMax]);
 
   const updateFilter = (key: string, value: string | null) => {
     setValues((prev) => {
@@ -133,6 +181,28 @@ export default function CatalogFilters({
     setValues((prev) => ({ ...prev, search: value }));
   };
 
+  // تعديل الـ Min ليمنع تخطي الـ Max
+  const updatePriceMin = (value: string) => {
+    setValues((prev) => {
+      if (value !== "" && prev.priceMax !== null && Number(value) > Number(prev.priceMax)) {
+        // إذا كان المدخل أكبر من الماكس الحالي، نجعل المين يساوي الماكس
+        return { ...prev, priceMin: prev.priceMax };
+      }
+      return { ...prev, priceMin: value === "" ? null : value };
+    });
+  };
+
+  // تعديل الـ Max ليمنع النزول عن الـ Min
+  const updatePriceMax = (value: string) => {
+    setValues((prev) => {
+      if (value !== "" && prev.priceMin !== null && Number(value) < Number(prev.priceMin)) {
+        // إذا كان المدخل أصغر من المين الحالي، نجعل الماكس يساوي المين
+        return { ...prev, priceMax: prev.priceMin };
+      }
+      return { ...prev, priceMax: value === "" ? null : value };
+    });
+  };
+
   return (
     <div
       className={`flex w-full flex-col items-start justify-start gap-4 ${className}`}
@@ -142,7 +212,7 @@ export default function CatalogFilters({
       </div>
 
       <div className="inline-flex w-full flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center justify-start gap-3">
+        <div className="flex w-full flex-wrap items-center justify-start gap-3 sm:w-auto">
           {filters.map((filter) => (
             <FilterDropdown
               key={filter.key}
@@ -152,10 +222,17 @@ export default function CatalogFilters({
               onChange={(v) => updateFilter(filter.key, v)}
             />
           ))}
+
+          <PriceRangeInput
+            min={values.priceMin ?? ""}
+            max={values.priceMax ?? ""}
+            onMinChange={updatePriceMin}
+            onMaxChange={updatePriceMax}
+          />
         </div>
 
         {/* Search bar */}
-        <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-3 sm:w-96">
+        <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-3 sm:w-80">
           <input
             type="text"
             value={values.search}

@@ -12,6 +12,10 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   sizeguide?: string;
+  isMustHave?: boolean;
+  isFlashDeals?: boolean;
+  flashDealPrice?: number;
+  flashDealEndsAt?: string;
   brand: {
     id: string;
     name: string;
@@ -49,14 +53,17 @@ export type ProductsQuery = {
   search?: string;
   categoryId?: string;
   brandId?: string;
-
+  filter?: string;
+  size?: string;
+  color?: string;
+  priceMin?: string;
+  priceMax?: string;
   sortBy?: "name" | "price" | "rating";
   sortOrder?: "asc" | "desc";
 
   page?: number;
   limit?: number;
 };
-
 
 type ProductsResponse = {
   products: Product[];
