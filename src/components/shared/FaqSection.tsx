@@ -38,16 +38,16 @@ function FaqSection() {
   ]
 
   return (
-    <div className="mt-16 mb-16 inline-flex w-full flex-col items-start justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-8xl font-bold text-foreground">
+    <div className="mt-16 mb-16 flex w-full flex-col items-start justify-start gap-10">
+      <div className="self-stretch text-center font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
         Frequently asked questions
       </div>
-      <div className="self-stretch inline-flex items-center justify-between">
+      <div className="flex w-full flex-col items-center gap-8 lg:flex-row lg:items-start lg:justify-between">
         <AssetImage
           file="image 17.png"
-          className="h-[721px] w-[566px] rounded-3xl"
+          className="h-[300px] sm:h-[450px] lg:h-[721px] w-full max-w-[566px] rounded-3xl object-cover"
         />
-        <div className="inline-flex w-[802px] flex-col items-start justify-start gap-8">
+        <div className="flex w-full flex-col items-start justify-start gap-8 lg:flex-1">
           <CollapsibleFAQ faqs={faqs} />
         </div>
       </div>

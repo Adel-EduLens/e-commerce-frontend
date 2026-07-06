@@ -25,7 +25,7 @@ export default function CollapsibleFAQ({
         return (
           <div
             key={`${faq.question}-${index}`}
-            className={`rounded-3xl p-8 transition-colors duration-300 ${
+            className={`rounded-2xl p-4 sm:rounded-3xl sm:p-8 transition-colors duration-300 ${
               isOpen ? "bg-[#1C1B2E]" : "bg-[#EDEDED]"
             }`}
           >
@@ -35,7 +35,7 @@ export default function CollapsibleFAQ({
               className="flex w-full items-center justify-between"
             >
               <h3
-                className={`text-2xl font-medium ${
+                className={`text-base sm:text-xl lg:text-2xl font-medium text-start ${
                   isOpen ? "text-[#BBFF63]" : "text-[#1A1A1A]"
                 }`}
               >
@@ -61,7 +61,7 @@ export default function CollapsibleFAQ({
                 isOpen ? "mt-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <p className={`text-xl ${isOpen ? "text-white" : "text-[#1A1A1A]"}`}>
+              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-white" : "text-[#1A1A1A]"}`}>
                 {faq.answer}
               </p>
             </div>
