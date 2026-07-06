@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
+import { useRecommendationStore } from "../store/useRecommendationStore";
 
 import { useProduct } from "../hooks/queries/productsQuery";
 import { useParams } from "react-router-dom";
@@ -19,6 +20,7 @@ export default function ProductDetailsPage() {
   const { user, isAuthenticated } = useAuthStore();
   const { data: product, isPending, isError } = useProduct(id);
   const { data: reviews = [] } = useReviews(id);
+  const addSignal = useRecommendationStore((s) => s.addSignal);
 
   const [selectedColor, setSelectedColor] = useState("");
 
@@ -33,6 +35,12 @@ export default function ProductDetailsPage() {
       setSelectedColor(product.colors[0].color);
     }
   }, [product, selectedColor]);
+
+  useEffect(() => {
+    if (product) {
+      addSignal(product.id, product.categoryId, "view");
+    }
+  }, [product?.id]);
 
   if (!isAuthenticated || !user) {
     return null;
@@ -65,7 +73,7 @@ export default function ProductDetailsPage() {
           />
         </div>
         <ReviewsSection />
-        <RecommedProducts />
+        <RecommedProducts currentProductId={product.id} currentCategoryId={product.categoryId} />
       </div>
     </div>
   );

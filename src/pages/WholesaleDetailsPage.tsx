@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useAuthStore } from "../store/useAuthStore";
+import { useRecommendationStore } from "../store/useRecommendationStore";
 import { useWholesale } from "../hooks/queries/wholesaleQuery";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
@@ -13,6 +14,7 @@ export default function WholesaleDetailsPage() {
   const { id } = useParams();
   const { user, isAuthenticated } = useAuthStore();
   const { data: wholesale, isPending, isError } = useWholesale(id);
+  const addSignal = useRecommendationStore((s) => s.addSignal);
 
   const [selectedColor, setSelectedColor] = useState("");
 
@@ -21,6 +23,12 @@ export default function WholesaleDetailsPage() {
       navigate("/login");
     }
   }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    if (wholesale) {
+      addSignal(wholesale.id, wholesale.categoryId, "view");
+    }
+  }, [wholesale?.id]);
 
   if (!isAuthenticated || !user) {
     return null;
@@ -53,7 +61,7 @@ export default function WholesaleDetailsPage() {
             item={item}
           />
         </div>
-        <RecommedProducts />
+        <RecommedProducts currentProductId={wholesale.id} currentCategoryId={wholesale.categoryId} />
       </div>
     </div>
   );
