@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useRecommendationStore } from "../store/useRecommendationStore";
+import { useRecentStore } from "../store/useRecentStore";
 
 import { useProduct } from "../hooks/queries/productsQuery";
 import { useParams } from "react-router-dom";
@@ -35,6 +36,13 @@ export default function ProductDetailsPage() {
   useEffect(() => {
     if (product) {
       addSignal(product.id, product.categoryId, "view");
+      useRecentStore.getState().addProduct({
+        id: String(product.id),
+        name: product.name,
+        price: Number(product.price) || 0,
+        images: product.images || [],
+        sizes: product.sizes || [],
+      });
     }
   }, [addSignal, product, product?.id]);
 

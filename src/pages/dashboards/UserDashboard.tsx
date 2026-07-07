@@ -1,6 +1,10 @@
 import { useAuthStore } from "../../store/useAuthStore";
 import { asset } from '../../lib/utils';
 import ProductsSection from "../../components/shared/ProductsSection";
+import { useWishlist } from "../../hooks/useWishlist";
+import { useRecentStore } from "../../store/useRecentStore";
+import { useProducts } from "../../hooks/queries/productsQuery";
+import { useNavigate } from "react-router-dom";
 
 function ViewAllButton({ onClick }: { onClick?: () => void }) {
   return (
@@ -16,30 +20,48 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-function ProductGallery({ title }: { title: string }) {
+const getProductImage = (prod: any, fallback: string) => {
+  if (!prod) return fallback;
+  if (typeof prod.image === 'string') return prod.image;
+  if (Array.isArray(prod.images) && prod.images.length > 0) {
+    return prod.images[0].url || prod.images[0] || fallback;
+  }
+  if (prod.imageUrl) return prod.imageUrl;
+  return fallback;
+};
+
+function ProductGallery({ title, products = [], onNavigate }: { title: string; products?: any[]; onNavigate?: () => void }) {
+  const fallbackImg = asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png");
+  const mainImage = getProductImage(products[0], fallbackImg);
+  const thumbnails = [
+    getProductImage(products[1], fallbackImg),
+    getProductImage(products[2], fallbackImg),
+    getProductImage(products[3], fallbackImg),
+  ];
+
   return (
-    <div className="flex flex-col items-center gap-6 flex-1 min-w-0 max-w-md">
+    <div className="flex flex-col items-center gap-6 flex-1 min-w-0 max-w-md w-full">
       <div className="self-start font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
         {title}
       </div>
-      <div className="w-full overflow-hidden rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-foreground">
+      <div className="w-full overflow-hidden rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-foreground p-2">
         <div className="flex gap-2">
           {/* Main image */}
-          <div className="flex-1 bg-background rounded-lg overflow-hidden">
+          <div className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
             <img
-              className="w-full h-full object-contain"
-              src={asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png")}
+              className="absolute inset-0 w-full h-full object-contain p-2"
+              src={mainImage}
               alt=""
               draggable={false}
             />
           </div>
           {/* Thumbnail column */}
           <div className="hidden sm:flex w-24 flex-col gap-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
                 <img
-                  className="w-full h-full object-contain"
-                  src={asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png")}
+                  className="absolute inset-0 w-full h-full object-contain p-1"
+                  src={thumbnails[i]}
                   alt=""
                   draggable={false}
                 />
@@ -48,14 +70,28 @@ function ProductGallery({ title }: { title: string }) {
           </div>
         </div>
       </div>
-      <ViewAllButton />
+      <ViewAllButton onClick={onNavigate} />
     </div>
   );
 }
 
-
 export default function UserDashboard() {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+
+  const { data: defaultData } = useProducts({ limit: 8 });
+  const defaultProducts = defaultData?.products || [];
+
+  const { data: wishlistData } = useWishlist();
+  const apiFavorites = Array.isArray(wishlistData?.data)
+    ? wishlistData.data.map((item: any) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
+    : [];
+  const favoriteProducts = apiFavorites.length > 0 ? apiFavorites : defaultProducts.slice(0, 4);
+
+  const recentProducts = useRecentStore((s) => s.products);
+  const viewedProducts = recentProducts.length > 0
+    ? recentProducts
+    : (defaultProducts.slice(4, 8).length > 0 ? defaultProducts.slice(4, 8) : defaultProducts.slice(0, 4));
 
   return (
     <div className="w-full">
@@ -63,9 +99,17 @@ export default function UserDashboard() {
         HI, {user?.name?.toUpperCase() || "THERE"}
       </h1>
 
-      <div className="mt-8 flex flex-col lg:flex-row gap-8">
-        <ProductGallery title="FAVORITES" />
-        <ProductGallery title="VIEWED" />
+      <div className="mt-8 flex justify-between flex-col lg:flex-row gap-8">
+        <ProductGallery
+          title="FAVORITES"
+          products={favoriteProducts}
+          onNavigate={() => navigate("/favorites")}
+        />
+        <ProductGallery
+          title="VIEWED"
+          products={viewedProducts}
+          onNavigate={() => navigate("/products")}
+        />
       </div>
 
       <ProductsSection

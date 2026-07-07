@@ -8,6 +8,8 @@ import { api } from "../lib/axios";
 import { useRecentStore } from "../store/useRecentStore";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/useAuthStore";
+import { useWishlist } from "../hooks/useWishlist";
+import type { BagProduct } from "../types/product";
 type BagTab = "favorites" | "recent";
 
 const FAVORITE_PRODUCTS = [
@@ -340,8 +342,16 @@ function FavoritesSection({
 }) {
   const { t } = useTranslation("bag");
   const recentProducts = useRecentStore((state) => state.products);
+  const activeRecentProducts = recentProducts.length > 0 ? recentProducts : RECENT_PRODUCTS;
+
+  const { data: wishlistData } = useWishlist();
+  const apiFavorites = Array.isArray(wishlistData?.data)
+    ? wishlistData.data.map((item: any) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
+    : [];
+  const activeFavoriteProducts = apiFavorites.length > 0 ? apiFavorites : FAVORITE_PRODUCTS;
+
   const products =
-    selectedTab === "favorites" ? FAVORITE_PRODUCTS : recentProducts;
+    selectedTab === "favorites" ? activeFavoriteProducts : activeRecentProducts;
 
   return (
     <div className="w-full">
@@ -349,22 +359,20 @@ function FavoritesSection({
         <button
           type="button"
           onClick={() => onSelectTab("favorites")}
-          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${
-            selectedTab === "favorites"
+          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "favorites"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
-          }`}
+            }`}
         >
           {t("favorites.favorites")}
         </button>
         <button
           type="button"
           onClick={() => onSelectTab("recent")}
-          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${
-            selectedTab === "recent"
+          className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "recent"
               ? "border-b-[3px] border-foreground text-foreground"
               : "text-gray-text hover:text-foreground"
-          }`}
+            }`}
         >
           {t("favorites.recentlyViewed")}
         </button>
@@ -376,31 +384,21 @@ function FavoritesSection({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => {
-            const title = "title" in product ? product.title : product.name;
-            const price =
-              "price" in product
-                ? typeof product.price === "number"
-                  ? `${product.price} EGP`
-                  : product.price
-                : "";
-            const sizeLabel =
-              "sizeLabel" in product
-                ? product.sizeLabel
-                : product.sizes.map((s) => s.size).join(" - ");
-            const imageSrc =
-              "imageSrc" in product
-                ? product.imageSrc
-                : product.images?.[0]?.url;
+          {products.map((product: BagProduct, index: number) => {
+            const title = product.title || product.name || "Product";
+            const rawPrice = product.price ?? product.unitPrice ?? "";
+            const price = typeof rawPrice === "number" ? `${rawPrice} EGP` : rawPrice;
+            const sizeLabel = product.sizeLabel || (Array.isArray(product.sizes) ? product.sizes.map((s: any) => typeof s === "string" ? s : (s.size || s.name || "")).filter(Boolean).join(" - ") : "");
+            const imageSrc = product.imageSrc || product.image || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === "string" ? product.images[0] : product.images[0].url) : undefined);
 
             return (
               <ProductCard
-                key={`${selectedTab}-${title}`}
+                key={`${selectedTab}-${product.id || index}-${title}`}
                 title={title}
                 sizeLabel={sizeLabel}
                 price={price}
                 imageSrc={imageSrc}
-                featured={"featured" in product && Boolean(product.featured)}
+                featured={Boolean(product.featured)}
                 accentClassName="bg-primary"
               />
             );
@@ -436,7 +434,7 @@ export default function BagPage() {
       toast.error(t("toast.userRequired"));
       navigate("/");
     }
-  }, [user, navigate,t]);
+  }, [user, navigate, t]);
   useEffect(() => {
     if (subtotal === 0 && appliedCoupon) {
       setAppliedCoupon(null);

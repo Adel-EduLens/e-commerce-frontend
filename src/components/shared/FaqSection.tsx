@@ -50,7 +50,18 @@ function FaqSection() {
           className="h-[300px] sm:h-[450px] lg:h-[721px] w-full max-w-[566px] rounded-3xl object-cover"
         />
         <div className="flex w-full flex-col items-start justify-start gap-8 lg:flex-1">
-          <CollapsibleFAQ faqs={faqs} />
+          {isLoading ? (
+            <div className="flex flex-col gap-8 w-full">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="rounded-2xl p-4 sm:rounded-3xl sm:p-8 bg-gray-light animate-pulse flex w-full items-center justify-between h-[88px] sm:h-[120px]">
+                  <div className="h-6 sm:h-8 w-2/3 rounded-md bg-gray-300 dark:bg-gray-600" />
+                  <div className="h-12 w-12 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <CollapsibleFAQ faqs={faqs} />
+          )}
         </div>
       </div>
     </div>
