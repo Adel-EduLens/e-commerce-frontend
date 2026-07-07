@@ -14,12 +14,13 @@ import ProductCard from "../shared/ProductCard";
 import { ViewAllButton } from "../ui/ViewAllButton";
 import { useHomeFilters } from "../../hooks/utils/HomeFilters";
 import CatalogFilters from "./CatalogFilters";
-
+import { useTranslation } from "react-i18next";
 export default function ProductsSection({
   title,
   navigateTo,
   query,
 }: ProductsSectionProps) {
+  const { t } = useTranslation("productSection");
   const navigate = useNavigate();
   const [filterValues, setFilterValues] = useState<FilterValues>({
     search: "",
@@ -68,21 +69,21 @@ export default function ProductsSection({
   return (
     <section className="mt-16 flex w-full flex-col items-center gap-10">
       <h2 className="text-center font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        {title}
+        {t(title)}
       </h2>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
         <CatalogFilters filters={filters} onFilterChange={setFilterValues} />
         {isPending ?? (
           <div className="flex w-full flex-wrap justify-center gap-6">
             <div className="w-full py-2 text-center text-gray-text">
-              Loading...
+              {t("Loading")}
             </div>
           </div>
         )}
         {isError && (
           <div className="flex w-full flex-wrap justify-center gap-6">
             <div className="w-full py-2 text-center text-gray-text">
-              Something went wrong. Please try again later.
+              {t("Something went wrong")}
             </div>
           </div>
         )}

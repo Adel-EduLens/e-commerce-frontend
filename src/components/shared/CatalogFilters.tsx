@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ function FilterDropdown({
   onChange: (value: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
-
+  const { t } = useTranslation("filters");
   return (
     <div className="relative w-full sm:w-44">
       <button
@@ -45,7 +46,7 @@ function FilterDropdown({
         className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
       >
         <div className="truncate font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
-          {value ?? label}
+          {value ?? t(label)}
         </div>
         <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
           <ChevronDown
@@ -67,7 +68,7 @@ function FilterDropdown({
                 }}
                 className="whitespace-nowrap px-4 py-3 text-left font-['Montserrat'] text-lg font-medium text-[#6B7280] hover:bg-[#EDEDED]"
               >
-                Clear
+                {t("Clear")}
               </button>
             )}
             {options.map((option) => (
@@ -82,7 +83,7 @@ function FilterDropdown({
                   value === option ? "text-[#1A1A1A]" : "text-[#6B7280]"
                 }`}
               >
-                {option}
+                {t(option)}
               </button>
             ))}
           </div>
@@ -105,6 +106,7 @@ function PriceRangeInput({
   onMinChange: (value: string) => void;
   onMaxChange: (value: string) => void;
 }) {
+  const { t } = useTranslation("filters");
   const inputClasses =
     "w-full bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
@@ -117,7 +119,7 @@ function PriceRangeInput({
           inputMode="numeric"
           value={min}
           onChange={(e) => onMinChange(e.target.value)}
-          placeholder="Min Price"
+          placeholder={t("Min Price")}
           className={inputClasses}
         />
       </div>
@@ -129,7 +131,7 @@ function PriceRangeInput({
           inputMode="numeric"
           value={max}
           onChange={(e) => onMaxChange(e.target.value)}
-          placeholder="Max Price"
+          placeholder={t("Max Price")}
           className={inputClasses}
         />
       </div>
@@ -152,6 +154,7 @@ export default function CatalogFilters({
   filters = [],
   onFilterChange,
 }: CatalogFiltersProps) {
+  const { t } = useTranslation("filters");
   const [values, setValues] = useState<FilterValues>(() =>
     buildInitialValues(filters),
   );
@@ -208,7 +211,7 @@ export default function CatalogFilters({
       className={`flex w-full flex-col items-start justify-start gap-4 ${className}`}
     >
       <div className="font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
-        Filter by
+        {t("Filter by")}
       </div>
 
       <div className="flex w-full flex-col gap-4 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
@@ -237,7 +240,7 @@ export default function CatalogFilters({
             type="text"
             value={values.search}
             onChange={(e) => updateSearch(e.target.value)}
-            placeholder="Search..."
+            placeholder={t("Search")}
             className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
           />
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">

@@ -1,0 +1,48 @@
+{
+  "page": {
+    "title": "MY BAG",
+    "itemCount_one": "({{count}} item)",
+    "itemCount_other": "({{count}} items)",
+    "addItems": "Add Items"
+  },
+  "summary": {
+    "couponTitle": "Enter an active coupon code to apply:",
+    "dynamicDiscount": "DYNAMIC DISCOUNTS ACTIVE",
+    "couponPlaceholder": "Enter discount code",
+    "apply": "Apply",
+    "applied": "Applied",
+    "subtotal": "Subtotal",
+    "discount": "Discount ({{code}})",
+    "estimatedShipping": "Estimated Shipping",
+    "estimatedTaxes": "Estimated Taxes",
+    "calculatedAtCheckout": "Calculated at Checkout",
+    "total": "Total",
+    "checkout": "Proceed to Checkout"
+  },
+  "bagItem": {
+    "remove": "Remove {{title}} from bag",
+    "size": "Size",
+    "color": "Color",
+    "lineTotal": "Line total",
+    "off": "{{discount}}% OFF"
+  },
+  "empty": {
+    "title": "Your bag is empty",
+    "description": "Add a few pieces you love and they'll show up here with editable quantities, discount codes, and checkout totals.",
+    "button": "Browse Products"
+  },
+  "favorites": {
+    "favorites": "Favorites",
+    "recentlyViewed": "Recently Viewed",
+    "emptyRecent": "No recently viewed items yet."
+  },
+  "toast": {
+    "enterCoupon": "Enter a discount code first",
+    "couponNotApplicable": "This coupon code does not apply to any items in your bag",
+    "couponApplied": "Discount code applied successfully",
+    "invalidCoupon": "Invalid coupon code",
+    "emptyBag": "Your bag is empty",
+    "checkout": "Taking you to checkout",
+    "removed": "{{title}} removed from bag"
+  }
+}

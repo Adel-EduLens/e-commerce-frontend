@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useOutletContext } from "react-router-dom";
 import type { AccountLayoutContext } from "../layouts/AccountLayout";
 import { useAuthStore } from "../store/useAuthStore";
+import { useTranslation } from "react-i18next";
 
 type ContactForm = {
   name: string;
@@ -160,32 +161,51 @@ function AddressCard({
   onDelete: () => void;
   onDraftChange: (value: AddressItem) => void;
 }) {
+  const { t } = useTranslation("contact");
   return (
     <div className="flex w-full max-w-xl flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
       <div className="inline-flex w-full items-center justify-between">
         <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
-          {isEditing ? "Editing Address" : address.label}
+          {isEditing ? t("Editing Address") : t(address.label)}
         </div>
         <div className="inline-flex items-center justify-start gap-1">
           {isEditing ? (
             <>
-              <IconButton icon={Check} label="Save address" tone="success" onClick={onSave} />
-              <IconButton icon={X} label="Cancel address" onClick={onCancel} />
+              <IconButton
+                icon={Check}
+                label={t("Save address")}
+                tone="success"
+                onClick={onSave}
+              />
+              <IconButton
+                icon={X}
+                label={t("Cancel address")}
+                onClick={onCancel}
+              />
             </>
           ) : (
-            <IconButton icon={PenLine} label="Edit address" onClick={onEdit} />
+            <IconButton
+              icon={PenLine}
+              label={t("Edit address")}
+              onClick={onEdit}
+            />
           )}
-          <IconButton icon={Trash2} label="Delete address" tone="danger" onClick={onDelete} />
+          <IconButton
+            icon={Trash2}
+            label={t("Delete address")}
+            tone="danger"
+            onClick={onDelete}
+          />
         </div>
       </div>
       <DetailField
-        label="Label"
+        label={t("Label")}
         value={isEditing ? draft.label : address.label}
         isEditing={isEditing}
         onChange={(value) => onDraftChange({ ...draft, label: value })}
       />
       <DetailField
-        label="Address"
+        label={t("Address")}
         value={isEditing ? draft.value : address.value}
         isEditing={isEditing}
         onChange={(value) => onDraftChange({ ...draft, value })}
@@ -195,6 +215,7 @@ function AddressCard({
 }
 
 export default function ContactDetailsPage() {
+  const { t } = useTranslation("contact");
   const { setFooterConfig } = useOutletContext<AccountLayoutContext>();
   const { user, updateUser } = useAuthStore();
   const [contactDetails, setContactDetails] = useState<ContactForm>({
@@ -203,7 +224,8 @@ export default function ContactDetailsPage() {
     phone: String(user?.phone ?? "+201024941663"),
   });
   const [contactDraft, setContactDraft] = useState<ContactForm>(contactDetails);
-  const [addresses, setAddresses] = useState<AddressItem[]>(loadStoredAddresses);
+  const [addresses, setAddresses] =
+    useState<AddressItem[]>(loadStoredAddresses);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [addressDraft, setAddressDraft] = useState<AddressItem>({
     id: "",
@@ -230,7 +252,10 @@ export default function ContactDetailsPage() {
     window.localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(addresses));
   }, [addresses]);
 
-  const footerTop = useMemo(() => 970 + Math.max(addresses.length - 2, 0) * 210, [addresses.length]);
+  const footerTop = useMemo(
+    () => 970 + Math.max(addresses.length - 2, 0) * 210,
+    [addresses.length],
+  );
 
   useEffect(() => {
     setFooterConfig({
@@ -254,12 +279,12 @@ export default function ContactDetailsPage() {
     const trimmedPhone = contactDraft.phone.trim();
 
     if (!trimmedName || !trimmedEmail || !trimmedPhone) {
-      toast.error("Please complete all contact details");
+      toast.error(t("Please complete all contact details"));
       return;
     }
 
     if (!trimmedEmail.includes("@")) {
-      toast.error("Please enter a valid email address");
+      toast.error(t("Please enter a valid email address"));
       return;
     }
 
@@ -281,7 +306,7 @@ export default function ContactDetailsPage() {
       });
     }
 
-    toast.success("Contact details updated");
+    toast.success(t("Contact details updated"));
   };
 
   const handleStartEditingAddress = (address: AddressItem) => {
@@ -299,7 +324,7 @@ export default function ContactDetailsPage() {
     const trimmedValue = addressDraft.value.trim();
 
     if (!trimmedLabel || !trimmedValue) {
-      toast.error("Please complete the address label and value");
+      toast.error(t("Please complete the address label and value"));
       return;
     }
 
@@ -312,30 +337,30 @@ export default function ContactDetailsPage() {
 
     setAddresses((currentAddresses) =>
       currentAddresses.map((address) =>
-        address.id === addressId ? nextAddress : address
-      )
+        address.id === addressId ? nextAddress : address,
+      ),
     );
     handleCancelEditingAddress();
-    toast.success("Address updated");
+    toast.success(t("Address updated"));
   };
 
   const handleDeleteAddress = (addressId: string) => {
     setAddresses((currentAddresses) =>
-      currentAddresses.filter((address) => address.id !== addressId)
+      currentAddresses.filter((address) => address.id !== addressId),
     );
 
     if (editingAddressId === addressId) {
       handleCancelEditingAddress();
     }
 
-    toast.success("Address removed");
+    toast.success(t("Address removed"));
   };
 
   const handleAddAddress = () => {
     const nextId = `address-${Date.now()}`;
     const nextAddress = {
       id: nextId,
-      label: "New Address",
+      label: t("New Address"),
       value: "",
     };
 
@@ -350,27 +375,33 @@ export default function ContactDetailsPage() {
 
   return (
     <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-8">
-      <SectionHeader title="CONTACT DETAILS" icon={PenLine} />
+      <SectionHeader title={t("CONTACT DETAILS")} icon={PenLine} />
       <div className="flex self-stretch flex-col items-start justify-start gap-6">
         <DetailField
-          label="Name"
+          label={t("Name")}
           value={contactDraft.name}
           isEditing
-          onChange={(value) => setContactDraft((current) => ({ ...current, name: value }))}
+          onChange={(value) =>
+            setContactDraft((current) => ({ ...current, name: value }))
+          }
         />
         <DetailField
-          label="Email"
+          label={t("Email")}
           value={contactDraft.email}
           type="email"
           isEditing
-          onChange={(value) => setContactDraft((current) => ({ ...current, email: value }))}
+          onChange={(value) =>
+            setContactDraft((current) => ({ ...current, email: value }))
+          }
         />
         <DetailField
-          label="Phone Number"
+          label={t("Phone Number")}
           value={contactDraft.phone}
           type="tel"
           isEditing
-          onChange={(value) => setContactDraft((current) => ({ ...current, phone: value }))}
+          onChange={(value) =>
+            setContactDraft((current) => ({ ...current, phone: value }))
+          }
         />
         <div className="inline-flex items-center justify-start gap-4">
           <button
@@ -380,7 +411,7 @@ export default function ContactDetailsPage() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Check className="h-5 w-5" strokeWidth={2} />
-            Save Changes
+            {t("Save Changes")}
           </button>
           <button
             type="button"
@@ -389,7 +420,7 @@ export default function ContactDetailsPage() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="h-5 w-5" strokeWidth={2} />
-            Reset
+            {t("Reset")}
           </button>
         </div>
         <button
@@ -404,18 +435,18 @@ export default function ContactDetailsPage() {
             />
           </div>
           <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
-            Reset your password
+            {t("Reset your password")}
           </div>
         </button>
       </div>
-      <SectionHeader title="ADDRESSES" icon={Plus}>
+      <SectionHeader title={t("ADDRESSES")} icon={Plus}>
         <button
           type="button"
           onClick={handleAddAddress}
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#BBFF63] px-4 py-2 font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]"
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
-          Add Address
+          {t("Add Address")}
         </button>
       </SectionHeader>
       <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-6">

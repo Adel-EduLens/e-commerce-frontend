@@ -1,0 +1,35 @@
+{
+  "CONTACT DETAILS": "بيانات التواصل",
+  "ADDRESSES": "العناوين",
+
+  "Name": "الاسم",
+  "Email": "البريد الإلكتروني",
+  "Phone Number": "رقم الهاتف",
+
+  "Save Changes": "حفظ التغييرات",
+  "Reset": "إعادة تعيين",
+  "Reset your password": "إعادة تعيين كلمة المرور",
+
+  "Add Address": "إضافة عنوان",
+  "Editing Address": "تعديل العنوان",
+  "Label": "الاسم",
+  "Address": "العنوان",
+
+  "Home": "المنزل",
+  "Work": "العمل",
+  "New Address": "عنوان جديد",
+
+  "Save address": "حفظ العنوان",
+  "Cancel address": "إلغاء",
+  "Edit address": "تعديل العنوان",
+  "Delete address": "حذف العنوان",
+
+  "Please complete all contact details": "يرجى إدخال جميع بيانات التواصل",
+  "Please enter a valid email address": "يرجى إدخال بريد إلكتروني صحيح",
+  "Contact details updated": "تم تحديث بيانات التواصل",
+
+  "Please complete the address label and value": "يرجى إدخال اسم العنوان والعنوان بالكامل",
+  "Address updated": "تم تحديث العنوان",
+  "Address removed": "تم حذف العنوان"
+
+}

@@ -1,0 +1,48 @@
+{
+  "page": {
+    "title": "سلة التسوق",
+    "itemCount_one": "(منتج واحد)",
+    "itemCount_other": "({{count}} منتجات)",
+    "addItems": "إضافة منتجات"
+  },
+  "summary": {
+    "couponTitle": "أدخل كود خصم صالح:",
+    "dynamicDiscount": "توجد خصومات مفعلة",
+    "couponPlaceholder": "أدخل كود الخصم",
+    "apply": "تطبيق",
+    "applied": "تم التطبيق",
+    "subtotal": "الإجمالي الفرعي",
+    "discount": "الخصم ({{code}})",
+    "estimatedShipping": "الشحن المتوقع",
+    "estimatedTaxes": "الضرائب المتوقعة",
+    "calculatedAtCheckout": "يتم احتسابها عند الدفع",
+    "total": "الإجمالي",
+    "checkout": "إتمام الطلب"
+  },
+  "bagItem": {
+    "remove": "إزالة {{title}} من السلة",
+    "size": "المقاس",
+    "color": "اللون",
+    "lineTotal": "إجمالي المنتج",
+    "off": "خصم {{discount}}%"
+  },
+  "empty": {
+    "title": "سلة التسوق فارغة",
+    "description": "أضف المنتجات التي تعجبك وستظهر هنا مع إمكانية تعديل الكمية وتطبيق أكواد الخصم ومراجعة الإجمالي.",
+    "button": "تصفح المنتجات"
+  },
+  "favorites": {
+    "favorites": "المفضلة",
+    "recentlyViewed": "شوهدت مؤخراً",
+    "emptyRecent": "لا توجد منتجات تمت مشاهدتها مؤخراً."
+  },
+  "toast": {
+    "enterCoupon": "أدخل كود الخصم أولاً",
+    "couponNotApplicable": "كود الخصم لا ينطبق على أي منتج في السلة",
+    "couponApplied": "تم تطبيق كود الخصم بنجاح",
+    "invalidCoupon": "كود الخصم غير صالح",
+    "emptyBag": "سلة التسوق فارغة",
+    "checkout": "جارٍ الانتقال إلى صفحة الدفع",
+    "removed": "تمت إزالة {{title}} من السلة"
+  }
+}
