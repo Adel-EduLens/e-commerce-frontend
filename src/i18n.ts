@@ -55,6 +55,9 @@ import productDetailsAr from "./locales/ar/product-details.json";
 
 import reviewFormEn from "./locales/en/reviewForm.json";
 import reviewFormAr from "./locales/ar/reviewForm.json";
+
+import compareEn from "./locales/en/compare.json";
+import compareAr from "./locales/ar/compare.json";
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -79,6 +82,7 @@ i18n
         bag: bagEn,
         productDetails: productDetailsEn,
         reviewForm: reviewFormEn,
+        compare: compareEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -99,6 +103,7 @@ i18n
         bag: bagAr,
         productDetails: productDetailsAr,
         reviewForm: reviewFormAr,
+        compare: compareAr,
       },
     },
 

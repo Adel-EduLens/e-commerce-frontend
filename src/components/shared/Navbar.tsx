@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useCartStore } from '../../store/useCartStore'
 import { useTranslation } from 'react-i18next'
 import { asset } from '../../lib/utils';
-
+import { MdCompare } from "react-icons/md";
+import { Scale } from 'lucide-react';
 const navLinks = [
   { label: 'home', path: '/' },
   { label: 'shop', path: '/products' },
@@ -88,6 +89,9 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
+            <Link to="/compare" className="hidden sm:block">
+              <Scale className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" />
+            </Link>
             <Link to="/favorites" className="hidden sm:block">
               <Heart className="h-6 w-6 lg:h-8 lg:w-8 text-foreground hover:text-primary transition-colors" strokeWidth={1.5} />
             </Link>
@@ -148,6 +152,10 @@ export default function Navbar() {
             )
           })}
           <div className="flex items-center gap-4 border-t border-stroke pt-3 sm:hidden">
+            <Link to="/compare" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">
+              <MdCompare className="h-5 w-5"  />
+              <span className="font-['Montserrat'] text-sm font-medium">Compare</span>
+            </Link>
             <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">
               <Heart className="h-5 w-5" strokeWidth={1.5} />
               <span className="font-['Montserrat'] text-sm font-medium">Favorites</span>

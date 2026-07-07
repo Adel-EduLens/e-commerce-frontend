@@ -13,6 +13,12 @@ import { Modal } from "../ui/modal";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
 
+import { Scale } from "lucide-react";
+import {
+  addCompareProduct,
+  removeCompareProduct,
+  isProductCompared,
+} from "../../utils/compareStorage";
 type ProductInfoPanelProps = {
   selectedColor: string;
   setSelectedColor: (color: string) => void;
@@ -38,6 +44,13 @@ export function ProductInfoPanel({
 
   const { t } = useTranslation("productDetails");
 
+  const [isCompared, setIsCompared] = useState(false);
+  useEffect(() => {
+    const func = async () => {
+      setIsCompared(isProductCompared(item.id));
+    };
+    func();
+  }, [item.id]);
   useEffect(() => {
     const func = async () => {
       if (item.sizes.length > 0) {
@@ -105,7 +118,22 @@ export function ProductInfoPanel({
     toast.success(t("checkout"));
     navigate("/checkout");
   };
+  const handleCompare = () => {
+    try {
+      if (isCompared) {
+        removeCompareProduct(item.id);
+        setIsCompared(false);
+        toast.success("Removed from compare");
+        return;
+      }
 
+      addCompareProduct(item.id);
+      setIsCompared(true);
+      toast.success("Added to compare");
+    } catch {
+      toast.error("You can compare up to 4 products.");
+    }
+  };
   const description = item.description ?? "";
 
   return (
@@ -193,7 +221,7 @@ export function ProductInfoPanel({
                   type="button"
                   onClick={() => setSelectedColor(color.color)}
                   className="relative h-6 w-6"
-                  aria-label={`Select ${color.color} color`} 
+                  aria-label={`Select ${color.color} color`}
                 >
                   <div
                     className="absolute left-0 top-0 h-6 w-6 rounded-full border"
@@ -281,7 +309,7 @@ export function ProductInfoPanel({
         </div>
       </div>
       {/* CTAs */}
-      <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-start gap-3 sm:gap-4">
+      <div className="flex  w-full flex-wrap items-center justify-start gap-3 sm:gap-4">
         <button
           type="button"
           onClick={handleToggleFavorite}
@@ -295,6 +323,21 @@ export function ProductInfoPanel({
 
           <span className="font-['Montserrat'] text-sm  font-semibold text-foreground sm:text-base">
             {t("addToFavorite")}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={handleCompare}
+          className={`flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl px-3 py-3 outline outline-1 outline-offset-[-1px] transition-all sm:px-4 sm:py-4 ${
+            isCompared
+              ? "bg-primary text-primary-foreground outline-primary"
+              : "bg-card text-foreground outline-stroke hover:bg-primary hover:text-primary-foreground"
+          }`}
+        >
+          <Scale className="h-6 w-6" strokeWidth={2} />
+
+          <span className="font-['Montserrat'] text-sm font-semibold sm:text-base">
+            {isCompared ? t("removeFromCompare") : t("addToCompare")}
           </span>
         </button>
 

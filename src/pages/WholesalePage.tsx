@@ -235,6 +235,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                 filtered.map((item) => (
                   <ProductCard
                     key={item.id}
+                    productId={item.id}
                     title={item.name}
                     price={`$${item.price}`}
                     imageSrc={item.images[0]?.url}

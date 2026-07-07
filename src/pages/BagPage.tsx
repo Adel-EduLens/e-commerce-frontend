@@ -394,6 +394,7 @@ function FavoritesSection({
             return (
               <ProductCard
                 key={`${selectedTab}-${product.id || index}-${title}`}
+                productId={product.id?.toString()}
                 title={title}
                 sizeLabel={sizeLabel}
                 price={price}

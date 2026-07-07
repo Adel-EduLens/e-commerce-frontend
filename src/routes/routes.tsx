@@ -53,6 +53,8 @@ import ProductsPage from "../pages/ProductsPage";
 import RetailPage from "../pages/RetailPage";
 import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
 
+import ComparePage from "../pages/ComparePage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -91,6 +93,14 @@ export const router = createBrowserRouter([
         element: (
           <UserLayout>
             <ProductsPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "compare",
+        element: (
+          <UserLayout>
+            <ComparePage />
           </UserLayout>
         ),
       },
@@ -263,7 +273,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'dashboard/trader',
+        path: "dashboard/trader",
         element: (
           <ProtectedRoute allowedRoles={["trader"]}>
             <TraderLayout />

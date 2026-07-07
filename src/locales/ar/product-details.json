@@ -75,5 +75,8 @@
   "lowestRating": "الأقل تقييمًا",
 
   "viewAll": "عرض الكل",
-  "viewLess": "عرض أقل"
+  "viewLess": "عرض أقل",
+
+  "addToCompare": "أضف إلى المقارنة",
+  "removeFromCompare": "أزل من المقارنة"
 }

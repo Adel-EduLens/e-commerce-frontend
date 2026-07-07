@@ -1,0 +1,27 @@
+{
+  "header": {
+    "title": "Compare Products",
+    "comparing": "Comparing",
+    "product": "product",
+    "products": "products",
+    "clear": "Clear Comparison"
+  },
+  "empty": {
+    "title": "No Products Selected",
+    "description": "Start adding products to compare their price, rating, sizes, colors, brands and more.",
+    "button": "Browse Products"
+  },
+  "card": {
+    "mustHave": "Must Have",
+    "flashDeal": "Flash Deal",
+    "brand": "Brand",
+    "category": "Category",
+    "colors": "Colors",
+    "sizes": "Sizes",
+    "description": "Description",
+    "noDescription": "No description available.",
+    "viewProduct": "View Product",
+    "remove": "Remove",
+    "noData": "—"
+  }
+}

@@ -143,6 +143,7 @@ export default function ProductsPage() {
             <ProductCard
               key={product.id}
               title={product.name}
+              productId={product.id}
               price={`$${product.price}`}
               imageSrc={product.images[0]?.url}
               sizeLabel={product.sizes.map((size) => size.size).join(" - ")}

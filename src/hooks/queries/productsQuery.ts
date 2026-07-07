@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery ,useQueries } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 
 export interface Product {
@@ -120,5 +120,15 @@ export const useProductFilters = () => {
   return useQuery({
     queryKey: ["products", "filters"],
     queryFn: getProductFilters,
+  });
+};
+
+export const useCompareProducts = (ids: string[]) => {
+  return useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["product", id],
+      queryFn: () => getProduct(id),
+      enabled: !!id,
+    })),
   });
 };

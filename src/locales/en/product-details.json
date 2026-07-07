@@ -75,5 +75,8 @@
   "lowestRating": "Lowest Rating",
 
   "viewAll": "View All",
-  "viewLess": "View Less"
+  "viewLess": "View Less",
+
+  "addToCompare": "Add to Compare",
+  "removeFromCompare": "Remove from Compare"
 }
