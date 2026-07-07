@@ -5,7 +5,6 @@ import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
 import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
-import { buildPriceRanges, matchesPriceRange } from '../utils/priceRanges'
 import { asset } from '../lib/utils';
 
 function AssetImage({
@@ -203,13 +202,10 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
 
   const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
-  const priceRanges = useMemo(() => buildPriceRanges(products.map((p) => p.price)), [products])
-
   const filterConfigs = useMemo(() => [
     { key: 'category', label: 'Category', options: allCategories },
     { key: 'brand', label: 'Brand', options: allBrands },
-    ...(priceRanges.length > 1 ? [{ key: 'price', label: 'Price', options: priceRanges }] : []),
-  ], [allCategories, allBrands, priceRanges])
+  ], [allCategories, allBrands])
 
   const handleFilter = useCallback((f: FilterValues) => setFilterState(f), [])
 
@@ -217,7 +213,8 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
     return products.filter((item) => {
       if (filterState.search && !item.name.toLowerCase().includes(filterState.search.toLowerCase())) return false
       if (filterState.category && item.category.name !== filterState.category) return false
-      if (filterState.price && !matchesPriceRange(item.price, filterState.price)) return false
+      if (filterState.priceMin !== null && item.price < Number(filterState.priceMin)) return false
+      if (filterState.priceMax !== null && item.price > Number(filterState.priceMax)) return false
       return true
     })
   }, [products, filterState])
