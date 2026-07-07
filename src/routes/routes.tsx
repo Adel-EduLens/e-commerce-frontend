@@ -50,6 +50,8 @@ import AdminDesignPage from "../pages/admin/AdminDesignPage";
 import TraderLoginPage from "../pages/TraderLoginPage";
 
 import ProductsPage from "../pages/ProductsPage";
+import RetailPage from "../pages/RetailPage";
+import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -89,6 +91,22 @@ export const router = createBrowserRouter([
         element: (
           <UserLayout>
             <ProductsPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "retail",
+        element: (
+          <UserLayout>
+            <RetailPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "retail/:slug",
+        element: (
+          <UserLayout>
+            <RetailProductDetailsPage />
           </UserLayout>
         ),
       },
