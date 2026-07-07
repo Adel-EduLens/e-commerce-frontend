@@ -10,6 +10,7 @@ import { ReviewsSection } from "../components/product/ReviewsSection";
 import { RecommedProducts } from "../components/product/recommedProducts";
 import { useReviews } from "../hooks/queries/reviewQuery";
 import type { DetailItem } from "../types/DetailItem";
+import { useTranslation } from "react-i18next";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
@@ -18,6 +19,8 @@ export default function ProductDetailsPage() {
   const addSignal = useRecommendationStore((s) => s.addSignal);
 
   const [selectedColor, setSelectedColor] = useState("");
+
+  const {t} = useTranslation("productDetails");
 
 
   useEffect(() => {
@@ -33,12 +36,12 @@ export default function ProductDetailsPage() {
     if (product) {
       addSignal(product.id, product.categoryId, "view");
     }
-  }, [product?.id]);
+  }, [addSignal, product, product?.id]);
 
 
-  if (isPending) return <div className="p-10 text-center">Loading...</div>;
+  if (isPending) return <div className="p-10 text-center">{t("loading")}</div>;
   if (isError || !product)
-    return <div className="p-10 text-center">Product not found.</div>;
+    return <div className="p-10 text-center">{t("productNotFound")}</div>;
 
   const item: DetailItem = {
     ...product,
@@ -50,7 +53,7 @@ export default function ProductDetailsPage() {
     <div className="w-full bg-background">
       <div className="mx-auto flex w-full max-w-[1428px] flex-col gap-12 px-4 py-6 sm:px-6 sm:py-8 lg:gap-20 lg:px-8 lg:py-10">
         <div className="font-['Montserrat'] text-sm font-normal text-gray-text sm:text-base">
-          Home / {product.category.name} / {product.name}
+          {t("home")} / {product.category.name} / {product.name}
         </div>
 
         <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">

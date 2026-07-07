@@ -1,0 +1,16 @@
+{
+  "editYourReview": "تعديل تقييمك",
+  "writeReview": "اكتب تقييمًا",
+
+  "shareThoughts": "شارك رأيك حول هذا المنتج (اختياري)",
+
+  "cancel": "إلغاء",
+
+  "saving": "جارٍ الحفظ...",
+
+  "saveChanges": "حفظ التعديلات",
+
+  "submitReview": "إرسال التقييم",
+
+  "stars": "{{count}} نجوم"
+}
