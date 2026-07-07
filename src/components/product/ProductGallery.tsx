@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowCircle } from "./ui/ArrowCircle";
 import type { DetailItem } from "../../types/DetailItem";
+import { useTranslation } from "react-i18next";
 
 type ProductGalleryProps = {
   selectedColor: string;
@@ -11,6 +12,8 @@ export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const images = item.images;
+
+  const {t} = useTranslation("productDetails");
 
   useEffect(() => {
     const func = async () => {
@@ -64,7 +67,7 @@ export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
                     ? "outline-foreground"
                     : "outline-stroke"
                 }`}
-                aria-label={`Open product image ${index + 1}`}
+                aria-label={t("openProductImage", { number: index + 1 })}
               >
                 <img
                   src={image.url}
@@ -78,7 +81,7 @@ export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
             <button
               type="button"
               onClick={() => handleGalleryStep("previous")}
-              aria-label="Previous image"
+              aria-label={t("previousImage")}
             >
               <ArrowCircle direction="next" />
             </button>
@@ -86,7 +89,7 @@ export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
             <button
               type="button"
               onClick={() => handleGalleryStep("next")}
-              aria-label="Next image"
+              aria-label={t("nextImage")}
             >
               <ArrowCircle direction="prev" />
             </button>

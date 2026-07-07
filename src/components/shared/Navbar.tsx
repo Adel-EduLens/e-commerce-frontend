@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'home', path: '/' },
   { label: 'shop', path: '/products' },
   { label: 'wholesale', path: '/wholesale' },
+  { label: 'retail', path: '/retail' },
   { label: 'designLab', path: '/design-lab' },
   { label: 'dropshipping', path: '/dropshipping' },
 ]

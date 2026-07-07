@@ -11,6 +11,7 @@ import { useCartStore } from "../../store/useCartStore";
 import { ArrowCircle } from "./ui/ArrowCircle";
 import { Modal } from "../ui/modal";
 import type { DetailItem } from "../../types/DetailItem";
+import { useTranslation } from "react-i18next";
 
 type ProductInfoPanelProps = {
   selectedColor: string;
@@ -35,6 +36,8 @@ export function ProductInfoPanel({
   const [isFavorite, setIsFavorite] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
+  const { t } = useTranslation("productDetails");
+
   useEffect(() => {
     const func = async () => {
       if (item.sizes.length > 0) {
@@ -54,18 +57,14 @@ export function ProductInfoPanel({
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success("Product link copied to clipboard");
+      toast.success(t("copiedLink"));
     } catch {
-      toast.error("Unable to copy the product link");
+      toast.error(t("copyFailed"));
     }
   };
 
   const handleToggleFavorite = () => {
-    toast.success(
-      isFavorite
-        ? "Added to favorites Coming soon"
-        : "Removed from favorites Coming soon",
-    );
+    toast.success(isFavorite ? t("favoriteRemoved") : t("favoriteAdded"));
     setIsFavorite((current) => {
       const next = !current;
       return next;
@@ -94,14 +93,16 @@ export function ProductInfoPanel({
     });
 
     toast.success(
-      `${quantity} item${
-        quantity > 1 ? "s" : ""
-      } added to bag (${selectedSize}, ${selectedColor})`,
+      t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
+        count: quantity,
+        size: selectedSize,
+        color: selectedColor,
+      }),
     );
   };
 
   const handleBuyNow = () => {
-    toast.success("Taking you to checkout");
+    toast.success(t("checkout"));
     navigate("/checkout");
   };
 
@@ -123,7 +124,7 @@ export function ProductInfoPanel({
             onClick={() => setIsDescriptionExpanded((prev) => !prev)}
             className="font-semibold text-foreground"
           >
-            {isDescriptionExpanded ? "Show Less" : "Read More"}
+            {isDescriptionExpanded ? t("showLess") : t("readMore")}
           </button>
         </p>
       )}
@@ -156,7 +157,7 @@ export function ProductInfoPanel({
           </div>
 
           <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-            {reviewCount} Reviews
+            {reviewCount} {t("reviews")}
           </div>
         </div>
 
@@ -168,7 +169,7 @@ export function ProductInfoPanel({
           <RiShareForwardLine className="h-6 w-6 fill-foreground text-foreground" />
 
           <div className="font-['Montserrat'] text-base font-medium text-foreground">
-            Share
+            {t("share")}
           </div>
         </button>
       </div>
@@ -177,7 +178,7 @@ export function ProductInfoPanel({
       {item.colors.length > 0 && (
         <div className="flex flex-col items-start justify-start gap-2">
           <div className="font-['Montserrat'] text-lg text-foreground sm:text-xl">
-            <span className="font-medium text-gray-text">Color:</span>{" "}
+            <span className="font-medium text-gray-text">{t("color")}:</span>{" "}
             <span className="font-normal text-foreground">{selectedColor}</span>
           </div>
 
@@ -192,7 +193,7 @@ export function ProductInfoPanel({
                   type="button"
                   onClick={() => setSelectedColor(color.color)}
                   className="relative h-6 w-6"
-                  aria-label={`Select ${color.color} color`}
+                  aria-label={`Select ${color.color} color`} 
                 >
                   <div
                     className="absolute left-0 top-0 h-6 w-6 rounded-full border"
@@ -214,7 +215,7 @@ export function ProductInfoPanel({
       {item.sizes.length > 0 && (
         <div className="flex w-full flex-wrap items-start justify-start gap-x-10 gap-y-2 sm:gap-x-[167px]">
           <div className="font-['Montserrat'] text-lg text-foreground sm:text-xl">
-            <span className="font-medium text-gray-text">Size:</span>{" "}
+            <span className="font-medium text-gray-text">{t("size")}:</span>{" "}
             <span className="font-normal text-foreground">{selectedSize}</span>
           </div>
 
@@ -224,7 +225,7 @@ export function ProductInfoPanel({
               onClick={() => setIsSizeGuideOpen(true)}
               className="font-['Montserrat'] text-base font-medium text-gray-text underline"
             >
-              Size Guide
+              {t("sizeGuide")}
             </button>
           )}
 
@@ -250,7 +251,7 @@ export function ProductInfoPanel({
       {/* Quantity */}
       <div className="flex flex-col items-start justify-start gap-2">
         <div className="font-['Montserrat'] text-lg font-medium text-gray-text sm:text-xl">
-          Quantity:
+          {t("quantity")}:
         </div>
 
         <div className="inline-flex items-center justify-start gap-4 rounded-3xl bg-gray-light p-2">
@@ -261,7 +262,7 @@ export function ProductInfoPanel({
                 Math.max(item.minOrder ?? 1, current - 1),
               )
             }
-            aria-label="Decrease quantity"
+            aria-label={t("decreaseQuantity")}
           >
             <ArrowCircle direction="prev" />
           </button>
@@ -273,7 +274,7 @@ export function ProductInfoPanel({
           <button
             type="button"
             onClick={() => setQuantity((current) => Math.min(10, current + 1))}
-            aria-label="Increase quantity"
+            aria-label={t("increaseQuantity")}
           >
             <ArrowCircle />
           </button>
@@ -293,7 +294,7 @@ export function ProductInfoPanel({
           />
 
           <span className="font-['Montserrat'] text-sm  font-semibold text-foreground sm:text-base">
-            Add to favorite
+            {t("addToFavorite")}
           </span>
         </button>
 
@@ -305,7 +306,7 @@ export function ProductInfoPanel({
           <BsBag className="h-6 w-6 text-foreground" fill="currentColor" />
 
           <span className="font-['Montserrat'] text-sm font-semibold text-foreground sm:text-base">
-            Add to Cart
+            {t("addToCart")}
           </span>
         </button>
 
@@ -315,7 +316,7 @@ export function ProductInfoPanel({
           className="flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl bg-primary px-3 py-3 sm:px-4 sm:py-4"
         >
           <span className="font-['Montserrat'] text-sm font-semibold text-foreground sm:text-base">
-            Buy Now
+            {t("buyNow")}
           </span>
         </button>
       </div>
@@ -330,13 +331,11 @@ export function ProductInfoPanel({
 
           <div className="font-['Montserrat'] text-sm font-medium leading-6">
             <span className="text-urgent">
-              Get it Tomorrow, 29th Sep,
+              {t("deliveryTitle")}
               <br />
             </span>
 
-            <span className="text-foreground">
-              Order within 3 Hours &amp; 26minutes
-            </span>
+            <span className="text-foreground">{t("deliverySubtitle")}</span>
           </div>
         </div>
 
@@ -344,7 +343,7 @@ export function ProductInfoPanel({
           <RotateCcw className="h-8 w-8 shrink-0 text-foreground" />
 
           <div className="font-['Poppins'] text-sm font-medium leading-6 text-foreground">
-            Free online returns within 14 days
+            {t("freeReturns")}
           </div>
         </div>
       </div>
@@ -362,7 +361,7 @@ export function ProductInfoPanel({
             />
           ) : (
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Size guide not available for this product.
+              {t("sizeGuideUnavailable")}
             </p>
           )}
         </Modal>

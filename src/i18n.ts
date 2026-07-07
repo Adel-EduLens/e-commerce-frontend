@@ -49,6 +49,12 @@ import helpCenterAr from "./locales/ar/help-center.json";
 
 import bagEn from "./locales/en/bag.json";
 import bagAr from "./locales/ar/bag.json";
+
+import productDetailsEn from "./locales/en/product-details.json";
+import productDetailsAr from "./locales/ar/product-details.json";
+
+import reviewFormEn from "./locales/en/reviewForm.json";
+import reviewFormAr from "./locales/ar/reviewForm.json";
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -71,6 +77,8 @@ i18n
         notify: notifyEn,
         helpCenter: helpCenterEn,
         bag: bagEn,
+        productDetails: productDetailsEn,
+        reviewForm: reviewFormEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -89,6 +97,8 @@ i18n
         notify: notifyAr,
         helpCenter: helpCenterAr,
         bag: bagAr,
+        productDetails: productDetailsAr,
+        reviewForm: reviewFormAr,
       },
     },
 

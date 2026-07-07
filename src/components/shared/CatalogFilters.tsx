@@ -162,7 +162,7 @@ export default function CatalogFilters({
   );
 
   const prevKeysRef = useRef("");
-  const currentKeys = filters.map((f) => f.key).join(",");
+  const currentKeys = (Array.isArray(filters) ? filters : []).map((f) => f.key).join(",");
   if (currentKeys !== prevKeysRef.current) {
     prevKeysRef.current = currentKeys;
   }

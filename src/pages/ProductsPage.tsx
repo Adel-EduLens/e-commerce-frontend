@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-
-
 import { ProductCard, CatalogFilters } from "../components/shared";
 import Pagination from "../components/shared/Pagination";
 import { useProducts } from "../hooks/queries/productsQuery";
@@ -15,8 +13,8 @@ import { useTranslation } from "react-i18next";
 const FILTER_LABELS: Record<string, string> = {
   "best-deal": "Best Deals",
   "most-popular": "Most Popular",
-  "premium": "Premium Collection",
-  "new": "New Arrivals",
+  premium: "Premium Collection",
+  new: "New Arrivals",
   "must-have": "This Season's Must-Haves",
   "flash-deals": "Flash Deals",
 };
@@ -26,11 +24,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   women: "Women",
 };
 
-
-
 export default function ProductsPage() {
   const { t } = useTranslation("productSection");
-
 
   const { filters: filter2 } = useHomeFilters();
 
@@ -45,7 +40,6 @@ export default function ProductsPage() {
   });
 
   const [searchParams] = useSearchParams();
-
 
   const urlCategoryName = searchParams.get("category") ?? "";
   const filter = searchParams.get("filter") ?? "";
@@ -87,8 +81,6 @@ export default function ProductsPage() {
     limit: 16,
   });
 
-
-
   useEffect(() => {
     const func = async () => {
       setPage(1);
@@ -120,7 +112,6 @@ export default function ProductsPage() {
 
     return "All Products";
   }, [filter, effectiveCategoryName]);
-
 
   if (isError) {
     return (

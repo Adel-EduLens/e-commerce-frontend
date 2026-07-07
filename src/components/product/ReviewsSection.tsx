@@ -7,6 +7,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 
 import { Star } from "../ui/star";
 import { ReviewForm } from "./ReviewForm";
+import { useTranslation } from "react-i18next";
 
 type ReviewFilterValue = "all" | "5" | "4" | "3" | "2" | "1";
 type ReviewSortValue = "newest" | "oldest" | "highest" | "lowest";
@@ -15,22 +16,22 @@ const FILTER_OPTIONS: {
   label: string;
   value: ReviewFilterValue;
 }[] = [
-  { label: "All Reviews", value: "all" },
-  { label: "5 Stars", value: "5" },
-  { label: "4 Stars", value: "4" },
-  { label: "3 Stars", value: "3" },
-  { label: "2 Stars", value: "2" },
-  { label: "1 Star", value: "1" },
+  { label: "allReviews", value: "all" },
+  { label: "fiveStars", value: "5" },
+  { label: "fourStars", value: "4" },
+  { label: "threeStars", value: "3" },
+  { label: "twoStars", value: "2" },
+  { label: "oneStar", value: "1" },
 ];
 
 const SORT_OPTIONS: {
   label: string;
   value: ReviewSortValue;
 }[] = [
-  { label: "Newest", value: "newest" },
-  { label: "Oldest", value: "oldest" },
-  { label: "Highest Rating", value: "highest" },
-  { label: "Lowest Rating", value: "lowest" },
+  { label: "newest", value: "newest" },
+  { label: "oldest", value: "oldest" },
+  { label: "highestRating", value: "highest" },
+  { label: "lowestRating", value: "lowest" },
 ];
 
 export function ReviewsSection() {
@@ -44,6 +45,8 @@ export function ReviewsSection() {
   const [showAllReviews, setShowAllReviews] = useState(false);
   const [helpfulReviewIds, setHelpfulReviewIds] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
+
+  const { t } = useTranslation("productDetails");
 
   const myReview = useMemo(
     () => reviews.find((review) => review.userId === Number(user?.id)),
@@ -169,11 +172,11 @@ export function ReviewsSection() {
   };
 
   if (isPending) {
-    return <div className="flex justify-center py-10">Loading...</div>;
+    return <div className="flex justify-center py-10">{t("loading")}</div>;
   }
   if (isError) {
     return (
-      <div className="flex justify-center py-10">Could not load reviews.</div>
+      <div className="flex justify-center py-10">{t("couldNotLoadReviews")}</div>
     );
   }
 
@@ -182,7 +185,7 @@ export function ReviewsSection() {
       <div className="flex w-full flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-center justify-start gap-4 sm:gap-6">
           <h2 className="font-['Montserrat'] text-3xl font-bold text-foreground sm:text-5xl">
-            Reviews
+            {t("reviews")}
           </h2>
 
           {reviews.length > 0 && (
@@ -214,7 +217,7 @@ export function ReviewsSection() {
             onClick={() => setShowForm(true)}
             className="rounded-2xl bg-primary px-5 py-3 font-['Montserrat'] text-base font-semibold text-foreground"
           >
-            {myReview ? "Edit Your Review" : "Write a Review"}
+            {myReview ? t("editYourReview") : t("writeReview")}
           </button>
         )}
       </div>
@@ -229,7 +232,7 @@ export function ReviewsSection() {
 
       {reviews.length === 0 && (
         <div className="flex w-full justify-center py-10">
-          No reviews found. Be the first to review this product!
+          {t("noReviews")}
         </div>
       )}
 
@@ -252,7 +255,7 @@ export function ReviewsSection() {
               >
                 {FILTER_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.label)}
                   </option>
                 ))}
               </select>
@@ -266,7 +269,7 @@ export function ReviewsSection() {
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {t(option.label)}
                   </option>
                 ))}
               </select>
