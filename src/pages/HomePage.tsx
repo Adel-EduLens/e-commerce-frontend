@@ -1,9 +1,11 @@
 
-import { useEffect, useState } from 'react'
+
+import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../store/useAuthStore'
+import { Link } from 'react-router-dom'
+
+
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 
@@ -459,18 +461,7 @@ function VoteSection() {
 
 
 export function HomePage() {
-  const navigate = useNavigate()
-  const { user, isAuthenticated } = useAuthStore()
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate('/login')
-    }
-  }, [isAuthenticated, user, navigate])
-
-  if (!isAuthenticated || !user) {
-    return null
-  }
 
   return (
     <div className="w-full overflow-hidden">

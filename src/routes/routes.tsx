@@ -283,11 +283,11 @@ export const router = createBrowserRouter([
             element: <TraderProductsPage />,
           },
           {
-            path: 'coupons',
+            path: "coupons",
             element: <TraderCouponsPage />,
           },
           {
-            path: 'customers',
+            path: "customers",
 
             element: <TraderCustomersPage />,
           },
@@ -342,11 +342,9 @@ export const router = createBrowserRouter([
       {
         path: "dropshipping",
         element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <DropshippingPage />
-            </UserLayout>
-          </ProtectedRoute>
+          <UserLayout>
+            <DropshippingPage />
+          </UserLayout>
         ),
       },
       {
@@ -362,15 +360,13 @@ export const router = createBrowserRouter([
       {
         path: "wholesale",
         element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <WholesalePage />
-            </UserLayout>
-          </ProtectedRoute>
+          <UserLayout>
+            <WholesalePage />
+          </UserLayout>
         ),
       },
       {
-        path: 'wholesale/:id',
+        path: "wholesale/:id",
         element: (
           <ProtectedRoute>
             <UserLayout>
@@ -380,7 +376,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'design-lab',
+        path: "design-lab",
         element: (
           <UserLayout>
             <DesignLabPage />

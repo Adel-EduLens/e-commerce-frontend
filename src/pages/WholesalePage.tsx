@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuthStore } from '../store/useAuthStore'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
@@ -261,9 +260,8 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
 }
 
 export default function WholesalePage() {
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { user, isAuthenticated } = useAuthStore()
+
 
   const categoryFilter = searchParams.get('category')
   const filterParam = searchParams.get('filter')
@@ -289,15 +287,6 @@ export default function WholesalePage() {
     window.scrollTo(0, 0)
   }, [categoryFilter, filterParam])
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate('/login')
-    }
-  }, [isAuthenticated, user, navigate])
-
-  if (!isAuthenticated || !user) {
-    return null
-  }
 
   if (categoryName || activeFilter) {
     return (

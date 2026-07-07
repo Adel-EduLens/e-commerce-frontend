@@ -43,6 +43,8 @@
     "invalidCoupon": "Invalid coupon code",
     "emptyBag": "Your bag is empty",
     "checkout": "Taking you to checkout",
-    "removed": "{{title}} removed from bag"
+    "removed": "{{title}} removed from bag",
+    "loginFirst": "Please login first",
+    "userRequired" : "Please login as a user"
   }
 }

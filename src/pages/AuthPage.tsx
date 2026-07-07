@@ -89,12 +89,13 @@ export default function AuthPage({ mode }: AuthPageProps) {
       const { token, user: loggedInUser } = response.data.data
       setAuth(loggedInUser, token)
       toast.success(t('toast.welcomeBack', { name: loggedInUser.name }))
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin");
       const dest =
         loggedInUser.role === 'trader'
           ? '/dashboard/trader'
           : loggedInUser.role === 'admin'
             ? '/dashboard/admin'
-            : '/'
+            : redirectPath || '/'
       console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role)
       navigate(dest, { replace: true })
     } catch (error) {
