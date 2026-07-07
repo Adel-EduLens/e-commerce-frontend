@@ -20,6 +20,8 @@ import accountSidebarAr from "./locales/ar/accountSidebar.json";
 import navbarEn from "./locales/en/navbar.json";
 import navbarAr from "./locales/ar/navbar.json";
 
+import footerEn from "./locales/en/footer.json";
+import footerAr from "./locales/ar/footer.json";
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -32,6 +34,7 @@ i18n
         accountSidebar: accountSidebarEn,
         navbar: navbarEn,
         translation: en,
+        footer: footerEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -40,6 +43,7 @@ i18n
         accountSidebar: accountSidebarAr,
         navbar: navbarAr,
         translation: ar,
+        footer: footerAr,
       },
     },
 
