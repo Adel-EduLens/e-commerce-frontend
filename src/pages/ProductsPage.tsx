@@ -32,7 +32,7 @@ export default function ProductsPage() {
   const { t } = useTranslation("productSection");
 
 
-  const filter2 = useHomeFilters();
+  const { filters: filter2 } = useHomeFilters();
 
   const [filters, setFilters] = useState<FilterValues>({
     search: "",
