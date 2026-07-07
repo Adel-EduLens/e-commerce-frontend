@@ -40,10 +40,10 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<PickedL
     const houseNumber = addr.house_number || "";
     const streetAddress = [houseNumber, road].filter(Boolean).join(" ");
 
-    return { 
-      city, 
-      area, 
-      streetAddress: streetAddress || "Unknown Street" 
+    return {
+      city,
+      area,
+      streetAddress: streetAddress || "Unknown Street"
     };
   } catch {
     // Reverse geocoding is best-effort; the pin itself is still captured either way.
@@ -137,11 +137,11 @@ export default function GoogleMapPicker({
         const lng = pos.coords.longitude;
         setPendingMarker([lat, lng]);
         mapRef.current?.flyTo([lat, lng], 15);
-        
+
         // Auto-fill checkout fields immediately
         const address = await reverseGeocode(lat, lng);
         onLocationPick({ lat, lng, ...address });
-        
+
         setIsLocating(false);
       },
       async (error) => {
@@ -163,7 +163,7 @@ export default function GoogleMapPicker({
                 const lng = data.longitude;
                 setPendingMarker([lat, lng]);
                 mapRef.current?.flyTo([lat, lng], 15);
-                
+
                 // Auto-fill checkout fields immediately
                 const address = await reverseGeocode(lat, lng);
                 onLocationPick({ lat, lng, ...address });
