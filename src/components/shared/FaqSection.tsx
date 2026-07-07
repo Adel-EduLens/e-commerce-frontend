@@ -1,5 +1,6 @@
 import CollapsibleFAQ from './CollapsibleFAQ'
 import { asset } from '../../lib/utils';
+import { usePublicFAQs } from '../../hooks/queries/faqQuery';
 
 function AssetImage({
   file,
@@ -16,7 +17,9 @@ function AssetImage({
 }
 
 function FaqSection() {
-  const faqs = [
+  const { data: apiFaqs, isLoading } = usePublicFAQs();
+
+  const faqs = apiFaqs && apiFaqs.length > 0 ? apiFaqs.slice(0, 4) : [
     {
       question: 'Can Cancel at any time ?',
       answer:
@@ -34,7 +37,7 @@ function FaqSection() {
       question: 'How can I contact support?',
       answer: 'You can contact us via email or live chat.',
     },
-  ]
+  ];
 
   return (
     <div className="mt-16 mb-16 flex w-full flex-col items-start justify-start gap-10">
