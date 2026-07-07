@@ -1,7 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
-import { useAuthStore } from "../store/useAuthStore";
 import { CollapsibleFAQ } from "../components/shared";
 
 const ds = (file: string) =>
@@ -291,22 +289,9 @@ function FAQSection() {
 /* --------------------------------- Page ------------------------------------- */
 
 export default function DropshippingPage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+
  
 
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, user, navigate]);
-
-
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
