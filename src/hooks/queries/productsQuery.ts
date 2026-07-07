@@ -103,3 +103,22 @@ export const useProduct = (id?: string) => {
     enabled: !!id,
   });
 };
+
+export interface ProductFilters {
+  categories: string[];
+  brands: string[];
+  sizes: string[];
+  colors: string[];
+}
+
+const getProductFilters = async (): Promise<ProductFilters> => {
+  const { data } = await api.get("/products/filters");
+  return data.data;
+};
+
+export const useProductFilters = () => {
+  return useQuery({
+    queryKey: ["products", "filters"],
+    queryFn: getProductFilters,
+  });
+};

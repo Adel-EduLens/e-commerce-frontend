@@ -84,14 +84,14 @@ function Panel({
 }) {
   return (
     <section
-      className={`rounded-[24px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5 ${className}`}
+      className={`rounded-[24px] border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5 ${className}`}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-['Montserrat'] text-lg font-semibold text-[#111827] sm:text-xl">
+        <h2 className="font-['Montserrat'] text-lg font-semibold text-foreground sm:text-xl">
           {title}
         </h2>
         {right ?? (action ? (
-          <button className="text-xs font-medium text-[#6B7280] transition hover:text-[#111827]">
+          <button className="text-xs font-medium text-gray-text transition hover:text-foreground">
             {action}
           </button>
         ) : null)}
@@ -121,7 +121,7 @@ function NetProfitChart() {
   return (
     <div className="space-y-2">
       <div className="grid gap-4 lg:grid-cols-[44px_minmax(0,1fr)]">
-        <div className="hidden flex-col justify-between pt-2 pb-8 font-['Montserrat'] text-sm font-medium text-[#111827] lg:flex">
+        <div className="hidden flex-col justify-between pt-2 pb-8 font-['Montserrat'] text-sm font-medium text-foreground lg:flex">
           <span>40K</span>
           <span>30K</span>
           <span>20K</span>
@@ -155,7 +155,7 @@ function NetProfitChart() {
               </g>
             ))}
           </svg>
-          <div className="mt-2 grid grid-cols-5 gap-2 font-['Montserrat'] text-sm font-medium text-[#111827] sm:grid-cols-10">
+          <div className="mt-2 grid grid-cols-5 gap-2 font-['Montserrat'] text-sm font-medium text-foreground sm:grid-cols-10">
             {profitTrendSeries.map((d) => (
               <span key={d.month} className="text-center">{d.month}</span>
             ))}
@@ -188,8 +188,8 @@ function OrdersDonut() {
           style={{ background: `conic-gradient(${stops})` }}
         >
           <div className="flex h-36 w-36 flex-col items-center justify-center rounded-full bg-white text-center">
-            <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">1,234</p>
-            <p className="mt-1 font-['Montserrat'] text-xs font-medium text-[#6B7280]">
+            <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">1,234</p>
+            <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">
               <span className="text-teal-500">↑ 8.5%</span> Total Orders
             </p>
           </div>
@@ -199,7 +199,7 @@ function OrdersDonut() {
         {orderStatus.map((seg) => (
           <div key={seg.label} className="flex items-center gap-2">
             <span className="h-3.5 w-3.5 shrink-0 rounded" style={{ backgroundColor: seg.color }} />
-            <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">
+            <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
               {seg.label} — {seg.share}%
             </span>
           </div>
@@ -214,14 +214,14 @@ function OrdersDonut() {
 export default function TraderAnalyticsPage() {
   const [search, setSearch] = useState("");
 
-  const rowBg = (i: number) => (i % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]");
+  const rowBg = (i: number) => (i % 2 === 0 ? "bg-white" : "bg-background");
 
   return (
     <>
       {/* Search + filters */}
           <div className="flex flex-wrap items-center gap-3">
             <label className="relative flex min-w-[280px] items-center">
-              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none">
+              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-gray-text" viewBox="0 0 24 24" fill="none">
                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5" />
               </svg>
               <input
@@ -229,15 +229,15 @@ export default function TraderAnalyticsPage() {
                 placeholder="Search customers"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                className="w-full rounded-2xl border border-stroke bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text focus:border-stroke"
               />
             </label>
             <button
               type="button"
-              className="flex h-11 items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+              className="flex h-11 items-center gap-1.5 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
             >
               Date Range
-              <svg className="h-4 w-4 text-[#6B7280]" viewBox="0 0 16 16" fill="none">
+              <svg className="h-4 w-4 text-gray-text" viewBox="0 0 16 16" fill="none">
                 <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
@@ -248,14 +248,14 @@ export default function TraderAnalyticsPage() {
             {summaryCards.map((card) => (
               <div
                 key={card.label}
-                className="rounded-[24px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]"
+                className="rounded-[24px] border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]"
               >
                 <div className="mb-5 flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.label}</p>
-                    <p className="mt-2 font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+                    <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
+                    <p className="mt-2 font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#BBFF63]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary">
                     <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                       <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                       <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
@@ -270,7 +270,7 @@ export default function TraderAnalyticsPage() {
                       <path d="M10 5v10M10 15l-4-4M10 15l4-4" stroke="#F43F5E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     )}
                   </svg>
-                  <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">
+                  <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
                     <span className={card.up ? "text-teal-500" : "text-rose-500"}>{card.delta}</span>{" "}
                     {card.note}
                   </p>
@@ -294,7 +294,7 @@ export default function TraderAnalyticsPage() {
                       <div className="w-5 bg-sky-300 rounded-t-lg" style={{ height: `${(d.profit / 40) * 100}%` }} />
                       <div className="w-5 bg-primary rounded-t-lg" style={{ height: `${(d.cogs / 40) * 100}%` }} />
                     </div>
-                    <span className="font-['Montserrat'] text-xs text-center font-medium text-[#111827]">{d.week}</span>
+                    <span className="font-['Montserrat'] text-xs text-center font-medium text-foreground">{d.week}</span>
                   </div>
                 ))}
               </div>
@@ -309,8 +309,8 @@ export default function TraderAnalyticsPage() {
               <div className="flex flex-col items-center gap-4">
                 <div className="relative flex h-48 w-48 items-center justify-center rounded-full border-[12px] border-primary border-r-sky-300">
                   <div className="text-center">
-                    <p className="font-['Montserrat'] text-xl font-semibold text-[#111827]">1,234</p>
-                    <p className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">Total Orders</p>
+                    <p className="font-['Montserrat'] text-xl font-semibold text-foreground">1,234</p>
+                    <p className="font-['Montserrat'] text-xs font-medium text-gray-text">Total Orders</p>
                   </div>
                 </div>
                 <div className="w-full text-sm font-medium">
@@ -332,7 +332,7 @@ export default function TraderAnalyticsPage() {
              <div className="overflow-x-auto">
                 <table className="min-w-full text-left font-['Montserrat'] text-xs font-medium">
                   <thead>
-                    <tr className="bg-[#111827] text-primary">
+                    <tr className="bg-secondary text-primary">
                       <th className="px-4 py-3 rounded-l-lg">Period</th>
                       <th className="px-4 py-3">Total Discounts</th>
                       <th className="px-4 py-3">Avg. Discount</th>
@@ -371,7 +371,7 @@ export default function TraderAnalyticsPage() {
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left font-['Montserrat'] text-xs font-medium">
                   <thead>
-                    <tr className="bg-[#111827] text-primary">
+                    <tr className="bg-secondary text-primary">
                       <th className="px-4 py-3 rounded-l-lg">Category</th>
                       <th className="px-4 py-3">Materials</th>
                       <th className="px-4 py-3">Labor</th>
@@ -426,7 +426,7 @@ export default function TraderAnalyticsPage() {
             <div className="overflow-x-auto">
               <table className="min-w-full text-left font-['Montserrat'] text-xs font-medium">
                 <thead>
-                  <tr className="bg-[#111827] text-primary">
+                  <tr className="bg-secondary text-primary">
                     <th className="px-4 py-3 rounded-l-lg">Category</th>
                     <th className="px-4 py-3">Current Stock</th>
                     <th className="px-4 py-3">Total Cost</th>

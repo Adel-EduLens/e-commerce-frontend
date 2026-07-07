@@ -12,6 +12,7 @@ import { loginSchema, type LoginFormValues } from '../schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '../lib/axios'
 import { useTranslation } from 'react-i18next'
+import { handleApiError } from '../lib/utils';
 
 function Toggle({
   checked,
@@ -68,9 +69,7 @@ const TraderLoginPage = () => {
       toast.success(t('toast.welcomeBack', { name: loggedInUser.name }))
       navigate('/dashboard/trader')
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>
-      const errMsg = err.response?.data?.message || t('toast.loginFailed')
-      toast.error(errMsg)
+      handleApiError(error, t('toast.loginFailed'))
     } finally {
       setIsLoading(false)
     }

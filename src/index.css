@@ -34,7 +34,7 @@
   --card: #ffffff;
   --stroke: #e0e0e0;
   --gray-light: #ededed;
-  --gray-text: #6b7280;
+  --gray-text: #555555;
   --shadow: #1e252d1a;
   --ink: #0f1115;
   --info: #87c3ff;
@@ -44,61 +44,25 @@
 }
 
 .dark {
+  --primary: #bbff63;
   --primary-foreground: #1a1a1a;
   --secondary: #ffffff;
   --secondary-foreground: #1a1a1a;
   --background: #0f1115;
   --foreground: #ffffff;
-  --card: #1c1b2e;
+  --card: #1c1f24;
   --stroke: #2a2d35;
   --gray-light: #1c1f24;
-  --gray-text: #9ca3af;
+  --gray-text: #bbbbbb;
   --shadow: #0000004d;
-}
-
-/* Dark mode text color overrides for section headers and other dark text */
-.dark .text-\[\#1A1A1A\],
-.dark .text-\[\#111827\] {
-  color: var(--foreground) !important;
-}
-
-.dark .text-\[\#6B7280\] {
-  color: var(--gray-text) !important;
-}
-
-/* Maintain contrast for dark text on explicitly light or accent backgrounds in dark mode */
-.dark .bg-primary.text-\[\#1A1A1A\],
-.dark .bg-primary .text-\[\#1A1A1A\],
-.dark .bg-\[\#BBFF63\].text-\[\#1A1A1A\],
-.dark .bg-\[\#BBFF63\] .text-\[\#1A1A1A\],
-.dark .bg-\[\#C4B5FD\].text-\[\#1A1A1A\],
-.dark .bg-\[\#C4B5FD\] .text-\[\#1A1A1A\] {
-  color: #1A1A1A !important;
+  --ink: #f9fafb;
+  --info: #87c3ff;
+  --urgent: #ef4444;
 }
 
 /* Dark mode layout and structural color overrides */
 .dark .bg-white {
   background-color: var(--card) !important;
-}
-
-.dark .bg-\[\#EDEDED\] {
-  background-color: var(--gray-light) !important;
-}
-
-.dark .bg-\[\#F9FAFB\] {
-  background-color: var(--background) !important;
-}
-
-.dark .bg-\[\#F5F7FA\] {
-  background-color: var(--background) !important;
-}
-
-.dark .outline-\[\#E0E0E0\],
-.dark .outline-\[\#EDEDED\],
-.dark .border-\[\#E5E7EB\],
-.dark .border-\[\#E0E0E0\] {
-  outline-color: var(--stroke) !important;
-  border-color: var(--stroke) !important;
 }
 
 * {
@@ -122,7 +86,7 @@ body {
 /* Custom Text Stroke for outline text */
 .text-outline {
   color: transparent;
-  -webkit-text-stroke: 2.5px #000000;
+  -webkit-text-stroke: 2.5px var(--foreground);
   paint-order: stroke fill;
 }
 
@@ -179,13 +143,12 @@ body {
 
 /* Invert black/dark SVG icons in dark mode for correct visibility */
 .dark img[src$=".svg"] {
-  filter: invert(1);
+  filter: brightness(0) invert(1);
 }
 
 /* Exclude colored SVGs, rating stars, active hearts, and those on explicitly dark/primary backgrounds from inversion */
 .dark .bg-primary img[src$=".svg"],
-.dark .bg-\[\#BBFF63\] img[src$=".svg"],
-.dark .bg-\[\#1A1A1A\] img[src$=".svg"],
+.dark .bg-secondary img[src$=".svg"],
 .dark .bg-black img[src$=".svg"],
 .dark img[src*="mdi_heart.svg"],
 .dark img[src*="star"] {

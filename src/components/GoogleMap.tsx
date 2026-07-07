@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect, useRef } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { LocateFixed, Search, Loader2 } from "lucide-react";
@@ -40,10 +40,10 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<PickedL
     const houseNumber = addr.house_number || "";
     const streetAddress = [houseNumber, road].filter(Boolean).join(" ");
 
-    return { 
-      city, 
-      area, 
-      streetAddress: streetAddress || "Unknown Street" 
+    return {
+      city,
+      area,
+      streetAddress: streetAddress || "Unknown Street"
     };
   } catch {
     // Reverse geocoding is best-effort; the pin itself is still captured either way.
@@ -137,42 +137,21 @@ export default function GoogleMapPicker({
         const lng = pos.coords.longitude;
         setPendingMarker([lat, lng]);
         mapRef.current?.flyTo([lat, lng], 15);
-        
+
         // Auto-fill checkout fields immediately
         const address = await reverseGeocode(lat, lng);
         onLocationPick({ lat, lng, ...address });
-        
+
         setIsLocating(false);
       },
       async (error) => {
+        setIsLocating(false);
         if (explicit) {
-          setIsLocating(false);
           if (error.code === error.PERMISSION_DENIED) {
             alert("Location access was denied. Please enable location permissions for this site in your browser settings (usually the lock icon in the address bar).");
           } else {
             alert("Unable to retrieve your location. Please ensure your GPS is enabled.");
           }
-        } else {
-          // Silent fallback to IP on mount if GPS is blocked/fails
-          try {
-            const res = await fetch("https://ipapi.co/json/");
-            if (res.ok) {
-              const data = await res.json();
-              if (data.latitude && data.longitude) {
-                const lat = data.latitude;
-                const lng = data.longitude;
-                setPendingMarker([lat, lng]);
-                mapRef.current?.flyTo([lat, lng], 15);
-                
-                // Auto-fill checkout fields immediately
-                const address = await reverseGeocode(lat, lng);
-                onLocationPick({ lat, lng, ...address });
-              }
-            }
-          } catch (e) {
-            console.error("IP Geolocation fallback failed", e);
-          }
-          setIsLocating(false);
         }
       },
       { enableHighAccuracy: true, timeout: 8000 }
@@ -202,7 +181,8 @@ export default function GoogleMapPicker({
   }, [searchInput]);
 
   useEffect(() => {
-    handleUseCurrentLocation();
+    // Intentionally avoiding auto-prompting GPS or fetching IP location on mount to comply with GDPR/privacy best practices.
+    // The user must explicitly click "Use my current location".
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -306,8 +286,8 @@ export default function GoogleMapPicker({
 
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full z-[1000] pointer-events-none pb-1">
           <div className="flex flex-col items-center drop-shadow-md">
-            <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center shadow-lg border-2 border-[#BBFF63]">
-              <LocateFixed className="h-5 w-5 text-[#BBFF63]" />
+            <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center shadow-lg border-2 border-primary">
+              <LocateFixed className="h-5 w-5 text-primary" />
             </div>
             <div className="w-0 h-0 border-l-4 border-r-4 border-t-8 border-l-transparent border-r-transparent border-t-foreground" />
           </div>

@@ -26,7 +26,7 @@ export default function CollapsibleFAQ({
           <div
             key={`${faq.question}-${index}`}
             className={`rounded-2xl p-4 sm:rounded-3xl sm:p-8 transition-colors duration-300 ${
-              isOpen ? "bg-[#1C1B2E]" : "bg-[#EDEDED]"
+              isOpen ? "bg-[#1C1B2E]" : "bg-gray-light"
             }`}
           >
             <button
@@ -36,7 +36,7 @@ export default function CollapsibleFAQ({
             >
               <h3
                 className={`text-base sm:text-xl lg:text-2xl font-medium text-start ${
-                  isOpen ? "text-[#BBFF63]" : "text-[#1A1A1A]"
+                  isOpen ? "text-primary" : "text-foreground"
                 }`}
               >
                 {faq.question}
@@ -61,7 +61,7 @@ export default function CollapsibleFAQ({
                 isOpen ? "mt-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-white" : "text-[#1A1A1A]"}`}>
+              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-white" : "text-foreground"}`}>
                 {faq.answer}
               </p>
             </div>

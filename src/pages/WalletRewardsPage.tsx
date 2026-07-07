@@ -15,12 +15,12 @@ function TransactionRow({
 }) {
   const { t } = useTranslation("wallet");
   return (
-    <div className="flex w-full items-start justify-between py-3 border-b border-[#E0E0E0] last:border-b-0">
+    <div className="flex w-full items-start justify-between py-3 border-b border-stroke last:border-b-0">
       <div className="flex flex-col gap-1">
         <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
           {label === "Reward Earned" ? t(label) : label}
         </div>
-        <div className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">
+        <div className="font-['Montserrat'] text-xs font-medium text-gray-text">
           {date}
         </div>
       </div>
@@ -68,19 +68,19 @@ function WalletPanel() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               {t("Link Card")}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               {t("Redeem Points")}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <PlusCircle className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               {t("Add Funds")}
@@ -93,7 +93,7 @@ function WalletPanel() {
         {t("Transactions")}
       </div>
 
-      <div className="flex items-center gap-3 sm:gap-4 border-b border-[#E0E0E0]">
+      <div className="flex items-center gap-3 sm:gap-4 border-b border-stroke">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -102,7 +102,7 @@ function WalletPanel() {
             className={`cursor-pointer py-3 sm:py-4 font-['Montserrat'] text-sm sm:text-base font-bold ${
               activeTab === tab.key
                 ? "border-b-[3px] border-foreground text-foreground"
-                : "text-[#6B7280]"
+                : "text-gray-text"
             }`}
           >
             {t(tab.label)}

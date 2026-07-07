@@ -48,15 +48,15 @@ function CategorySelect({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
+        className="flex w-full items-center justify-between rounded-2xl bg-gray-light p-4"
       >
         <span
-          className={`font-['Montserrat'] text-base font-medium ${value ? 'text-[#1A1A1A]' : 'text-[#6B7280]'}`}
+          className={`font-['Montserrat'] text-base font-medium ${value ? 'text-foreground' : 'text-gray-text'}`}
         >
           {value ?? 'Select a category'}
         </span>
         <FaChevronDown
-          className={`h-4 w-4 text-[#6B7280] transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 text-gray-text transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -72,9 +72,8 @@ function CategorySelect({
                   onChange(category)
                   setOpen(false)
                 }}
-                className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-[#EDEDED] ${
-                  value === category ? 'text-[#1A1A1A]' : 'text-[#6B7280]'
-                }`}
+                className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-gray-light ${value === category ? 'text-foreground' : 'text-gray-text'
+                  }`}
               >
                 {category}
               </button>
@@ -129,11 +128,7 @@ function AddVideoForm({
           onCancelEdit()
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          toast.error(error.response?.data?.message ?? 'Failed to update video')
-        } else {
-          toast.error('An unexpected error occurred')
-        }
+        handleApiError(error, 'Failed to update video');
       }
       return
     }
@@ -153,11 +148,7 @@ function AddVideoForm({
         onAdded()
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to add video')
-      } else {
-        toast.error('An unexpected error occurred')
-      }
+      handleApiError(error, 'Failed to add video');
     }
   }
 
@@ -176,7 +167,7 @@ function AddVideoForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. How to track your order"
-          className="w-full rounded-2xl bg-[#EDEDED] p-4 font-['Montserrat'] text-base font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
+          className="w-full rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none"
         />
       </div>
 
@@ -184,15 +175,15 @@ function AddVideoForm({
         <label className="font-['Montserrat'] text-sm font-medium ">
           YouTube video code
         </label>
-        <div className="flex items-center gap-2 rounded-2xl bg-[#EDEDED] p-4">
-          <FaYoutube className="h-5 w-5 shrink-0 text-[#6B7280]" />
+        <div className="flex items-center gap-2 rounded-2xl bg-gray-light p-4">
+          <FaYoutube className="h-5 w-5 shrink-0 text-gray-text" />
           <input
             type="text"
             value={youtubeInput}
             onChange={(e) => setYoutubeInput(e.target.value)}
             onBlur={() => setTouched(true)}
             placeholder="e.g. dQw4w9WgXcQ"
-            className="w-full bg-transparent font-['Montserrat'] text-base font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
+            className="w-full bg-transparent font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none"
           />
         </div>
         {youtubeInputHasError && (
@@ -224,7 +215,7 @@ function AddVideoForm({
         <button
           type="button"
           onClick={handleSubmit}
-          className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-[#BBFF63] p-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A]"
+          className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-primary p-4 font-['Montserrat'] text-base font-semibold text-foreground"
         >
           <FaPlus className="h-4 w-4" />
           {editingVideo ? 'Save changes' : 'Add video'}
@@ -233,7 +224,7 @@ function AddVideoForm({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-[#EDEDED] p-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A]"
+            className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-semibold text-foreground"
           >
             Cancel
           </button>
@@ -254,8 +245,8 @@ function VideoList({
 }) {
   if (videos.length === 0) {
     return (
-      <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-[#F9FAFB] p-10 text-center">
-        <div className="font-['Montserrat'] text-base font-medium text-[#6B7280]">
+      <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-background p-10 text-center">
+        <div className="font-['Montserrat'] text-base font-medium text-gray-text">
           No videos added yet. Fill in the form to add your first one.
         </div>
       </div>
@@ -269,11 +260,7 @@ function VideoList({
         onDelete(id)
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to delete video')
-      } else {
-        toast.error('An unexpected error occurred')
-      }
+      handleApiError(error, 'Failed to delete video');
     }
   }
 
@@ -282,7 +269,7 @@ function VideoList({
       {videos.map((video) => (
         <div
           key={video.id}
-          className="flex items-center gap-4 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+          className="flex items-center gap-4 rounded-2xl bg-white p-4 outline outline-1 outline-offset-[-1px] outline-stroke"
         >
           <img
             src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
@@ -290,10 +277,10 @@ function VideoList({
             className="h-16 w-28 shrink-0 rounded-lg object-cover"
           />
           <div className="flex flex-1 flex-col gap-1">
-            <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-lg font-semibold text-foreground">
               {video.title}
             </div>
-            <div className="w-fit rounded-full bg-[#EDEDED] px-3 py-1 font-['Montserrat'] text-sm font-medium text-[#6B7280]">
+            <div className="w-fit rounded-full bg-gray-light px-3 py-1 font-['Montserrat'] text-sm font-medium text-gray-text">
               {video.category}
             </div>
           </div>
@@ -302,7 +289,7 @@ function VideoList({
               type="button"
               onClick={() => onEdit(video.id)}
               aria-label="Edit video"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDEDED] text-[#1A1A1A] hover:bg-[#E0E0E0]"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-light text-foreground hover:bg-stroke"
             >
               <FaPen className="h-4 w-4" />
             </button>
@@ -310,7 +297,7 @@ function VideoList({
               type="button"
               onClick={() => handleDelete(video.id)}
               aria-label="Delete video"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EDEDED] text-red-500 hover:bg-red-100"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-light text-red-500 hover:bg-red-100"
             >
               <FaTrash className="h-4 w-4" />
             </button>
@@ -321,28 +308,18 @@ function VideoList({
   )
 }
 
+import { useAdminHelpCenterVideos } from '../../hooks/queries/helpCenterQuery';
+import { useQueryClient } from '@tanstack/react-query';
+import { handleApiError } from '../../lib/utils';
+
 export default function AddHelpVideoPage() {
-  const [videos, setVideos] = useState<HelpVideo[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
+  const queryClient = useQueryClient();
+  const { data: videos = [] } = useAdminHelpCenterVideos();
 
-  const handelFetchVideos = async () => {
-    try {
-      const res = await api.get('/admin/help-center/video')
-      if (res.status === 200) {
-        setVideos(res.data.data)
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data.message)
-      } else {
-        toast.error('An unexpected error occurred')
-      }
-    }
-  }
-
-  useEffect(() => {
-    handelFetchVideos()
-  }, [])
+  const handelFetchVideos = () => {
+    queryClient.invalidateQueries({ queryKey: ['help-center', 'admin'] });
+  };
 
   const editingVideo = videos.find((v) => v.id === editingId) ?? null
 
@@ -360,14 +337,14 @@ export default function AddHelpVideoPage() {
       />
 
       <div className="flex flex-col gap-4">
-        <div className="font-['Montserrat'] text-2xl font-semibold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-2xl font-semibold text-foreground">
           Videos
         </div>
         <VideoList
           videos={videos}
           onEdit={(id) => setEditingId(id)}
           onDelete={(id) => {
-            setVideos((prev) => prev.filter((v) => v.id !== id))
+            queryClient.invalidateQueries({ queryKey: ['help-center', 'admin'] })
             if (editingId === id) setEditingId(null)
           }}
         />

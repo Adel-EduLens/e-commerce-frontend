@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const useFAQManagment = () => {
   const [faqLoading, setFaqLoading] = useState(false)

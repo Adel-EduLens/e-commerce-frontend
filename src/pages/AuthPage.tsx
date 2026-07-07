@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { Globe, ChevronDown } from 'lucide-react'
 import { AxiosError } from 'axios'
 import type { ApiErrorResponse } from '../types/api'
+import { handleApiError } from '../lib/utils';
 
 interface AuthPageProps {
   mode: 'login' | 'signup'
@@ -88,18 +89,17 @@ export default function AuthPage({ mode }: AuthPageProps) {
       const { token, user: loggedInUser } = response.data.data
       setAuth(loggedInUser, token)
       toast.success(t('toast.welcomeBack', { name: loggedInUser.name }))
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin");
       const dest =
         loggedInUser.role === 'trader'
           ? '/dashboard/trader'
           : loggedInUser.role === 'admin'
             ? '/dashboard/admin'
-            : '/'
+            : redirectPath || '/'
       console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role)
       navigate(dest, { replace: true })
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>
-      const errMsg = err.response?.data?.message || t('toast.loginFailed')
-      toast.error(errMsg)
+      handleApiError(error, t('toast.loginFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -121,9 +121,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             : '/'
       )
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>
-      const errMsg = err.response?.data?.message || t('toast.signupFailed')
-      toast.error(errMsg)
+      handleApiError(error, t('toast.signupFailed'))
     } finally {
       setIsLoading(false)
     }

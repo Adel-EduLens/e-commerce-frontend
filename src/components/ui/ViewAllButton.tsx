@@ -4,9 +4,9 @@ export function ViewAllButton({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4"
+      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4"
     >
-      <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
         View All
       </div>
       <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white flex items-center justify-center">

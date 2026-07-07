@@ -65,16 +65,16 @@ function pillStyle(status: string) {
 
 function Pagination() {
   return (
-    <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-      <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-        <span className="font-['Inter'] text-sm font-medium text-[#111827]">6 per page</span>
+    <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+      <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+        <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
         <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
       </div>
-      <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-        <span className="font-['Inter'] text-sm font-medium text-[#111827]">
-          1-6 <span className="text-[#6B7280]">of 14</span>
+      <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+        <span className="font-['Inter'] text-sm font-medium text-foreground">
+          1-6 <span className="text-gray-text">of 14</span>
         </span>
-        <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+        <span className="mx-1 h-5 border-l border-stroke" />
         <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
           <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
         </button>
@@ -90,7 +90,7 @@ function ExportBtn() {
   return (
     <button
       type="button"
-      className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+      className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
     >
       <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
         <rect x="1.5" y="2.5" width="17" height="14" rx="1.5" stroke="#111827" strokeWidth="1.5" />
@@ -104,9 +104,9 @@ function ExportBtn() {
 function ThreeDot() {
   return (
     <button type="button" className="flex h-4 w-4 flex-col items-center justify-center gap-0.5">
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
     </button>
   );
 }
@@ -114,12 +114,12 @@ function ThreeDot() {
 function DarkTH({ cols }: { cols: string[] }) {
   return (
     <thead>
-      <tr className="bg-[#111827]">
+      <tr className="bg-secondary">
         <th className="px-4 py-3">
-          <div className="h-5 w-5 rounded-md border border-[#BBFF63] bg-[#111827]" />
+          <div className="h-5 w-5 rounded-md border border-primary bg-secondary" />
         </th>
         {cols.map((col) => (
-          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-[#BBFF63] whitespace-nowrap">
+          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
             {col}
           </th>
         ))}
@@ -205,7 +205,7 @@ function CategoryDonut() {
         {categorySegments.map((seg) => (
           <div key={seg.label} className="flex items-center gap-1.5">
             <div className="h-3 w-3 shrink-0 rounded" style={{ background: seg.color }} />
-            <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">{seg.label} {seg.value}%</span>
+            <span className="font-['Montserrat'] text-xs font-semibold text-foreground">{seg.label} {seg.value}%</span>
           </div>
         ))}
       </div>
@@ -318,8 +318,8 @@ function WholesaleModal({
   };
 
   const inputClass =
-    "w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 font-['Montserrat'] text-sm text-[#111827] outline-none focus:border-[#BBFF63] focus:ring-1 focus:ring-[#BBFF63]";
-  const labelClass = "font-['Montserrat'] text-sm font-medium text-[#111827]";
+    "w-full rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-[#BBFF63]";
+  const labelClass = "font-['Montserrat'] text-sm font-medium text-foreground";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
@@ -328,10 +328,10 @@ function WholesaleModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">
+          <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
             {editItem ? "Edit Wholesale Product" : "Add Wholesale Product"}
           </h2>
-          <button type="button" onClick={onClose} className="text-2xl text-[#6B7280] hover:text-[#111827]">&times;</button>
+          <button type="button" onClick={onClose} className="text-2xl text-gray-text hover:text-foreground">&times;</button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -386,9 +386,9 @@ function WholesaleModal({
                   type="checkbox"
                   checked={form[key]}
                   onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.checked }))}
-                  className="h-4 w-4 rounded border-[#E5E7EB] accent-[#BBFF63]"
+                  className="h-4 w-4 rounded border-stroke accent-[#BBFF63]"
                 />
-                <span className="font-['Montserrat'] text-sm text-[#111827]">{label}</span>
+                <span className="font-['Montserrat'] text-sm text-foreground">{label}</span>
               </label>
             ))}
           </div>
@@ -399,14 +399,14 @@ function WholesaleModal({
             <div className="flex gap-2">
               <input className={inputClass} placeholder="https://..." value={imageInput} onChange={(e) => setImageInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
               <input className={inputClass + " max-w-[120px]"} placeholder="Color" value={imageColorInput} onChange={(e) => setImageColorInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
-              <button type="button" onClick={addImage} className="shrink-0 rounded-lg bg-[#BBFF63] px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#a8e854]">Add</button>
+              <button type="button" onClick={addImage} className="shrink-0 rounded-lg bg-primary px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground hover:bg-[#a8e854]">Add</button>
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {form.images.map((img, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1 font-['Montserrat'] text-xs text-[#111827]">
+                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-gray-light px-3 py-1 font-['Montserrat'] text-xs text-foreground">
                   {img.url.length > 30 ? img.url.slice(0, 30) + "..." : img.url}
-                  {img.color && <span className="text-[#6B7280]">({img.color})</span>}
-                  <button type="button" onClick={() => removeImage(i)} className="ml-1 text-[#6B7280] hover:text-red-500">&times;</button>
+                  {img.color && <span className="text-gray-text">({img.color})</span>}
+                  <button type="button" onClick={() => removeImage(i)} className="ml-1 text-gray-text hover:text-red-500">&times;</button>
                 </span>
               ))}
             </div>
@@ -415,10 +415,10 @@ function WholesaleModal({
 
           {/* Submit */}
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="rounded-lg border border-[#E5E7EB] bg-white px-5 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#F9FAFB]">
+            <button type="button" onClick={onClose} className="rounded-lg border border-stroke bg-white px-5 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground hover:bg-background">
               Cancel
             </button>
-            <button type="submit" disabled={isSubmitting} className="rounded-lg bg-[#111827] px-5 py-2.5 font-['Montserrat'] text-sm font-medium text-white hover:bg-[#1F2937] disabled:opacity-50">
+            <button type="submit" disabled={isSubmitting} className="rounded-lg bg-secondary px-5 py-2.5 font-['Montserrat'] text-sm font-medium text-white hover:bg-[#1F2937] disabled:opacity-50">
               {isSubmitting ? "Saving..." : editItem ? "Update" : "Create"}
             </button>
           </div>
@@ -447,12 +447,12 @@ function DeleteModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
       <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="font-['Montserrat'] text-lg font-semibold text-[#111827]">Delete Product</h3>
-        <p className="mt-2 font-['Montserrat'] text-sm text-[#6B7280]">
+        <h3 className="font-['Montserrat'] text-lg font-semibold text-foreground">Delete Product</h3>
+        <p className="mt-2 font-['Montserrat'] text-sm text-gray-text">
           Are you sure you want to delete <strong>{name}</strong>? This action cannot be undone.
         </p>
         <div className="mt-5 flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-lg border border-[#E5E7EB] bg-white px-4 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] hover:bg-[#F9FAFB]">
+          <button type="button" onClick={onClose} className="rounded-lg border border-stroke bg-white px-4 py-2 font-['Montserrat'] text-sm font-medium text-foreground hover:bg-background">
             Cancel
           </button>
           <button type="button" onClick={onConfirm} disabled={isPending} className="rounded-lg bg-red-600 px-4 py-2 font-['Montserrat'] text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50">
@@ -504,11 +504,11 @@ export default function TraderWholesalePage() {
     !search || w.name.toLowerCase().includes(search.toLowerCase()) || w.brand.toLowerCase().includes(search.toLowerCase())
   );
 
-  const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]");
+  const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-background");
 
   const CheckBox = ({ checked }: { checked: boolean }) => (
     <td className="px-4 py-3">
-      <div className={`h-5 w-5 rounded-md border ${checked ? "border-[#111827] bg-[#111827]" : "border-[#E5E7EB] bg-white"}`}>
+      <div className={`h-5 w-5 rounded-md border ${checked ? "border-secondary bg-secondary" : "border-stroke bg-white"}`}>
         {checked && (
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
             <path d="M5 10.5l3.5 3.5 6.5-7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -539,14 +539,14 @@ export default function TraderWholesalePage() {
               placeholder="Search products or brands"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+              className="w-full rounded-2xl border border-stroke bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text focus:border-stroke"
             />
           </label>
           <div className="ml-auto">
             <button
               type="button"
               onClick={openCreate}
-              className="flex items-center gap-2 rounded-lg bg-[#111827] px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-white transition hover:bg-[#1F2937]"
+              className="flex items-center gap-2 rounded-lg bg-secondary px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-white transition hover:bg-[#1F2937]"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
                 <path d="M10 4v12M4 10h12" stroke="white" strokeWidth="2" strokeLinecap="round" />
@@ -559,12 +559,12 @@ export default function TraderWholesalePage() {
         {/* Stat cards */}
         <div className="flex gap-4 overflow-x-auto pb-1">
           {statCards.map((card) => (
-            <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-[#E5E7EB] bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
               <div className="absolute left-4 top-4 flex flex-col gap-2">
-                <p className="font-['Montserrat'] text-base font-medium text-[#6B7280]">{card.label}</p>
-                <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+                <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+                <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
               </div>
-              <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#BBFF63]">
+              <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
                 <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                   <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                   <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
@@ -574,17 +574,17 @@ export default function TraderWholesalePage() {
                 <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                   {card.trendUp ? "+" : "-"}{card.trend}
                 </span>
-                <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.sub}</span>
+                <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Earnings Over Time */}
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Earnings Over Time</h2>
-            <button type="button" className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]">
+            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Earnings Over Time</h2>
+            <button type="button" className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
               Partner
               <img className="h-5 w-5 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
             </button>
@@ -593,9 +593,9 @@ export default function TraderWholesalePage() {
         </div>
 
         {/* Top Clients Table */}
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Top Clients</h2>
+        <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Top Clients</h2>
             <ExportBtn />
           </div>
           <div className="overflow-x-auto">
@@ -607,10 +607,10 @@ export default function TraderWholesalePage() {
                   return (
                     <tr key={idx} className={rowBg(idx)}>
                       <CheckBox checked={idx === 0} />
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.name}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.order}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.spent}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.last}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.name}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.order}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.spent}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.last}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                           {row.status}
@@ -629,16 +629,16 @@ export default function TraderWholesalePage() {
         {/* 3-column bottom panels */}
         <div className="grid gap-4 lg:grid-cols-3">
           {/* Recent Alerts */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Recent Alerts</h2>
+          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Recent Alerts</h2>
             <div className="space-y-3">
               {recentAlerts.map((alert, idx) => (
-                <div key={idx} className="flex gap-3 rounded-xl border border-[#E5E7EB] p-3">
+                <div key={idx} className="flex gap-3 rounded-xl border border-stroke p-3">
                   <div className={`mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full ${alert.color}`} />
                   <div className="min-w-0 flex-1">
-                    <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{alert.title}</p>
-                    <p className="mt-0.5 font-['Montserrat'] text-xs text-[#6B7280]">{alert.desc}</p>
-                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-[#9CA3AF]">{alert.time}</p>
+                    <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{alert.title}</p>
+                    <p className="mt-0.5 font-['Montserrat'] text-xs text-gray-text">{alert.desc}</p>
+                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">{alert.time}</p>
                   </div>
                 </div>
               ))}
@@ -646,40 +646,40 @@ export default function TraderWholesalePage() {
           </div>
 
           {/* Top-Selling Products */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Top-Selling Products</h2>
+          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Top-Selling Products</h2>
             <div className="space-y-3">
               {topSellingProducts.length > 0 ? topSellingProducts.map((prod, idx) => (
-                <div key={idx} className="flex items-center gap-3 rounded-xl border border-[#E5E7EB] p-3">
-                  <div className="h-10 w-10 shrink-0 rounded-lg bg-[#F3F4F6] flex items-center justify-center">
-                    <span className="font-['Montserrat'] text-xs font-bold text-[#6B7280]">{idx + 1}</span>
+                <div key={idx} className="flex items-center gap-3 rounded-xl border border-stroke p-3">
+                  <div className="h-10 w-10 shrink-0 rounded-lg bg-gray-light flex items-center justify-center">
+                    <span className="font-['Montserrat'] text-xs font-bold text-gray-text">{idx + 1}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{prod.name}</p>
-                    <p className="font-['Montserrat'] text-xs text-[#6B7280]">{prod.sku}</p>
+                    <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{prod.name}</p>
+                    <p className="font-['Montserrat'] text-xs text-gray-text">{prod.sku}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{prod.revenue}</p>
-                    <p className="font-['Montserrat'] text-xs text-[#6B7280]">{prod.units}</p>
+                    <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{prod.revenue}</p>
+                    <p className="font-['Montserrat'] text-xs text-gray-text">{prod.units}</p>
                   </div>
                 </div>
               )) : (
-                <p className="font-['Montserrat'] text-sm text-[#6B7280]">No products yet</p>
+                <p className="font-['Montserrat'] text-sm text-gray-text">No products yet</p>
               )}
             </div>
           </div>
 
           {/* Product Category Donut */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Product Category</h2>
+          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Product Category</h2>
             <CategoryDonut />
           </div>
         </div>
 
         {/* Wholesale Products Table (CRUD) */}
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Wholesale Products</h2>
+        <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Wholesale Products</h2>
             <ExportBtn />
           </div>
           <div className="overflow-x-auto">
@@ -687,18 +687,18 @@ export default function TraderWholesalePage() {
               <DarkTH cols={["Name", "Category", "Brand", "Price", "Min Order", "Tags", "Actions"]} />
               <tbody>
                 {wholesalesLoading ? (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center font-['Montserrat'] text-sm text-[#6B7280]">Loading...</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-8 text-center font-['Montserrat'] text-sm text-gray-text">Loading...</td></tr>
                 ) : filteredWholesales.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center font-['Montserrat'] text-sm text-[#6B7280]">No wholesale products found</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-8 text-center font-['Montserrat'] text-sm text-gray-text">No wholesale products found</td></tr>
                 ) : (
                   filteredWholesales.map((w, idx) => (
                     <tr key={w.id} className={rowBg(idx)}>
                       <CheckBox checked={false} />
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{w.name}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{w.category.name}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{w.brand}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">${w.price}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{w.minOrder}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{w.name}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{w.category.name}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{w.brand}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">${w.price}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{w.minOrder}</td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {w.isBestDeal && <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-['Montserrat'] text-[10px] font-medium text-emerald-700">Best Deal</span>}
@@ -711,7 +711,7 @@ export default function TraderWholesalePage() {
                           <button
                             type="button"
                             onClick={() => openEdit(w)}
-                            className="rounded-md bg-[#F3F4F6] p-1.5 text-[#111827] hover:bg-[#E5E7EB]"
+                            className="rounded-md bg-gray-light p-1.5 text-foreground hover:bg-stroke"
                             title="Edit"
                           >
                             <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">

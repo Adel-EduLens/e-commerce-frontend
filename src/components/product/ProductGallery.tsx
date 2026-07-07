@@ -13,17 +13,20 @@ export function ProductGallery({ selectedColor, item }: ProductGalleryProps) {
   const images = item.images;
 
   useEffect(() => {
-    if (!selectedColor || images.length === 0) return;
+    const func = async () => {
+      if (!selectedColor || images.length === 0) return;
 
-    const matchingIndex = images.findIndex(
-      (image) =>
-        image.color &&
-        image.color.toLowerCase() === selectedColor.toLowerCase(),
-    );
+      const matchingIndex = images.findIndex(
+        (image) =>
+          image.color &&
+          image.color.toLowerCase() === selectedColor.toLowerCase(),
+      );
 
-    if (matchingIndex !== -1) {
-      setSelectedImageIndex(matchingIndex);
-    }
+      if (matchingIndex !== -1) {
+        setSelectedImageIndex(matchingIndex);
+      }
+    };
+    func();
   }, [selectedColor, images]);
 
   const handleGalleryStep = (direction: "previous" | "next") => {

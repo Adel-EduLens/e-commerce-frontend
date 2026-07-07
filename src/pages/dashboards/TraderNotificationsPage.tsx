@@ -14,7 +14,7 @@ export default function TraderNotificationsPage() {
           {/* Search + filters */}
           <div className="flex flex-wrap items-center gap-3.5">
             <label className="relative flex w-80 items-center">
-              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-[#111827]" viewBox="0 0 24 24" fill="none">
+              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-foreground" viewBox="0 0 24 24" fill="none">
                 <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
                 <path d="M20 20L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
@@ -23,23 +23,23 @@ export default function TraderNotificationsPage() {
                 placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-3 pl-11 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                className="w-full rounded-2xl border border-stroke bg-white py-3 pl-11 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text focus:border-stroke"
               />
             </label>
             <button
               type="button"
-              className="flex h-11 items-center gap-1 rounded-2xl border border-[#E5E7EB] bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+              className="flex h-11 items-center gap-1 rounded-2xl border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
             >
               All
-              <svg className="h-4 w-4 text-[#6B7280]" viewBox="0 0 16 16" fill="none">
+              <svg className="h-4 w-4 text-gray-text" viewBox="0 0 16 16" fill="none">
                 <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
 
           {/* Notifications List Panel */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
-            <h2 className="mb-6 font-['Montserrat'] text-xl font-semibold text-[#111827]">
+          <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
+            <h2 className="mb-6 font-['Montserrat'] text-xl font-semibold text-foreground">
               Notification
             </h2>
             
@@ -47,9 +47,9 @@ export default function TraderNotificationsPage() {
               {notificationsData.map((notification, idx) => (
                 <div 
                   key={idx}
-                  className="relative rounded-lg border border-[#E5E7EB] bg-[#F5F7FA] p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
+                  className="relative rounded-lg border border-stroke bg-background p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
                 >
-                  <div className="absolute right-4 top-4 text-xs font-medium font-['Montserrat'] text-[#6B7280]">
+                  <div className="absolute right-4 top-4 text-xs font-medium font-['Montserrat'] text-gray-text">
                     {notification.date}
                   </div>
                   
@@ -59,12 +59,12 @@ export default function TraderNotificationsPage() {
                         <path d="M2 6.5L4.5 9L10 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <h3 className="font-['Montserrat'] text-sm font-semibold text-[#111827]">
+                    <h3 className="font-['Montserrat'] text-sm font-semibold text-foreground">
                       {notification.title}
                     </h3>
                   </div>
                   
-                  <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">
+                  <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
                     {notification.description}
                   </p>
                 </div>

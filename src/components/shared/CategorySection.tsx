@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { asset } from '../../lib/utils';
 
 type AssetImageProps = {
   file: string
@@ -6,7 +7,6 @@ type AssetImageProps = {
   alt?: string
 }
 
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 function AssetImage({ file, className, alt = '' }: AssetImageProps) {
   return (
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
@@ -52,7 +52,7 @@ function CategoriesSection() {
               className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-6 py-2 sm:px-8 sm:py-3">
-              <div className="font-['Montserrat'] text-xl sm:text-2xl lg:text-4xl font-bold text-[#1A1A1A] whitespace-nowrap">
+              <div className="font-['Montserrat'] text-xl sm:text-2xl lg:text-4xl font-bold text-foreground whitespace-nowrap">
                 {category.label}
               </div>
             </div>

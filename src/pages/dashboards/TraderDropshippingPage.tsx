@@ -53,10 +53,10 @@ const topProducts = [
 
 function Panel({ title, action, children }: { title: string; action?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[24px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
+    <section className="rounded-[24px] border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-['Montserrat'] text-lg font-semibold text-[#111827] sm:text-xl">{title}</h2>
-        {action && <button className="text-xs font-medium text-[#6B7280] hover:text-[#111827]">{action}</button>}
+        <h2 className="font-['Montserrat'] text-lg font-semibold text-foreground sm:text-xl">{title}</h2>
+        {action && <button className="text-xs font-medium text-gray-text hover:text-foreground">{action}</button>}
       </div>
       {children}
     </section>
@@ -193,7 +193,7 @@ function OrdersDonutChart() {
         {orderStatus.map((seg) => (
           <div key={seg.label} className="flex items-center gap-2">
             <div className="h-4 w-4 shrink-0 rounded" style={{ backgroundColor: seg.color }} />
-            <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">
+            <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
               {seg.label} — {seg.share}%
             </span>
           </div>
@@ -215,14 +215,14 @@ export default function TraderDropshippingPage() {
             {statsCards.map((card) => (
               <div
                 key={card.label}
-                className="rounded-[24px] border border-[#E5E7EB] bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]"
+                className="rounded-[24px] border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
-                    <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.label}</p>
-                    <p className="font-['Montserrat'] text-2xl font-bold text-[#111827]">{card.value}</p>
+                    <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
+                    <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#BBFF63]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary">
                     <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                       <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                       <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
@@ -242,15 +242,15 @@ export default function TraderDropshippingPage() {
                   <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                     {card.trend}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.sub}</span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* 3. Basic Information */}
-          <div className="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Basic Information</h2>
+          <div className="rounded-[24px] border border-stroke bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Basic Information</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Left column */}
               <div className="flex flex-col gap-3">
@@ -261,9 +261,9 @@ export default function TraderDropshippingPage() {
                   { label: "Address", value: "12 El Tahrir St, Cairo" },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center gap-3">
-                    <div className="h-5 w-5 shrink-0 rounded bg-[#E5E7EB]" />
-                    <span className="w-32 shrink-0 font-['Montserrat'] text-sm font-medium text-[#6B7280]">{row.label}</span>
-                    <span className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{row.value}</span>
+                    <div className="h-5 w-5 shrink-0 rounded bg-stroke" />
+                    <span className="w-32 shrink-0 font-['Montserrat'] text-sm font-medium text-gray-text">{row.label}</span>
+                    <span className="font-['Montserrat'] text-sm font-semibold text-foreground">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -276,9 +276,9 @@ export default function TraderDropshippingPage() {
                   { label: "Commission", value: "15%" },
                 ].map((row) => (
                   <div key={row.label} className="flex items-center gap-3">
-                    <div className="h-5 w-5 shrink-0 rounded bg-[#E5E7EB]" />
-                    <span className="w-32 shrink-0 font-['Montserrat'] text-sm font-medium text-[#6B7280]">{row.label}</span>
-                    <span className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{row.value}</span>
+                    <div className="h-5 w-5 shrink-0 rounded bg-stroke" />
+                    <span className="w-32 shrink-0 font-['Montserrat'] text-sm font-medium text-gray-text">{row.label}</span>
+                    <span className="font-['Montserrat'] text-sm font-semibold text-foreground">{row.value}</span>
                   </div>
                 ))}
               </div>
@@ -289,14 +289,14 @@ export default function TraderDropshippingPage() {
           <div className="grid gap-5 xl:grid-cols-[minmax(0,2fr)_340px]">
 
             {/* Earnings Over Time */}
-            <div className="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Earnings Over Time</h2>
+            <div className="rounded-[24px] border border-stroke bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Earnings Over Time</h2>
               <EarningsChart />
             </div>
 
             {/* Orders by Status */}
-            <div className="rounded-[24px] border border-[#E5E7EB] bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Orders by Status</h2>
+            <div className="rounded-[24px] border border-stroke bg-white p-5 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Orders by Status</h2>
               <OrdersDonutChart />
             </div>
           </div>
@@ -308,7 +308,7 @@ export default function TraderDropshippingPage() {
             <Panel title="Withdraw Requests" action="View All">
               <div className="flex flex-col gap-3">
                 {withdrawRequests.map((req, idx) => (
-                  <div key={idx} className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-3">
+                  <div key={idx} className="rounded-xl border border-stroke bg-background p-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100">
@@ -317,13 +317,13 @@ export default function TraderDropshippingPage() {
                             <path d="M1 7h14" stroke="currentColor" strokeWidth="1.2" />
                           </svg>
                         </div>
-                        <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">Order ID: {req.orderId}</span>
+                        <span className="font-['Montserrat'] text-xs font-semibold text-foreground">Order ID: {req.orderId}</span>
                       </div>
-                      <span className="font-['Montserrat'] text-xs font-bold text-[#111827]">{req.amount}</span>
+                      <span className="font-['Montserrat'] text-xs font-bold text-foreground">{req.amount}</span>
                     </div>
-                    <p className="mt-1.5 font-['Montserrat'] text-xs text-[#6B7280]">Partner: {req.partner}</p>
+                    <p className="mt-1.5 font-['Montserrat'] text-xs text-gray-text">Partner: {req.partner}</p>
                     <div className="mt-2 flex items-center justify-between gap-2">
-                      <span className="font-['Montserrat'] text-xs text-[#6B7280]">{req.date}</span>
+                      <span className="font-['Montserrat'] text-xs text-gray-text">{req.date}</span>
                       <div className="flex items-center gap-2">
                         <button className="rounded-2xl bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">Approve</button>
                         <button className="rounded-2xl bg-red-100 px-2 py-1 text-xs font-medium text-red-700">Reject</button>
@@ -338,7 +338,7 @@ export default function TraderDropshippingPage() {
             <Panel title="Partner Rating" action="View All">
               <div className="flex flex-col gap-3">
                 {partnerRatings.map((review, idx) => (
-                  <div key={idx} className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-3">
+                  <div key={idx} className="rounded-xl border border-stroke bg-background p-3">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100">
@@ -347,17 +347,17 @@ export default function TraderDropshippingPage() {
                             <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
                           </svg>
                         </div>
-                        <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">{review.name}</span>
+                        <span className="font-['Montserrat'] text-xs font-semibold text-foreground">{review.name}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <svg className="h-3.5 w-3.5 text-amber-400" viewBox="0 0 14 14" fill="currentColor">
                           <path d="M7 1l1.545 3.13 3.455.502-2.5 2.435.59 3.433L7 9l-3.09 1.625.59-3.433L2 4.632l3.455-.502z" />
                         </svg>
-                        <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">{review.rating}</span>
+                        <span className="font-['Montserrat'] text-xs font-semibold text-foreground">{review.rating}</span>
                       </div>
                     </div>
-                    <p className="mt-2 font-['Montserrat'] text-xs text-[#6B7280]">{review.review}</p>
-                    <p className="mt-2 font-['Montserrat'] text-xs text-[#6B7280]">{review.date}</p>
+                    <p className="mt-2 font-['Montserrat'] text-xs text-gray-text">{review.review}</p>
+                    <p className="mt-2 font-['Montserrat'] text-xs text-gray-text">{review.date}</p>
                   </div>
                 ))}
               </div>
@@ -367,19 +367,19 @@ export default function TraderDropshippingPage() {
             <Panel title="Top-Selling Products" action="View All">
               <div className="flex flex-col gap-3">
                 {topProducts.map((product, idx) => (
-                  <div key={idx} className="flex items-center gap-3 rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-3">
+                  <div key={idx} className="flex items-center gap-3 rounded-xl border border-stroke bg-background p-3">
                     <img
                       src="https://placehold.co/48x48"
                       alt={product.name}
                       className="h-12 w-12 rounded-lg object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-['Montserrat'] text-sm font-semibold text-[#111827]">{product.name}</p>
-                      <p className="font-['Montserrat'] text-xs font-bold text-[#111827]">{product.revenue}</p>
+                      <p className="truncate font-['Montserrat'] text-sm font-semibold text-foreground">{product.name}</p>
+                      <p className="font-['Montserrat'] text-xs font-bold text-foreground">{product.revenue}</p>
                       <div className="flex items-center gap-2">
-                        <span className="font-['Montserrat'] text-xs text-[#6B7280]">{product.units}</span>
-                        <span className="font-['Montserrat'] text-xs text-[#6B7280]">·</span>
-                        <span className="font-['Montserrat'] text-xs text-[#6B7280]">{product.unitPrice}</span>
+                        <span className="font-['Montserrat'] text-xs text-gray-text">{product.units}</span>
+                        <span className="font-['Montserrat'] text-xs text-gray-text">·</span>
+                        <span className="font-['Montserrat'] text-xs text-gray-text">{product.unitPrice}</span>
                       </div>
                     </div>
                   </div>

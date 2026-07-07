@@ -3,11 +3,11 @@ import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
-import { useAuthStore } from "../store/useAuthStore";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 import { api } from "../lib/axios";
 import { useRecentStore } from "../store/useRecentStore";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "../store/useAuthStore";
 type BagTab = "favorites" | "recent";
 
 const FAVORITE_PRODUCTS = [
@@ -413,7 +413,7 @@ function FavoritesSection({
 
 export default function BagPage() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user } = useAuthStore();
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const incrementQuantity = useCartStore((state) => state.incrementQuantity);
@@ -431,13 +431,12 @@ export default function BagPage() {
       items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
     [items],
   );
-
   useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
+    if (user && user.role === "trader") {
+      toast.error(t("toast.userRequired"));
+      navigate("/");
     }
-  }, [isAuthenticated, user, navigate]);
-
+  }, [user, navigate,t]);
   useEffect(() => {
     if (subtotal === 0 && appliedCoupon) {
       setAppliedCoupon(null);
@@ -473,10 +472,6 @@ export default function BagPage() {
       return total;
     }, 0);
   }, [appliedCoupon, items]);
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
 
   const handleAddItems = () => {
     navigate("/season-must-haves");
@@ -521,6 +516,12 @@ export default function BagPage() {
   const handleCheckout = () => {
     if (!items.length) {
       toast.error(t("toast.emptyBag"));
+      return;
+    }
+    if (!user) {
+      sessionStorage.setItem("redirectAfterLogin", "/bag");
+      toast.error(t("toast.loginFirst"));
+      navigate("/login");
       return;
     }
 

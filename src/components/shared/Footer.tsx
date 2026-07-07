@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from "react-i18next";
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
+
 
 const footerLinks: Record<string, { label: string; path: string }[]> = {
   About: [
@@ -45,14 +46,14 @@ function FooterColumn({
   const { t } = useTranslation("footer");
   return (
     <div className="flex flex-col items-start gap-3">
-      <div className="font-['Montserrat'] text-lg sm:text-xl lg:text-2xl font-medium text-[#1A1A1A]">
-        {t(title)}
+      <div className="font-['Montserrat'] text-lg sm:text-xl lg:text-2xl font-medium text-foreground">
+        {title}
       </div>
       {items.map((item) => (
         <Link
           key={item.label}
           to={item.path}
-          className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#6B7280] hover:text-[#1A1A1A]"
+          className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-gray-text hover:text-foreground"
         >
           {t(item.label)}
         </Link>
@@ -74,7 +75,7 @@ export default function Footer({
   const { t } = useTranslation("footer");
   return (
     <div
-      className="relative w-full overflow-hidden border-t border-[#E0E0E0] py-8 px-4 sm:px-6 lg:px-8"
+      className="relative w-full overflow-hidden border-t border-stroke py-8 px-4 sm:px-6 lg:px-8"
       style={style}
     >
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Montserrat'] text-[80px] sm:text-[120px] lg:text-[200px] xl:text-[250px] font-medium text-gray-500/20 whitespace-nowrap select-none">
@@ -92,7 +93,7 @@ export default function Footer({
               {socials.map((social) => (
                 <div
                   key={social}
-                  className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]"
+                  className="flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-stroke"
                 >
                   <img
                     src={asset(social)}
@@ -103,6 +104,7 @@ export default function Footer({
                 </div>
               ))}
             </div>
+
             <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#1A1A1A]">
               {t("SIGN UP FOR DISCOUNTS + UPDATES")}
             </div>
@@ -121,10 +123,11 @@ export default function Footer({
             </div>
           </div>
         </div>
+
         <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
           {t("copyright")}
         </div>
       </div>
-    </div>
+    </div >
   )
 }

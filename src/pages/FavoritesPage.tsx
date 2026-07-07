@@ -40,14 +40,14 @@ function ProductRow() {
 function FilterSection() {
   return (
     <div className="mt-6 inline-flex w-full flex-col items-start justify-start gap-3">
-      <div className="self-stretch font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+      <div className="self-stretch font-['Montserrat'] text-3xl font-bold text-foreground">
         Filter by
       </div>
       <div className="flex flex-wrap items-center gap-4 self-stretch">
         <div className="flex items-center justify-start gap-4">
           {/* Sort by */}
-          <div className="flex items-center justify-center gap-2 rounded-2xl bg-[#EDEDED] p-4">
-            <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
+          <div className="flex items-center justify-center gap-2 rounded-2xl bg-gray-light p-4">
+            <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
               Sort by
             </div>
             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
@@ -58,8 +58,8 @@ function FilterSection() {
             </div>
           </div>
           {/* Filter by */}
-          <div className="flex w-auto items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-            <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
+          <div className="flex w-auto items-center justify-between rounded-2xl bg-gray-light p-4">
+            <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
               Filter by
             </div>
             <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
@@ -71,8 +71,8 @@ function FilterSection() {
           </div>
         </div>
         {/* Search */}
-        <div className="flex w-full sm:w-96 items-center justify-between rounded-2xl bg-[#EDEDED] p-4">
-          <div className="font-['Montserrat'] text-2xl font-medium text-[#6B7280]">
+        <div className="flex w-full sm:w-96 items-center justify-between rounded-2xl bg-gray-light p-4">
+          <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
             Search
           </div>
           <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">

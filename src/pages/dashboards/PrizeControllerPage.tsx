@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { handleApiError } from '../../lib/utils';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { prizeSchema } from "../../schemas";
 import { toast } from "sonner";
@@ -37,10 +38,7 @@ const PrizeControllerPage = () => {
       toast.success("Prize added successfully");
       reset();
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const errMsg =
-        err.response?.data?.message || "حدث خطأ أثناء إضافة الجائزة";
-      toast.error(errMsg);
+      handleApiError(error, "حدث خطأ أثناء إضافة الجائزة");
     }
   };
 
@@ -49,9 +47,7 @@ const PrizeControllerPage = () => {
       await deletePrize.mutateAsync(id);
       toast.success("Prize deleted successfully");
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const errMsg = err.response?.data?.message || "حدث خطأ أثناء حذف الجائزة";
-      toast.error(errMsg);
+      handleApiError(error, "حدث خطأ أثناء حذف الجائزة");
     }
   };
 

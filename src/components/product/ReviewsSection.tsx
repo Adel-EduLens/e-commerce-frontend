@@ -248,7 +248,7 @@ export function ReviewsSection() {
                 onChange={(e) =>
                   setFilterValue(e.target.value as ReviewFilterValue)
                 }
-                className="rounded-2xl bg-[#EDEDED] px-5 py-3 font-['Montserrat'] text-base font-medium text-foreground outline-none sm:text-lg"
+                className="rounded-2xl bg-gray-light px-5 py-3 font-['Montserrat'] text-base font-medium text-foreground outline-none sm:text-lg"
               >
                 {FILTER_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -262,7 +262,7 @@ export function ReviewsSection() {
                 onChange={(e) =>
                   setSortValue(e.target.value as ReviewSortValue)
                 }
-                className="rounded-2xl bg-[#EDEDED] px-5 py-3 font-['Montserrat'] text-base font-medium text-foreground outline-none sm:text-lg"
+                className="rounded-2xl bg-gray-light px-5 py-3 font-['Montserrat'] text-base font-medium text-foreground outline-none sm:text-lg"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>

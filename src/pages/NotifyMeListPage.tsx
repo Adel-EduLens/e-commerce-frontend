@@ -14,12 +14,13 @@ function ProductRequestCard() {
         draggable={false}
       />
       <div className="flex flex-1 flex-col gap-2 py-2">
-        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
           Amber Blaze Classic Tee
         </div>
-        <div className="font-['Montserrat'] text-base sm:text-xl font-semibold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-base sm:text-xl font-semibold text-foreground">
           $250
         </div>
+
         <div className="inline-flex flex-wrap items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
           <div className="font-['Montserrat'] text-sm sm:text-base text-[#1A1A1A]">
             <span className="font-medium">{t("Size")}: </span>
@@ -51,6 +52,7 @@ function NotifyMePanel() {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-3">
+
         <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
           {t("NOTIFY ME LIST")}
         </div>

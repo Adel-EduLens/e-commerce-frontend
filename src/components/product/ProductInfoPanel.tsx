@@ -36,9 +36,12 @@ export function ProductInfoPanel({
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
-    if (item.sizes.length > 0) {
-      setSelectedSize(item.sizes[0].size);
-    }
+    const func = async () => {
+      if (item.sizes.length > 0) {
+        setSelectedSize(item.sizes[0].size);
+      }
+    };
+    func();
   }, [item]);
 
   const getColorValue = (color: string) => {
@@ -253,7 +256,11 @@ export function ProductInfoPanel({
         <div className="inline-flex items-center justify-start gap-4 rounded-3xl bg-gray-light p-2">
           <button
             type="button"
-            onClick={() => setQuantity((current) => Math.max(item.minOrder ?? 1, current - 1))}
+            onClick={() =>
+              setQuantity((current) =>
+                Math.max(item.minOrder ?? 1, current - 1),
+              )
+            }
             aria-label="Decrease quantity"
           >
             <ArrowCircle direction="prev" />

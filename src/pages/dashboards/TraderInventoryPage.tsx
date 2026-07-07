@@ -91,14 +91,14 @@ export default function TraderInventoryPage() {
             {summaryCards.map((card) => (
               <div
                 key={card.label}
-                className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+                className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
-                    <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.label}</p>
-                    <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+                    <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
+                    <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#BBFF63]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary">
                     <img className="h-6 w-6" src={asset("material-symbols_inventory.svg")} alt="" />
                   </div>
                 </div>
@@ -106,7 +106,7 @@ export default function TraderInventoryPage() {
                   <span className={`font-['Montserrat'] text-sm font-medium ${card.up ? "text-teal-500" : "text-rose-500"}`}>
                     {card.delta}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]"> {card.note}</span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text"> {card.note}</span>
                 </div>
               </div>
             ))}
@@ -125,12 +125,12 @@ export default function TraderInventoryPage() {
                 placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none transition placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
               />
             </label>
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+              className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
             >
               <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
               Add Item
@@ -138,17 +138,17 @@ export default function TraderInventoryPage() {
           </div>
 
           {/* Inventory Table Panel */}
-          <section className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+          <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
             {/* Panel header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="flex items-center gap-4">
-                <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Products Table</h2>
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Products Table</h2>
                 <div className="flex items-center gap-2">
                   {(["Category", "Status", "Sort by"] as const).map((label) => (
                     <button
                       key={label}
                       type="button"
-                      className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1.5 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                      className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-2 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
                     >
                       {label}
                       <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
@@ -158,27 +158,27 @@ export default function TraderInventoryPage() {
               </div>
               <div className="flex items-center gap-2">
                 {/* Tables / Cards toggle */}
-                <div className="flex items-center gap-1 rounded-2xl border border-[#E5E7EB] bg-white px-2 py-1">
+                <div className="flex items-center gap-1 rounded-2xl border border-stroke bg-white px-2 py-1">
                   <button
                     type="button"
                     onClick={() => setViewMode("table")}
-                    className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "table" ? "bg-[#F3F4F6]" : ""}`}
+                    className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "table" ? "bg-gray-light" : ""}`}
                   >
                     <img className="h-6 w-6" src={asset("material-symbols_table-outline.svg")} alt="" />
-                    <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-[#111827]" : "text-[#6B7280]"}`}>Tables</span>
+                    <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}>Tables</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode("cards")}
-                    className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "cards" ? "bg-[#F3F4F6]" : ""}`}
+                    className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "cards" ? "bg-gray-light" : ""}`}
                   >
                     <img className="h-6 w-6" src={asset("clarity_view-cards-line.svg")} alt="" />
-                    <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-[#111827]" : "text-[#6B7280]"}`}>Cards</span>
+                    <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}>Cards</span>
                   </button>
                 </div>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                  className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
                 >
                   <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
                   Export
@@ -194,7 +194,7 @@ export default function TraderInventoryPage() {
                   return (
                     <div
                       key={item.id}
-                      className="relative flex flex-col overflow-hidden rounded-lg border border-[#E5E7EB] bg-white"
+                      className="relative flex flex-col overflow-hidden rounded-lg border border-stroke bg-white"
                     >
                       {/* Image */}
                       <div className="relative mx-2 mt-2 h-48 overflow-hidden rounded-lg">
@@ -213,34 +213,34 @@ export default function TraderInventoryPage() {
                       <div className="flex flex-col gap-2 px-2 pb-3 pt-2">
                         {/* Name + Views */}
                         <div className="flex items-center justify-between gap-2">
-                          <p className="truncate font-['Montserrat'] text-base font-semibold text-[#111827]">
+                          <p className="truncate font-['Montserrat'] text-base font-semibold text-foreground">
                             {item.product}
                           </p>
-                          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-                            <span className="text-[#6B7280]">Views: </span>
-                            <span className="font-semibold text-[#111827]">540</span>
+                          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                            <span className="text-gray-text">Views: </span>
+                            <span className="font-semibold text-foreground">540</span>
                           </p>
                         </div>
 
                         {/* Category + SKU */}
                         <div className="flex items-center justify-between gap-2">
-                          <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">
+                          <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
                             {item.category} / Hoodie
                           </p>
-                          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-                            <span className="text-[#6B7280]">SKU: </span>
-                            <span className="font-semibold text-[#111827]">{item.sku}</span>
+                          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                            <span className="text-gray-text">SKU: </span>
+                            <span className="font-semibold text-foreground">{item.sku}</span>
                           </p>
                         </div>
 
                         {/* Price + Stock */}
                         <div className="flex items-center justify-between gap-2">
-                          <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">
+                          <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
                             {item.price}
                           </p>
-                          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-                            <span className="text-[#6B7280]">Stock: </span>
-                            <span className="font-semibold text-[#111827]">{item.stock}</span>
+                          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                            <span className="text-gray-text">Stock: </span>
+                            <span className="font-semibold text-foreground">{item.stock}</span>
                           </p>
                         </div>
 
@@ -249,27 +249,27 @@ export default function TraderInventoryPage() {
                           <div className="flex items-center gap-2">
                             <button
                               type="button"
-                              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                               title="Edit"
                             >
                               <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
                             </button>
                             <button
                               type="button"
-                              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                               title="Copy"
                             >
                               <img className="h-4 w-4" src={asset("solar_copy-linear.svg")} alt="Copy" />
                             </button>
                             <button
                               type="button"
-                              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                               title="Delete"
                             >
                               <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
                             </button>
                           </div>
-                          <p className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">
+                          <p className="font-['Montserrat'] text-xs font-medium text-gray-text">
                             Last Updated: 2 days ago
                           </p>
                         </div>
@@ -282,14 +282,14 @@ export default function TraderInventoryPage() {
             <div className="overflow-x-auto">
               <table className="min-w-full border-separate border-spacing-0">
                 <thead>
-                  <tr className="bg-[#111827]">
+                  <tr className="bg-secondary">
                     <th className="px-4 py-3">
                       <div
-                        className="h-5 w-5 cursor-pointer rounded-md border border-[#BBFF63] bg-[#111827] flex items-center justify-center"
+                        className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
                         onClick={toggleAll}
                       >
                         {allSelected && (
-                          <svg className="h-3 w-3 text-[#BBFF63]" viewBox="0 0 12 12" fill="none">
+                          <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
                             <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
@@ -298,7 +298,7 @@ export default function TraderInventoryPage() {
                     {["Image", "Product", "Category", "Stock", "SKU", "Price", "Date", "Status", "Actions"].map((col) => (
                       <th
                         key={col}
-                        className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#BBFF63] whitespace-nowrap"
+                        className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap"
                       >
                         {col}
                       </th>
@@ -310,11 +310,11 @@ export default function TraderInventoryPage() {
                     const isChecked = selected.has(item.id);
                     const pill = statusPill(item.status);
                     return (
-                      <tr key={item.id} className={idx % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}>
+                      <tr key={item.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
                         <td className="px-4 py-3">
                           <div
                             className={`h-5 w-5 cursor-pointer rounded-md border flex items-center justify-center transition ${
-                              isChecked ? "border-[#111827] bg-[#111827]" : "border-gray-300 bg-white"
+                              isChecked ? "border-secondary bg-secondary" : "border-gray-300 bg-white"
                             }`}
                             onClick={() => toggleRow(item.id)}
                           >
@@ -332,22 +332,22 @@ export default function TraderInventoryPage() {
                             alt={item.product}
                           />
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                           {item.product}
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                           {item.category}
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                           {item.stock}
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                           {item.sku}
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                           {item.price}
                         </td>
-                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#111827] whitespace-nowrap">
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground whitespace-nowrap">
                           {item.date}
                         </td>
                         <td className="px-3 py-3 text-center">
@@ -358,10 +358,10 @@ export default function TraderInventoryPage() {
                         <td className="px-3 py-3 text-center">
                           <button
                             type="button"
-                            className="flex mx-auto h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                            className="flex mx-auto h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                             title="More actions"
                           >
-                            <svg className="h-4 w-4 text-[#6B7280]" viewBox="0 0 16 16" fill="currentColor">
+                            <svg className="h-4 w-4 text-gray-text" viewBox="0 0 16 16" fill="currentColor">
                               <circle cx="8" cy="3" r="1.2" />
                               <circle cx="8" cy="8" r="1.2" />
                               <circle cx="8" cy="13" r="1.2" />
@@ -377,16 +377,16 @@ export default function TraderInventoryPage() {
             )}
 
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-              <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                <span className="font-['Inter'] text-sm font-medium text-[#111827]">6 per page</span>
+            <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+              <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
                 <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
               </div>
-              <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                <span className="font-['Inter'] text-sm font-medium text-[#111827]">
-                  1-6 <span className="text-[#6B7280]">of 14</span>
+              <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                <span className="font-['Inter'] text-sm font-medium text-foreground">
+                  1-6 <span className="text-gray-text">of 14</span>
                 </span>
-                <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+                <span className="mx-1 h-5 border-l border-stroke" />
                 <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
                   <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
                 </button>
@@ -400,35 +400,35 @@ export default function TraderInventoryPage() {
           {/* Bottom panels */}
           <div className="grid gap-4 lg:grid-cols-3">
             {/* Recent Alerts */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Recent Alerts</h3>
+                <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Recent Alerts</h3>
               </div>
               <div className="flex flex-col gap-3">
                 {alerts.map((alert, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-[#E5E7EB] bg-[#F5F7FA] p-3 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
+                    className="rounded-xl border border-stroke bg-background p-3 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
                   >
                     <div className="flex items-center gap-1.5">
                       <svg className="h-5 w-5 shrink-0 text-emerald-700" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <rect x="3" y="3" width="14" height="14" rx="2" />
                       </svg>
-                      <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{alert.title}</p>
+                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{alert.title}</p>
                     </div>
-                    <p className="mt-1.5 font-['Montserrat'] text-sm font-medium text-[#6B7280]">{alert.message}</p>
-                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-[#9CA3AF]">{alert.time}</p>
+                    <p className="mt-1.5 font-['Montserrat'] text-sm font-medium text-gray-text">{alert.message}</p>
+                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">{alert.time}</p>
                   </div>
                 ))}
               </div>
-              <button type="button" className="mt-3 w-full text-center font-['Montserrat'] text-xs font-medium text-[#6B7280] hover:text-[#111827] transition">
+              <button type="button" className="mt-3 w-full text-center font-['Montserrat'] text-xs font-medium text-gray-text hover:text-foreground transition">
                 View All
               </button>
             </div>
 
             {/* Inventory Snapshot */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Inventory Snapshot</h3>
+            <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Inventory Snapshot</h3>
               <div className="flex flex-col gap-3 mb-5">
                 {[
                   { label: "In Stock", count: "320 items", color: "bg-emerald-700", dot: "text-emerald-700" },
@@ -440,9 +440,9 @@ export default function TraderInventoryPage() {
                       <svg className={`h-5 w-5 shrink-0 ${row.dot}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <rect x="3" y="3" width="14" height="14" rx="2" />
                       </svg>
-                      <span className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{row.label}</span>
+                      <span className="font-['Montserrat'] text-sm font-semibold text-foreground">{row.label}</span>
                     </div>
-                    <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{row.count}</span>
+                    <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{row.count}</span>
                   </div>
                 ))}
               </div>
@@ -463,40 +463,40 @@ export default function TraderInventoryPage() {
                 ].map((leg) => (
                   <div key={leg.label} className="flex items-center gap-1.5">
                     <div className={`h-4 w-4 rounded-md shrink-0 ${leg.color}`} />
-                    <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">{leg.label}</span>
+                    <span className="font-['Montserrat'] text-xs font-semibold text-foreground">{leg.label}</span>
                   </div>
                 ))}
               </div>
 
-              <button type="button" className="mt-4 w-full text-center font-['Montserrat'] text-xs font-medium text-[#6B7280] hover:text-[#111827] transition">
+              <button type="button" className="mt-4 w-full text-center font-['Montserrat'] text-xs font-medium text-gray-text hover:text-foreground transition">
                 View All
               </button>
             </div>
 
             {/* Activity Log */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Activity Log</h3>
+                <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Activity Log</h3>
               </div>
               <div className="flex flex-col gap-3">
                 {activityLogs.map((log, i) => (
                   <div
                     key={i}
-                    className="rounded-xl border border-[#E5E7EB] bg-[#F5F7FA] p-3 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
+                    className="rounded-xl border border-stroke bg-background p-3 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]"
                   >
                     <div className="flex items-center gap-1.5">
                       <svg className="h-5 w-5 shrink-0 text-emerald-700" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <rect x="3" y="3" width="14" height="14" rx="2" />
                       </svg>
-                      <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{log.title}</p>
+                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{log.title}</p>
                     </div>
-                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-[#6B7280]">{log.addedBy}</p>
-                    <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{log.note}</p>
-                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-[#9CA3AF]">{log.time}</p>
+                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">{log.addedBy}</p>
+                    <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{log.note}</p>
+                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">{log.time}</p>
                   </div>
                 ))}
               </div>
-              <button type="button" className="mt-3 w-full text-center font-['Montserrat'] text-xs font-medium text-[#6B7280] hover:text-[#111827] transition">
+              <button type="button" className="mt-3 w-full text-center font-['Montserrat'] text-xs font-medium text-gray-text hover:text-foreground transition">
                 View All
               </button>
             </div>

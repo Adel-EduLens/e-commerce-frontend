@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
-import { useAuthStore } from "../store/useAuthStore";
+
 
 import { ProductCard, CatalogFilters } from "../components/shared";
 import Pagination from "../components/shared/Pagination";
@@ -30,7 +30,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function ProductsPage() {
   const { t } = useTranslation("productSection");
-  const navigate = useNavigate();
+
+
   const filter2 = useHomeFilters();
 
   const [filters, setFilters] = useState<FilterValues>({
@@ -45,7 +46,6 @@ export default function ProductsPage() {
 
   const [searchParams] = useSearchParams();
 
-  const { user, isAuthenticated } = useAuthStore();
 
   const urlCategoryName = searchParams.get("category") ?? "";
   const filter = searchParams.get("filter") ?? "";
@@ -87,11 +87,7 @@ export default function ProductsPage() {
     limit: 16,
   });
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, user, navigate]);
+
 
   useEffect(() => {
     const func = async () => {
@@ -125,7 +121,6 @@ export default function ProductsPage() {
     return "All Products";
   }, [filter, effectiveCategoryName]);
 
-  if (!isAuthenticated || !user) return null;
 
   if (isError) {
     return (

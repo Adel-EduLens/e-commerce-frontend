@@ -3,8 +3,7 @@ import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { useCartStore } from '../../store/useCartStore'
 import { useTranslation } from 'react-i18next'
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../../lib/utils';
 
 const navLinks = [
   { label: 'home', path: '/' },
@@ -58,7 +57,7 @@ export default function Navbar() {
                 key={item.label}
                 to={item.path}
                 className={`font-['Montserrat'] text-base xl:text-lg font-semibold transition-colors ${isActive
-                  ? 'flex items-center justify-center gap-2.5 rounded-lg bg-primary px-4 py-2 text-[#1A1A1A]'
+                  ? 'flex items-center justify-center gap-2.5 rounded-lg bg-primary px-4 py-2 text-foreground'
                   : 'text-foreground hover:text-primary'
                   }`}
               >
@@ -140,7 +139,7 @@ export default function Navbar() {
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`rounded-lg px-4 py-3 font-['Montserrat'] text-base font-semibold transition-colors ${isActive
-                  ? 'bg-primary text-[#1A1A1A]'
+                  ? 'bg-primary text-foreground'
                   : 'text-foreground hover:bg-background'
                   }`}
               >
