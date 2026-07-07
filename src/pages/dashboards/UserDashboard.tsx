@@ -1,8 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
-import { ProductCard } from "../../components/shared";
-import CatalogFilters from "../../components/shared/CatalogFilters";
-import { useHomeFilters } from "../../hooks/utils/HomeFilters";
+import ProductsSection from "../../components/shared/ProductsSection";
 
 const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
 
@@ -57,26 +54,6 @@ function ProductGallery({ title }: { title: string }) {
   );
 }
 
-function RecommendedSection() {
-  const filters = useHomeFilters();
-
-  return (
-    <div className="mt-12 flex w-full flex-col items-center gap-10">
-      <div className="self-stretch font-['Montserrat'] text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
-        Recommended for You
-      </div>
-      <div className="w-full flex flex-col items-center gap-8">
-        <CatalogFilters filters={filters} />
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ProductCard key={index} />
-          ))}
-        </div>
-        <ViewAllButton />
-      </div>
-    </div>
-  );
-}
 
 export default function UserDashboard() {
   const { user } = useAuthStore();
@@ -92,7 +69,13 @@ export default function UserDashboard() {
         <ProductGallery title="VIEWED" />
       </div>
 
-      <RecommendedSection />
+       <ProductsSection
+        title="Recommended for You"
+        navigateTo="/products?filter=flash-deals"
+        query={{
+          filter: "flash-deals",
+        }}
+      />
     </div>
   );
 }

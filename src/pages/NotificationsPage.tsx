@@ -1,7 +1,7 @@
 import { useState } from "react";
-
+import { useTranslation } from "react-i18next";
 function NotificationSwitch() {
-const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(false);
 
   return (
     <button
@@ -20,7 +20,8 @@ const [enabled, setEnabled] = useState(false);
   );
 }
 
-function NotificationRow({ label , src }: { label: string  ,src:string}) {
+function NotificationRow({ label, src }: { label: string; src: string }) {
+  const { t } = useTranslation("notifications");
   return (
     <div className="flex items-center gap-4 sm:gap-5">
       <img
@@ -31,7 +32,7 @@ function NotificationRow({ label , src }: { label: string  ,src:string}) {
       />
       <div className="flex flex-1 items-center justify-between py-3 sm:py-4">
         <div className="font-['Montserrat'] text-lg sm:text-2xl font-medium text-foreground">
-          {label}
+          {t(label)}
         </div>
         <NotificationSwitch />
       </div>
@@ -40,15 +41,16 @@ function NotificationRow({ label , src }: { label: string  ,src:string}) {
 }
 
 function NotificationsPanel() {
+  const { t } = useTranslation("notifications");
   return (
     <div className="flex w-full max-w-xl flex-col gap-6">
       <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-        NOTIFICATIONS
+        {t("NOTIFICATIONS")}
       </div>
       <div className="flex flex-col gap-4 sm:gap-6">
         <NotificationRow label="Men" src="/home-page/image%208.png" />
-        <NotificationRow label="Women" src="/home-page/image%207.png"/>
-        <NotificationRow label="Kids"   src="/home-page/image%209.png"  />
+        <NotificationRow label="Women" src="/home-page/image%207.png" />
+        <NotificationRow label="Kids" src="/home-page/image%209.png" />
       </div>
     </div>
   );

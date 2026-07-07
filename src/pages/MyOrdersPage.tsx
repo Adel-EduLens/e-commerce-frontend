@@ -1,27 +1,61 @@
 import { useState } from "react";
-import {
-  FileText,
-  Package,
-  Truck,
-  CheckCircle2,
-} from "lucide-react";
+import { FileText, Package, Truck, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type Tab = "active" | "completed" | "returns";
 
 const orderItems = [
-  { id: 1, name: "Amber Blaze Classic Tee", price: "$250", size: "XXL", color: "bg-red-200", qty: 1 },
-  { id: 2, name: "Amber Blaze Classic Tee", price: "$250", size: "XXL", color: "bg-red-200", qty: 1 },
-  { id: 3, name: "Amber Blaze Classic Tee", price: "$250", size: "XXL", color: "bg-red-200", qty: 1 },
+  {
+    id: 1,
+    name: "Amber Blaze Classic Tee",
+    price: "$250",
+    size: "XXL",
+    color: "bg-red-200",
+    qty: 1,
+  },
+  {
+    id: 2,
+    name: "Amber Blaze Classic Tee",
+    price: "$250",
+    size: "XXL",
+    color: "bg-red-200",
+    qty: 1,
+  },
+  {
+    id: 3,
+    name: "Amber Blaze Classic Tee",
+    price: "$250",
+    size: "XXL",
+    color: "bg-red-200",
+    qty: 1,
+  },
 ];
 
 const orderSteps = [
   { icon: FileText, label: "New Order", date: "25 Sep, 2025", completed: true },
-  { icon: CheckCircle2, label: "Confirmed", date: "25 Sep, 2025", completed: true },
+  {
+    icon: CheckCircle2,
+    label: "Confirmed",
+    date: "25 Sep, 2025",
+    completed: true,
+  },
   { icon: Package, label: "Shipped", date: "25 Sep, 2025", completed: true },
-  { icon: Truck, label: "Delivered", date: "Pending Delivery", completed: false },
+  {
+    icon: Truck,
+    label: "Delivered",
+    date: "Pending Delivery",
+    completed: false,
+  },
 ];
 
-function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (tab: Tab) => void }) {
+function OrderTabs({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: Tab;
+  onTabChange: (tab: Tab) => void;
+}) {
+  const { t } = useTranslation("orders");
   const tabs: { key: Tab; label: string }[] = [
     { key: "active", label: "Active" },
     { key: "completed", label: "Completed" },
@@ -41,7 +75,7 @@ function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (t
                 : "text-[#6B7280]"
             }`}
           >
-            {tab.label}
+            {t(tab.label)}
           </button>
         ))}
       </div>
@@ -51,24 +85,28 @@ function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (t
 }
 
 function OrderHeader() {
+  const { t } = useTranslation("orders");
   return (
     <div className="flex items-center gap-4 rounded-lg bg-[#1A1A1A] p-4">
       <div className="flex flex-col gap-2">
         <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">
-          Order #24653565
+          {t("Order")} #24653565
         </span>
         <div className="flex items-center gap-4">
           <span className="font-['Montserrat'] text-base font-medium text-white/70">
             25 Sep, 2025
           </span>
-          <span className="font-['Montserrat'] text-base font-medium text-white/70">15:04</span>
+          <span className="font-['Montserrat'] text-base font-medium text-white/70">
+            15:04
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
-function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
+function OrderItemCard({ item }: { item: (typeof orderItems)[0] }) {
+  const { t } = useTranslation("orders");
   return (
     <div className="flex rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] overflow-hidden">
       <div className="p-2 shrink-0">
@@ -83,12 +121,12 @@ function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
         </span>
         <div className="flex items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
           <span className="font-['Montserrat'] text-base">
-            <span className="font-medium text-[#1A1A1A]">Size: </span>
+            <span className="font-medium text-[#1A1A1A]">{t("Size")}: </span>
             <span className="font-bold text-[#1A1A1A]">{item.size}</span>
           </span>
           <div className="flex items-center gap-2">
             <span className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
-              Color:
+              {t("Color")}:
             </span>
             <div className={`h-6 w-6 rounded-full ${item.color}`} />
           </div>
@@ -102,9 +140,12 @@ function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
 }
 
 function OrderStatus() {
+  const { t } = useTranslation("orders");
   return (
     <div className="w-full lg:w-80 shrink-0 rounded-lg bg-[#1A1A1A] p-4 self-start">
-      <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">Order Status</span>
+      <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">
+        {t("Order Status")}
+      </span>
 
       <div className="mt-8 flex flex-col">
         {orderSteps.map((step, index) => (
@@ -125,21 +166,26 @@ function OrderStatus() {
                       step.completed ? "text-[#BBFF63]" : "text-zinc-400"
                     }`}
                   >
-                    {step.label}
+                    {t(step.label)}
                   </span>
                   <span
                     className={`font-['Montserrat'] text-sm font-medium ${
                       step.completed ? "text-white/70" : "text-zinc-400"
                     }`}
                   >
-                    {step.date}
+                    {step.date === "Pending Delivery"
+                      ? t("Pending Delivery")
+                      : step.date}
                   </span>
                 </div>
               </div>
               <div className="h-8 w-8 flex items-center justify-center">
                 {step.completed ? (
                   <div className="h-8 w-8 rounded-full bg-[#BBFF63] flex items-center justify-center">
-                    <CheckCircle2 className="h-5 w-5 text-black" strokeWidth={2} />
+                    <CheckCircle2
+                      className="h-5 w-5 text-black"
+                      strokeWidth={2}
+                    />
                   </div>
                 ) : (
                   <div className="h-8 w-8 rounded-full bg-zinc-400" />

@@ -1,0 +1,19 @@
+{
+  "Order": "طلب",
+  
+  "Active": "النشطة",
+  "Completed": "المكتملة",
+  "Returns": "المرتجعات",
+
+  "Order Status": "حالة الطلب",
+
+  "New Order": "طلب جديد",
+  "Confirmed": "تم التأكيد",
+  "Shipped": "تم الشحن",
+  "Delivered": "تم التسليم",
+
+  "Pending Delivery": "بانتظار التسليم",
+
+  "Size": "المقاس",
+  "Color": "اللون"
+}

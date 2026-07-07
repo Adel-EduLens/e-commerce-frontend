@@ -6,10 +6,10 @@ import en from "./locales/en/translation.json";
 import ar from "./locales/ar/translation.json";
 
 import authEn from "./locales/en/auth.json";
-import authAr from "./locales/ar/auth.json"
+import authAr from "./locales/ar/auth.json";
 
 import dropshippingEn from "./locales/en/dropshipping.json";
-import dropshippingAr from "./locales/ar/dropshipping.json"
+import dropshippingAr from "./locales/ar/dropshipping.json";
 
 import settingEn from "./locales/en/setting.json";
 import settingAr from "./locales/ar/setting.json";
@@ -22,6 +22,33 @@ import navbarAr from "./locales/ar/navbar.json";
 
 import footerEn from "./locales/en/footer.json";
 import footerAr from "./locales/ar/footer.json";
+
+import productSectionEn from "./locales/en/productSection.json";
+import productSectionAr from "./locales/ar/productSection.json";
+
+import filtersEn from "./locales/en/filters.json";
+import filtersAr from "./locales/ar/filters.json";
+
+import ordersEn from "./locales/en/orders.json";
+import ordersAr from "./locales/ar/orders.json";
+
+import walletEn from "./locales/en/wallet.json";
+import walletAr from "./locales/ar/wallet.json";
+
+import contactEn from "./locales/en/contact.json";
+import contactAr from "./locales/ar/contact.json";
+
+import notificationsEn from "./locales/en/notifications.json";
+import notificationsAr from "./locales/ar/notifications.json";
+
+import notifyEn from "./locales/en/notify.json";
+import notifyAr from "./locales/ar/notify.json";
+
+import helpCenterEn from "./locales/en/help-center.json";
+import helpCenterAr from "./locales/ar/help-center.json";
+
+import bagEn from "./locales/en/bag.json";
+import bagAr from "./locales/ar/bag.json";
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -35,6 +62,15 @@ i18n
         navbar: navbarEn,
         translation: en,
         footer: footerEn,
+        productSection: productSectionEn,
+        filters: filtersEn,
+        orders: ordersEn,
+        wallet: walletEn,
+        contact: contactEn,
+        notifications: notificationsEn,
+        notify: notifyEn,
+        helpCenter: helpCenterEn,
+        bag: bagEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -44,6 +80,15 @@ i18n
         navbar: navbarAr,
         translation: ar,
         footer: footerAr,
+        productSection: productSectionAr,
+        filters: filtersAr,
+        orders: ordersAr,
+        wallet: walletAr,
+        contact: contactAr,
+        notifications: notificationsAr,
+        notify: notifyAr,
+        helpCenter: helpCenterAr,
+        bag: bagAr,
       },
     },
 
