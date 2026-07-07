@@ -37,24 +37,24 @@ function OrderTabs({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (t
             onClick={() => onTabChange(tab.key)}
             className={`pb-4 font-['Montserrat'] text-base font-bold cursor-pointer ${
               activeTab === tab.key
-                ? "text-[#1A1A1A] border-b-[3px] border-[#1A1A1A]"
-                : "text-[#6B7280]"
+                ? "text-foreground border-b-[3px] border-secondary"
+                : "text-gray-text"
             }`}
           >
             {tab.label}
           </button>
         ))}
       </div>
-      <div className="absolute bottom-0 left-0 w-full h-px bg-[#E0E0E0]" />
+      <div className="absolute bottom-0 left-0 w-full h-px bg-stroke" />
     </div>
   );
 }
 
 function OrderHeader() {
   return (
-    <div className="flex items-center gap-4 rounded-lg bg-[#1A1A1A] p-4">
+    <div className="flex items-center gap-4 rounded-lg bg-secondary p-4">
       <div className="flex flex-col gap-2">
-        <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">
+        <span className="font-['Montserrat'] text-base font-bold text-primary">
           Order #24653565
         </span>
         <div className="flex items-center gap-4">
@@ -75,25 +75,25 @@ function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
         <div className="h-[166px] w-[140px] rounded-lg bg-[#F0F0F0]" />
       </div>
       <div className="flex flex-col gap-2 p-4">
-        <span className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
+        <span className="font-['Montserrat'] text-xl font-medium text-foreground">
           {item.name}
         </span>
-        <span className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
+        <span className="font-['Montserrat'] text-xl font-semibold text-foreground">
           {item.price}
         </span>
-        <div className="flex items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
+        <div className="flex items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-stroke">
           <span className="font-['Montserrat'] text-base">
-            <span className="font-medium text-[#1A1A1A]">Size: </span>
-            <span className="font-bold text-[#1A1A1A]">{item.size}</span>
+            <span className="font-medium text-foreground">Size: </span>
+            <span className="font-bold text-foreground">{item.size}</span>
           </span>
           <div className="flex items-center gap-2">
-            <span className="font-['Montserrat'] text-base font-medium text-[#1A1A1A]">
+            <span className="font-['Montserrat'] text-base font-medium text-foreground">
               Color:
             </span>
             <div className={`h-6 w-6 rounded-full ${item.color}`} />
           </div>
         </div>
-        <span className="font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]">
+        <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
           ({item.qty})
         </span>
       </div>
@@ -103,8 +103,8 @@ function OrderItemCard({ item }: { item: typeof orderItems[0] }) {
 
 function OrderStatus() {
   return (
-    <div className="w-full lg:w-80 shrink-0 rounded-lg bg-[#1A1A1A] p-4 self-start">
-      <span className="font-['Montserrat'] text-base font-bold text-[#BBFF63]">Order Status</span>
+    <div className="w-full lg:w-80 shrink-0 rounded-lg bg-secondary p-4 self-start">
+      <span className="font-['Montserrat'] text-base font-bold text-primary">Order Status</span>
 
       <div className="mt-8 flex flex-col">
         {orderSteps.map((step, index) => (
@@ -115,14 +115,14 @@ function OrderStatus() {
                   className={`flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#2A2D35]`}
                 >
                   <step.icon
-                    className={`h-8 w-8 ${step.completed ? "text-[#BBFF63]" : "text-zinc-400"}`}
+                    className={`h-8 w-8 ${step.completed ? "text-primary" : "text-zinc-400"}`}
                     strokeWidth={1.5}
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <span
                     className={`font-['Montserrat'] text-base font-bold ${
-                      step.completed ? "text-[#BBFF63]" : "text-zinc-400"
+                      step.completed ? "text-primary" : "text-zinc-400"
                     }`}
                   >
                     {step.label}
@@ -138,7 +138,7 @@ function OrderStatus() {
               </div>
               <div className="h-8 w-8 flex items-center justify-center">
                 {step.completed ? (
-                  <div className="h-8 w-8 rounded-full bg-[#BBFF63] flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
                     <CheckCircle2 className="h-5 w-5 text-black" strokeWidth={2} />
                   </div>
                 ) : (
@@ -150,9 +150,9 @@ function OrderStatus() {
               <div
                 className={`ml-[35px] h-12 w-0.5 ${
                   step.completed && orderSteps[index + 1]?.completed
-                    ? "bg-[#BBFF63]"
+                    ? "bg-primary"
                     : step.completed
-                      ? "bg-[#BBFF63]"
+                      ? "bg-primary"
                       : "bg-zinc-400"
                 }`}
               />

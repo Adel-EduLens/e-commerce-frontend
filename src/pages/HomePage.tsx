@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
 import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters from '../components/shared/CatalogFilters'
-import { useProducts } from '../hooks/queries/productsQuery'
+import { useProducts, useProductFilters } from '../hooks/queries/productsQuery'
+import { useHomeFilters } from '../hooks/utils/HomeFilters'
 import { api } from '../lib/axios'
 import { AxiosError } from 'axios'
 import { toast } from 'sonner'
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../lib/utils';
 
 type AssetImageProps = {
   file: string
@@ -30,9 +31,9 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4"
+      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4"
     >
-      <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
         View All
       </div>
       <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
@@ -45,36 +46,41 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
   )
 }
 
-function useHomeFilters() {
-  const { data } = useProducts({ limit: 100 })
-
-  const products = data?.products ?? []
-  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
-  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean) as string[])], [products])
-  const allSizes = useMemo(() => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))], [products])
-  const allColors = useMemo(() => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))], [products])
-  return useMemo(() => [
-    { key: 'category', label: 'Category', options: allCategories },
-    { key: 'brand', label: 'Brand', options: allBrands },
-    { key: 'size', label: 'Size', options: allSizes },
-    { key: 'color', label: 'Color', options: allColors },
-  ], [allCategories, allBrands, allSizes, allColors])
-}
-
 function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
-  const filters = useHomeFilters()
+  const { filters, products } = useHomeFilters()
+  const displayProducts = products.slice(0, 4)
 
   return (
     <div className="w-full flex flex-col items-center justify-start gap-8">
       <CatalogFilters filters={filters} />
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <ProductCard
-            key={index}
-            featured={featuredIndex === index}
-            accentClassName="bg-violet-300"
-          />
-        ))}
+        {displayProducts.length > 0 ? (
+          displayProducts.map((product, index) => (
+            <ProductCard
+              key={product.id}
+              title={product.name}
+              price={`$${product.price.toFixed(2)}`}
+              imageSrc={product.images?.[0]?.url}
+              rating={product.rating}
+              sizeLabel={product.sizes?.length > 0 ? `${product.sizes[0].size} - ${product.sizes[product.sizes.length - 1].size}` : ''}
+              to={`/product/${product.id}`}
+              featured={featuredIndex === index}
+              accentClassName="bg-violet-300"
+              isMustHave={product.isMustHave}
+              isFlashDeals={product.isFlashDeals}
+              flashDealPrice={product.flashDealPrice}
+              flashDealEndsAt={product.flashDealEndsAt}
+            />
+          ))
+        ) : (
+          Array.from({ length: 4 }).map((_, index) => (
+            <ProductCard
+              key={index}
+              featured={featuredIndex === index}
+              accentClassName="bg-violet-300"
+            />
+          ))
+        )}
       </div>
       <ViewAllButton />
     </div>
@@ -83,23 +89,23 @@ function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
 
 function HeroSection() {
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl bg-[#BBFF63]">
+    <div className="relative w-full overflow-hidden rounded-3xl bg-primary">
       {/* Mobile/Tablet layout */}
       <div className="relative z-10 flex flex-col px-6 py-10 lg:hidden">
-        <div className="font-['Montserrat'] text-5xl sm:text-7xl font-bold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-5xl sm:text-7xl font-bold text-foreground">
           Discover
         </div>
         <div className="relative my-2">
-          <div className="h-12 sm:h-16 w-3/4 rounded-2xl bg-[#1A1A1A]" />
+          <div className="h-12 sm:h-16 w-3/4 rounded-2xl bg-secondary" />
           <div className="absolute left-2 -top-2 font-['Montserrat'] text-5xl sm:text-7xl font-bold text-white">
             fashion
           </div>
         </div>
-        <div className="font-['Montserrat'] text-3xl sm:text-5xl font-bold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-3xl sm:text-5xl font-bold text-foreground">
           Fits Your Story
         </div>
-        <div className="mt-6 rounded-xl bg-[#F9FAFB] p-4">
-          <p className="font-['Inter'] text-base sm:text-lg font-medium text-[#1A1A1A]">
+        <div className="mt-6 rounded-xl bg-background p-4">
+          <p className="font-['Inter'] text-base sm:text-lg font-medium text-foreground">
             step into the spotlight with our latest drop. each piece is made to
             turn heads while keeping you comfortable from day to night.
           </p>
@@ -108,26 +114,26 @@ function HeroSection() {
 
       {/* Desktop layout */}
       <div className="relative hidden lg:block h-[978px]">
-        <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-[#1A1A1A]" />
-        <div className="absolute left-[30px] top-[367.19px] h-32 w-[504.79px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
+        <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-secondary" />
+        <div className="absolute left-[30px] top-[367.19px] h-32 w-[504.79px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-secondary" />
         <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
-          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-[#1A1A1A]">
+          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-foreground">
             Discover
           </div>
           <div className="relative h-56 w-[517.21px]">
-            <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-[#1A1A1A]" />
+            <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-secondary" />
             <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-white">
               fashion
             </div>
           </div>
-          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-[#1A1A1A]">
+          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-foreground">
             Fits Your Story
           </div>
         </div>
         <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
-          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-[#F9FAFB] opacity-75">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-[#1A1A1A]">
-              step into the spotilght with our latest drop. each piece is made to
+          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-background opacity-75">
+            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-foreground">
+              step into the spotlight with our latest drop. each piece is made to
               turn heads while keeping you comfortable from day to night.
               <br />
             </div>
@@ -138,9 +144,9 @@ function HeroSection() {
               />
             </div>
           </div>
-          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-[#F9FAFB]">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
-              step into the spotilght with our latest drop. each piece is made to
+          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-background">
+            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-foreground">
+              step into the spotlight with our latest drop. each piece is made to
               turn heads while keeping you comfortable from day to night.
               <br />
             </div>
@@ -158,15 +164,15 @@ function HeroSection() {
             className="absolute left-0 top-0 h-[971px] w-[741px]"
           />
         </div>
-        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-[#F9FAFB]">
-          <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-[#1A1A1A]">
+        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-background">
+          <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-foreground">
             Unlock fresh styles, exclusive drops, and a whole new vibe that&apos;s
-            set to dominarte 2025
+            set to dominate 2025
             <br />
             <br />
           </div>
         </div>
-        <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-[#1A1A1A]" />
+        <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-secondary" />
       </div>
     </div>
   )
@@ -196,7 +202,7 @@ function CollectionSection() {
               100+ Collections for your outfit inspirations in this summer
             </div>
           </div>
-          <div className="inline-flex h-10 sm:h-12 w-56 sm:w-72 items-center justify-center rounded-[200px] bg-[#1A1A1A] outline outline-1 outline-offset-[-1px]">
+          <div className="inline-flex h-10 sm:h-12 w-56 sm:w-72 items-center justify-center rounded-[200px] bg-secondary outline outline-1 outline-offset-[-1px]">
             <div className="text-center font-['Inter'] text-xs sm:text-sm font-medium leading-6 tracking-wide text-white">
               VIEW COLLECTIONS
             </div>
@@ -206,13 +212,13 @@ function CollectionSection() {
       <div className="flex flex-row lg:flex-col gap-2.5 lg:w-[352px]">
         <Link
           to="/collections/men"
-          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-[#EDEDED] no-underline"
+          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
         >
           <AssetImage
             file="image 4.png"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-[#1A1A1A]">
+          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-foreground">
             Outdoor
             <br />
             Active
@@ -220,13 +226,13 @@ function CollectionSection() {
         </Link>
         <Link
           to="/collections/men"
-          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-[#EDEDED] no-underline"
+          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
         >
           <AssetImage
             file="image 5.png"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-[#1A1A1A]">
+          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-foreground">
             Casual
             <br />
             Comfort
@@ -239,7 +245,10 @@ function CollectionSection() {
 
 function MustHavesSection() {
   const navigate = useNavigate()
-  const filters = useHomeFilters()
+  const { filters, products } = useHomeFilters()
+  
+  const mustHaves = products.filter(p => p.isMustHave).slice(0, 4)
+  const displayProducts = mustHaves.length > 0 ? mustHaves : products.slice(0, 4)
 
   return (
     <div className="mt-16 w-full">
@@ -249,9 +258,27 @@ function MustHavesSection() {
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
         <CatalogFilters filters={filters} />
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <ProductCard key={index} />
-          ))}
+          {displayProducts.length > 0 ? (
+            displayProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                title={product.name}
+                price={`$${product.price.toFixed(2)}`}
+                imageSrc={product.images?.[0]?.url}
+                rating={product.rating}
+                sizeLabel={product.sizes?.length > 0 ? `${product.sizes[0].size} - ${product.sizes[product.sizes.length - 1].size}` : ''}
+                to={`/product/${product.id}`}
+                isMustHave={product.isMustHave}
+                isFlashDeals={product.isFlashDeals}
+                flashDealPrice={product.flashDealPrice}
+                flashDealEndsAt={product.flashDealEndsAt}
+              />
+            ))
+          ) : (
+            Array.from({ length: 4 }).map((_, index) => (
+              <ProductCard key={index} />
+            ))
+          )}
         </div>
         <ViewAllButton onClick={() => navigate('/season-must-haves')} />
       </div>
@@ -322,27 +349,14 @@ type VoteDesign = {
   votes?: number
 }
 
+import { useDesigns } from '../hooks/queries/designsQuery';
+import { handleApiError } from '../lib/utils';
+
 function VoteSection() {
-  const [designs, setDesigns] = useState<VoteDesign[]>([])
+  const queryClient = useQueryClient()
+  const { data: designs = [] } = useDesigns();
   const [currentIndex, setCurrentIndex] = useState(0)
   const [voting, setVoting] = useState(false)
-  const fetchDesigns = async () => {
-    try {
-      const res = await api.get('/upload/images')
-      if (res.status === 200) {
-        setDesigns(res.data?.data ?? [])
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to load designs')
-      } else {
-        toast.error('An unexpected error occurred')
-      }
-    }
-  }
-  useEffect(() => {
-    fetchDesigns()
-  }, [])
 
   const current = designs[currentIndex]
 
@@ -367,8 +381,8 @@ function VoteSection() {
       const res = await api.put(`/upload/vote/${current.id}`)
       if (res.status === 200) {
         toast.success('Your vote has been counted!')
-        setDesigns((prev) =>
-          prev.map((design) =>
+        queryClient.setQueryData(['designs'], (prev: VoteDesign[] | undefined) =>
+          prev?.map((design) =>
             design.id === current.id
               ? { ...design, votes: (design.votes ?? 0) + 1 }
               : design
@@ -376,11 +390,7 @@ function VoteSection() {
         )
       }
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message ?? 'Failed to submit vote')
-      } else {
-        toast.error('An unexpected error occurred')
-      }
+      handleApiError(error, 'Failed to submit vote');
     } finally {
       setVoting(false)
     }
@@ -406,20 +416,20 @@ function VoteSection() {
             className="w-full h-64 sm:h-96 rounded-3xl object-cover"
           />
         )}
-        <div className="rounded-3xl bg-[#BBFF63] p-6 flex flex-col gap-4">
+        <div className="rounded-3xl bg-primary p-6 flex flex-col gap-4">
           {!current ? (
-            <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-xl font-medium text-foreground">
               No designs to vote on yet.
             </div>
           ) : (
             <>
-              <div className="font-['Montserrat'] text-2xl sm:text-3xl font-semibold text-[#1A1A1A] break-words">
+              <div className="font-['Montserrat'] text-2xl sm:text-3xl font-semibold text-foreground break-words">
                 {current.title?.trim() || 'Untitled design'}
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">Votes</div>
-                  <div className="font-['Montserrat'] text-xl font-normal text-[#1A1A1A]">{(current.votes ?? 0).toLocaleString()}</div>
+                  <div className="font-['Montserrat'] text-xl font-semibold text-foreground">Votes</div>
+                  <div className="font-['Montserrat'] text-xl font-normal text-foreground">{(current.votes ?? 0).toLocaleString()}</div>
                 </div>
                 <button
                   type="button"
@@ -428,9 +438,9 @@ function VoteSection() {
                   className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 disabled:opacity-60"
                 >
                   {voting ? (
-                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-[#1A1A1A]/20 border-t-[#1A1A1A]" />
+                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-secondary/20 border-t-[#1A1A1A]" />
                   ) : (
-                    <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A] flex gap-1">
+                    <div className="font-['Montserrat'] text-xl font-medium text-foreground flex gap-1">
                       <AssetImage file="lucide_vote.svg" className="h-6 w-6" />
                       Vote
                     </div>
@@ -442,7 +452,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="h-10 w-10 rounded-full bg-[#1A1A1A] flex items-center justify-center"
+                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center"
                 >
                   <AssetImage file="weui_arrow-filled-2.svg" className="h-6 w-3" />
                 </button>
@@ -450,7 +460,7 @@ function VoteSection() {
                   {designs.map((design, index) => (
                     <div
                       key={design.id}
-                      className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-[#1A1A1A]' : 'bg-white'}`}
+                      className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-secondary' : 'bg-white'}`}
                     />
                   ))}
                 </div>
@@ -458,7 +468,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="h-10 w-10 rounded-full bg-[#1A1A1A] flex items-center justify-center"
+                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center"
                 >
                   <AssetImage file="weui_arrow-filled.svg" className="h-6 w-3" />
                 </button>
@@ -470,22 +480,22 @@ function VoteSection() {
 
       {/* Desktop layout */}
       <div className="hidden lg:block relative h-[1242px] mt-8">
-        <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-[#BBFF63]">
+        <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-primary">
           <VoteRings />
           {!current ? (
-            <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-[#1A1A1A]">
+            <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-foreground">
               No designs to vote on yet.
             </div>
           ) : (
             <>
-              <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-[#1A1A1A]">
+              <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-foreground">
                 {current.title?.trim() || 'Untitled design'}
               </div>
               <div className="absolute left-[714px] top-[350px] inline-flex flex-col items-start justify-start gap-4">
-                <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-[#1A1A1A]">
+                <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-foreground">
                   Votes
                 </div>
-                <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-[#1A1A1A]">
+                <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-foreground">
                   {(current.votes ?? 0).toLocaleString()}
                 </div>
               </div>
@@ -496,9 +506,9 @@ function VoteSection() {
                 className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4 disabled:opacity-60"
               >
                 {voting ? (
-                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-[#1A1A1A]/20 border-t-[#1A1A1A]" />
+                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-secondary/20 border-t-[#1A1A1A]" />
                 ) : (
-                  <div className="font-['Montserrat'] text-3xl font-medium text-[#1A1A1A] flex gap-1">
+                  <div className="font-['Montserrat'] text-3xl font-medium text-foreground flex gap-1">
                     <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
                     Vote
                   </div>
@@ -513,7 +523,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary"
                 >
                   <AssetImage
                     file="weui_arrow-filled-2.svg"
@@ -524,9 +534,8 @@ function VoteSection() {
                   {designs.map((design, index) => (
                     <div
                       key={design.id}
-                      className={`h-2 w-2 rounded-full ${
-                        index === currentIndex ? 'bg-[#BBFF63]' : 'bg-[#E0E0E0]'
-                      }`}
+                      className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-primary' : 'bg-stroke'
+                        }`}
                     />
                   ))}
                 </div>
@@ -534,7 +543,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-[#1A1A1A]"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary"
                 >
                   <AssetImage
                     file="weui_arrow-filled.svg"
@@ -570,14 +579,14 @@ function FlashDealsSection() {
           Flash Deals
         </div>
         <div className="flex items-center justify-start gap-4 sm:gap-6">
-          <div className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-[#1A1A1A]">
+          <div className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-foreground">
             Ends in
           </div>
           <div className="flex items-center justify-start gap-2">
             {['08', ':', '30', ':', '48'].map((item, index) => (
               <div
                 key={`${item}-${index}`}
-                className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-[#1A1A1A]"
+                className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-foreground"
               >
                 {item}
               </div>

@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Star } from '../ui/star'
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../../lib/utils';
 
 const defaultImage = asset(
   'medium-shot-man-posing-with-blue-background-removebg-preview 1.png'
@@ -76,7 +75,7 @@ export default function ProductCard({
   isFlashDeals = false,
 }: ProductCardProps) {
   const rootTone = featured ? accentClassName : 'bg-white'
-  const mediaTone = featured ? accentClassName : 'bg-[#F9FAFB]'
+  const mediaTone = featured ? accentClassName : 'bg-background'
 
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined
   const { label: countdownLabel, expired } = useCountdown(
@@ -123,7 +122,7 @@ export default function ProductCard({
           </div>
         )}
 
-        <div className="absolute right-2 top-2 h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-[#EDEDED] flex items-center justify-center">
+        <div className="absolute right-2 top-2 h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light flex items-center justify-center">
           <img
             className="h-6 w-6"
             src={asset('mdi_heart.svg')}
@@ -135,11 +134,11 @@ export default function ProductCard({
 
       <div className={`mx-2 mb-2 mt-1 rounded-lg bg-white p-2 ${
         featured
-          ? 'outline outline-1 outline-offset-[-1px] outline-[#1A1A1A]'
+          ? 'outline outline-1 outline-offset-[-1px] outline-secondary'
           : ''
       }`}>
         <div className="flex items-start justify-between gap-2">
-          <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium leading-tight text-[#1A1A1A] line-clamp-2 flex-1">
+          <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium leading-tight text-foreground line-clamp-2 flex-1">
             {title}
           </div>
           <div className="flex items-center shrink-0">
@@ -150,7 +149,7 @@ export default function ProductCard({
           </div>
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <div className="font-['Montserrat'] text-xs sm:text-sm lg:text-base font-medium text-[#1A1A1A]">
+          <div className="font-['Montserrat'] text-xs sm:text-sm lg:text-base font-medium text-foreground">
             {sizeLabel}
           </div>
           {showFlashDeal ? (
@@ -163,7 +162,7 @@ export default function ProductCard({
               </span>
             </div>
           ) : (
-            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-foreground">
               {price}
             </div>
           )}

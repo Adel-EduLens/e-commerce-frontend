@@ -47,10 +47,10 @@ export default function TraderLayout() {
   const title = currentItem ? currentItem.label : "Dashboard";
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] p-4 text-[#111827] sm:p-6">
+    <div className="min-h-screen bg-background p-4 text-foreground sm:p-6">
       <div className="mx-auto flex w-full max-w-[1440px] gap-4 lg:flex-row">
         {/* ── Sidebar ── */}
-        <aside className="w-full rounded-[32px] bg-[#111827] p-4 text-white shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
+        <aside className="w-full rounded-[32px] bg-secondary p-4 text-white shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
           <div className="flex h-full flex-col">
             <div className="mb-8">
               <img className="h-12 w-auto" src={traderAsset("logo gen-z .white 1.png")} alt="Gen-Z" />
@@ -65,7 +65,7 @@ export default function TraderLayout() {
                     type="button"
                     onClick={() => item.path && navigate(item.path)}
                     className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive ? "bg-[#BBFF63] text-[#111827]" : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
+                      isActive ? "bg-primary text-foreground" : "text-gray-text hover:bg-white/5 hover:text-white"
                     }`}
                   >
                     <div
@@ -87,14 +87,14 @@ export default function TraderLayout() {
                   <img className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" src={avatar} alt={user?.name || "Trader"} />
                   <div className="min-w-0">
                     <p className="truncate font-['Montserrat'] text-sm font-semibold text-white">{user?.name || "Maan Hassan"}</p>
-                    <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-[#BBFF63]">{user?.role || "trader"}</p>
+                    <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-primary">{user?.role || "trader"}</p>
                   </div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full rounded-2xl border border-white/10 px-4 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:border-[#BBFF63]/40 hover:bg-[#BBFF63]/10"
+                className="w-full rounded-2xl border border-white/10 px-4 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:border-primary/40 hover:bg-primary/10"
               >
                 Log out
               </button>
@@ -105,13 +105,13 @@ export default function TraderLayout() {
         {/* ── Main ── */}
         <main className="min-w-0 flex-1 space-y-5 pb-6">
           {/* Top Header */}
-          <div className="flex h-20 items-center justify-between rounded-3xl border border-[#E5E7EB] bg-white px-6">
-            <h1 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">
+          <div className="flex h-20 items-center justify-between rounded-3xl border border-stroke bg-white px-6">
+            <h1 className="font-['Montserrat'] text-xl font-semibold text-foreground">
               {title}
             </h1>
             <div className="flex items-center gap-4">
-              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-gray-50">
-                <svg className="h-5 w-5 text-[#111827]" viewBox="0 0 24 24" fill="none">
+              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-gray-50">
+                <svg className="h-5 w-5 text-foreground" viewBox="0 0 24 24" fill="none">
                   <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" fill="currentColor" />
                 </svg>
               </button>

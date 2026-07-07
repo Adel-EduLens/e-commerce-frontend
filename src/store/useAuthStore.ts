@@ -40,8 +40,6 @@ export const useAuthStore = create<AuthStore & { _hasHydrated: boolean; setHasHy
           token: null,
           isAuthenticated: false,
         });
-        // Explicitly remove from localStorage
-        localStorage.removeItem(STORAGE_KEY);
       },
 
       getToken: () => get().token,

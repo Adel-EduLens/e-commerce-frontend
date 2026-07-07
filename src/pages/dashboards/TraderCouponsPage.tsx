@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
 import { Trash2, Plus, Calendar, Tag, Percent, ShoppingBag, Eye } from "lucide-react";
 import { api } from "../../lib/axios";
-
-interface Coupon {
-  id: string;
-  code: string;
-  discount: number;
-  validUntil: string;
-  categoryId: string | null;
-  productId: string | null;
-  category?: { id: string; name: string } | null;
-  product?: { id: string; name: string } | null;
-  createdAt: string;
-}
+import { useQueryClient } from "@tanstack/react-query";
+import { useCoupons } from "../../hooks/queries/couponsQuery";
+import { useCategories } from "../../hooks/queries/categoriesQuery";
+import { useProducts } from "../../hooks/queries/productsQuery";
+import { handleApiError } from '../../lib/utils';
 
 interface Category {
   id: string;
@@ -26,10 +20,12 @@ interface Product {
 }
 
 export default function TraderCouponsPage() {
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: coupons = [], isLoading: isLoadingCoupons } = useCoupons();
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 100 });
+  const products = productsData?.products || [];
+  const loading = isLoadingCoupons || isLoadingCategories || isLoadingProducts;
 
   // Form State
   const [code, setCode] = useState("");
@@ -39,31 +35,6 @@ export default function TraderCouponsPage() {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch Coupons, Categories, and Products
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [couponsRes, categoriesRes, productsRes] = await Promise.all([
-        api.get("/coupons"),
-        api.get("/categories"),
-        api.get("/products"),
-      ]);
-
-      setCoupons(couponsRes.data.data || []);
-      setCategories(categoriesRes.data.data || []);
-      // Products response may vary, sometimes nested under 'products' or 'data'
-      const rawProducts = productsRes.data.data || productsRes.data || [];
-      setProducts(Array.isArray(rawProducts) ? rawProducts : (rawProducts.products || []));
-    } catch (error) {
-      toast.error("Failed to load dashboard data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   const handleCreateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,10 +71,9 @@ export default function TraderCouponsPage() {
       setSelectedCategory("");
       setSelectedProduct("");
       
-      fetchData();
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Failed to create coupon";
-      toast.error(msg);
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+    } catch (error) {
+      handleApiError(error, "Failed to create coupon");
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +85,7 @@ export default function TraderCouponsPage() {
     try {
       await api.delete(`/coupons/${id}`);
       toast.success("Coupon deleted successfully");
-      fetchData();
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
     } catch (error) {
       toast.error("Failed to delete coupon");
     }
@@ -125,33 +95,33 @@ export default function TraderCouponsPage() {
     <div className="space-y-6">
       {/* ── Heading / Stat cards ── */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-[24px] bg-white border border-[#E5E7EB] p-6 shadow-sm flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#BBFF63]/25 text-[#111827]">
+        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
             <Percent className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#4B5563]">Active Coupons</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-[#111827]">
+            <p className="text-sm font-semibold text-gray-text">Active Coupons</p>
+            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
               {coupons.filter(c => new Date(c.validUntil) > new Date()).length}
             </p>
           </div>
         </div>
-        <div className="rounded-[24px] bg-white border border-[#E5E7EB] p-6 shadow-sm flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#BBFF63]/25 text-[#111827]">
+        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
             <Tag className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#4B5563]">Total Coupons</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-[#111827]">{coupons.length}</p>
+            <p className="text-sm font-semibold text-gray-text">Total Coupons</p>
+            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{coupons.length}</p>
           </div>
         </div>
-        <div className="rounded-[24px] bg-white border border-[#E5E7EB] p-6 shadow-sm flex items-center gap-4 sm:col-span-2 lg:col-span-1">
+        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4 sm:col-span-2 lg:col-span-1">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600">
             <Calendar className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#4B5563]">Expired Coupons</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-[#111827]">
+            <p className="text-sm font-semibold text-gray-text">Expired Coupons</p>
+            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
               {coupons.filter(c => new Date(c.validUntil) <= new Date()).length}
             </p>
           </div>
@@ -160,51 +130,51 @@ export default function TraderCouponsPage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* ── Create Coupon Form ── */}
-        <div className="rounded-3xl border border-[#E5E7EB] bg-white p-6 shadow-sm h-fit">
-          <h2 className="font-['Montserrat'] text-lg font-bold text-[#111827] mb-4 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-[#BBFF63]" style={{ strokeWidth: 3 }} />
+        <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm h-fit">
+          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" style={{ strokeWidth: 3 }} />
             Create Coupon
           </h2>
           <form onSubmit={handleCreateCoupon} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#4B5563] mb-1">Coupon Code</label>
+              <label className="block text-sm font-semibold text-gray-text mb-1">Coupon Code</label>
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="e.g. SUMMER30"
-                className="w-full h-11 px-4 border border-[#E5E7EB] rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-[#111827]"
+                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#4B5563] mb-1">Discount (%)</label>
+              <label className="block text-sm font-semibold text-gray-text mb-1">Discount (%)</label>
               <input
                 type="number"
                 min="1"
                 max="100"
                 value={discount}
                 onChange={(e) => setDiscount(Number(e.target.value))}
-                className="w-full h-11 px-4 border border-[#E5E7EB] rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-[#111827]"
+                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#4B5563] mb-1">Valid Until</label>
+              <label className="block text-sm font-semibold text-gray-text mb-1">Valid Until</label>
               <input
                 type="datetime-local"
                 value={validUntil}
                 onChange={(e) => setValidUntil(e.target.value)}
-                className="w-full h-11 px-4 border border-[#E5E7EB] rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-[#111827]"
+                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#4B5563] mb-1">Category Restriction (Optional)</label>
+              <label className="block text-sm font-semibold text-gray-text mb-1">Category Restriction (Optional)</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full h-11 px-4 border border-[#E5E7EB] rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-[#111827]"
+                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
               >
                 <option value="">No Restriction (Applies to all)</option>
                 {categories.map((cat) => (
@@ -216,11 +186,11 @@ export default function TraderCouponsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#4B5563] mb-1">Product Restriction (Optional)</label>
+              <label className="block text-sm font-semibold text-gray-text mb-1">Product Restriction (Optional)</label>
               <select
                 value={selectedProduct}
                 onChange={(e) => setSelectedProduct(e.target.value)}
-                className="w-full h-11 px-4 border border-[#E5E7EB] rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-[#111827]"
+                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
               >
                 <option value="">No Restriction (Applies to all)</option>
                 {products.map((prod) => (
@@ -234,7 +204,7 @@ export default function TraderCouponsPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 bg-[#111827] text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50"
+              className="w-full h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50"
             >
               {isSubmitting ? "Creating..." : "Create Coupon"}
             </button>
@@ -242,24 +212,24 @@ export default function TraderCouponsPage() {
         </div>
 
         {/* ── Coupons List Table ── */}
-        <div className="rounded-3xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:col-span-2">
-          <h2 className="font-['Montserrat'] text-lg font-bold text-[#111827] mb-4">
+        <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm lg:col-span-2">
+          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
             Coupon Management
           </h2>
           
           {loading ? (
-            <div className="py-12 text-center text-[#9CA3AF] font-medium font-['Montserrat']">
+            <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
               Loading coupons...
             </div>
           ) : coupons.length === 0 ? (
-            <div className="py-12 text-center text-[#9CA3AF] font-medium font-['Montserrat']">
+            <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
               No coupons created yet. Use the left form to add your first coupon!
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#E5E7EB] text-xs font-bold text-[#6B7280] uppercase tracking-wider">
+                  <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
                     <th className="py-3 pr-4">Code</th>
                     <th className="py-3 px-4">Discount</th>
                     <th className="py-3 px-4">Restrictions</th>
@@ -272,8 +242,8 @@ export default function TraderCouponsPage() {
                   {coupons.map((coupon) => {
                     const isExpired = new Date(coupon.validUntil) <= new Date();
                     return (
-                      <tr key={coupon.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-[#F9FAFB] transition">
-                        <td className="py-4 pr-4 font-['Montserrat'] font-bold text-[#111827]">
+                      <tr key={coupon.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-background transition">
+                        <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
                           {coupon.code}
                         </td>
                         <td className="py-4 px-4 font-['Montserrat'] font-semibold">
@@ -291,10 +261,10 @@ export default function TraderCouponsPage() {
                               {coupon.category.name}
                             </span>
                           ) : (
-                            <span className="text-[#9CA3AF] text-xs">Global Coupon</span>
+                            <span className="text-gray-text text-xs">Global Coupon</span>
                           )}
                         </td>
-                        <td className="py-4 px-4 font-['Montserrat'] text-xs text-[#6B7280]">
+                        <td className="py-4 px-4 font-['Montserrat'] text-xs text-gray-text">
                           {new Date(coupon.validUntil).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-4">

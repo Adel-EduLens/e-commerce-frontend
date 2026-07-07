@@ -49,7 +49,7 @@ export function RecommedProducts({
         <h2 className="w-full font-['Montserrat'] text-xl font-bold text-foreground md:text-3xl sm:text-5xl">
           Recommended for You
         </h2>
-        <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
+        <p className="font-['Montserrat'] text-lg text-gray-text">Loading...</p>
       </section>
     );
   }

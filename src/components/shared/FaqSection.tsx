@@ -1,6 +1,5 @@
 import CollapsibleFAQ from './CollapsibleFAQ'
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../../lib/utils';
 
 function AssetImage({
   file,

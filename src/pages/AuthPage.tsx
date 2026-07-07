@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { Globe, ChevronDown } from 'lucide-react'
 import { AxiosError } from 'axios'
 import type { ApiErrorResponse } from '../types/api'
+import { handleApiError } from '../lib/utils';
 
 interface AuthPageProps {
   mode: 'login' | 'signup'
@@ -97,9 +98,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
       console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role)
       navigate(dest, { replace: true })
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>
-      const errMsg = err.response?.data?.message || t('toast.loginFailed')
-      toast.error(errMsg)
+      handleApiError(error, t('toast.loginFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -121,9 +120,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             : '/'
       )
     } catch (error) {
-      const err = error as AxiosError<ApiErrorResponse>
-      const errMsg = err.response?.data?.message || t('toast.signupFailed')
-      toast.error(errMsg)
+      handleApiError(error, t('toast.signupFailed'))
     } finally {
       setIsLoading(false)
     }

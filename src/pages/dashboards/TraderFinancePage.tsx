@@ -59,16 +59,16 @@ function pillStyle(status: string) {
 
 function Pagination() {
   return (
-    <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-      <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-        <span className="font-['Inter'] text-sm font-medium text-[#111827]">6 per page</span>
+    <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+      <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+        <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
         <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
       </div>
-      <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-        <span className="font-['Inter'] text-sm font-medium text-[#111827]">
-          1-6 <span className="text-[#6B7280]">of 14</span>
+      <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+        <span className="font-['Inter'] text-sm font-medium text-foreground">
+          1-6 <span className="text-gray-text">of 14</span>
         </span>
-        <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+        <span className="mx-1 h-5 border-l border-stroke" />
         <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
           <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
         </button>
@@ -84,7 +84,7 @@ function ExportBtn() {
   return (
     <button
       type="button"
-      className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+      className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
     >
       <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
         <rect x="1.5" y="2.5" width="17" height="14" rx="1.5" stroke="#111827" strokeWidth="1.5" />
@@ -98,9 +98,9 @@ function ExportBtn() {
 function ThreeDot() {
   return (
     <button type="button" className="flex h-4 w-4 flex-col items-center justify-center gap-0.5">
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-      <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+      <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
     </button>
   );
 }
@@ -122,12 +122,12 @@ function RevenueChannelChart() {
       <div className="flex flex-col gap-6">
         {channels.map((ch) => (
           <div key={ch.label} className="flex items-center gap-3">
-            <span className="w-28 shrink-0 text-right font-['Montserrat'] text-sm font-semibold text-[#111827]">
+            <span className="w-28 shrink-0 text-right font-['Montserrat'] text-sm font-semibold text-foreground">
               {ch.label}
             </span>
-            <div className="flex-1 h-4 rounded-[10px] bg-[#F3F4F6] overflow-hidden">
+            <div className="flex-1 h-4 rounded-[10px] bg-gray-light overflow-hidden">
               <div
-                className="h-full rounded-[10px] bg-[#BBFF63]"
+                className="h-full rounded-[10px] bg-primary"
                 style={{ width: `${(ch.value / max) * 100}%` }}
               />
             </div>
@@ -136,7 +136,7 @@ function RevenueChannelChart() {
       </div>
       <div className="flex justify-between pl-[7.5rem]">
         {xLabels.map((l) => (
-          <span key={l} className="font-['Montserrat'] text-sm font-medium text-[#111827]">{l}</span>
+          <span key={l} className="font-['Montserrat'] text-sm font-medium text-foreground">{l}</span>
         ))}
       </div>
     </div>
@@ -182,20 +182,20 @@ function FinanceDonutChart() {
       </svg>
       <div className="grid w-full grid-cols-2 gap-x-6 gap-y-3 px-2">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 shrink-0 rounded bg-[#BBFF63]" />
-          <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">Retail 35%</span>
+          <div className="h-4 w-4 shrink-0 rounded bg-primary" />
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground">Retail 35%</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 shrink-0 rounded bg-[#7DD3FC]" />
-          <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">Dropship — 30%</span>
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground">Dropship — 30%</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 shrink-0 rounded bg-[#FCD34D]" />
-          <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">Wholesales — 25%</span>
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground">Wholesales — 25%</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-4 w-4 shrink-0 rounded bg-[#C084FC]" />
-          <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">Brands — 10%</span>
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground">Brands — 10%</span>
         </div>
       </div>
     </div>
@@ -207,12 +207,12 @@ function FinanceDonutChart() {
 function DarkTH({ cols }: { cols: string[] }) {
   return (
     <thead>
-      <tr className="bg-[#111827]">
+      <tr className="bg-secondary">
         <th className="px-4 py-3">
-          <div className="h-5 w-5 rounded-md border border-[#BBFF63] bg-[#111827]" />
+          <div className="h-5 w-5 rounded-md border border-primary bg-secondary" />
         </th>
         {cols.map((col) => (
-          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-[#BBFF63] whitespace-nowrap">
+          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
             {col}
           </th>
         ))}
@@ -226,11 +226,11 @@ function DarkTH({ cols }: { cols: string[] }) {
 export default function TraderFinancePage() {
   const [search, setSearch] = useState("");
 
-  const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]");
+  const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-background");
 
   const CheckBox = ({ checked }: { checked: boolean }) => (
     <td className="px-4 py-3">
-      <div className={`h-5 w-5 rounded-md border ${checked ? "border-[#111827] bg-[#111827]" : "border-[#E5E7EB] bg-white"}`}>
+      <div className={`h-5 w-5 rounded-md border ${checked ? "border-secondary bg-secondary" : "border-stroke bg-white"}`}>
         {checked && (
           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
             <path d="M5 10.5l3.5 3.5 6.5-7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -251,11 +251,11 @@ export default function TraderFinancePage() {
                 placeholder="Search customers"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                className="w-full rounded-2xl border border-stroke bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text focus:border-stroke"
               />
             </label>
             {["Date Range", "Compare"].map((f) => (
-              <button key={f} type="button" className="flex h-11 items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]">
+              <button key={f} type="button" className="flex h-11 items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
                 {f}
                 <img className="h-5 w-5 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
               </button>
@@ -265,12 +265,12 @@ export default function TraderFinancePage() {
           {/* Top stat cards */}
           <div className="flex gap-4 overflow-x-auto pb-1">
             {topCards.map((card) => (
-              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-[#E5E7EB] bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
                 <div className="absolute left-4 top-4 flex flex-col gap-2">
-                  <p className="font-['Montserrat'] text-base font-medium text-[#6B7280]">{card.label}</p>
-                  <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+                  <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+                  <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                 </div>
-                <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#BBFF63]">
+                <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
                   <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                     <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
@@ -280,7 +280,7 @@ export default function TraderFinancePage() {
                   <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                     {card.trendUp ? "+" : "-"}{card.trend}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.sub}</span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
                 </div>
               </div>
             ))}
@@ -288,20 +288,20 @@ export default function TraderFinancePage() {
 
           {/* Revenue by Channel + Donut */}
           <div className="flex gap-4">
-            <div className="flex-1 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-5 font-['Montserrat'] text-xl font-semibold text-[#111827]">Revenue by Sales Channel</h2>
+            <div className="flex-1 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-5 font-['Montserrat'] text-xl font-semibold text-foreground">Revenue by Sales Channel</h2>
               <RevenueChannelChart />
             </div>
-            <div className="w-80 shrink-0 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Order Status Distribution</h2>
+            <div className="w-80 shrink-0 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Order Status Distribution</h2>
               <FinanceDonutChart />
             </div>
           </div>
 
           {/* Earnings Break Down */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-              <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Earnings Break Down</h2>
+          <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Earnings Break Down</h2>
               <ExportBtn />
             </div>
             <div className="overflow-x-auto">
@@ -311,13 +311,13 @@ export default function TraderFinancePage() {
                   {earningsRows.map((row, idx) => (
                     <tr key={row.source} className={rowBg(idx)}>
                       <CheckBox checked={idx === 1} />
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.source}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.revenue}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.pct}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.avgOrder}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.orders}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.lastPurchase}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.profit}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.source}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.revenue}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.pct}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.avgOrder}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.orders}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.lastPurchase}</td>
+                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.profit}</td>
                       <td className="px-4 py-3"><ThreeDot /></td>
                     </tr>
                   ))}
@@ -330,16 +330,16 @@ export default function TraderFinancePage() {
           {/* Channel revenue cards */}
           <div className="flex gap-4 overflow-x-auto pb-1">
             {channelCards.map((card) => (
-              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-[#E5E7EB] bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
                 <div className="absolute left-4 top-4 flex flex-col gap-2">
-                  <p className="font-['Montserrat'] text-base font-medium text-[#6B7280]">{card.label}</p>
-                  <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+                  <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+                  <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-1">
                   <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                     {card.trendUp ? "+" : "-"}{card.trend}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.sub}</span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
                 </div>
               </div>
             ))}
@@ -349,9 +349,9 @@ export default function TraderFinancePage() {
           <div className="grid gap-4 lg:grid-cols-2">
 
             {/* Refunds Summary */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-                <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Refunds Summary</h2>
+            <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Refunds Summary</h2>
                 <ExportBtn />
               </div>
               <div className="overflow-x-auto">
@@ -363,10 +363,10 @@ export default function TraderFinancePage() {
                       return (
                         <tr key={idx} className={rowBg(idx)}>
                           <CheckBox checked={idx === 1} />
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.id}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.customer}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.amount}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.reason}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.id}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.customer}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.amount}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.reason}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                               {row.status}
@@ -383,9 +383,9 @@ export default function TraderFinancePage() {
             </div>
 
             {/* Payouts Section */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-                <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Payouts Section</h2>
+            <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Payouts Section</h2>
                 <ExportBtn />
               </div>
               <div className="overflow-x-auto">
@@ -397,10 +397,10 @@ export default function TraderFinancePage() {
                       return (
                         <tr key={idx} className={rowBg(idx)}>
                           <CheckBox checked={idx === 1} />
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.id}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.amount}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.method}</td>
-                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.date}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.id}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.amount}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.method}</td>
+                          <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.date}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                               {row.status}
@@ -418,9 +418,9 @@ export default function TraderFinancePage() {
           </div>
 
           {/* Transaction History */}
-          <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
-              <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Transaction History</h2>
+          <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
+              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Transaction History</h2>
               <ExportBtn />
             </div>
             <div className="overflow-x-auto">
@@ -432,14 +432,14 @@ export default function TraderFinancePage() {
                     return (
                       <tr key={idx} className={rowBg(idx)}>
                         <CheckBox checked={idx === 1} />
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.id}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.type}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.channel}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.id}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.type}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.channel}</td>
                         <td className={`px-4 py-3 font-['Montserrat'] text-xs font-medium ${row.positive ? "text-teal-500" : "text-rose-500"}`}>{row.amount}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.fees}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.net}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.date}</td>
-                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{row.method}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.fees}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.net}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.date}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.method}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                             {row.status}

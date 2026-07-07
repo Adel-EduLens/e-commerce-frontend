@@ -73,13 +73,13 @@ function ThemeMockup({ isDark = false }: { isDark?: boolean }) {
       className={`h-36 w-full overflow-hidden ${isDark ? "bg-[#0f1115]" : "bg-white"}`}
     >
       <div
-        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-[#1c1b2e]" : "bg-[#F9FAFB]"}`}
+        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-[#1c1b2e]" : "bg-background"}`}
       >
         <div className="grid grid-cols-2 gap-2 p-2">
-          <div className="h-10 bg-[#BBFF63]" />
-          <div className="h-10 bg-[#BBFF63]" />
-          <div className="h-10 bg-[#BBFF63]" />
-          <div className="h-10 bg-[#BBFF63]" />
+          <div className="h-10 bg-primary" />
+          <div className="h-10 bg-primary" />
+          <div className="h-10 bg-primary" />
+          <div className="h-10 bg-primary" />
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@ function ThemeCard({
           {label}
         </div>
         {selected && (
-          <CheckCircle className="h-5 w-5 fill-[#BBFF63] text-[#BBFF63]" />
+          <CheckCircle className="h-5 w-5 fill-[#BBFF63] text-primary" />
         )}
       </div>
     </div>

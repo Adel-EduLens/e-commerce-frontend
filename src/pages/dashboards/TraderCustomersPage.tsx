@@ -100,8 +100,8 @@ function DonutChart() {
         {segments.map((seg) => (
           <div key={seg.label} className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: seg.color, border: seg.color === "#E5E7EB" ? "1px solid #D1D5DB" : undefined }} />
-            <span className="font-['Montserrat'] text-xs text-[#6B7280]">{seg.label}</span>
-            <span className="ml-auto font-['Montserrat'] text-xs font-semibold text-[#111827]">{seg.value}%</span>
+            <span className="font-['Montserrat'] text-xs text-gray-text">{seg.label}</span>
+            <span className="ml-auto font-['Montserrat'] text-xs font-semibold text-foreground">{seg.value}%</span>
           </div>
         ))}
       </div>
@@ -120,24 +120,24 @@ function OverviewPanel() {
       {rows.map((row) => (
         <div key={row.label} className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">{row.label}</span>
-            <span className="font-['Montserrat'] text-xs font-semibold text-[#111827]">{row.pct}%</span>
+            <span className="font-['Montserrat'] text-xs font-medium text-gray-text">{row.label}</span>
+            <span className="font-['Montserrat'] text-xs font-semibold text-foreground">{row.pct}%</span>
           </div>
-          <div className="h-3 w-full overflow-hidden rounded-full bg-[#F3F4F6]">
+          <div className="h-3 w-full overflow-hidden rounded-full bg-gray-light">
             <div className="h-full rounded-full" style={{ width: `${row.pct}%`, backgroundColor: row.color }} />
           </div>
         </div>
       ))}
       <div className="mt-1 grid grid-cols-2 gap-3">
-        <div className="rounded-xl bg-[#F9FAFB] p-3">
-          <p className="font-['Montserrat'] text-[10px] font-medium text-[#6B7280]">Returning Customers</p>
+        <div className="rounded-xl bg-background p-3">
+          <p className="font-['Montserrat'] text-[10px] font-medium text-gray-text">Returning Customers</p>
           <p className="mt-0.5 font-['Montserrat'] text-sm font-bold text-emerald-600">+8.5%</p>
-          <p className="font-['Montserrat'] text-[10px] text-[#9CA3AF]">8% this month</p>
+          <p className="font-['Montserrat'] text-[10px] text-gray-text">8% this month</p>
         </div>
-        <div className="rounded-xl bg-[#F9FAFB] p-3">
-          <p className="font-['Montserrat'] text-[10px] font-medium text-[#6B7280]">New Customers</p>
+        <div className="rounded-xl bg-background p-3">
+          <p className="font-['Montserrat'] text-[10px] font-medium text-gray-text">New Customers</p>
           <p className="mt-0.5 font-['Montserrat'] text-sm font-bold text-red-500">-3%</p>
-          <p className="font-['Montserrat'] text-[10px] text-[#9CA3AF]">since last month</p>
+          <p className="font-['Montserrat'] text-[10px] text-gray-text">since last month</p>
         </div>
       </div>
       <p className="rounded-xl bg-[#F0FDF4] px-3 py-2 font-['Montserrat'] text-xs text-emerald-700">
@@ -218,7 +218,7 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+        className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
       >
         <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
           <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -229,12 +229,12 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
       {/* Stat cards */}
       <div className="flex gap-4 overflow-x-auto pb-1">
         {statCards.map((card) => (
-          <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-[#E5E7EB] bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <div className="absolute left-4 top-4 flex flex-col gap-2">
-              <p className="font-['Montserrat'] text-base font-medium text-[#6B7280]">{card.label}</p>
-              <p className="font-['Montserrat'] text-2xl font-semibold text-[#111827]">{card.value}</p>
+              <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+              <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
             </div>
-            <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[#BBFF63]">
+            <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
               <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                 <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
@@ -244,15 +244,15 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
               <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                 {card.trendUp ? "+" : "-"}{card.trend}
               </span>
-              <span className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">{card.sub}</span>
+              <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
             </div>
           </div>
         ))}
       </div>
 
       {/* Customer Information */}
-      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Customer Information</h3>
+      <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Customer Information</h3>
         <div className="flex flex-col gap-4">
           {[
             { label: "Name", value: customer.name },
@@ -261,9 +261,9 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
             { label: "Address", value: "12 El Tahrir St, Cairo" },
           ].map((row) => (
             <div key={row.label} className="flex items-center gap-1.5">
-              <div className="h-6 w-6 shrink-0 rounded bg-[#F3F4F6]" />
-              <span className="font-['Montserrat'] text-base font-semibold text-[#6B7280]">{row.label} </span>
-              <span className="font-['Montserrat'] text-base font-semibold text-[#111827]">{row.value}</span>
+              <div className="h-6 w-6 shrink-0 rounded bg-gray-light" />
+              <span className="font-['Montserrat'] text-base font-semibold text-gray-text">{row.label} </span>
+              <span className="font-['Montserrat'] text-base font-semibold text-foreground">{row.value}</span>
             </div>
           ))}
         </div>
@@ -271,42 +271,42 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
 
       {/* Spending Chart + Behavior Insights */}
       <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Customer Spending Over Time</h3>
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Customer Spending Over Time</h3>
           <LineChart />
         </div>
 
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-[#111827]">Behavior Insights</h3>
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Behavior Insights</h3>
           <div className="flex flex-col gap-3">
             {insights.map((ins) => (
-              <div key={ins.label} className="rounded-lg border border-[#E5E7EB] bg-[#F5F7FA] px-2 py-2 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]">
-                <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">{ins.label}</p>
-                <p className="mt-0.5 font-['Montserrat'] text-sm font-medium text-[#6B7280]">{ins.value}</p>
+              <div key={ins.label} className="rounded-lg border border-stroke bg-background px-2 py-2 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.10)]">
+                <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{ins.label}</p>
+                <p className="mt-0.5 font-['Montserrat'] text-sm font-medium text-gray-text">{ins.value}</p>
               </div>
             ))}
           </div>
           <div className="mt-4 text-center">
-            <span className="cursor-pointer font-['Montserrat'] text-xs font-medium text-[#6B7280] hover:underline">View All</span>
+            <span className="cursor-pointer font-['Montserrat'] text-xs font-medium text-gray-text hover:underline">View All</span>
           </div>
         </div>
       </div>
 
       {/* Order History */}
-      <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <div className="flex items-center justify-between border-b border-[#E5E7EB] px-4 py-4">
+      <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
           <div className="flex items-center gap-4">
-            <h3 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">Order History</h3>
+            <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Order History</h3>
             <div className="flex items-center gap-2">
               {["Payment", "Delivery", "Date Range"].map((f) => (
-                <button key={f} type="button" className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]">
+                <button key={f} type="button" className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-2 py-1 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background">
                   {f}
                   <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
                 </button>
               ))}
             </div>
           </div>
-          <button type="button" className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]">
+          <button type="button" className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
               <rect x="1.5" y="2.5" width="17" height="14" rx="1.5" stroke="#111827" strokeWidth="1.5" />
               <path d="M1.5 7h17" stroke="#111827" strokeWidth="1.5" />
@@ -318,16 +318,16 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-[#111827]">
+              <tr className="bg-secondary">
                 <th className="px-4 py-3">
-                  <div className="h-5 w-5 rounded-md border border-[#BBFF63] bg-[#111827] flex items-center justify-center">
+                  <div className="h-5 w-5 rounded-md border border-primary bg-secondary flex items-center justify-center">
                     <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
                       <path d="M2.5 6.5l2.5 2.5 4.5-5" stroke="#BBFF63" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
                 {["Order ID", "Date", "Items", "Payment", "Total", "Status", "Actions"].map((col) => (
-                  <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-[#BBFF63] whitespace-nowrap">
+                  <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
                     {col}
                   </th>
                 ))}
@@ -337,9 +337,9 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
               {customerOrders.map((order, idx) => {
                 const pill = orderStatusPill(order.status);
                 return (
-                  <tr key={order.id} className={idx % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}>
+                  <tr key={order.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
                     <td className="px-4 py-3">
-                      <div className={`h-5 w-5 rounded-md border ${idx === 1 ? "border-[#111827] bg-[#111827]" : "border-[#E5E7EB] bg-white"}`}>
+                      <div className={`h-5 w-5 rounded-md border ${idx === 1 ? "border-secondary bg-secondary" : "border-stroke bg-white"}`}>
                         {idx === 1 && (
                           <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
                             <path d="M5 10.5l3.5 3.5 6.5-7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -347,11 +347,11 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{order.id}</td>
-                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{order.date}</td>
-                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{order.items}</td>
-                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{order.payment}</td>
-                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{order.total}</td>
+                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.id}</td>
+                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.date}</td>
+                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.items}</td>
+                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.payment}</td>
+                    <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.total}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                         {order.status}
@@ -359,9 +359,9 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
                     </td>
                     <td className="px-4 py-3">
                       <button type="button" className="flex h-6 w-4 flex-col items-center justify-center gap-1">
-                        <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-                        <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
-                        <span className="h-0.5 w-0.5 rounded-full bg-[#6B7280]" />
+                        <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+                        <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
+                        <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
                       </button>
                     </td>
                   </tr>
@@ -372,16 +372,16 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-          <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-            <span className="font-['Inter'] text-sm font-medium text-[#111827]">6 per page</span>
+        <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+          <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+            <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
             <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-            <span className="font-['Inter'] text-sm font-medium text-[#111827]">
-              1-6 <span className="text-[#6B7280]">of {customerOrders.length}</span>
+          <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
+            <span className="font-['Inter'] text-sm font-medium text-foreground">
+              1-6 <span className="text-gray-text">of {customerOrders.length}</span>
             </span>
-            <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+            <span className="mx-1 h-5 border-l border-stroke" />
             <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
               <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
             </button>
@@ -431,9 +431,9 @@ export default function TraderCustomersPage() {
               {/* Summary Cards */}
               <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
                 {summaryCards.map((card) => (
-                  <div key={card.label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                    <p className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">{card.label}</p>
-                    <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-[#111827]">{card.value}</p>
+                  <div key={card.label} className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                    <p className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.label}</p>
+                    <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
                     <p className={`mt-0.5 font-['Montserrat'] text-xs font-medium ${card.up ? "text-emerald-600" : "text-red-500"}`}>
                       {card.trend}
                     </p>
@@ -454,12 +454,12 @@ export default function TraderCustomersPage() {
                     placeholder="Search customers..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none transition placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                    className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
                   />
                 </label>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-xl bg-[#111827] px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:bg-[#1F2937]"
+                  className="flex items-center gap-2 rounded-xl bg-secondary px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:bg-[#1F2937]"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
                     <path d="M2 3h12M2 8h8M2 13h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -471,15 +471,15 @@ export default function TraderCustomersPage() {
               </div>
 
               {/* Customer Activity Table */}
-              <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
-                  <h2 className="font-['Montserrat'] text-base font-semibold text-[#111827]">Customer Activity</h2>
+              <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
+                  <h2 className="font-['Montserrat'] text-base font-semibold text-foreground">Customer Activity</h2>
                   <div className="flex items-center gap-2">
                     {(["Status", "Activity", "Spending", "Date Range"] as const).map((label) => (
                       <button
                         key={label}
                         type="button"
-                        className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                        className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
                       >
                         {label}
                         <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
@@ -487,7 +487,7 @@ export default function TraderCustomersPage() {
                     ))}
                     <button
                       type="button"
-                      className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                      className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
                     >
                       <img className="h-4 w-4" src={asset("download-cloud-02.svg")} alt="" />
                       Export
@@ -498,9 +498,9 @@ export default function TraderCustomersPage() {
                 <div className="overflow-x-auto">
                   <table className="min-w-full border-separate border-spacing-0">
                     <thead>
-                      <tr className="bg-[#111827]">
+                      <tr className="bg-secondary">
                         {["Customer Name", "Email", "Orders", "Total Spent", "Frequency", "Last Purchase", "Status", "Actions"].map((col) => (
-                          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-[#BBFF63] whitespace-nowrap">
+                          <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
                             {col}
                           </th>
                         ))}
@@ -512,7 +512,7 @@ export default function TraderCustomersPage() {
                         return (
                           <tr
                             key={customer.id}
-                            className={`cursor-pointer transition hover:bg-[#F9FAFB] ${idx % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}`}
+                            className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-white" : "bg-background"}`}
                             onClick={() => setSelectedCustomer(customer)}
                           >
                             <td className="px-4 py-3">
@@ -522,14 +522,14 @@ export default function TraderCustomersPage() {
                                   src={asset(customer.avatar)}
                                   alt={customer.name}
                                 />
-                                <span className="font-['Montserrat'] text-xs font-semibold text-[#111827] whitespace-nowrap">{customer.name}</span>
+                                <span className="font-['Montserrat'] text-xs font-semibold text-foreground whitespace-nowrap">{customer.name}</span>
                               </div>
                             </td>
-                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-[#6B7280]">{customer.email}</td>
-                            <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-[#111827]">{customer.orders}</td>
-                            <td className="px-4 py-3 font-['Montserrat'] text-xs font-semibold text-[#111827]">{customer.totalSpent}</td>
-                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-[#6B7280]">{customer.frequency}</td>
-                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-[#6B7280]">{customer.lastPurchase}</td>
+                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-gray-text">{customer.email}</td>
+                            <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{customer.orders}</td>
+                            <td className="px-4 py-3 font-['Montserrat'] text-xs font-semibold text-foreground">{customer.totalSpent}</td>
+                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-gray-text">{customer.frequency}</td>
+                            <td className="px-4 py-3 font-['Montserrat'] text-xs text-gray-text">{customer.lastPurchase}</td>
                             <td className="px-4 py-3">
                               <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
                                 {customer.status}
@@ -539,14 +539,14 @@ export default function TraderCustomersPage() {
                               <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   type="button"
-                                  className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                                  className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                                   title="Edit"
                                 >
                                   <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
                                 </button>
                                 <button
                                   type="button"
-                                  className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                                  className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                                   title="Delete"
                                 >
                                   <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
@@ -561,16 +561,16 @@ export default function TraderCustomersPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-                  <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                    <span className="font-['Montserrat'] text-sm font-medium text-[#111827]">10 per page</span>
+                <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                    <span className="font-['Montserrat'] text-sm font-medium text-foreground">10 per page</span>
                     <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                    <span className="font-['Inter'] text-sm font-medium text-[#111827]">
-                      1-6 <span className="text-[#6B7280]">of {customers.length}</span>
+                  <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                    <span className="font-['Inter'] text-sm font-medium text-foreground">
+                      1-6 <span className="text-gray-text">of {customers.length}</span>
                     </span>
-                    <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+                    <span className="mx-1 h-5 border-l border-stroke" />
                     <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
                       <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
                     </button>
@@ -584,8 +584,8 @@ export default function TraderCustomersPage() {
               {/* Bottom panels */}
               <div className="grid gap-4 lg:grid-cols-3">
                 {/* Recent Alerts */}
-                <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                  <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-[#111827]">Recent Alerts</h3>
+                <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                  <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">Recent Alerts</h3>
                   <div className="flex flex-col gap-3">
                     {alerts.map((alert, i) => (
                       <div
@@ -607,25 +607,25 @@ export default function TraderCustomersPage() {
                               : "bg-emerald-400"
                           }`}
                         />
-                        <p className="font-['Montserrat'] text-xs font-medium text-[#111827]">{alert.text}</p>
+                        <p className="font-['Montserrat'] text-xs font-medium text-foreground">{alert.text}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Customer by Status (Donut) */}
-                <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                  <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-[#111827]">Customer by Status</h3>
+                <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                  <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">Customer by Status</h3>
                   <DonutChart />
                 </div>
 
                 {/* Overview (Horizontal Bars) */}
-                <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
                   <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-['Montserrat'] text-base font-semibold text-[#111827]">Overview</h3>
+                    <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">Overview</h3>
                     <button
                       type="button"
-                      className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                      className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
                     >
                       This Week
                       <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />

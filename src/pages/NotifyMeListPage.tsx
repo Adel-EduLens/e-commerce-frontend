@@ -12,25 +12,25 @@ function ProductRequestCard() {
         draggable={false}
       />
       <div className="flex flex-1 flex-col gap-2 py-2">
-        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
           Amber Blaze Classic Tee
         </div>
-        <div className="font-['Montserrat'] text-base sm:text-xl font-semibold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-base sm:text-xl font-semibold text-foreground">
           $250
         </div>
-        <div className="inline-flex flex-wrap items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-          <div className="font-['Montserrat'] text-sm sm:text-base text-[#1A1A1A]">
+        <div className="inline-flex flex-wrap items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-stroke">
+          <div className="font-['Montserrat'] text-sm sm:text-base text-foreground">
             <span className="font-medium">Size: </span>
             <span className="font-bold">XXL</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
               Color:
             </div>
             <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-[#FECACA]" />
           </div>
         </div>
-        <div className="font-['Montserrat'] text-xs sm:text-sm font-semibold text-[#6B7280]">
+        <div className="font-['Montserrat'] text-xs sm:text-sm font-semibold text-gray-text">
           Requested on Sep 30, 2025
         </div>
       </div>
@@ -48,10 +48,10 @@ function NotifyMePanel() {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
           NOTIFY ME LIST
         </div>
-        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
           You'll be notified as soon as these items come back in stock.
         </div>
       </div>

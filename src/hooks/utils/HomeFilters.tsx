@@ -1,38 +1,22 @@
 import { useMemo } from "react";
-import { useProducts } from "../queries/productsQuery";
+import { useProducts, useProductFilters } from "../queries/productsQuery";
 
-export  function useHomeFilters() {
-  const { data } = useProducts({ limit: 100 });
+export function useHomeFilters() {
+  const { data: filtersData, isLoading: isLoadingFilters } = useProductFilters()
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 100 })
 
-  const products = data?.products ?? [];
-  const allCategories = useMemo(
-    () => [...new Set(products.map((p) => p.category.name))],
-    [products],
-  );
-  const allBrands = useMemo(
-    () => [
-      ...new Set(
-        products.map((p) => p.brand?.name).filter(Boolean) as string[],
-      ),
-    ],
-    [products],
-  );
-  const allSizes = useMemo(
-    () => [...new Set(products.flatMap((p) => p.sizes.map((s) => s.size)))],
-    [products],
-  );
-  const allColors = useMemo(
-    () => [...new Set(products.flatMap((p) => p.colors.map((c) => c.color)))],
-    [products],
-  );
+  const products = productsData?.products ?? []
+  const allCategories = filtersData?.categories ?? []
+  const allBrands = filtersData?.brands ?? []
+  const allSizes = filtersData?.sizes ?? []
+  const allColors = filtersData?.colors ?? []
 
-  return useMemo(
-    () => [
-      { key: "category", label: "Category", options: allCategories },
-      { key: "brand", label: "Brand", options: allBrands },
-      { key: "size", label: "Size", options: allSizes },
-      { key: "color", label: "Color", options: allColors },
-    ],
-    [allCategories, allBrands, allSizes, allColors],
-  );
+  const filters = useMemo(() => [
+    { key: 'category', label: 'Category', options: allCategories },
+    { key: 'brand', label: 'Brand', options: allBrands },
+    { key: 'size', label: 'Size', options: allSizes },
+    { key: 'color', label: 'Color', options: allColors },
+  ], [allCategories, allBrands, allSizes, allColors])
+
+  return { filters, products, isLoading: isLoadingProducts || isLoadingFilters }
 }

@@ -3,17 +3,16 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { ProductCard } from "../../components/shared";
 import CatalogFilters from "../../components/shared/CatalogFilters";
 import { useHomeFilters } from "../../hooks/utils/HomeFilters";
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../../lib/utils';
 
 function ViewAllButton({ onClick }: { onClick?: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4"
+      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4"
     >
-      <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
         View All
       </div>
     </button>
@@ -29,7 +28,7 @@ function ProductGallery({ title }: { title: string }) {
       <div className="w-full overflow-hidden rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-foreground">
         <div className="flex gap-2">
           {/* Main image */}
-          <div className="flex-1 bg-[#F9FAFB] rounded-lg overflow-hidden">
+          <div className="flex-1 bg-background rounded-lg overflow-hidden">
             <img
               className="w-full h-full object-contain"
               src={asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png")}
@@ -40,7 +39,7 @@ function ProductGallery({ title }: { title: string }) {
           {/* Thumbnail column */}
           <div className="hidden sm:flex w-24 flex-col gap-2">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex-1 bg-[#F9FAFB] rounded-lg overflow-hidden">
+              <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden">
                 <img
                   className="w-full h-full object-contain"
                   src={asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png")}

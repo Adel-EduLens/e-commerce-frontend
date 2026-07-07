@@ -72,7 +72,7 @@ export default function ProductsSection({
       </h2>
       <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
         <CatalogFilters filters={filters} onFilterChange={setFilterValues} />
-        {isPending ?? (
+        {isPending && (
           <div className="flex w-full flex-wrap justify-center gap-6">
             <div className="w-full py-2 text-center text-gray-text">
               Loading...

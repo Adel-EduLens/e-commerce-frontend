@@ -30,25 +30,25 @@ function HeroSection() {
   const { t } = useTranslation("dropshipping");
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl bg-[#BBFF63] px-6 py-10 sm:px-10 sm:py-14 lg:h-[770px] lg:px-0 lg:py-0">
+    <div className="relative w-full overflow-hidden rounded-3xl bg-primary px-6 py-10 sm:px-10 sm:py-14 lg:h-[770px] lg:px-0 lg:py-0">
       <div className="relative z-10 flex flex-col lg:block lg:h-full">
-        <h1 className="max-w-full font-['Montserrat'] text-4xl font-bold text-[#1A1A1A] sm:text-6xl lg:absolute lg:start-[24px] lg:top-[122px] lg:w-[833px] lg:text-8xl">
+        <h1 className="max-w-full font-['Montserrat'] text-4xl font-bold text-foreground sm:text-6xl lg:absolute lg:start-[24px] lg:top-[122px] lg:w-[833px] lg:text-8xl">
           {t("hero.title")}
         </h1>
 
-        <p className="mt-6 max-w-md font-['Montserrat'] text-xl font-medium text-[#1A1A1A] sm:text-2xl lg:absolute lg:start-[24px] lg:top-[614px] lg:mt-0 lg:max-w-none lg:text-3xl">
+        <p className="mt-6 max-w-md font-['Montserrat'] text-xl font-medium text-foreground sm:text-2xl lg:absolute lg:start-[24px] lg:top-[614px] lg:mt-0 lg:max-w-none lg:text-3xl">
           {t("hero.tagline")}
         </p>
 
-        <div className="mt-8 inline-flex w-fit items-center justify-start gap-2 rounded-2xl bg-[#1A1A1A] p-4 lg:absolute lg:start-[24px] lg:top-[682px] lg:mt-0">
+        <div className="mt-8 inline-flex w-fit items-center justify-start gap-2 rounded-2xl bg-secondary p-4 lg:absolute lg:start-[24px] lg:top-[682px] lg:mt-0">
           <span className="font-['Montserrat'] text-lg font-semibold text-white sm:text-xl">
             {t("hero.cta")}
           </span>
         </div>
 
         {/* Decorative elements: desktop only */}
-        <div className="pointer-events-none absolute end-[calc(100%-1261px)] top-[509px] hidden h-0 w-[554.16px] origin-top-right rotate-[47.41deg] outline outline-2 outline-offset-[-1px] outline-[#1A1A1A] rtl:rotate-[-47.41deg] lg:block" />
-        <div className="pointer-events-none absolute end-[calc(100%-1202px)] top-[134px] hidden h-[480px] w-[480px] rounded-full border-2 border-[#1A1A1A] lg:block" />
+        <div className="pointer-events-none absolute end-[calc(100%-1261px)] top-[509px] hidden h-0 w-[554.16px] origin-top-right rotate-[47.41deg] outline outline-2 outline-offset-[-1px] outline-secondary rtl:rotate-[-47.41deg] lg:block" />
+        <div className="pointer-events-none absolute end-[calc(100%-1202px)] top-[134px] hidden h-[480px] w-[480px] rounded-full border-2 border-secondary lg:block" />
 
         <AssetImage
           file="image 45.png"
@@ -100,7 +100,7 @@ function WhyDropshipSection() {
             key={card.key}
             className={`relative h-auto min-h-[288px] w-full overflow-hidden rounded-2xl bg-card p-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke lg:absolute lg:h-72 lg:w-[566px] lg:p-0 ${card.position}`}
           >
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-[#BBFF63] lg:absolute lg:start-[24px] lg:top-[24px]">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-primary lg:absolute lg:start-[24px] lg:top-[24px]">
               <AssetImage file={card.icon} className="h-11 w-11" />
             </div>
             <div className="mt-6 font-['Montserrat'] text-2xl font-semibold text-foreground sm:text-3xl lg:absolute lg:start-[24px] lg:top-[148px] lg:mt-0 lg:text-4xl">
@@ -113,7 +113,7 @@ function WhyDropshipSection() {
         ))}
 
         {/* Center circle: desktop only */}
-        <div className="hidden h-40 w-40 items-center justify-center overflow-hidden rounded-full bg-[#BBFF63] lg:absolute lg:start-[590px] lg:top-[282px] lg:flex">
+        <div className="hidden h-40 w-40 items-center justify-center overflow-hidden rounded-full bg-primary lg:absolute lg:start-[590px] lg:top-[282px] lg:flex">
           <img src={ds("lucide_box.svg")} className="size-20" alt="" />
         </div>
 
@@ -162,11 +162,11 @@ function HowWeStartSection() {
           {t("howWeStart.title")}
         </h2>
         <div className="flex w-full flex-col items-start justify-start gap-6 sm:w-72">
-          <p className="self-stretch font-['Montserrat'] text-lg font-normal text-[#6B7280]">
+          <p className="self-stretch font-['Montserrat'] text-lg font-normal text-gray-text">
             {t("howWeStart.subtitle")}
           </p>
-          <div className="inline-flex h-12 items-center justify-center gap-2.5 overflow-hidden rounded-[40px] bg-[#BBFF63] px-6 py-3">
-            <span className="font-['Montserrat'] text-lg font-medium text-[#1A1A1A]">
+          <div className="inline-flex h-12 items-center justify-center gap-2.5 overflow-hidden rounded-[40px] bg-primary px-6 py-3">
+            <span className="font-['Montserrat'] text-lg font-medium text-foreground">
               {t("howWeStart.cta")}
             </span>
           </div>
@@ -179,8 +179,8 @@ function HowWeStartSection() {
             key={step.key}
             className="relative h-56 w-full overflow-hidden rounded-3xl bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
-            <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#BBFF63] px-2 py-0.5">
-              <div className="text-center font-['Outfit'] text-base font-medium text-[#1A1A1A]">
+            <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-primary px-2 py-0.5">
+              <div className="text-center font-['Outfit'] text-base font-medium text-foreground">
                 {i + 1}
               </div>
             </div>
@@ -188,7 +188,7 @@ function HowWeStartSection() {
               <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-foreground">
                 {t(`howWeStart.steps.${step.key}.title`)}
               </div>
-              <div className="self-stretch font-['Montserrat'] text-base font-normal text-[#6B7280]">
+              <div className="self-stretch font-['Montserrat'] text-base font-normal text-gray-text">
                 {t(`howWeStart.steps.${step.key}.desc`)}
               </div>
             </div>
@@ -227,8 +227,8 @@ function EverythingYouNeedSection() {
             key={card}
             className="relative h-auto w-full overflow-hidden rounded-3xl bg-card pb-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
-            <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-[#BBFF63] px-2 py-0.5">
-              <div className="text-center font-['Outfit'] text-base font-medium text-[#1A1A1A]">
+            <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-primary px-2 py-0.5">
+              <div className="text-center font-['Outfit'] text-base font-medium text-foreground">
                 {cards.indexOf(card) + 1}
               </div>
             </div>
@@ -236,7 +236,7 @@ function EverythingYouNeedSection() {
               <div className="self-stretch font-['Montserrat'] text-lg font-semibold text-foreground">
                 {t(`everything.cards.${card}.title`)}
               </div>
-              <div className="self-stretch font-['Montserrat'] text-base font-normal text-[#6B7280]">
+              <div className="self-stretch font-['Montserrat'] text-base font-normal text-gray-text">
                 {t(`everything.cards.${card}.desc`)}
               </div>
             </div>

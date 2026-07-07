@@ -42,14 +42,14 @@ function FilterDropdown({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-4"
+        className="flex w-full items-center justify-between rounded-2xl bg-gray-light p-4"
       >
-        <div className="truncate font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
+        <div className="truncate font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-gray-text">
           {value ?? label}
         </div>
         <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
           <ChevronDown
-            className={`h-5 w-5 text-[#6B7280] transition-transform ${open ? "rotate-180" : ""}`}
+            className={`h-5 w-5 text-gray-text transition-transform ${open ? "rotate-180" : ""}`}
           />
         </div>
       </button>
@@ -65,7 +65,7 @@ function FilterDropdown({
                   onChange(null);
                   setOpen(false);
                 }}
-                className="whitespace-nowrap px-4 py-3 text-left font-['Montserrat'] text-lg font-medium text-[#6B7280] hover:bg-[#EDEDED]"
+                className="whitespace-nowrap px-4 py-3 text-left font-['Montserrat'] text-lg font-medium text-gray-text hover:bg-gray-light"
               >
                 Clear
               </button>
@@ -78,8 +78,8 @@ function FilterDropdown({
                   onChange(option);
                   setOpen(false);
                 }}
-                className={`whitespace-nowrap px-4 py-3 text-left font-['Montserrat'] text-lg font-medium hover:bg-[#EDEDED] ${
-                  value === option ? "text-[#1A1A1A]" : "text-[#6B7280]"
+                className={`whitespace-nowrap px-4 py-3 text-left font-['Montserrat'] text-lg font-medium hover:bg-gray-light ${
+                  value === option ? "text-foreground" : "text-gray-text"
                 }`}
               >
                 {option}
@@ -106,11 +106,11 @@ function PriceRangeInput({
   onMaxChange: (value: string) => void;
 }) {
   const inputClasses =
-    "w-full bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+    "w-full bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-foreground placeholder:text-gray-text focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
   return (
     <div className="col-span-2 grid grid-cols-2 gap-3 sm:col-span-1 sm:flex sm:w-auto">
-      <div className="flex items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+      <div className="flex items-center rounded-2xl bg-gray-light px-4 py-4 sm:w-36">
         <input
           type="number"
           min={0}
@@ -122,7 +122,7 @@ function PriceRangeInput({
         />
       </div>
 
-      <div className="flex items-center rounded-2xl bg-[#EDEDED] px-4 py-4 sm:w-36">
+      <div className="flex items-center rounded-2xl bg-gray-light px-4 py-4 sm:w-36">
         <input
           type="number"
           min={0}
@@ -207,7 +207,7 @@ export default function CatalogFilters({
     <div
       className={`flex w-full flex-col items-start justify-start gap-4 ${className}`}
     >
-      <div className="font-['Montserrat'] text-2xl font-bold text-[#1A1A1A]">
+      <div className="font-['Montserrat'] text-2xl font-bold text-foreground">
         Filter by
       </div>
 
@@ -232,13 +232,13 @@ export default function CatalogFilters({
         </div>
 
         {/* Search bar */}
-        <div className="flex w-full items-center rounded-2xl bg-[#EDEDED] px-4 py-3 sm:w-80">
+        <div className="flex w-full items-center rounded-2xl bg-gray-light px-4 py-3 sm:w-80">
           <input
             type="text"
             value={values.search}
             onChange={(e) => updateSearch(e.target.value)}
             placeholder="Search..."
-            className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#1A1A1A] placeholder:text-[#6B7280] focus:outline-none"
+            className="min-w-0 flex-1 bg-transparent font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-foreground placeholder:text-gray-text focus:outline-none"
           />
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white">
             <CiSearch size={24} />

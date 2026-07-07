@@ -46,7 +46,7 @@ function loadStoredAddresses(): AddressItem[] {
 
 function FieldLabel({ children }: { children: string }) {
   return (
-    <div className="self-stretch font-['Montserrat'] text-xl font-medium text-[#6B7280]">
+    <div className="self-stretch font-['Montserrat'] text-xl font-medium text-gray-text">
       {children}
     </div>
   );
@@ -68,16 +68,16 @@ function DetailField({
   return (
     <div className="flex self-stretch flex-col items-start justify-start gap-4">
       <FieldLabel>{label}</FieldLabel>
-      <div className="inline-flex items-center justify-start gap-2.5 self-stretch overflow-hidden border-b border-[#E0E0E0] pb-4">
+      <div className="inline-flex items-center justify-start gap-2.5 self-stretch overflow-hidden border-b border-stroke pb-4">
         {isEditing ? (
           <input
             type={type}
             value={value}
             onChange={(event) => onChange?.(event.target.value)}
-            className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-[#1A1A1A] outline-none placeholder:text-[#9CA3AF]"
+            className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none placeholder:text-gray-text"
           />
         ) : (
-          <div className="font-['Montserrat'] text-xl font-medium text-[#1A1A1A]">
+          <div className="font-['Montserrat'] text-xl font-medium text-foreground">
             {value}
           </div>
         )}
@@ -102,7 +102,7 @@ function IconButton({
       ? "text-[#DC2626] hover:bg-[#FEE2E2]"
       : tone === "success"
         ? "text-[#15803D] hover:bg-[#DCFCE7]"
-        : "text-[#1A1A1A] hover:bg-[#F3F4F6]";
+        : "text-foreground hover:bg-gray-light";
 
   return (
     <button
@@ -129,11 +129,11 @@ function SectionHeader({
   return (
     <div className="inline-flex items-center justify-between self-stretch">
       <div className="inline-flex items-center justify-start gap-3">
-        <div className="font-['Montserrat'] text-3xl font-bold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
           {title}
         </div>
         <div className="relative h-8 w-8 overflow-hidden">
-          <Icon className="absolute left-[4px] top-[4px] h-6 w-6 text-[#1A1A1A]" />
+          <Icon className="absolute left-[4px] top-[4px] h-6 w-6 text-foreground" />
         </div>
       </div>
       {children}
@@ -163,7 +163,7 @@ function AddressCard({
   return (
     <div className="flex w-full max-w-xl flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
       <div className="inline-flex w-full items-center justify-between">
-        <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-lg font-semibold text-foreground">
           {isEditing ? "Editing Address" : address.label}
         </div>
         <div className="inline-flex items-center justify-start gap-1">
@@ -377,7 +377,7 @@ export default function ContactDetailsPage() {
             type="button"
             onClick={handleSaveContact}
             disabled={!hasUnsavedContactChanges}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#BBFF63] px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Check className="h-5 w-5" strokeWidth={2} />
             Save Changes
@@ -386,7 +386,7 @@ export default function ContactDetailsPage() {
             type="button"
             onClick={handleResetContact}
             disabled={!hasUnsavedContactChanges}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-[#1A1A1A] outline outline-1 outline-offset-[-1px] outline-[#E0E0E0] disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground outline outline-1 outline-offset-[-1px] outline-stroke disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="h-5 w-5" strokeWidth={2} />
             Reset
@@ -412,7 +412,7 @@ export default function ContactDetailsPage() {
         <button
           type="button"
           onClick={handleAddAddress}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#BBFF63] px-4 py-2 font-['Montserrat'] text-sm font-semibold text-[#1A1A1A]"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 font-['Montserrat'] text-sm font-semibold text-foreground"
         >
           <Plus className="h-4 w-4" strokeWidth={2} />
           Add Address

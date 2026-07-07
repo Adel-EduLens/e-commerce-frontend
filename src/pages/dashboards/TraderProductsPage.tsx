@@ -174,14 +174,14 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="relative w-full max-w-[650px] rounded-2xl bg-white overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-5 border-b border-[#E5E7EB]/20">
-          <h2 className="font-['Montserrat'] text-3xl font-semibold text-[#111827]">
+        <div className="flex items-center justify-between px-6 pt-6 pb-5 border-b border-stroke/20">
+          <h2 className="font-['Montserrat'] text-3xl font-semibold text-foreground">
             Add Product
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center text-[#6B7280] transition hover:text-[#111827]"
+            className="flex h-6 w-6 items-center justify-center text-gray-text transition hover:text-foreground"
           >
             <img className="h-4 w-4" src={asset("x-close.svg")} alt="Close" />
           </button>
@@ -191,14 +191,14 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col gap-4 px-6 py-5">
           {/* Upload Images */}
           <div className="flex flex-col gap-4">
-            <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+            <label className="font-['Montserrat'] text-base font-semibold text-foreground">
               Upload Images
             </label>
-            <div className="relative flex h-14 items-center rounded-xl border border-[#E5E7EB] overflow-hidden">
-              <span className="absolute left-4 font-['Montserrat'] text-base font-medium text-[#6B7280]">
+            <div className="relative flex h-14 items-center rounded-xl border border-stroke overflow-hidden">
+              <span className="absolute left-4 font-['Montserrat'] text-base font-medium text-gray-text">
                 {imageName || "Upload images"}
               </span>
-              <label className="absolute right-3 flex h-9 cursor-pointer items-center justify-center rounded-lg bg-[#F3F4F6] px-5 font-['Inter'] text-base font-medium text-[#111827] transition hover:bg-[#E5E7EB]">
+              <label className="absolute right-3 flex h-9 cursor-pointer items-center justify-center rounded-lg bg-gray-light px-5 font-['Inter'] text-base font-medium text-foreground transition hover:bg-stroke">
                 Choose File
                 <input
                   type="file"
@@ -212,25 +212,25 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
 
           {/* Product Name */}
           <div className="flex flex-col gap-4">
-            <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+            <label className="font-['Montserrat'] text-base font-semibold text-foreground">
               Product Name
             </label>
-            <div className="h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
+            <div className="h-14 rounded-xl border border-stroke overflow-hidden">
               <input
                 type="text"
                 placeholder="Enter Product Name"
-                className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280]"
+                className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text"
               />
             </div>
           </div>
 
           {/* Category */}
           <div className="flex flex-col gap-4">
-            <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+            <label className="font-['Montserrat'] text-base font-semibold text-foreground">
               Category
             </label>
-            <div className="relative h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
-              <select className="h-full w-full appearance-none px-4 font-['Montserrat'] text-base font-medium text-[#6B7280] outline-none bg-white">
+            <div className="relative h-14 rounded-xl border border-stroke overflow-hidden">
+              <select className="h-full w-full appearance-none px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none bg-white">
                 <option value="" disabled selected>Select Category</option>
                 <option value="men">Men</option>
                 <option value="women">Women</option>
@@ -246,26 +246,26 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
           {/* Price + Discount */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-1 flex-col gap-4">
-              <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+              <label className="font-['Montserrat'] text-base font-semibold text-foreground">
                 Price
               </label>
-              <div className="h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
+              <div className="h-14 rounded-xl border border-stroke overflow-hidden">
                 <input
                   type="text"
                   placeholder="Enter price"
-                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280]"
+                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text"
                 />
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-4">
-              <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+              <label className="font-['Montserrat'] text-base font-semibold text-foreground">
                 Discount
               </label>
-              <div className="h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
+              <div className="h-14 rounded-xl border border-stroke overflow-hidden">
                 <input
                   type="text"
                   placeholder="Enter Discount (optional)"
-                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280]"
+                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text"
                 />
               </div>
             </div>
@@ -274,23 +274,23 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
           {/* Stock Quantity + Status */}
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-1 flex-col gap-4">
-              <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+              <label className="font-['Montserrat'] text-base font-semibold text-foreground">
                 Stock Quantity
               </label>
-              <div className="h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
+              <div className="h-14 rounded-xl border border-stroke overflow-hidden">
                 <input
                   type="number"
                   placeholder="Enter Quantity"
-                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none placeholder:text-[#6B7280]"
+                  className="h-full w-full px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text"
                 />
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-4">
-              <label className="font-['Montserrat'] text-base font-semibold text-[#111827]">
+              <label className="font-['Montserrat'] text-base font-semibold text-foreground">
                 Status
               </label>
-              <div className="relative h-14 rounded-xl border border-[#E5E7EB] overflow-hidden">
-                <select className="h-full w-full appearance-none px-4 font-['Montserrat'] text-base font-medium text-[#6B7280] outline-none bg-white">
+              <div className="relative h-14 rounded-xl border border-stroke overflow-hidden">
+                <select className="h-full w-full appearance-none px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none bg-white">
                   <option value="" disabled selected>Select Status</option>
                   <option value="active">Active</option>
                   <option value="low-stock">Low Stock</option>
@@ -309,7 +309,7 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 items-center justify-center rounded-lg bg-[#111827] px-6 font-['Montserrat'] text-base font-semibold text-white shadow-[0px_5px_3px_0px_rgba(0,0,0,0.25)] transition hover:bg-[#1F2937]"
+            className="flex h-10 items-center justify-center rounded-lg bg-secondary px-6 font-['Montserrat'] text-base font-semibold text-white shadow-[0px_5px_3px_0px_rgba(0,0,0,0.25)] transition hover:bg-[#1F2937]"
           >
             Done
           </button>
@@ -335,14 +335,14 @@ function TableView({
     <div className="overflow-x-auto">
       <table className="min-w-full border-separate border-spacing-0">
         <thead>
-          <tr className="bg-[#111827]">
+          <tr className="bg-secondary">
             <th className="px-4 py-3 text-left">
               <div
-                className="h-5 w-5 cursor-pointer rounded-md border border-[#BBFF63] bg-[#111827] outline outline-1 outline-offset-[-1px] outline-[#BBFF63] flex items-center justify-center"
+                className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary outline outline-1 outline-offset-[-1px] outline-[#BBFF63] flex items-center justify-center"
                 onClick={onToggleAll}
               >
                 {allSelected && (
-                  <svg className="h-3 w-3 text-[#BBFF63]" viewBox="0 0 12 12" fill="none">
+                  <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
                     <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
@@ -351,7 +351,7 @@ function TableView({
             {["Image", "Name", "Price", "Category", "Stock", "Status", "Actions"].map((col) => (
               <th
                 key={col}
-                className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-[#BBFF63]"
+                className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary"
               >
                 {col}
               </th>
@@ -364,13 +364,13 @@ function TableView({
             return (
               <tr
                 key={product.id}
-                className={index % 2 === 0 ? "bg-white" : "bg-[#FAFAFA]"}
+                className={index % 2 === 0 ? "bg-white" : "bg-background"}
               >
                 <td className="px-4 py-2">
                   <div
                     className={`h-5 w-5 cursor-pointer rounded-md border flex items-center justify-center transition ${
                       isChecked
-                        ? "border-[#111827] bg-[#111827]"
+                        ? "border-secondary bg-secondary"
                         : "border-gray-300 bg-white"
                     }`}
                     onClick={() => onToggle(product.id)}
@@ -389,16 +389,16 @@ function TableView({
                     alt={product.name}
                   />
                 </td>
-                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                   {product.name}
                 </td>
-                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                   {product.price}
                 </td>
-                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                   {product.category}
                 </td>
-                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-[#111827]">
+                <td className="px-3 py-2 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                   {product.stock}
                 </td>
                 <td className="px-3 py-2 text-center">
@@ -408,21 +408,21 @@ function TableView({
                   <div className="flex items-center justify-center gap-1.5">
                     <button
                       type="button"
-                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                       title="Edit"
                     >
                       <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
                     </button>
                     <button
                       type="button"
-                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                       title="Copy"
                     >
                       <img className="h-4 w-4" src={asset("solar_copy-linear.svg")} alt="Copy" />
                     </button>
                     <button
                       type="button"
-                      className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                       title="Delete"
                     >
                       <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
@@ -451,7 +451,7 @@ function ProductCard({
   return (
     <div
       className={`relative flex flex-col overflow-hidden rounded-lg border bg-white transition cursor-pointer ${
-        selected ? "border-[#111827] ring-2 ring-[#111827]/20" : "border-[#E5E7EB]"
+        selected ? "border-secondary ring-2 ring-[#111827]/20" : "border-stroke"
       }`}
       onClick={() => onSelect(product.id)}
     >
@@ -474,34 +474,34 @@ function ProductCard({
       <div className="flex flex-col gap-2 px-2 pb-3 pt-1">
         {/* Name + Views */}
         <div className="flex items-center justify-between gap-2">
-          <p className="font-['Montserrat'] text-base font-semibold text-[#111827] truncate">
+          <p className="font-['Montserrat'] text-base font-semibold text-foreground truncate">
             {product.name}
           </p>
-          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-            <span className="text-[#6B7280]">Views: </span>
-            <span className="font-semibold text-[#111827]">{product.views}</span>
+          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+            <span className="text-gray-text">Views: </span>
+            <span className="font-semibold text-foreground">{product.views}</span>
           </p>
         </div>
 
         {/* Subcategory + Sales */}
         <div className="flex items-center justify-between gap-2">
-          <p className="font-['Montserrat'] text-sm font-medium text-[#6B7280]">
+          <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
             {product.subcategory}
           </p>
-          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-            <span className="text-[#6B7280]">Sales: </span>
-            <span className="font-semibold text-[#111827]">{product.sales}</span>
+          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+            <span className="text-gray-text">Sales: </span>
+            <span className="font-semibold text-foreground">{product.sales}</span>
           </p>
         </div>
 
         {/* Price + Stock */}
         <div className="flex items-center justify-between gap-2">
-          <p className="font-['Montserrat'] text-sm font-semibold text-[#111827]">
+          <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
             {product.price}
           </p>
-          <p className="shrink-0 font-['Montserrat'] text-sm text-[#6B7280]">
-            <span className="text-[#6B7280]">Stock: </span>
-            <span className="font-semibold text-[#111827]">{product.stock}</span>
+          <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+            <span className="text-gray-text">Stock: </span>
+            <span className="font-semibold text-foreground">{product.stock}</span>
           </p>
         </div>
 
@@ -511,7 +511,7 @@ function ProductCard({
             <button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
               title="Edit"
             >
               <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
@@ -519,7 +519,7 @@ function ProductCard({
             <button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
               title="Copy"
             >
               <img className="h-4 w-4" src={asset("solar_copy-linear.svg")} alt="Copy" />
@@ -527,13 +527,13 @@ function ProductCard({
             <button
               type="button"
               onClick={(e) => e.stopPropagation()}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-white transition hover:bg-[#F9FAFB]"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
               title="Delete"
             >
               <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
             </button>
           </div>
-          <p className="font-['Montserrat'] text-xs font-medium text-[#6B7280]">
+          <p className="font-['Montserrat'] text-xs font-medium text-gray-text">
             Last Updated: {product.updatedAgo}
           </p>
         </div>
@@ -600,13 +600,13 @@ export default function TraderProductsPage() {
                 placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-[#E5E7EB] bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-[#111827] outline-none transition placeholder:text-[#6B7280] focus:border-[#D1D5DB]"
+                className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
               />
             </label>
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+              className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
             >
               <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
               Add Products
@@ -614,11 +614,11 @@ export default function TraderProductsPage() {
           </div>
 
           {/* Products panel */}
-          <section className="rounded-2xl border border-[#E5E7EB] bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+          <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
             {/* Panel header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="flex items-center gap-4">
-                <h2 className="font-['Montserrat'] text-xl font-semibold text-[#111827]">
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
                   Products Table
                 </h2>
                 <div className="flex items-center gap-2">
@@ -626,7 +626,7 @@ export default function TraderProductsPage() {
                     <button
                       key={label}
                       type="button"
-                      className="flex items-center gap-1 rounded-lg border border-[#E5E7EB] bg-white px-2 py-1.5 font-['Montserrat'] text-xs font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                      className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-2 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
                     >
                       {label}
                       <img
@@ -641,14 +641,14 @@ export default function TraderProductsPage() {
 
               <div className="flex items-center gap-2">
                 {/* Table / Cards toggle */}
-                <div className="flex items-center gap-1 rounded-2xl border border-[#E5E7EB] bg-white px-2 py-1">
+                <div className="flex items-center gap-1 rounded-2xl border border-stroke bg-white px-2 py-1">
                   <button
                     type="button"
                     onClick={() => setViewMode("table")}
                     className={`flex items-center gap-1 rounded-2xl px-2 py-1 font-['Montserrat'] text-xs font-medium transition ${
                       viewMode === "table"
-                        ? "bg-[#F3F4F6] text-[#111827]"
-                        : "text-[#6B7280] hover:text-[#111827]"
+                        ? "bg-gray-light text-foreground"
+                        : "text-gray-text hover:text-foreground"
                     }`}
                   >
                     <img className="h-6 w-6" src={asset("material-symbols_table-outline.svg")} alt="" />
@@ -659,8 +659,8 @@ export default function TraderProductsPage() {
                     onClick={() => setViewMode("cards")}
                     className={`flex items-center gap-1 rounded-2xl px-2 py-1 font-['Montserrat'] text-xs font-medium transition ${
                       viewMode === "cards"
-                        ? "bg-[#F3F4F6] text-[#111827]"
-                        : "text-[#6B7280] hover:text-[#111827]"
+                        ? "bg-gray-light text-foreground"
+                        : "text-gray-text hover:text-foreground"
                     }`}
                   >
                     <img className="h-6 w-6" src={asset("clarity_view-cards-line.svg")} alt="" />
@@ -671,7 +671,7 @@ export default function TraderProductsPage() {
                 {/* Export */}
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-[#111827] transition hover:bg-[#F9FAFB]"
+                  className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
                 >
                   <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
                   Export
@@ -702,9 +702,9 @@ export default function TraderProductsPage() {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-end gap-2 border-t border-[#E5E7EB] px-4 py-3">
-              <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                <span className="font-['Montserrat'] text-sm font-medium text-[#111827]">
+            <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
+              <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                <span className="font-['Montserrat'] text-sm font-medium text-foreground">
                   6 per page
                 </span>
                 <img
@@ -713,12 +713,12 @@ export default function TraderProductsPage() {
                   alt=""
                 />
               </div>
-              <div className="flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-4 py-2.5">
-                <span className="font-['Inter'] text-sm font-medium text-[#111827]">
+              <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
+                <span className="font-['Inter'] text-sm font-medium text-foreground">
                   1-6{" "}
-                  <span className="text-[#6B7280]">of 14</span>
+                  <span className="text-gray-text">of 14</span>
                 </span>
-                <span className="mx-1 h-5 border-l border-[#E5E7EB]" />
+                <span className="mx-1 h-5 border-l border-stroke" />
                 <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
                   <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
                 </button>

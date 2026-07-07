@@ -247,7 +247,9 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard/trader',
         element: (
-          <TraderLayout />
+          <ProtectedRoute allowedRoles={["trader"]}>
+            <TraderLayout />
+          </ProtectedRoute>
         ),
         children: [
           {

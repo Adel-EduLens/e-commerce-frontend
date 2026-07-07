@@ -7,8 +7,7 @@ import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
 import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
 import { buildPriceRanges, matchesPriceRange } from '../utils/priceRanges'
-
-const asset = (file: string) => `/home-page/${encodeURIComponent(file)}`
+import { asset } from '../lib/utils';
 
 function AssetImage({
   file,
@@ -168,7 +167,7 @@ function HeroBanner() {
   return (
     <div className="relative mx-4 sm:mx-6 overflow-hidden rounded-3xl bg-[#C4B5FD]">
       <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-12 lg:py-16 lg:px-[352px] lg:min-h-[384px]">
-        <div className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-5xl font-semibold text-[#1A1A1A] max-w-lg">
+        <div className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-5xl font-semibold text-foreground max-w-lg">
           From Factory to You – Big Quantities, Bigger Profits.
         </div>
       </div>
@@ -186,8 +185,8 @@ function HeroBanner() {
 
 function ViewAllButton({ to }: { to: string }) {
   return (
-    <Link to={to} className="inline-flex items-center justify-start gap-2 rounded-2xl bg-[#BBFF63] p-4 no-underline">
-      <div className="font-['Montserrat'] text-xl font-semibold text-[#1A1A1A]">
+    <Link to={to} className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4 no-underline">
+      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
         View All
       </div>
       <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
@@ -233,7 +232,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
         <div className="flex w-full flex-col items-start justify-start gap-6">
           <CatalogFilters filters={filterConfigs} onFilterChange={handleFilter} />
           {isLoading ? (
-            <p className="font-['Montserrat'] text-lg text-[#6B7280]">Loading...</p>
+            <p className="font-['Montserrat'] text-lg text-gray-text">Loading...</p>
           ) : (
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filtered.length > 0 ? (
@@ -248,7 +247,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                   />
                 ))
               ) : (
-                <p className="col-span-4 text-center font-['Montserrat'] text-lg text-[#6B7280]">
+                <p className="col-span-4 text-center font-['Montserrat'] text-lg text-gray-text">
                   No wholesale products available yet.
                 </p>
               )}

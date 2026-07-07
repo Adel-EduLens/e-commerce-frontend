@@ -29,7 +29,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function ProductsPage() {
   const navigate = useNavigate();
-  const filter2 = useHomeFilters();
+  const { filters: filter2 } = useHomeFilters();
 
   const [filters, setFilters] = useState<FilterValues>({
     search: "",
@@ -135,7 +135,7 @@ export default function ProductsPage() {
 
   return (
     <div className="w-full">
-      <div className="font-['Montserrat'] text-5xl font-bold text-[#1A1A1A] sm:text-8xl">
+      <div className="font-['Montserrat'] text-5xl font-bold text-foreground sm:text-8xl">
         {pageTitle}
       </div>
 

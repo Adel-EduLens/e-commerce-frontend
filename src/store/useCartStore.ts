@@ -23,24 +23,9 @@ type CartStore = {
   incrementQuantity: (itemId: string) => void;
   decrementQuantity: (itemId: string) => void;
   clearCart: () => void;
-  getItemCount: () => number;
-  getSubtotal: () => number;
 };
 
-const INITIAL_CART_ITEMS: CartItem[] = [
-  {
-    id: "plain-maxi-tabard-dress-M-Black",
-    productId: "plain-maxi-tabard-dress",
-    title: "Plain Maxi Tabard Dress",
-    unitPrice: 1000,
-    currency: "EGP",
-    size: "M",
-    color: "Black",
-    colorHex: "#1A1A1A",
-    imageSrc: "/home%20page/image%2011.png",
-    quantity: 1,
-  },
-];
+const INITIAL_CART_ITEMS: CartItem[] = [];
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -111,15 +96,6 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => {
         set({ items: [] });
       },
-
-      getItemCount: () =>
-        get().items.reduce((total, item) => total + item.quantity, 0),
-
-      getSubtotal: () =>
-        get().items.reduce(
-          (total, item) => total + item.unitPrice * item.quantity,
-          0
-        ),
     }),
     {
       name: "cart-storage",
@@ -132,3 +108,16 @@ export const useCartStore = create<CartStore>()(
 );
 
 export const useCartItems = () => useCartStore((state) => state.items);
+
+export const useCartItemCount = () =>
+  useCartStore((state) =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+export const useCartSubtotal = () =>
+  useCartStore((state) =>
+    state.items.reduce(
+      (total, item) => total + item.unitPrice * item.quantity,
+      0
+    )
+  );

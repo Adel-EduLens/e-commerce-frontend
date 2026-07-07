@@ -22,7 +22,7 @@ function ProductRow({ indexes }: { indexes: number[] }) {
           sizeLabel="Min.order: 50 pieces"
           price="$250-450"
           featured={featuredIndexes.has(index)}
-          accentClassName="bg-[#BBFF63]"
+          accentClassName="bg-primary"
         />
       ))}
     </div>

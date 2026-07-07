@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   }
   const fetchAllUsers = async () => {
     try {
-      const response = await api.get('/admin/faqs/users')
+      const response = await api.get('/admin/users')
       setUsers(response?.data?.data || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
     newStatus: 'active' | 'suspended'
   ) => {
     try {
-      const response = await api.put(`/admin/faqs/users/${userId}/status`, {
+      const response = await api.put(`/admin/users/${userId}/status`, {
         status: newStatus,
       })
       if (response.status === 200) {
@@ -110,8 +110,14 @@ export default function AdminDashboard() {
       setFaqQuestion('')
       setFaqAnswer('')
       toast.success(response?.data?.message || 'Question added successfully')
-    } catch (error) {
-      toast.error('Unable to add question')
+    } catch (error: any) {
+      const data = error?.response?.data
+      if (data?.errors) {
+        const firstErrorKey = Object.keys(data.errors)[0]
+        toast.error(data.errors[firstErrorKey][0])
+      } else {
+        toast.error(data?.message || 'Unable to add question')
+      }
     } finally {
       setIsSavingFaq(false)
     }
@@ -181,8 +187,14 @@ export default function AdminDashboard() {
 
       toast.success(response?.data?.message || 'Question updated successfully')
       cancelEditingFaq()
-    } catch (error) {
-      toast.error('Unable to update question')
+    } catch (error: any) {
+      const data = error?.response?.data
+      if (data?.errors) {
+        const firstErrorKey = Object.keys(data.errors)[0]
+        toast.error(data.errors[firstErrorKey][0])
+      } else {
+        toast.error(data?.message || 'Unable to update question')
+      }
     } finally {
       setIsSavingFaq(false)
     }
