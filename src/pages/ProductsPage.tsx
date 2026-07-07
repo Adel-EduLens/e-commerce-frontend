@@ -10,12 +10,13 @@ import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
 import { useHomeFilters } from "../hooks/utils/HomeFilters";
+import { useTranslation } from "react-i18next";
 
 const FILTER_LABELS: Record<string, string> = {
   "best-deal": "Best Deals",
   "most-popular": "Most Popular",
-  premium: "Premium Collection",
-  new: "New Arrivals",
+  "premium": "Premium Collection",
+  "new": "New Arrivals",
   "must-have": "This Season's Must-Haves",
   "flash-deals": "Flash Deals",
 };
@@ -28,6 +29,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 
 export default function ProductsPage() {
+  const { t } = useTranslation("productSection");
   const navigate = useNavigate();
   const { filters: filter2 } = useHomeFilters();
 
@@ -128,15 +130,15 @@ export default function ProductsPage() {
   if (isError) {
     return (
       <div className="py-20 text-center text-gray-text">
-        Something went wrong. Please try again later.
+        {t("Something went wrong. Please try again later.")}
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <div className="font-['Montserrat'] text-5xl font-bold text-foreground sm:text-8xl">
-        {pageTitle}
+      <div className="font-['Montserrat'] text-5xl font-bold text-[#1A1A1A] sm:text-8xl">
+        {t(pageTitle)}
       </div>
 
       <div className="mt-8">
@@ -145,7 +147,7 @@ export default function ProductsPage() {
 
       {isLoading && (
         <div className="mt-8 w-full py-2 text-center text-gray-text">
-          Loading...
+          {t("Loading")}
         </div>
       )}
 
@@ -172,7 +174,7 @@ export default function ProductsPage() {
 
       {!isLoading && data?.products.length === 0 && (
         <div className="mt-20 text-center text-xl text-gray-500">
-          No products found.
+          {t("No products found.")}
         </div>
       )}
 

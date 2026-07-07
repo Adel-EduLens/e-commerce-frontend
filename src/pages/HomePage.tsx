@@ -1,17 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
-import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
-import CatalogFilters from '../components/shared/CatalogFilters'
-import { useProducts, useProductFilters } from '../hooks/queries/productsQuery'
-import { useHomeFilters } from '../hooks/utils/HomeFilters'
+
 import { api } from '../lib/axios'
-import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { asset } from '../lib/utils';
+
 
 type AssetImageProps = {
   file: string
@@ -23,67 +22,6 @@ type AssetImageProps = {
 function AssetImage({ file, className, alt = '' }: AssetImageProps) {
   return (
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
-  )
-}
-
-function ViewAllButton({ onClick }: { onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4"
-    >
-      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
-        View All
-      </div>
-      <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-        <AssetImage
-          file="weui_arrow-filled-3.svg"
-          className="absolute left-[14px] top-[8px] h-6 w-3"
-        />
-      </div>
-    </button>
-  )
-}
-
-function ProductGrid({ featuredIndex }: { featuredIndex?: number }) {
-  const { filters, products } = useHomeFilters()
-  const displayProducts = products.slice(0, 4)
-
-  return (
-    <div className="w-full flex flex-col items-center justify-start gap-8">
-      <CatalogFilters filters={filters} />
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {displayProducts.length > 0 ? (
-          displayProducts.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              title={product.name}
-              price={`$${product.price.toFixed(2)}`}
-              imageSrc={product.images?.[0]?.url}
-              rating={product.rating}
-              sizeLabel={product.sizes?.length > 0 ? `${product.sizes[0].size} - ${product.sizes[product.sizes.length - 1].size}` : ''}
-              to={`/product/${product.id}`}
-              featured={featuredIndex === index}
-              accentClassName="bg-violet-300"
-              isMustHave={product.isMustHave}
-              isFlashDeals={product.isFlashDeals}
-              flashDealPrice={product.flashDealPrice}
-              flashDealEndsAt={product.flashDealEndsAt}
-            />
-          ))
-        ) : (
-          Array.from({ length: 4 }).map((_, index) => (
-            <ProductCard
-              key={index}
-              featured={featuredIndex === index}
-              accentClassName="bg-violet-300"
-            />
-          ))
-        )}
-      </div>
-      <ViewAllButton />
-    </div>
   )
 }
 
@@ -243,59 +181,6 @@ function CollectionSection() {
   )
 }
 
-function MustHavesSection() {
-  const navigate = useNavigate()
-  const { filters, products } = useHomeFilters()
-  
-  const mustHaves = products.filter(p => p.isMustHave).slice(0, 4)
-  const displayProducts = mustHaves.length > 0 ? mustHaves : products.slice(0, 4)
-
-  return (
-    <div className="mt-16 w-full">
-      <div className="w-full font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        This Season's Must-Haves
-      </div>
-      <div className="mt-10 inline-flex w-full flex-col items-center justify-start gap-8">
-        <CatalogFilters filters={filters} />
-        <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {displayProducts.length > 0 ? (
-            displayProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                title={product.name}
-                price={`$${product.price.toFixed(2)}`}
-                imageSrc={product.images?.[0]?.url}
-                rating={product.rating}
-                sizeLabel={product.sizes?.length > 0 ? `${product.sizes[0].size} - ${product.sizes[product.sizes.length - 1].size}` : ''}
-                to={`/product/${product.id}`}
-                isMustHave={product.isMustHave}
-                isFlashDeals={product.isFlashDeals}
-                flashDealPrice={product.flashDealPrice}
-                flashDealEndsAt={product.flashDealEndsAt}
-              />
-            ))
-          ) : (
-            Array.from({ length: 4 }).map((_, index) => (
-              <ProductCard key={index} />
-            ))
-          )}
-        </div>
-        <ViewAllButton onClick={() => navigate('/season-must-haves')} />
-      </div>
-    </div>
-  )
-}
-
-function RecommendedSection() {
-  return (
-    <div className="mt-16 inline-flex w-full flex-col items-center justify-start gap-10">
-      <div className="self-stretch text-center font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        Recommended for You
-      </div>
-      <ProductGrid />
-    </div>
-  )
-}
 
 function VoteRings() {
   const rings = [
@@ -351,6 +236,7 @@ type VoteDesign = {
 
 import { useDesigns } from '../hooks/queries/designsQuery';
 import { handleApiError } from '../lib/utils';
+import ProductsSection from '../components/shared/ProductsSection'
 
 function VoteSection() {
   const queryClient = useQueryClient()
@@ -571,33 +457,6 @@ function VoteSection() {
   )
 }
 
-function FlashDealsSection() {
-  return (
-    <div className="mt-16 inline-flex w-full flex-col items-start justify-start gap-10">
-      <div className="flex flex-wrap items-center gap-4 sm:gap-6 lg:gap-11">
-        <div className="font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-          Flash Deals
-        </div>
-        <div className="flex items-center justify-start gap-4 sm:gap-6">
-          <div className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-foreground">
-            Ends in
-          </div>
-          <div className="flex items-center justify-start gap-2">
-            {['08', ':', '30', ':', '48'].map((item, index) => (
-              <div
-                key={`${item}-${index}`}
-                className="font-['Montserrat'] text-xl sm:text-3xl font-semibold text-foreground"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <ProductGrid featuredIndex={2} />
-    </div>
-  )
-}
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -617,11 +476,29 @@ export function HomePage() {
     <div className="w-full overflow-hidden">
       <HeroSection />
       <CollectionSection />
-      <MustHavesSection />
+      <ProductsSection
+        title="This Season's Must-Haves"
+        navigateTo="/products?filter=must-have"
+        query={{
+          filter: "must-have",
+        }}
+      />
       <CategoriesSection />
-      <RecommendedSection />
+      <ProductsSection
+        title="Recommended for You"
+        navigateTo="/products?filter=flash-deals"
+        query={{
+          filter: "flash-deals",
+        }}
+      />
       <VoteSection />
-      <FlashDealsSection />
+      <ProductsSection
+        title="Flash Deals"
+        navigateTo="/products?filter=flash-deals"
+        query={{
+          filter: "flash-deals",
+        }}
+      />
       <FaqSection />
     </div>
   )

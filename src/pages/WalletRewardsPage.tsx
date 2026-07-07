@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CreditCard, Gift, PlusCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type Tab = "all" | "orders" | "refunds" | "rewards";
 
@@ -12,11 +13,12 @@ function TransactionRow({
   date: string;
   amount: string;
 }) {
+  const { t } = useTranslation("wallet");
   return (
     <div className="flex w-full items-start justify-between py-3 border-b border-stroke last:border-b-0">
       <div className="flex flex-col gap-1">
         <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-          {label}
+          {label === "Reward Earned" ? t(label) : label}
         </div>
         <div className="font-['Montserrat'] text-xs font-medium text-gray-text">
           {date}
@@ -30,6 +32,7 @@ function TransactionRow({
 }
 
 function WalletPanel() {
+  const { t } = useTranslation("wallet");
   const [activeTab, setActiveTab] = useState<Tab>("all");
 
   const tabs: { key: Tab; label: string }[] = [
@@ -42,14 +45,14 @@ function WalletPanel() {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-        Wallet &amp; Rewards
+        {t("Wallet & Rewards")}
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
         <div className="flex items-center gap-6">
           <div className="flex flex-col gap-2">
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
-              Balance
+              {t("Balance")}
             </div>
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               $120.00
@@ -57,7 +60,7 @@ function WalletPanel() {
           </div>
           <div className="flex flex-col gap-2">
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
-              Points
+              {t("Points")}
             </div>
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               250
@@ -68,26 +71,26 @@ function WalletPanel() {
           <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-              Link Card
+              {t("Link Card")}
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-              Redeem Points
+              {t("Redeem Points")}
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <PlusCircle className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
             <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-              Add Funds
+              {t("Add Funds")}
             </div>
           </div>
         </div>
       </div>
 
       <div className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
-        Transactions
+        {t("Transactions")}
       </div>
 
       <div className="flex items-center gap-3 sm:gap-4 border-b border-stroke">
@@ -102,7 +105,7 @@ function WalletPanel() {
                 : "text-gray-text"
             }`}
           >
-            {tab.label}
+            {t(tab.label)}
           </button>
         ))}
       </div>

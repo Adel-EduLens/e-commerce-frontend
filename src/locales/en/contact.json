@@ -1,0 +1,35 @@
+{
+  "CONTACT DETAILS": "CONTACT DETAILS",
+  "ADDRESSES": "ADDRESSES",
+
+  "Name": "Name",
+  "Email": "Email",
+  "Phone Number": "Phone Number",
+
+  "Save Changes": "Save Changes",
+  "Reset": "Reset",
+  "Reset your password": "Reset your password",
+
+  "Add Address": "Add Address",
+  "Editing Address": "Editing Address",
+  "Label": "Label",
+  "Address": "Address",
+
+  "Home": "Home",
+  "Work": "Work",
+  "New Address": "New Address",
+
+  "Save address": "Save address",
+  "Cancel address": "Cancel address",
+  "Edit address": "Edit address",
+  "Delete address": "Delete address",
+
+  "Please complete all contact details": "Please complete all contact details",
+  "Please enter a valid email address": "Please enter a valid email address",
+  "Contact details updated": "Contact details updated",
+
+  "Please complete the address label and value": "Please complete the address label and value",
+  "Address updated": "Address updated",
+  "Address removed": "Address removed"
+
+}

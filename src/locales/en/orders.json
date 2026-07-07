@@ -1,0 +1,19 @@
+{
+  "Order": "Order",
+  
+  "Active": "Active",
+  "Completed": "Completed",
+  "Returns": "Returns",
+
+  "Order Status": "Order Status",
+
+  "New Order": "New Order",
+  "Confirmed": "Confirmed",
+  "Shipped": "Shipped",
+  "Delivered": "Delivered",
+
+  "Pending Delivery": "Pending Delivery",
+
+  "Size": "Size",
+  "Color": "Color"
+}

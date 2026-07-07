@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { asset } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
+
 
 const footerLinks: Record<string, { label: string; path: string }[]> = {
   About: [
@@ -41,6 +43,7 @@ function FooterColumn({
   title: string
   items: { label: string; path: string }[]
 }) {
+  const { t } = useTranslation("footer");
   return (
     <div className="flex flex-col items-start gap-3">
       <div className="font-['Montserrat'] text-lg sm:text-xl lg:text-2xl font-medium text-foreground">
@@ -52,7 +55,7 @@ function FooterColumn({
           to={item.path}
           className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-gray-text hover:text-foreground"
         >
-          {item.label}
+          {t(item.label)}
         </Link>
       ))}
     </div>
@@ -69,6 +72,7 @@ type FooterProps = {
 export default function Footer({
   style,
 }: FooterProps) {
+  const { t } = useTranslation("footer");
   return (
     <div
       className="relative w-full overflow-hidden border-t border-stroke py-8 px-4 sm:px-6 lg:px-8"
@@ -100,12 +104,13 @@ export default function Footer({
                 </div>
               ))}
             </div>
-            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-foreground">
-              SIGN UP FOR DISCOUNTS + UPDATES
+
+            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#1A1A1A]">
+              {t("SIGN UP FOR DISCOUNTS + UPDATES")}
             </div>
-            <div className="flex w-full items-center justify-between rounded-2xl bg-gray-light p-3 sm:p-4">
-              <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-gray-text">
-                Phone Number or Email
+            <div className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-3 sm:p-4">
+              <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
+                {t("Phone Number or Email")}
               </div>
               <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white">
                 <img
@@ -118,10 +123,11 @@ export default function Footer({
             </div>
           </div>
         </div>
-        <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
-          © 2025 GenZ, LLC. All Rights Reserved.
+
+        <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
+          {t("copyright")}
         </div>
       </div>
-    </div>
+    </div >
   )
 }
