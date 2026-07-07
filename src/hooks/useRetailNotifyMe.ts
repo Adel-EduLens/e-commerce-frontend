@@ -12,11 +12,26 @@ export function useRetailNotifyMe(userId?: string | number) {
   })
 
   const mutation = useMutation({
-    mutationFn: (payload: { retailProductId: string | number; userId?: string | number }) => retailApi.createRetailNotifyMe(payload),
+    mutationFn: async (payload: { retailProductId: string | number; userId?: string | number }) => {
+      const state = (await import('../store/useAuthStore')).useAuthStore.getState()
+      console.log('[NotifyMe] user:', state.user)
+      console.log('[NotifyMe] token:', state.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null))
+      console.log('Wishlist payload', payload)
+      return retailApi.createRetailNotifyMe(payload)
+    },
     onSuccess: () => {
       toast.success('Added to your notify list')
       queryClient.invalidateQueries({ queryKey: ['retailNotifyMe'] })
       queryClient.invalidateQueries({ queryKey: ['retailProducts'] })
+    },
+    onError: (error: any) => {
+      console.log(error.response?.status)
+      console.log(error.response?.data)
+      console.log(error.config?.url)
+      console.log(error.config?.method)
+      console.log(error.config?.headers)
+      console.log(error.config?.data)
+      toast.error(error?.response?.data?.message ?? error?.message ?? 'Unable to save notify me request.')
     },
   })
 

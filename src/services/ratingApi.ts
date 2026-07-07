@@ -30,6 +30,9 @@ async function postFallbackRating(payload: RateProductPayload) {
   const { productType, productId, rating } = payload
 
   if (productType === 'RETAIL') {
+    console.log('Rating payload', payload)
+    console.log('Stored token', localStorage.getItem('token'))
+    console.log('Axios Authorization', api.defaults.headers.common.Authorization)
     const response = await api.post(`/retail/products/${productId}/rating`, { rating })
     return normalizeRatingResponse(response.data)
   }
@@ -44,10 +47,36 @@ async function postFallbackRating(payload: RateProductPayload) {
 }
 
 export async function rateProduct(payload: RateProductPayload) {
+  console.log('Rating payload', payload)
+  console.log('Stored token', localStorage.getItem('token'))
+  console.log('Axios Authorization', api.defaults.headers.common.Authorization)
+
   try {
-    const response = await api.post('/ratings', payload)
+    const state = (await import('../store/useAuthStore')).useAuthStore.getState()
+    console.log('[ratingApi] user:', state.user)
+    console.log('[ratingApi] token:', state.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null))
+
+    if (payload.productType === 'RETAIL') {
+      const response = await api.post(`/retail/products/${payload.productId}/rating`, { rating: payload.rating })
+      return normalizeRatingResponse(response.data)
+    }
+
+    const response = await api.post('/ratings', {
+      productType: payload.productType,
+      productId: payload.productId,
+      rating: payload.rating,
+    })
     return normalizeRatingResponse(response.data)
   } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.log(error.response?.status)
+      console.log(error.response?.data)
+      console.log(error.config?.url)
+      console.log(error.config?.method)
+      console.log(error.config?.headers)
+      console.log(error.config?.data)
+    }
+
     if (
       axios.isAxiosError(error) &&
       error.response &&
@@ -55,6 +84,22 @@ export async function rateProduct(payload: RateProductPayload) {
     ) {
       return postFallbackRating(payload)
     }
-    throw error
+
+    const backendMessage = axios.isAxiosError(error)
+      ? error.response?.data?.message || error.message
+      : error instanceof Error
+        ? error.message
+        : 'Unable to save rating.'
+
+    const enhancedError = new Error(backendMessage) as Error & {
+      response?: { data?: { message?: string } }
+    }
+    enhancedError.response = {
+      data: {
+        message: backendMessage,
+      },
+    }
+
+    throw enhancedError
   }
 }
