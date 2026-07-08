@@ -1,6 +1,10 @@
 const STORAGE_KEY = "compareProducts";
 const MAX_COMPARE_PRODUCTS = 4;
 
+function notifyCompareUpdate() {
+  window.dispatchEvent(new Event("compareUpdated"));
+}
+
 export function getCompareProducts(): string[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
@@ -18,8 +22,9 @@ export function getCompareProducts(): string[] {
 export function saveCompareProducts(ids: string[]) {
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify(ids.slice(0, MAX_COMPARE_PRODUCTS))
+    JSON.stringify(ids.slice(0, MAX_COMPARE_PRODUCTS)),
   );
+  notifyCompareUpdate();
 }
 
 export function addCompareProduct(id: string) {
@@ -44,6 +49,7 @@ export function removeCompareProduct(id: string) {
 
 export function clearCompareProducts() {
   localStorage.removeItem(STORAGE_KEY);
+  notifyCompareUpdate();
 }
 
 export function isProductCompared(id: string) {
