@@ -206,13 +206,13 @@ export default function Navbar() {
       ? location.pathname === "/"
       : item.label === "shop"
         ? location.pathname === item.path ||
-          location.pathname.startsWith("/collections/")
+        location.pathname.startsWith("/collections/")
         : location.pathname === item.path;
 
   return (
     <div className="relative w-full max-w-full">
       <div className="relative flex h-16 lg:h-20 w-full max-w-full items-center gap-2 overflow-hidden rounded-2xl bg-card px-3 sm:px-4 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke">
-  
+
         <Link to="/" className="shrink-0">
           <img
             className="h-8 w-auto max-w-[64px] sm:h-9 sm:max-w-[75px] lg:h-11 lg:max-w-[90px] logo-theme object-contain"
@@ -229,11 +229,10 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 to={item.path}
-                className={`shrink-0 font-['Montserrat'] text-sm xl:text-lg font-semibold whitespace-nowrap transition-colors ${
-                  isActive
+                className={`shrink-0 font-['Montserrat'] text-sm xl:text-lg font-semibold whitespace-nowrap transition-colors ${isActive
                     ? "flex items-center justify-center gap-2.5 rounded-lg bg-primary px-3 py-2 text-foreground"
                     : "text-foreground hover:text-primary"
-                }`}
+                  }`}
               >
                 {t(item.label)}
               </Link>
@@ -344,11 +343,10 @@ export default function Navbar() {
                 key={item.label}
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`rounded-lg px-4 py-3 font-['Montserrat'] text-base font-semibold transition-colors ${
-                  isActive
+                className={`rounded-lg px-4 py-3 font-['Montserrat'] text-base font-semibold transition-colors ${isActive
                     ? "bg-primary text-foreground"
                     : "text-foreground hover:bg-background"
-                }`}
+                  }`}
               >
                 {t(item.label)}
               </Link>

@@ -45,7 +45,7 @@ export default function AccountLayout() {
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col bg-background">
-      <div className="sticky top-0 z-20 px-4 sm:px-6 lg:px-12 pt-4.5 pb-3">
+      <div className="sticky top-0 z-[9999] px-4 sm:px-6 lg:px-12 pt-4.5 pb-3">
         <Navbar />
       </div>
       <div className="flex flex-1 flex-col lg:flex-row gap-6 px-4 sm:px-6 py-3">
