@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useCartStore } from "../../store/useCartStore";
 import { useTranslation } from "react-i18next";
 import { asset } from "../../lib/utils";
-import { MdCompare } from "react-icons/md";
 import { Scale } from "lucide-react";
 import { getCompareProducts } from "../../utils/compareStorage";
 
@@ -136,7 +135,7 @@ export default function Navbar() {
               )}
             </Link>
 
-            <Link to="/compare" className="hidden md:block relative shrink-0">
+            <Link to="/compare" className="relative flex shrink-0 items-center justify-center mr-2.5 md:mr-0">
               <Scale className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors" />
               {compareItemsCount > 0 && (
                 <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
@@ -213,16 +212,6 @@ export default function Navbar() {
           })}
 
           <div className="flex flex-wrap items-center gap-4 border-t border-stroke pt-3 md:hidden">
-            <Link
-              to="/compare"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-foreground"
-            >
-              <MdCompare className="h-5 w-5" />
-              <span className="font-['Montserrat'] text-sm font-medium">
-                {t("compare", "Compare")}
-              </span>
-            </Link>
             <Link
               to="/favorites"
               onClick={() => setMobileMenuOpen(false)}

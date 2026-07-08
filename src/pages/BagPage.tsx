@@ -473,7 +473,7 @@ export default function BagPage() {
   }, [appliedCoupon, items]);
 
   const handleAddItems = () => {
-    navigate("/season-must-haves");
+    navigate("/products");
   };
 
   const handleApplyCoupon = async () => {
