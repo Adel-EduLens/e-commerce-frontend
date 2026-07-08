@@ -33,11 +33,7 @@ const getProductImage = (prod: any, fallback: string) => {
 function ProductGallery({ title, products = [], onNavigate }: { title: string; products?: any[]; onNavigate?: () => void }) {
   const fallbackImg = asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png");
   const mainImage = getProductImage(products[0], fallbackImg);
-  const thumbnails = [
-    getProductImage(products[1], fallbackImg),
-    getProductImage(products[2], fallbackImg),
-    getProductImage(products[3], fallbackImg),
-  ];
+  const thumbnailProducts = products.slice(1, 4).filter(Boolean);
 
   return (
     <div className="flex flex-col items-center gap-6 flex-1 min-w-0 max-w-md w-full">
@@ -56,18 +52,20 @@ function ProductGallery({ title, products = [], onNavigate }: { title: string; p
             />
           </div>
           {/* Thumbnail column */}
-          <div className="hidden sm:flex w-24 flex-col gap-2">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
-                <img
-                  className="absolute inset-0 w-full h-full object-contain p-1"
-                  src={thumbnails[i]}
-                  alt=""
-                  draggable={false}
-                />
-              </div>
-            ))}
-          </div>
+          {thumbnailProducts.length > 0 && (
+            <div className="hidden sm:flex w-24 flex-col gap-2">
+              {thumbnailProducts.map((prod, i) => (
+                <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
+                  <img
+                    className="absolute inset-0 w-full h-full object-contain p-1"
+                    src={getProductImage(prod, fallbackImg)}
+                    alt=""
+                    draggable={false}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       <ViewAllButton onClick={onNavigate} />
