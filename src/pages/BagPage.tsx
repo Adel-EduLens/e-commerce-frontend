@@ -525,7 +525,11 @@ export default function BagPage() {
     }
 
     toast.success(t("toast.checkout"));
-    navigate("/checkout");
+    navigate("/checkout", {
+      state: {
+        appliedCoupon: appliedCoupon
+      }
+    });
   };
 
   const handleRemoveItem = (item: CartItem) => {

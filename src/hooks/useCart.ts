@@ -26,8 +26,16 @@ export function useAddRetailProductToCart() {
         return payload.cartItem
       },
       onSuccess: (cartItem: CartItem) => {
-        addItem(cartItem)
+        addItem({
+          ...cartItem,
+          productId: String(cartItem.productId || cartItem.retailProductId || ''),
+          size: cartItem.size || '',
+          color: cartItem.color || '',
+          colorHex: cartItem.colorHex || '',
+        })
         queryClient.invalidateQueries({ queryKey: ['cart'] })
+        queryClient.invalidateQueries({ queryKey: ['retailProduct'] })
+        queryClient.invalidateQueries({ queryKey: ['products'] })
         toast.success('Added to cart')
       },
       onError: (error: Error) => {

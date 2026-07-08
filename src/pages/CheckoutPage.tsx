@@ -4,7 +4,7 @@ import GoogleMapPicker from "../components/GoogleMap";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
 import { MapPin, CheckCircle2, Compass, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function OrderSummary({
   items,
@@ -430,6 +430,8 @@ function RememberMeSection({ onPay, loading }: { onPay: () => void; loading: boo
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialCoupon = location.state?.appliedCoupon || null;
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -449,8 +451,8 @@ export default function CheckoutPage() {
     longitude: "",
   });
 
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(initialCoupon);
   const [couponError, setCouponError] = useState("");
 
   const subtotal = useMemo(
