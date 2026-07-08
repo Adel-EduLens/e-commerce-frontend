@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
@@ -12,33 +12,6 @@ import { useWishlist } from "../hooks/useWishlist";
 import type { BagProduct } from "../types/product";
 type BagTab = "favorites" | "recent";
 
-const FAVORITE_PRODUCTS = [
-  {
-    title: "Amber Blaze Classic Tee",
-    sizeLabel: "XS - XXL",
-    price: "1000 EGP",
-  },
-  {
-    title: "Urban Drift Hoodie",
-    sizeLabel: "S - XL",
-    price: "850 EGP",
-    featured: true,
-  },
-  { title: "Relaxed Denim Set", sizeLabel: "M - XXL", price: "1200 EGP" },
-  { title: "Soft Motion Knit", sizeLabel: "XS - L", price: "780 EGP" },
-] as const;
-
-const RECENT_PRODUCTS = [
-  { title: "Contour Street Jacket", sizeLabel: "S - XL", price: "1350 EGP" },
-  {
-    title: "Neutral Ease Tee",
-    sizeLabel: "XS - XXL",
-    price: "620 EGP",
-    featured: true,
-  },
-  { title: "Tailored Cargo Pant", sizeLabel: "M - XXL", price: "940 EGP" },
-  { title: "Canvas Weekend Tote", sizeLabel: "One Size", price: "450 EGP" },
-] as const;
 
 const formatCurrency = (amount: number) =>
   `${new Intl.NumberFormat("en-US", {
@@ -342,16 +315,15 @@ function FavoritesSection({
 }) {
   const { t } = useTranslation("bag");
   const recentProducts = useRecentStore((state) => state.products);
-  const activeRecentProducts = recentProducts.length > 0 ? recentProducts : RECENT_PRODUCTS;
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
     ? wishlistData.data.map((item: any) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
     : [];
-  const activeFavoriteProducts = apiFavorites.length > 0 ? apiFavorites : FAVORITE_PRODUCTS;
 
-  const products =
-    selectedTab === "favorites" ? activeFavoriteProducts : activeRecentProducts;
+  const allProducts = selectedTab === "favorites" ? apiFavorites : recentProducts;
+  const products = allProducts.slice(0, 4);
+  const viewAllLink = selectedTab === "favorites" ? "/favorites" : "/recently-viewed";
 
   return (
     <div className="w-full">
@@ -383,28 +355,40 @@ function FavoritesSection({
           {t("favorites.emptyRecent")}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product: BagProduct, index: number) => {
-            const title = product.title || product.name || "Product";
-            const rawPrice = product.price ?? product.unitPrice ?? "";
-            const price = typeof rawPrice === "number" ? `${rawPrice} EGP` : rawPrice;
-            const sizeLabel = product.sizeLabel || (Array.isArray(product.sizes) ? product.sizes.map((s: any) => typeof s === "string" ? s : (s.size || s.name || "")).filter(Boolean).join(" - ") : "");
-            const imageSrc = product.imageSrc || product.image || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === "string" ? product.images[0] : product.images[0].url) : undefined);
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product: BagProduct, index: number) => {
+              const title = product.title || product.name || "Product";
+              const rawPrice = product.price ?? product.unitPrice ?? "";
+              const price = typeof rawPrice === "number" ? `${rawPrice} EGP` : rawPrice;
+              const sizeLabel = product.sizeLabel || (Array.isArray(product.sizes) ? product.sizes.map((s: any) => typeof s === "string" ? s : (s.size || s.name || "")).filter(Boolean).join(" - ") : "");
+              const imageSrc = product.imageSrc || product.image || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === "string" ? product.images[0] : product.images[0].url) : undefined);
 
-            return (
-              <ProductCard
-                key={`${selectedTab}-${product.id || index}-${title}`}
-                productId={product.id?.toString()}
-                title={title}
-                sizeLabel={sizeLabel}
-                price={price}
-                imageSrc={imageSrc}
-                featured={Boolean(product.featured)}
-                accentClassName="bg-primary"
-              />
-            );
-          })}
-        </div>
+              return (
+                <ProductCard
+                  key={`${selectedTab}-${product.id || index}-${title}`}
+                  productId={product.id?.toString()}
+                  title={title}
+                  sizeLabel={sizeLabel}
+                  price={price}
+                  imageSrc={imageSrc}
+                  featured={Boolean(product.featured)}
+                  accentClassName="bg-primary"
+                />
+              );
+            })}
+          </div>
+          {allProducts.length > 4 && (
+            <div className="flex justify-center mt-8">
+              <Link
+                to={viewAllLink}
+                className="rounded-2xl bg-primary px-8 py-4 font-['Montserrat'] text-base font-semibold text-foreground hover:opacity-90 transition"
+              >
+                View All
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
