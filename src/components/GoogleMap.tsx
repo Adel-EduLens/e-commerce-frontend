@@ -18,6 +18,7 @@ export type PickedLocation = {
   city?: string;
   area?: string;
   streetAddress?: string;
+  displayAddress?: string;
 };
 
 const DEFAULT_CENTER: [number, number] = [30.0131, 31.2089]; // Giza, Egypt
@@ -39,11 +40,13 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<PickedL
     const road = addr.road || addr.pedestrian || addr.path || "";
     const houseNumber = addr.house_number || "";
     const streetAddress = [houseNumber, road].filter(Boolean).join(" ");
+    const displayAddress = data.display_name || [streetAddress, area, city].filter(Boolean).join(", ");
 
     return {
       city,
       area,
-      streetAddress: streetAddress || "Unknown Street"
+      streetAddress: streetAddress || "Unknown Street",
+      displayAddress
     };
   } catch {
     // Reverse geocoding is best-effort; the pin itself is still captured either way.
@@ -205,15 +208,36 @@ export default function GoogleMapPicker({
         <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
           Pin your location on the map
         </span>
-        <button
-          type="button"
-          onClick={() => handleUseCurrentLocation(true)}
-          disabled={isLocating}
-          className="flex items-center gap-1.5 rounded-lg border border-stroke px-3 py-1.5 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
-        >
-          <LocateFixed className="h-3.5 w-3.5" />
-          {isLocating ? "Locating..." : "Use my current location"}
-        </button>
+        <div className="flex gap-2">
+          {searchQuery && searchQuery.replace(/,/g, '').trim().length > 0 && (
+            <button
+              type="button"
+              onClick={async () => {
+                setIsSearching(true);
+                const coords = await forwardGeocode(searchQuery);
+                if (coords) {
+                  setPendingMarker(coords);
+                  mapRef.current?.flyTo(coords, 15);
+                }
+                setIsSearching(false);
+              }}
+              disabled={isSearching}
+              className="flex items-center gap-1.5 rounded-lg border border-stroke px-3 py-1.5 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
+            >
+              <Search className="h-3.5 w-3.5" />
+              {isSearching ? "Searching..." : "Locate form address"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => handleUseCurrentLocation(true)}
+            disabled={isLocating}
+            className="flex items-center gap-1.5 rounded-lg border border-stroke px-3 py-1.5 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
+          >
+            <LocateFixed className="h-3.5 w-3.5" />
+            {isLocating ? "Locating..." : "Use my current location"}
+          </button>
+        </div>
       </div>
 
       <div className="relative">
