@@ -34,7 +34,7 @@ export type ProductCardProps = {
   isMustHave?: boolean;
   isFlashDeals?: boolean;
   productId?: string;
-  productType?: 'SHOP' | 'WHOLESALE';
+  productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
   showTypeBadge?: boolean;
 };
 

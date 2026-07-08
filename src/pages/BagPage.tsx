@@ -318,7 +318,11 @@ function FavoritesSection({
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
-    ? wishlistData.data.map((item: any) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
+    ? wishlistData.data.map((item: any) => {
+        const product = item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct;
+        if (!product) return null;
+        return { ...product, _productType: item.productType };
+      }).filter(Boolean)
     : [];
 
   const allProducts = selectedTab === "favorites" ? apiFavorites : recentProducts;
@@ -368,6 +372,7 @@ function FavoritesSection({
                 <ProductCard
                   key={`${selectedTab}-${product.id || index}-${title}`}
                   productId={product.id?.toString()}
+                  productType={product._productType}
                   title={title}
                   sizeLabel={sizeLabel}
                   price={price}
