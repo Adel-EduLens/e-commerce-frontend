@@ -329,6 +329,9 @@ export default function TraderOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
@@ -383,12 +386,27 @@ export default function TraderOrdersPage() {
 
   const allSelected = selected.size === orders.length && orders.length > 0;
 
-  const filtered = orders.filter(
-    (o) =>
+  const filtered = orders.filter((o) => {
+    const matchesSearch =
       o.orderId.toLowerCase().includes(search.toLowerCase()) ||
       o.customer.toLowerCase().includes(search.toLowerCase()) ||
-      o.status.toLowerCase().includes(search.toLowerCase()),
-  );
+      o.status.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus = !statusFilter || o.status.toUpperCase() === statusFilter.toUpperCase();
+    const matchesPayment = !paymentFilter || o.payment.toLowerCase() === paymentFilter.toLowerCase();
+
+    let matchesDate = true;
+    if (dateFilter) {
+      const filterDate = new Date(dateFilter);
+      const orderDate = new Date(o.date);
+      matchesDate =
+        orderDate.getFullYear() === filterDate.getFullYear() &&
+        orderDate.getMonth() === filterDate.getMonth() &&
+        orderDate.getDate() === filterDate.getDate();
+    }
+
+    return matchesSearch && matchesStatus && matchesPayment && matchesDate;
+  });
 
   const totalOrdersCount = orders.length;
   const activeCount = orders.filter(o => ["PENDING", "PROCESSING", "SHIPPED"].includes(o.status.toUpperCase())).length;
@@ -443,21 +461,77 @@ export default function TraderOrdersPage() {
             ))}
           </div>
 
-          {/* Search */}
-          <div className="flex flex-wrap items-center justify-start gap-3">
-            <div className="relative flex min-w-[320px] items-center">
-              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+          {/* Search & Filters */}
+          <div className="flex flex-wrap items-center justify-start gap-4 bg-white p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[280px]">
+              <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="7" cy="7" r="4.5" />
                 <path d="M10.5 10.5L14 14" />
               </svg>
               <input
                 type="text"
-                placeholder="Search orders by ID, status or customer name..."
+                placeholder="Search by ID, customer name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:ring-1 focus:ring-secondary"
+                className="w-full rounded-xl border border-stroke bg-zinc-50 py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
               />
             </div>
+
+            {/* Status Filter */}
+            <div className="relative min-w-[160px]">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+              >
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="PROCESSING">Processing</option>
+                <option value="SHIPPED">Shipped</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+
+            {/* Payment Method Filter */}
+            <div className="relative min-w-[160px]">
+              <select
+                value={paymentFilter}
+                onChange={(e) => setPaymentFilter(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+              >
+                <option value="">All Payments</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div className="relative min-w-[160px]">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+              />
+            </div>
+
+            {/* Reset Button */}
+            {(search || statusFilter || paymentFilter || dateFilter) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("");
+                  setPaymentFilter("");
+                  setDateFilter("");
+                }}
+                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
+              >
+                Reset Filters
+              </button>
+            )}
           </div>
 
           {/* Orders Table Panel */}
