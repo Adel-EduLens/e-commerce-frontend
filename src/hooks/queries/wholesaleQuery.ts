@@ -16,6 +16,8 @@ export interface Wholesale {
   categoryId: string;
   createdAt: string;
   updatedAt: string;
+  sku?: string;
+  stock?: number;
 
   category: {
     id: string;
@@ -87,6 +89,8 @@ export interface WholesaleFormData {
   isMostPopular: boolean;
   isPremiumCollection: boolean;
   images: { url: string; color?: string }[];
+  sku?: string;
+  stock?: number;
 }
 
 const createWholesale = async (body: WholesaleFormData) => {
