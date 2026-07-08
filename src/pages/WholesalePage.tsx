@@ -236,6 +236,7 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                   <ProductCard
                     key={item.id}
                     productId={item.id}
+                    productType="WHOLESALE"
                     title={item.name}
                     price={`$${item.price}`}
                     imageSrc={item.images[0]?.url}

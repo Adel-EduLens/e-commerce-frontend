@@ -7,6 +7,7 @@ import { Heart, RotateCcw, Tag, Truck, Bell, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCartStore } from "../../store/useCartStore";
+import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 
 import { ArrowCircle } from "./ui/ArrowCircle";
 import { Modal } from "../ui/modal";
@@ -26,6 +27,7 @@ type ProductInfoPanelProps = {
   setSelectedColor: (color: string) => void;
   item: DetailItem;
   reviewCount?: number;
+  productType?: 'SHOP' | 'WHOLESALE';
 };
 
 export function ProductInfoPanel({
@@ -33,6 +35,7 @@ export function ProductInfoPanel({
   setSelectedColor,
   item,
   reviewCount = 0,
+  productType = 'SHOP',
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
 
@@ -41,8 +44,11 @@ export function ProductInfoPanel({
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+
+  const { data: wishlistStatus } = useWishlistStatus(productType, item.id)
+  const toggleWishlist = useToggleWishlist()
+  const isFavorite = Boolean(wishlistStatus?.isWishlisted)
 
   const { t } = useTranslation("productDetails");
 
@@ -94,11 +100,14 @@ export function ProductInfoPanel({
   };
 
   const handleToggleFavorite = () => {
-    toast.success(isFavorite ? t("favoriteRemoved") : t("favoriteAdded"));
-    setIsFavorite((current) => {
-      const next = !current;
-      return next;
-    });
+    toggleWishlist.mutate(
+      { productType, productId: item.id },
+      {
+        onSuccess: (data) => {
+          toast.success(data.isWishlisted ? t("favoriteAdded") : t("favoriteRemoved"))
+        },
+      }
+    )
   };
 
   const handleAddToCart = () => {
@@ -385,15 +394,16 @@ export function ProductInfoPanel({
         <button
           type="button"
           onClick={handleToggleFavorite}
-          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start"
+          disabled={toggleWishlist.isPending}
+          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start disabled:opacity-70"
         >
           <Heart
-            className="h-5 w-5 text-foreground sm:h-6 sm:w-6"
+            className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors ${isFavorite ? "text-red-500" : "text-foreground"}`}
             strokeWidth={2}
             fill={isFavorite ? "currentColor" : "none"}
           />
           <span className="font-['Montserrat'] text-xs font-semibold text-foreground sm:text-base">
-            {t("addToFavorite")}
+            {isFavorite ? t("removeFromFavorite") : t("addToFavorite")}
           </span>
         </button>
 

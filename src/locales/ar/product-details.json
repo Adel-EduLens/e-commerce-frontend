@@ -22,6 +22,7 @@
   "quantity": "الكمية",
 
   "addToFavorite": "إضافة للمفضلة",
+  "removeFromFavorite": "إزالة من المفضلة",
   "addToCart": "إضافة إلى السلة",
   "buyNow": "اشترِ الآن",
 
@@ -35,8 +36,8 @@
   "copiedLink": "تم نسخ رابط المنتج",
   "copyFailed": "تعذر نسخ رابط المنتج",
 
-  "favoriteAdded": "تمت الإضافة إلى المفضلة. قريبًا.",
-  "favoriteRemoved": "تمت الإزالة من المفضلة. قريبًا.",
+  "favoriteAdded": "تمت الإضافة إلى المفضلة",
+  "favoriteRemoved": "تمت الإزالة من المفضلة",
 
   "addedToBag": "تمت إضافة {{count}} منتج إلى السلة ({{size}}، {{color}})",
   "addedToBagPlural": "تمت إضافة {{count}} منتجات إلى السلة ({{size}}، {{color}})",

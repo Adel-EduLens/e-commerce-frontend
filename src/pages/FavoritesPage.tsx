@@ -1,120 +1,105 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../store/useAuthStore";
-import { ProductCard } from "../components/shared";
+import { useWishlist } from '../hooks/useWishlist'
+import RetailProductCard from '../components/retail/RetailProductCard'
+import ProductCard from '../components/shared/ProductCard'
+import { Heart } from 'lucide-react'
 
-const asset = (file: string) => `/home%20page/${encodeURIComponent(file)}`;
-
-function AssetImage({
-  file,
-  className,
-  alt = "",
-}: {
-  file: string;
-  className: string;
-  alt?: string;
-}) {
+function EmptyFavorites() {
   return (
-    <img
-      className={className}
-      src={asset(file)}
-      alt={alt}
-      draggable={false}
-    />
-  );
-}
-
-
-
-function ProductRow() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-      <ProductCard />
-      <ProductCard featured accentClassName="bg-[#C4B5FD]" />
-      <ProductCard />
-      <ProductCard />
+    <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <Heart size={56} className="text-gray-300" strokeWidth={1.5} />
+      <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">No favorites yet</p>
+      <p className="text-gray-text font-['Montserrat'] text-base">
+        Start adding products you love by pressing the heart icon.
+      </p>
     </div>
-  );
+  )
 }
-
-function FilterSection() {
-  return (
-    <div className="mt-6 inline-flex w-full flex-col items-start justify-start gap-3">
-      <div className="self-stretch font-['Montserrat'] text-3xl font-bold text-foreground">
-        Filter by
-      </div>
-      <div className="flex flex-wrap items-center gap-4 self-stretch">
-        <div className="flex items-center justify-start gap-4">
-          {/* Sort by */}
-          <div className="flex items-center justify-center gap-2 rounded-2xl bg-gray-light p-4">
-            <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
-              Sort by
-            </div>
-            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
-              <AssetImage
-                file="weui_arrow-filled-1.svg"
-                className="h-4 w-4 rotate-90"
-              />
-            </div>
-          </div>
-          {/* Filter by */}
-          <div className="flex w-auto items-center justify-between rounded-2xl bg-gray-light p-4">
-            <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
-              Filter by
-            </div>
-            <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white">
-              <AssetImage
-                file="weui_arrow-filled-1.svg"
-                className="h-4 w-4 rotate-90"
-              />
-            </div>
-          </div>
-        </div>
-        {/* Search */}
-        <div className="flex w-full sm:w-96 items-center justify-between rounded-2xl bg-gray-light p-4">
-          <div className="font-['Montserrat'] text-2xl font-medium text-gray-text">
-            Search
-          </div>
-          <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-            <AssetImage
-              file="mynaui_search.svg"
-              className="absolute left-[8px] top-[8px] h-6 w-6"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 
 
 export default function FavoritesPage() {
-  const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { data, isLoading } = useWishlist()
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, user, navigate]);
+  const items: any[] = data?.data ?? []
 
-  if (!isAuthenticated || !user) {
-    return null;
+  if (isLoading) {
+    return (
+      <div className="w-full">
+        <div className="font-['Montserrat'] text-4xl font-bold text-foreground">Favorites</div>
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="h-[26rem] w-full max-w-[20rem] rounded-2xl bg-gray-200 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="w-full">
       <div className="font-['Montserrat'] text-4xl font-bold text-foreground">
         Favorites
+        {items.length > 0 && (
+          <span className="ml-3 font-['Montserrat'] text-2xl font-medium text-gray-text">
+            ({items.length})
+          </span>
+        )}
       </div>
-      <FilterSection />
-      <div className="mt-6 flex flex-col gap-6">
-        <ProductRow />
-        <ProductRow />
-        <ProductRow />
-        <ProductRow />
-      </div>
+
+      {items.length === 0 ? (
+        <EmptyFavorites />
+      ) : (
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {items.map((item) => {
+            if (!item.product) return null
+
+            if (item.productType === 'RETAIL') {
+              return (
+                <RetailProductCard
+                  key={item.id}
+                  product={{ ...item.product, isWishlisted: true }}
+                />
+              )
+            }
+
+            if (item.productType === 'SHOP') {
+              const p = item.product
+              return (
+                <ProductCard
+                  key={item.id}
+                  productId={p.id}
+                  productType="SHOP"
+                  title={p.name}
+                  price={`${p.price} EGP`}
+                  to={`/product-details/${p.id}`}
+                  imageSrc={p.images?.[0]?.url}
+                  rating={p.rating ?? 0}
+                  flashDealPrice={p.flashDealPrice ?? undefined}
+                  flashDealEndsAt={p.flashDealEndsAt ?? undefined}
+                  isFlashDeals={p.isFlashDeals ?? false}
+                />
+              )
+            }
+
+            if (item.productType === 'WHOLESALE') {
+              const p = item.product
+              return (
+                <ProductCard
+                  key={item.id}
+                  productId={p.id}
+                  productType="WHOLESALE"
+                  title={p.name}
+                  price={`${p.price} EGP`}
+                  to={`/wholesale/${p.id}`}
+                  imageSrc={p.images?.[0]?.url}
+                  rating={p.rating ?? 0}
+                />
+              )
+            }
+
+            return null
+          })}
+        </div>
+      )}
     </div>
-  );
+  )
 }
