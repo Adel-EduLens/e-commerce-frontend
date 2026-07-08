@@ -5,6 +5,7 @@ export interface User {
   role: 'user' | 'trader' | 'admin'
   avatar?: string
   phone?: string
+  address?: string
   createdAt: string
   status: 'active' | 'suspended'
 }

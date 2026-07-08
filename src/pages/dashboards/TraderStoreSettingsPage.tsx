@@ -1,56 +1,137 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useUpdateTraderMe } from "../../hooks/queries/traderQuery";
+import { uploadImageFile } from "../../components/trader/inventoryUtils";
+import GoogleMapPicker, { type PickedLocation } from "../../components/GoogleMap";
 
 function GeneralInfoTab() {
+  const user = useAuthStore((s) => s.user);
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const { mutate: saveProfile, isPending: isSaving } = useUpdateTraderMe();
+
+  const [name, setName] = useState(user?.name ?? "");
+  const [pickedLocation, setPickedLocation] = useState<PickedLocation | null>(() => {
+    if (!user?.address) return null;
+    try { return JSON.parse(user.address); } catch { return null; }
+  });
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setAvatarUploading(true);
+    try {
+      const url = await uploadImageFile(file);
+      updateUser({ ...user, avatar: url });
+    } finally {
+      setAvatarUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleSave = () => {
+    setSaveSuccess(false);
+    saveProfile(
+      { name, address: pickedLocation ? JSON.stringify(pickedLocation) : undefined },
+      { onSuccess: () => setSaveSuccess(true) }
+    );
+  };
+
+  const addressLabel = pickedLocation
+    ? [pickedLocation.streetAddress, pickedLocation.area, pickedLocation.city]
+        .filter(Boolean)
+        .join(", ")
+    : null;
+
   return (
-    <div className="flex-1 p-8">
+    <div className="flex-1 p-8 overflow-y-auto">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">General Information</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348]">
-          Save
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348] disabled:opacity-60"
+        >
+          {isSaving ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
         </button>
       </div>
 
       <div className="flex flex-col gap-6 max-w-xl">
+        {/* Avatar */}
         <div className="flex flex-col gap-2">
-          <label className="font-['Montserrat'] text-base font-semibold text-foreground">Store Name</label>
-          <div className="relative flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-gray-200 overflow-hidden border border-stroke">
-            <img src="/store setting/tabler_photo-up.svg" className="h-6 w-6 opacity-60" alt="Upload" />
+          <label className="font-['Montserrat'] text-base font-semibold text-foreground">Profile Image</label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+          <div
+            onClick={() => !avatarUploading && fileInputRef.current?.click()}
+            className="relative flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-gray-200 overflow-hidden border border-stroke"
+          >
+            {user?.avatar ? (
+              <img src={user.avatar} className="h-full w-full object-cover" alt="Avatar" />
+            ) : (
+              <img src="/store setting/tabler_photo-up.svg" className="h-6 w-6 opacity-60" alt="Upload" />
+            )}
+            {avatarUploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              </div>
+            )}
           </div>
         </div>
 
+        {/* Name */}
         <div className="flex flex-col gap-2">
           <label className="font-['Montserrat'] text-base font-semibold text-foreground">Store Name</label>
           <input
             type="text"
-            defaultValue="GenZ"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-80 rounded-lg border border-stroke bg-white p-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-stroke"
           />
         </div>
 
+        {/* Email — read-only */}
         <div className="flex flex-col gap-2">
           <label className="font-['Montserrat'] text-base font-semibold text-foreground">Contact Email</label>
           <input
             type="email"
-            defaultValue="GenZ@Gmail.com"
-            className="w-80 rounded-lg border border-stroke bg-white p-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-stroke"
+            value={user?.email ?? ""}
+            readOnly
+            className="w-80 rounded-lg border border-stroke bg-gray-50 p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
           />
         </div>
 
+        {/* Phone — disabled */}
         <div className="flex flex-col gap-2">
           <label className="font-['Montserrat'] text-base font-semibold text-foreground">Phone</label>
           <input
             type="tel"
-            defaultValue="011145574412"
-            className="w-80 rounded-lg border border-stroke bg-white p-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-stroke"
+            value={user?.phone ?? ""}
+            disabled
+            className="w-80 rounded-lg border border-stroke bg-gray-50 p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
           />
         </div>
 
+        {/* Address — map picker */}
         <div className="flex flex-col gap-2">
           <label className="font-['Montserrat'] text-base font-semibold text-foreground">Address</label>
-          <img
-            className="h-52 w-96 rounded-lg object-cover"
-            src="/store setting/🌎 Map Maker_ Cairo, Cairo, Egypt (Standard).png"
-            alt="Map placeholder"
+          {addressLabel && (
+            <p className="font-['Montserrat'] text-sm text-gray-text">{addressLabel}</p>
+          )}
+          <GoogleMapPicker
+            onLocationPick={setPickedLocation}
+            searchQuery={
+              pickedLocation
+                ? [pickedLocation.area, pickedLocation.city].filter(Boolean).join(", ")
+                : undefined
+            }
           />
         </div>
       </div>
