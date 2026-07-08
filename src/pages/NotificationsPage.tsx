@@ -6,6 +6,17 @@ import {
   useMarkAllNotificationsRead,
   useDeleteNotification,
 } from "../hooks/useUserNotifications";
+import { useCategories } from "../hooks/queries/categoriesQuery";
+import { useCategorySubscriptions } from "../hooks/queries/notificationQuery";
+import { useTranslation } from "react-i18next";
+
+const COLLECTION_LABELS = ["Men", "Women", "Kids"];
+const COLLECTION_IMAGES: Record<string, string> = {
+  Men: "/home-page/image%208.png",
+  Women: "/home-page/image%207.png",
+  Kids: "/home-page/image%209.png",
+};
+
 
 function NotificationCard({
   notification,
@@ -33,11 +44,10 @@ function NotificationCard({
 
   return (
     <div
-      className={`flex items-start gap-4 rounded-2xl p-4 border transition-all ${
-        notification.isRead
-          ? "bg-card border-stroke"
-          : "bg-primary/5 border-primary/30"
-      }`}
+      className={`flex items-start gap-4 rounded-2xl p-4 border transition-all ${notification.isRead
+        ? "bg-card border-stroke"
+        : "bg-primary/5 border-primary/30"
+        }`}
     >
       {/* Image or Icon */}
       <div className="h-14 w-14 rounded-xl overflow-hidden bg-gray-light shrink-0 flex items-center justify-center">
@@ -137,9 +147,15 @@ function EmptyNotifications() {
 export default function NotificationsPage() {
   const { data: notifications = [], isLoading, isError } = useUserNotifications();
   const markReadMutation = useMarkNotificationRead();
+  const { t } = useTranslation("notifications");
   const markAllReadMutation = useMarkAllNotificationsRead();
   const deleteMutation = useDeleteNotification();
+  const { data: categories = [] } = useCategories();
+  const collectionCategories = categories.filter((c) =>
+    COLLECTION_LABELS.includes(c.name)
+  );
 
+  const { data: subscribedIds = [] } = useCategorySubscriptions();
   const unreadCount = notifications.filter((n: any) => !n.isRead).length;
 
   if (isLoading) {
@@ -162,17 +178,43 @@ export default function NotificationsPage() {
     <div className="flex w-full max-w-2xl flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Bell className="h-7 w-7 text-foreground" />
-          <h1 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-            Notifications
-          </h1>
-          {unreadCount > 0 && (
-            <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2 font-['Montserrat'] text-xs font-bold text-primary-foreground">
-              {unreadCount}
-            </span>
-          )}
+        <div className="flex flex-col gap-6">
+          <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
+            {t("NOTIFICATIONS")}
+          </div>
+          <div className="flex flex-col gap-4 sm:gap-6">
+            {collectionCategories.map((cat) => {
+              const enabled = subscribedIds.includes(cat.id);
+              return (
+                <div key={cat.id} className="flex items-center gap-4 sm:gap-5">
+                  <img
+                    src={COLLECTION_IMAGES[cat.name] ?? ""}
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover object-top shrink-0"
+                    alt={cat.name}
+                    draggable={false}
+                  />
+                  <div className="flex flex-1 items-center justify-between py-3 sm:py-4">
+                    <div className="font-['Montserrat'] text-lg sm:text-2xl font-medium text-foreground">
+                      {t(cat.name)}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => console.log("clicked")}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${enabled ? "bg-primary" : "bg-stroke"
+                        }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${enabled ? "translate-x-6" : "translate-x-1"
+                          }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
 
         {unreadCount > 0 && (
           <button

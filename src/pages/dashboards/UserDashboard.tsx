@@ -108,7 +108,7 @@ export default function UserDashboard() {
         <ProductGallery
           title="VIEWED"
           products={viewedProducts}
-          onNavigate={() => navigate("/products")}
+          onNavigate={() => navigate("/recently-viewed")}
         />
       </div>
 

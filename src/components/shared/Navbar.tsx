@@ -1,11 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Bell, Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useCartStore } from "../../store/useCartStore";
 import { useTranslation } from "react-i18next";
 import { asset } from "../../lib/utils";
 import { Scale } from "lucide-react";
 import { getCompareProducts } from "../../utils/compareStorage";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useMarkAllRead, useNotifications } from "../../hooks/queries/notificationQuery";
 
 const navLinks = [
   { label: "home", path: "/" },
@@ -15,6 +18,144 @@ const navLinks = [
   { label: "designLab", path: "/design-lab" },
   { label: "dropshipping", path: "/dropshipping" },
 ];
+
+function NotificationBell() {
+  const { data } = useNotifications();
+  const markAllRead = useMarkAllRead();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState({ top: 0, right: 0 });
+
+  const unread = data?.unread ?? 0;
+  const recent = (data?.notifications ?? []).slice(0, 5);
+
+  const updateCoords = () => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    setCoords({
+      top: rect.bottom + window.scrollY + 10,
+      right: window.innerWidth - rect.right,
+    });
+  };
+
+  const handleOpen = () => {
+    updateCoords();
+    setOpen((p) => !p);
+  };
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        btnRef.current?.contains(e.target as Node) ||
+        dropdownRef.current?.contains(e.target as Node)
+      ) return;
+      setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleSeeAll = () => {
+    setOpen(false);
+    navigate("/notifications");
+  };
+
+  const dropdown = open ? (
+    <div
+      ref={dropdownRef}
+      style={{ top: coords.top, right: coords.right }}
+      className="fixed z-[9999] w-80 rounded-2xl bg-card shadow-[0px_8px_24px_-4px_rgba(30,37,45,0.18)] outline outline-1 outline-stroke overflow-hidden"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-stroke">
+        <span className="font-['Montserrat'] text-sm font-bold text-foreground">
+          Notifications {unread > 0 && <span className="text-primary">({unread})</span>}
+        </span>
+        {unread > 0 && (
+          <button
+            type="button"
+            onClick={() => markAllRead.mutate()}
+            className="font-['Montserrat'] text-xs text-gray-text hover:text-primary transition-colors"
+          >
+            Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* List */}
+      <div className="max-h-72 overflow-y-auto divide-y divide-stroke">
+        {recent.length === 0 ? (
+          <p className="px-4 py-6 text-center font-['Montserrat'] text-sm text-gray-text">
+            No notifications yet
+          </p>
+        ) : (
+          recent.map((n) => (
+            <button
+              key={n.id}
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                if (n.productId) navigate(`/products/${n.productId}`);
+              }}
+              className="w-full flex items-start gap-3 px-4 py-3 text-start hover:bg-background transition-colors"
+            >
+              {n.imageUrl ? (
+                <img src={n.imageUrl} alt="" className="h-10 w-10 rounded-lg object-cover shrink-0" />
+              ) : (
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Bell className="h-4 w-4 text-primary" strokeWidth={1.5} />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground truncate">{n.title}</p>
+                <p className="font-['Montserrat'] text-xs text-gray-text line-clamp-2 mt-0.5">{n.body}</p>
+              </div>
+              {!n.isRead && (
+                <span className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />
+              )}
+            </button>
+          ))
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-stroke p-3">
+        <button
+          type="button"
+          onClick={handleSeeAll}
+          className="w-full rounded-xl bg-primary py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:opacity-90 transition-opacity"
+        >
+          See All
+        </button>
+      </div>
+    </div>
+  ) : null;
+
+  return (
+    <div className="relative shrink-0">
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={handleOpen}
+        className="relative flex items-center justify-center"
+        aria-label="Notifications"
+      >
+        <Bell
+          className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
+          strokeWidth={1.5}
+        />
+        {unread > 0 && (
+          <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
+            {unread > 9 ? "9+" : unread}
+          </span>
+        )}
+      </button>
+      {createPortal(dropdown, document.body)}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const { t } = useTranslation("navbar");
@@ -26,6 +167,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const items = useCartStore((state) => state.items);
   const itemCount = items.length;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const [compareItemsCount, setCompareItemsCount] = useState(
     getCompareProducts().length,
@@ -144,6 +286,8 @@ export default function Navbar() {
               )}
             </Link>
 
+            {isAuthenticated && <NotificationBell />}
+
             <Link to="/favorites" className="hidden md:block shrink-0">
               <Heart
                 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
@@ -212,6 +356,18 @@ export default function Navbar() {
           })}
 
           <div className="flex flex-wrap items-center gap-4 border-t border-stroke pt-3 md:hidden">
+            {isAuthenticated && (
+              <Link
+                to="/notifications"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-foreground"
+              >
+                <Bell className="h-5 w-5" strokeWidth={1.5} />
+                <span className="font-['Montserrat'] text-sm font-medium">
+                  {t("notifications", "Notifications")}
+                </span>
+              </Link>
+            )}
             <Link
               to="/favorites"
               onClick={() => setMobileMenuOpen(false)}
