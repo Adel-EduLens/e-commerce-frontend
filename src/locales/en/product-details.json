@@ -22,6 +22,7 @@
   "quantity": "Quantity",
 
   "addToFavorite": "Add to Favorite",
+  "removeFromFavorite": "Remove from Fav",
   "addToCart": "Add to Cart",
   "buyNow": "Buy Now",
 
@@ -35,8 +36,8 @@
   "copiedLink": "Product link copied to clipboard",
   "copyFailed": "Unable to copy the product link",
 
-  "favoriteAdded": "Added to favorites. Coming soon.",
-  "favoriteRemoved": "Removed from favorites. Coming soon.",
+  "favoriteAdded": "Added to favorites",
+  "favoriteRemoved": "Removed from favorites",
 
   "addedToBag": "{{count}} item added to bag ({{size}}, {{color}})",
   "addedToBagPlural": "{{count}} items added to bag ({{size}}, {{color}})",

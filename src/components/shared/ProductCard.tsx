@@ -1,14 +1,17 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Star } from "../ui/star";
 import { asset } from "../../lib/utils";
 import { MdCompare } from "react-icons/md";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import {
   addCompareProduct,
   removeCompareProduct,
   isProductCompared,
 } from "../../utils/compareStorage";
+import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
@@ -30,6 +33,7 @@ export type ProductCardProps = {
   isMustHave?: boolean;
   isFlashDeals?: boolean;
   productId?: string;
+  productType?: 'SHOP' | 'WHOLESALE';
 };
 
 function useCountdown(endsAt?: string) {
@@ -82,6 +86,7 @@ export default function ProductCard({
   flashDealEndsAt,
   isFlashDeals = false,
   productId = "",
+  productType = "SHOP",
 }: ProductCardProps) {
   const rootTone = featured ? accentClassName : "bg-white";
   const mediaTone = featured ? accentClassName : "bg-background";
@@ -91,10 +96,26 @@ export default function ProductCard({
     showFlashDeal ? flashDealEndsAt : undefined,
   );
   const [isCompared, setIsCompared] = useState(false);
+  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { data: wishlistStatus } = useWishlistStatus(productType, productId);
+  const toggleWishlist = useToggleWishlist();
+  const isWishlisted = Boolean(wishlistStatus?.isWishlisted);
 
   useEffect(() => {
     setIsCompared(isProductCompared(productId));
   }, [productId]);
+
+  const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
+    toggleWishlist.mutate({ productType, productId });
+  };
 
   const handleCompare = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -172,14 +193,20 @@ export default function ProductCard({
           </div>
         )}
 
-        <div className="absolute right-2 top-2 h-10 w-10 overflow-hidden rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light flex items-center justify-center">
-          <img
-            className="h-6 w-6"
-            src={asset("mdi_heart.svg")}
-            alt=""
-            draggable={false}
+        <button
+          type="button"
+          onClick={handleToggleWishlist}
+          disabled={toggleWishlist.isPending}
+          aria-label={isWishlisted ? "Remove from favorites" : "Add to favorites"}
+          className="absolute right-2 top-2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 disabled:opacity-70"
+        >
+          <Heart
+            size={20}
+            strokeWidth={1.8}
+            className={`transition-colors ${isWishlisted ? "text-red-500" : "text-slate-400"}`}
+            fill={isWishlisted ? "currentColor" : "none"}
           />
-        </div>
+        </button>
       </div>
 
       <div

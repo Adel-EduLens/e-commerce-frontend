@@ -59,6 +59,7 @@ export default function WholesaleDetailsPage() {
             selectedColor={selectedColor}
             setSelectedColor={setSelectedColor}
             item={item}
+            productType="WHOLESALE"
           />
         </div>
         <RecommedProducts currentProductId={wholesale.id} currentCategoryId={wholesale.categoryId} />
