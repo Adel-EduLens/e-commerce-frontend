@@ -29,6 +29,7 @@ import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
 import TraderLayout from "../components/layout/TraderLayout";
 import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
 import UserDashboard from "../pages/dashboards/UserDashboard";
+import RecentlyViewedPage from "../pages/RecentlyViewedPage";
 import MyOrdersPage from "../pages/MyOrdersPage";
 import HelpCenterPage from "../pages/HelpCenterPage";
 import WalletRewardsPage from "../pages/WalletRewardsPage";
@@ -146,6 +147,10 @@ export const router = createBrowserRouter([
           {
             path: "dashboard/user",
             element: <UserDashboard />,
+          },
+          {
+            path: "recently-viewed",
+            element: <RecentlyViewedPage />,
           },
           {
             path: "contact-details",
