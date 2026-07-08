@@ -8,6 +8,7 @@ import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
 import { useHomeFilters } from "../hooks/utils/HomeFilters";
+import { useWholesales } from "../hooks/queries/wholesaleQuery";
 import { useTranslation } from "react-i18next";
 
 const FILTER_LABELS: Record<string, string> = {
@@ -82,6 +83,12 @@ export default function ProductsPage() {
     limit: 16,
   });
 
+  const { data: wholesales = [], isLoading: isWholesaleLoading } = useWholesales(
+    filters.search ? { search: filters.search } : undefined
+  );
+  
+  const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
+
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
@@ -129,6 +136,53 @@ export default function ProductsPage() {
     );
   }
 
+  const combinedProducts = useMemo(() => {
+    const items: React.ReactNode[] = [];
+    
+    if (data?.products) {
+      data.products.forEach((product) => {
+        items.push(
+          <ProductCard
+            key={`retail-${product.id}`}
+            title={product.name}
+            productId={product.id}
+            price={`$${product.price}`}
+            imageSrc={product.images[0]?.url}
+            sizeLabel={product.sizes.map((size) => size.size).join(" - ")}
+            featured={product.rating >= 4}
+            isMustHave={product.isMustHave}
+            isFlashDeals={product.isFlashDeals}
+            flashDealPrice={product.flashDealPrice}
+            flashDealEndsAt={product.flashDealEndsAt}
+            rating={product.rating}
+            productType="SHOP"
+            to={`/product-details/${product.id}`}
+          />
+        );
+      });
+    }
+
+    if (filters.search && wholesales) {
+      wholesales.forEach((wholesale) => {
+        items.push(
+          <ProductCard
+            key={`wholesale-${wholesale.id}`}
+            title={wholesale.name}
+            productId={wholesale.id}
+            price={`$${wholesale.price}`}
+            imageSrc={wholesale.images[0]?.url}
+            sizeLabel={`Min. Order: ${wholesale.minOrder}`}
+            featured={wholesale.rating >= 4}
+            rating={wholesale.rating}
+            productType="WHOLESALE"
+            to={`/wholesale/${wholesale.id}`}
+          />
+        );
+      });
+    }
+    return items;
+  }, [data, wholesales, filters.search]);
+
   return (
     <div className="w-full">
       <div className="font-['Montserrat'] text-5xl font-bold text-[#1A1A1A] sm:text-8xl">
@@ -143,41 +197,25 @@ export default function ProductsPage() {
         />
       </div>
 
-      {isLoading && (
+      {isAnyLoading && (
         <div className="mt-8 w-full py-2 text-center text-gray-text">
           {t("Loading")}
         </div>
       )}
 
-      {!isLoading && (
+      {!isAnyLoading && (
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {data?.products.map((product) => (
-            <ProductCard
-              key={product.id}
-              title={product.name}
-              productId={product.id}
-              price={`$${product.price}`}
-              imageSrc={product.images[0]?.url}
-              sizeLabel={product.sizes.map((size) => size.size).join(" - ")}
-              featured={product.rating >= 4}
-              isMustHave={product.isMustHave}
-              isFlashDeals={product.isFlashDeals}
-              flashDealPrice={product.flashDealPrice}
-              flashDealEndsAt={product.flashDealEndsAt}
-              rating={product.rating}
-              to={`/product-details/${product.id}`}
-            />
-          ))}
+          {combinedProducts}
         </div>
       )}
 
-      {!isLoading && data?.products.length === 0 && (
+      {!isAnyLoading && combinedProducts.length === 0 && (
         <div className="mt-20 text-center text-xl text-gray-500">
           {t("No products found.")}
         </div>
       )}
 
-      {!isLoading && data && data.pagination.totalPages > 1 && (
+      {!isAnyLoading && data && data.pagination.totalPages > 1 && (
         <Pagination
           className="mt-12 mb-8"
           currentPage={data.pagination.page}

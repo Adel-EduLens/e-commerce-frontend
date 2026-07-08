@@ -161,37 +161,45 @@ export default function ProductCard({
         >
           <MdCompare  size={18} />
         </button>
-        {/* Flash deal countdown badge */}
-        {showFlashDeal && countdownLabel && (
-          <div
-            className={`absolute left-2 top-2 flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white ${
-              expired ? "bg-gray-text" : "bg-urgent"
-            }`}
-          >
-            <svg
-              className="h-3 w-3 shrink-0"
-              viewBox="0 0 20 20"
-              fill="none"
-              aria-hidden="true"
+        {/* Badges Container */}
+        <div className="absolute left-2 top-2 flex flex-col gap-2 items-start z-30">
+          {productType && (
+            <div className={`rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${productType === 'WHOLESALE' ? 'bg-primary text-primary-foreground' : 'bg-gray-text'}`}>
+              {productType === 'WHOLESALE' ? 'Wholesale' : 'Retail'}
+            </div>
+          )}
+          {/* Flash deal countdown badge */}
+          {showFlashDeal && countdownLabel && (
+            <div
+              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${
+                expired ? "bg-gray-text" : "bg-urgent"
+              }`}
             >
-              <circle
-                cx="10"
-                cy="10"
-                r="7.5"
-                stroke="white"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M10 6v4l2.5 2"
-                stroke="white"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {countdownLabel}
-          </div>
-        )}
+              <svg
+                className="h-3 w-3 shrink-0"
+                viewBox="0 0 20 20"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="7.5"
+                  stroke="white"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M10 6v4l2.5 2"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {countdownLabel}
+            </div>
+          )}
+        </div>
 
         <button
           type="button"

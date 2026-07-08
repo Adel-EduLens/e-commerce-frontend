@@ -48,8 +48,9 @@ export const useWholesale = (id?: string) => {
   });
 };
 
-const getWholesales = async (filters?: { isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }): Promise<Wholesale[]> => {
+const getWholesales = async (filters?: { search?: string; isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }): Promise<Wholesale[]> => {
   const params: Record<string, string> = {};
+  if (filters?.search) params.search = filters.search;
   if (filters?.isBestDeal !== undefined) params.isBestDeal = String(filters.isBestDeal);
   if (filters?.isMostPopular !== undefined) params.isMostPopular = String(filters.isMostPopular);
   if (filters?.isPremiumCollection !== undefined) params.isPremiumCollection = String(filters.isPremiumCollection);
@@ -64,7 +65,7 @@ const getTraderWholesales = async (): Promise<Wholesale[]> => {
   return data.data;
 };
 
-export const useWholesales = (filters?: { isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }) => {
+export const useWholesales = (filters?: { search?: string; isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }) => {
   return useQuery({
     queryKey: ["wholesales", filters],
     queryFn: () => getWholesales(filters),
