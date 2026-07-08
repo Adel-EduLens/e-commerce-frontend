@@ -1,67 +1,82 @@
-import { useState } from "react";
-
-const asset = (file: string) =>
-  `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
-
-
-type OrderStatus = "Delivered" | "Shipped" | "Cancelled";
-
-interface Order {
-  id: number;
-  orderId: string;
-  customer: string;
-  date: string;
-  payment: string;
-  total: string;
-  status: OrderStatus;
-}
+import { useState, useEffect } from "react";
+import { api } from "../../lib/axios";
+import { toast } from "sonner";
+import { Loader2, ArrowLeft, Calendar, User, Mail, Phone, MapPin, CreditCard, ShoppingBag } from "lucide-react";
 
 interface OrderItem {
-  id: number;
-  image: string;
+  id: string;
+  productId: string;
   product: string;
   quantity: number;
   price: string;
   subtotal: string;
+  size: string | null;
+  color: string | null;
+  image: string;
 }
 
-const orders: Order[] = [
-  { id: 1, orderId: "#1023", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Visa", total: "$89.00", status: "Delivered" },
-  { id: 2, orderId: "#1024", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Cash", total: "$62.00", status: "Shipped" },
-  { id: 3, orderId: "#1025", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Cash", total: "$62.00", status: "Shipped" },
-  { id: 4, orderId: "#1026", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Cash", total: "$89.00", status: "Cancelled" },
-  { id: 5, orderId: "#1027", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Visa", total: "$89.00", status: "Cancelled" },
-  { id: 6, orderId: "#1028", customer: "Ahmed Hassan", date: "Oct 3, 2025", payment: "Visa", total: "$89.00", status: "Cancelled" },
-];
+interface Order {
+  id: string;
+  orderId: string;
+  customer: string;
+  customerEmail: string;
+  customerPhone: string;
+  address: string;
+  mapAddress: string | null;
+  latitude: string | null;
+  longitude: string | null;
+  date: string;
+  time: string;
+  payment: string;
+  total: string;
+  subtotal: string;
+  shipping: string;
+  discount: string;
+  status: string;
+  items: OrderItem[];
+}
 
-const orderItems: OrderItem[] = [
-  { id: 1, image: "image 69.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-  { id: 2, image: "unsplash_8Vt2haq8NSQ.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-  { id: 3, image: "image 69.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-  { id: 4, image: "unsplash_8Vt2haq8NSQ.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-  { id: 5, image: "image 69.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-  { id: 6, image: "unsplash_8Vt2haq8NSQ.png", product: "Hoodie – Black (M)", quantity: 1, price: "$49.99", subtotal: "$49.99" },
-];
+function statusPill(status: string) {
+  const norm = status.toUpperCase();
+  if (norm === "COMPLETED" || norm === "DELIVERED") {
+    return { bg: "bg-emerald-50", text: "text-emerald-700", ring: "outline-emerald-700" };
+  }
+  if (norm === "SHIPPED") {
+    return { bg: "bg-blue-50", text: "text-blue-700", ring: "outline-blue-700" };
+  }
+  if (norm === "PROCESSING") {
+    return { bg: "bg-amber-50", text: "text-amber-700", ring: "outline-amber-700" };
+  }
+  if (norm === "PENDING") {
+    return { bg: "bg-purple-50", text: "text-purple-700", ring: "outline-purple-700" };
+  }
+  return { bg: "bg-rose-50", text: "text-rose-700", ring: "outline-rose-700" };
+}
 
-const timelineSteps = [
-  { label: "New Order", time: "Oct 2, 10:00 AM", done: true },
-  { label: "Confirmed", time: "Oct 2, 11:30 AM", done: true },
-  { label: "Shipped", time: "Oct 3, 08:00 AM", done: true },
-  { label: "Delivered", time: "Oct 3, 02:00 PM", done: true },
-];
-
-function statusPill(status: OrderStatus) {
-  if (status === "Delivered") return { bg: "bg-emerald-50", text: "text-emerald-700", ring: "outline-emerald-700" };
-  if (status === "Shipped") return { bg: "bg-amber-100", text: "text-amber-800", ring: "outline-amber-700" };
-  return { bg: "bg-red-100", text: "text-red-700", ring: "outline-red-700" };
+function getTimelineSteps(status: string, dateStr: string, timeStr: string) {
+  const s = status.toUpperCase();
+  const baseTime = `${dateStr} ${timeStr}`;
+  return [
+    { label: "Order Placed", time: baseTime, done: true },
+    { label: "Processing", time: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" ? "In progress" : "Pending", done: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" },
+    { label: "Shipped", time: s === "SHIPPED" || s === "COMPLETED" ? "Shipped" : "Pending", done: s === "SHIPPED" || s === "COMPLETED" },
+    { label: "Delivered", time: s === "COMPLETED" ? "Delivered" : "Pending", done: s === "COMPLETED" },
+  ];
 }
 
 /* ─── Order Detail View ──────────────────────────────────────────────────── */
-function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
-  const pill = statusPill(order.status);
-  const [itemSelected, setItemSelected] = useState<Set<number>>(new Set());
+interface OrderDetailProps {
+  order: Order;
+  onBack: () => void;
+  onUpdateStatus: (id: string, status: string) => Promise<void>;
+}
 
-  const toggleItem = (id: number) => {
+function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
+  const pill = statusPill(order.status);
+  const [itemSelected, setItemSelected] = useState<Set<string>>(new Set());
+  const [updating, setUpdating] = useState(false);
+
+  const toggleItem = (id: string) => {
     setItemSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -72,72 +87,93 @@ function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
 
   const toggleAllItems = () => {
     setItemSelected((prev) =>
-      prev.size === orderItems.length ? new Set() : new Set(orderItems.map((i) => i.id)),
+      prev.size === order.items.length ? new Set() : new Set(order.items.map((i) => i.id)),
     );
   };
 
-  const allItemsSelected = itemSelected.size === orderItems.length;
+  const allItemsSelected = itemSelected.size === order.items.length && order.items.length > 0;
+
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUpdating(true);
+    try {
+      await onUpdateStatus(order.id, e.target.value);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const timelineSteps = getTimelineSteps(order.status, order.date, order.time);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Back button */}
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+        className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
       >
-        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
-          <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <ArrowLeft className="h-4 w-4" />
         Back to Orders
       </button>
 
       {/* Three info cards */}
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         {/* Order Info */}
-        <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <p className="font-['Montserrat'] text-base font-semibold text-foreground">
-            Order ID: {order.orderId}
-          </p>
-          <p className="mt-0.5 font-['Montserrat'] text-xs font-medium text-gray-text">
-            {order.date} — 10:24 AM
-          </p>
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">Status:</span>
-              <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
-                {order.status}
-              </span>
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+            Order Details
+          </h3>
+          <div className="flex flex-col gap-3 font-['Montserrat'] text-sm">
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">Order ID:</span>
+              <span className="font-bold text-foreground">{order.orderId}</span>
             </div>
-            <p className="font-['Montserrat'] text-sm font-semibold text-gray-text">
-              Delivery Type: <span className="text-foreground">Express</span>
-            </p>
-            <p className="font-['Montserrat'] text-sm font-semibold text-gray-text">
-              Payment: Paid: <span className="text-foreground">({order.payment})</span>
-            </p>
-            <p className="font-['Montserrat'] text-sm font-semibold text-gray-text">
-              Tracking ID: <span className="text-foreground">#TRK-547392</span>
-            </p>
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">Date & Time:</span>
+              <span className="font-semibold text-foreground">{order.date} — {order.time}</span>
+            </div>
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">Status:</span>
+              <div className="flex items-center gap-2">
+                {updating ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-secondary" />
+                ) : (
+                  <select
+                    value={order.status}
+                    onChange={handleStatusChange}
+                    className={`inline-flex rounded-xl px-2 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring} bg-white cursor-pointer focus:outline-none`}
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="PROCESSING">Processing</option>
+                    <option value="SHIPPED">Shipped</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                )}
+              </div>
+            </div>
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">Payment Type:</span>
+              <span className="font-semibold text-foreground">{order.payment}</span>
+            </div>
           </div>
         </div>
 
         {/* Customer Information */}
-        <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <p className="font-['Montserrat'] text-xl font-semibold text-foreground">Customer Information</p>
-          <div className="mt-4 flex flex-col gap-3">
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Customer Information</h3>
+          <div className="flex flex-col gap-3">
             {[
-              { icon: "M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-3.31 0-6 1.34-6 3v1h12v-1c0-1.66-2.69-3-6-3z", label: "Name", value: order.customer },
-              { icon: "M2 4h12v8H2zM2 4l6 5 6-5", label: "Email", value: `${order.customer.toLowerCase().replace(" ", "")}@gmail.com` },
-              { icon: "M3 3h2l1 4-1.5 1.5a11 11 0 0 0 4 4L10 11l4 1v2a1 1 0 0 1-1 1A15 15 0 0 1 2 4a1 1 0 0 1 1-1z", label: "Phone", value: "+20 1009084373" },
-              { icon: "M8 2C5.24 2 3 4.24 3 7c0 3.75 5 9 5 9s5-5.25 5-9c0-2.76-2.24-5-5-5z", label: "Address", value: "12 El Tahrir St, Cairo" },
-            ].map((row) => (
-              <div key={row.label} className="flex items-start gap-2">
-                <svg className="mt-0.5 h-5 w-5 shrink-0 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-                  <path d={row.icon} />
-                </svg>
-                <div>
-                  <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">{row.label} </span>
-                  <span className="font-['Montserrat'] text-sm font-semibold text-foreground">{row.value}</span>
+              { icon: <User className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Name", value: order.customer },
+              { icon: <Mail className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Email", value: order.customerEmail },
+              { icon: <Phone className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Phone", value: order.customerPhone },
+              { icon: <MapPin className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Address", value: order.address },
+            ].map((row, idx) => (
+              <div key={idx} className="flex items-start gap-2.5">
+                {row.icon}
+                <div className="min-w-0">
+                  <span className="font-['Montserrat'] text-xs font-semibold text-gray-text block">{row.label}</span>
+                  <span className="font-['Montserrat'] text-sm font-semibold text-foreground break-words">{row.value}</span>
                 </div>
               </div>
             ))}
@@ -145,26 +181,26 @@ function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
         </div>
 
         {/* Order Timeline */}
-        <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <p className="font-['Montserrat'] text-xl font-semibold text-foreground">Order Timeline</p>
-          <div className="mt-4 flex flex-col gap-0">
+        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Order Timeline</h3>
+          <div className="flex flex-col gap-0">
             {timelineSteps.map((step, i) => (
               <div key={step.label} className="flex items-start gap-3">
                 <div className="flex flex-col items-center">
-                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${step.done ? "border-primary bg-primary" : "border-stroke bg-white"}`}>
+                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${step.done ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"}`}>
                     {step.done && (
-                      <svg className="h-3 w-3 text-foreground" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
                   </div>
                   {i < timelineSteps.length - 1 && (
-                    <div className={`w-0.5 flex-1 ${step.done ? "bg-primary" : "bg-stroke"}`} style={{ height: 28 }} />
+                    <div className={`w-0.5 ${step.done ? "bg-secondary" : "bg-stroke"}`} style={{ height: 28 }} />
                   )}
                 </div>
                 <div className="pb-4">
                   <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">{step.label} </span>
-                  <span className="font-['Montserrat'] text-sm font-semibold text-foreground">— {step.time}</span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-foreground block text-xs">{step.time}</span>
                 </div>
               </div>
             ))}
@@ -174,90 +210,86 @@ function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
 
       {/* Ordered Items Table */}
       <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <div className="flex items-center justify-between px-5 py-4">
-          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Ordered Items</h3>
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-          >
-            <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
-            Export
-          </button>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Ordered Items</h3>
         </div>
 
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-secondary">
-                <th className="px-4 py-3">
+              <tr className="bg-zinc-50 border-b border-stroke">
+                <th className="px-5 py-3.5 text-left w-12">
                   <div
-                    className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
+                    className="h-5 w-5 cursor-pointer rounded border border-stroke bg-white flex items-center justify-center"
                     onClick={toggleAllItems}
                   >
                     {allItemsSelected && (
-                      <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
-                        <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
+                      <div className="h-3.5 w-3.5 bg-secondary rounded-sm flex items-center justify-center text-secondary-foreground">
+                        ✓
+                      </div>
                     )}
                   </div>
                 </th>
-                {["Image", "Product", "Quantity", "Price", "Subtotal", "Actions"].map((col) => (
-                  <th key={col} className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary">
+                {["Image", "Product Details", "Quantity", "Price", "Subtotal"].map((col) => (
+                  <th key={col} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider">
                     {col}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {orderItems.map((item, idx) => {
+              {order.items.map((item, idx) => {
                 const isChecked = itemSelected.has(item.id);
                 return (
-                  <tr key={item.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
-                    <td className="px-4 py-3">
+                  <tr key={item.id} className={`transition hover:bg-zinc-50/50 ${idx % 2 === 0 ? "bg-white" : "bg-zinc-50/30"}`}>
+                    <td className="px-5 py-4">
                       <div
-                        className={`h-5 w-5 cursor-pointer rounded-md border flex items-center justify-center transition ${
-                          isChecked ? "border-secondary bg-secondary" : "border-gray-300 bg-white"
+                        className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
+                          isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"
                         }`}
                         onClick={() => toggleItem(item.id)}
                       >
-                        {isChecked && (
-                          <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-                            <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
+                        {isChecked && <span className="text-[10px]">✓</span>}
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <div className="h-12 w-12 rounded-lg bg-zinc-100 border border-stroke overflow-hidden flex items-center justify-center mx-auto">
+                        {item.image ? (
+                          <img
+                            className="h-full w-full object-cover"
+                            src={item.image}
+                            alt={item.product}
+                          />
+                        ) : (
+                          <ShoppingBag className="h-5 w-5 text-zinc-400" />
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-center">
-                      <img
-                        className="mx-auto h-7 w-7 rounded-lg object-cover"
-                        src={asset(item.image)}
-                        alt={item.product}
-                      />
+                    <td className="px-4 py-4 text-center">
+                      <div className="font-['Montserrat'] text-sm font-bold text-foreground">
+                        {item.product}
+                      </div>
+                      <div className="flex justify-center gap-2 mt-1">
+                        {item.size && (
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
+                            Size: {item.size}
+                          </span>
+                        )}
+                        {item.color && (
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
+                            Color: {item.color}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                      #{item.product}
-                    </td>
-                    <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                    <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
                       {item.quantity}
                     </td>
-                    <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                    <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
                       {item.price}
                     </td>
-                    <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                    <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground">
                       {item.subtotal}
-                    </td>
-                    <td className="px-3 py-3 text-center">
-                      <button
-                        type="button"
-                        className="flex mx-auto h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
-                        title="More actions"
-                      >
-                        <svg className="h-4 w-4 text-gray-text" viewBox="0 0 16 16" fill="currentColor">
-                          <circle cx="8" cy="3" r="1.2" />
-                          <circle cx="8" cy="8" r="1.2" />
-                          <circle cx="8" cy="13" r="1.2" />
-                        </svg>
-                      </button>
                     </td>
                   </tr>
                 );
@@ -267,19 +299,25 @@ function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
         </div>
 
         {/* Summary totals */}
-        <div className="flex flex-col gap-1.5 border-t border-stroke px-5 py-4">
-          <p className="font-['Montserrat'] text-xs font-semibold">
-            <span className="text-gray-text">Subtotal: </span>
-            <span className="text-foreground">$89.97</span>
-          </p>
-          <p className="font-['Montserrat'] text-xs font-semibold">
-            <span className="text-gray-text">Shipping: </span>
-            <span className="text-foreground">$5.00</span>
-          </p>
-          <p className="font-['Montserrat'] text-xs font-semibold">
-            <span className="text-gray-text">Total: </span>
-            <span className="text-foreground">$94.97</span>
-          </p>
+        <div className="flex flex-col items-end gap-2 border-t border-stroke px-6 py-5 bg-zinc-50/50">
+          <div className="w-64 space-y-2 font-['Montserrat'] text-xs font-medium">
+            <div className="flex justify-between">
+              <span className="text-gray-text">Trader Subtotal:</span>
+              <span className="text-foreground font-bold">{order.subtotal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-text">Total Shipping:</span>
+              <span className="text-foreground">{order.shipping}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-text">Total Discount:</span>
+              <span className="text-foreground">{order.discount}</span>
+            </div>
+            <div className="flex justify-between text-sm font-bold pt-2 border-t border-stroke text-foreground">
+              <span>Order Grand Total:</span>
+              <span>{order.total}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -288,11 +326,47 @@ function OrderDetail({ order, onBack }: { order: Order; onBack: () => void }) {
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function TraderOrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const toggleRow = (id: number) => {
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/orders/trader");
+      setOrders(res.data?.data || []);
+    } catch (err) {
+      console.error("Failed to fetch trader orders:", err);
+      toast.error("Could not fetch orders. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const handleUpdateStatus = async (orderId: string, status: string) => {
+    try {
+      await api.patch(`/orders/trader/${orderId}/status`, { status });
+      toast.success("Order status updated successfully!");
+      // Update local state
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status } : o))
+      );
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) => prev ? { ...prev, status } : null);
+      }
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      toast.error("Could not update order status.");
+    }
+  };
+
+  const toggleRow = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -307,224 +381,179 @@ export default function TraderOrdersPage() {
     );
   };
 
-  const allSelected = selected.size === orders.length;
+  const allSelected = selected.size === orders.length && orders.length > 0;
 
   const filtered = orders.filter(
     (o) =>
       o.orderId.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer.toLowerCase().includes(search.toLowerCase()),
+      o.customer.toLowerCase().includes(search.toLowerCase()) ||
+      o.status.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const totalOrdersCount = orders.length;
+  const activeCount = orders.filter(o => ["PENDING", "PROCESSING", "SHIPPED"].includes(o.status.toUpperCase())).length;
+  const completedCount = orders.filter(o => ["COMPLETED", "DELIVERED"].includes(o.status.toUpperCase())).length;
+  const cancelledCount = orders.filter(o => o.status.toUpperCase() === "CANCELLED").length;
+
   const summaryCards = [
-    { label: "Total Orders", value: "1,234 Orders", delta: "8.5%", note: "Down from yesterday", up: false },
-    { label: "Active", value: "118", delta: "8.5%", note: "Up from yesterday", up: true },
-    { label: "Delivered", value: "176", delta: "8.5%", note: "Up from yesterday", up: true },
-    { label: "Returned", value: "30", delta: "8.5%", note: "Up from yesterday", up: true },
+    { label: "Total Orders", value: `${totalOrdersCount} Orders`, note: "All time received", up: true },
+    { label: "Active Orders", value: String(activeCount), note: "Pending/Processing/Shipped", up: true },
+    { label: "Completed Orders", value: String(completedCount), note: "Delivered to clients", up: true },
+    { label: "Cancelled Orders", value: String(cancelledCount), note: "Cancelled/Returned", up: false },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+      </div>
+    );
+  }
+
   return (
-    <>
-        <div className="space-y-4">
-          {selectedOrder ? (
-            <OrderDetail
-              order={selectedOrder}
-              onBack={() => setSelectedOrder(null)}
-            />
-          ) : (
-            <>
-              {/* Summary Cards */}
-              <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-                {summaryCards.map((card) => (
-                  <div
-                    key={card.label}
-                    className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex flex-col gap-1">
-                        <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
-                        <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
-                      </div>
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary">
-                        <img className="h-6 w-6" src={asset("carbon_follow-up-work-order.svg")} alt="" />
-                      </div>
-                    </div>
-                    <div className="mt-3 flex items-center gap-1">
-                      <span className={`font-['Montserrat'] text-sm font-medium ${card.up ? "text-teal-500" : "text-rose-500"}`}>
-                        {card.delta}
-                      </span>
-                      <span className="font-['Montserrat'] text-sm font-medium text-gray-text"> {card.note}</span>
-                    </div>
+    <div className="space-y-6">
+      {selectedOrder ? (
+        <OrderDetail
+          order={selectedOrder}
+          onBack={() => setSelectedOrder(null)}
+          onUpdateStatus={handleUpdateStatus}
+        />
+      ) : (
+        <>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+            {summaryCards.map((card, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col justify-between"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-col gap-1">
+                    <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">{card.label}</p>
+                    <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
                   </div>
-                ))}
-              </div>
-
-              {/* Search + Add Order */}
-              <div className="flex flex-wrap items-center justify-start gap-3">
-                <label className="relative flex min-w-[280px] items-center">
-                  <img
-                    className="pointer-events-none absolute left-4 h-5 w-5"
-                    src={asset("mynaui_search.svg")}
-                    alt=""
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-                >
-                  <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-                  Add Order
-                </button>
-              </div>
-
-              {/* Orders Table Panel */}
-              <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
-                {/* Panel header */}
-                <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-                  <div className="flex items-center gap-4">
-                    <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Products Table</h2>
-                    <div className="flex items-center gap-2">
-                      {(["Payment", "Delivery", "Date Range"] as const).map((label) => (
-                        <button
-                          key={label}
-                          type="button"
-                          className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-2 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background"
-                        >
-                          {label}
-                          <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
-                        </button>
-                      ))}
-                    </div>
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-50 border border-stroke text-secondary">
+                    <ShoppingBag className="h-5 w-5" />
                   </div>
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-                  >
-                    <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
-                    Export
-                  </button>
                 </div>
+                <div className="mt-3 flex items-center gap-1.5">
+                  <span className="font-['Montserrat'] text-xs font-medium text-gray-text"> {card.note}</span>
+                </div>
+              </div>
+            ))}
+          </div>
 
-                {/* Table */}
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-separate border-spacing-0">
-                    <thead>
-                      <tr className="bg-secondary">
-                        <th className="px-4 py-3">
-                          <div
-                            className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
-                            onClick={toggleAll}
-                          >
-                            {allSelected && (
-                              <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
-                                <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                              </svg>
-                            )}
+          {/* Search */}
+          <div className="flex flex-wrap items-center justify-start gap-3">
+            <div className="relative flex min-w-[320px] items-center">
+              <svg className="pointer-events-none absolute left-4 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="7" cy="7" r="4.5" />
+                <path d="M10.5 10.5L14 14" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search orders by ID, status or customer name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:ring-1 focus:ring-secondary"
+              />
+            </div>
+          </div>
+
+          {/* Orders Table Panel */}
+          <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
+            {/* Panel header */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
+              <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">Orders History Table</h2>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-separate border-spacing-0">
+                <thead>
+                  <tr className="bg-zinc-50 border-b border-stroke">
+                    <th className="px-5 py-3.5 text-left w-12">
+                      <div
+                        className="h-5 w-5 cursor-pointer rounded border border-stroke bg-white flex items-center justify-center"
+                        onClick={toggleAll}
+                      >
+                        {allSelected && (
+                          <div className="h-3.5 w-3.5 bg-secondary rounded-sm flex items-center justify-center text-secondary-foreground">
+                            ✓
                           </div>
-                        </th>
-                        {["Order ID", "Customer Name", "Date", "Payment", "Total", "Status", "Actions"].map((col) => (
-                          <th
-                            key={col}
-                            className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap"
-                          >
-                            {col}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((order, idx) => {
-                        const isChecked = selected.has(order.id);
-                        const pill = statusPill(order.status);
-                        return (
-                          <tr
-                            key={order.id}
-                            className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-white" : "bg-background"}`}
-                            onClick={() => setSelectedOrder(order)}
-                          >
-                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                              <div
-                                className={`h-5 w-5 cursor-pointer rounded-md border flex items-center justify-center transition ${
-                                  isChecked ? "border-secondary bg-secondary" : "border-gray-300 bg-white"
-                                }`}
-                                onClick={() => toggleRow(order.id)}
-                              >
-                                {isChecked && (
-                                  <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-                                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                  </svg>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                              {order.orderId}
-                            </td>
-                            <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                              {order.customer}
-                            </td>
-                            <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                              {order.date}
-                            </td>
-                            <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                              {order.payment}
-                            </td>
-                            <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                              {order.total}
-                            </td>
-                            <td className="px-3 py-3 text-center">
-                              <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
-                                {order.status}
-                              </span>
-                            </td>
-                            <td className="px-3 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                type="button"
-                                className="flex mx-auto h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
-                                title="More actions"
-                              >
-                                <svg className="h-4 w-4 text-gray-text" viewBox="0 0 16 16" fill="currentColor">
-                                  <circle cx="8" cy="3" r="1.2" />
-                                  <circle cx="8" cy="8" r="1.2" />
-                                  <circle cx="8" cy="13" r="1.2" />
-                                </svg>
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Pagination */}
-                <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
-                  <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
-                    <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
-                    <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
-                  </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
-                    <span className="font-['Inter'] text-sm font-medium text-foreground">
-                      1-6 <span className="text-gray-text">of 14</span>
-                    </span>
-                    <span className="mx-1 h-5 border-l border-stroke" />
-                    <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
-                      <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
-                    </button>
-                    <button type="button" className="flex h-5 w-5 items-center justify-center">
-                      <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Next" />
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-        </div>
-    </>
+                        )}
+                      </div>
+                    </th>
+                    {["Order ID", "Customer Name", "Date & Time", "Payment", "Trader Subtotal", "Order Total", "Status"].map((col) => (
+                      <th
+                        key={col}
+                        className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider whitespace-nowrap"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-12 text-center text-gray-text font-medium font-['Montserrat']">
+                        No orders found
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((order, idx) => {
+                      const isChecked = selected.has(order.id);
+                      const pill = statusPill(order.status);
+                      return (
+                        <tr
+                          key={order.id}
+                          className={`cursor-pointer transition hover:bg-zinc-50/50 ${idx % 2 === 0 ? "bg-white" : "bg-zinc-50/30"}`}
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                            <div
+                              className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
+                                isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"
+                              }`}
+                              onClick={() => toggleRow(order.id)}
+                            >
+                              {isChecked && <span className="text-[10px]">✓</span>}
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground whitespace-nowrap">
+                            {order.orderId}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-semibold text-foreground whitespace-nowrap">
+                            {order.customer}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-gray-text whitespace-nowrap">
+                            {order.date} — {order.time}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                            {order.payment}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-secondary whitespace-nowrap">
+                            {order.subtotal}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                            {order.total}
+                          </td>
+                          <td className="px-4 py-4 text-center whitespace-nowrap">
+                            <span className={`inline-flex rounded-xl px-2.5 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
+                              {order.status}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      )}
+    </div>
   );
 }

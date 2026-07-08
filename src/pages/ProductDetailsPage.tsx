@@ -64,7 +64,7 @@ export default function ProductDetailsPage() {
           {t("home")} / {product.category.name} / {product.name}
         </div>
 
-        <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+        <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
           <ProductGallery selectedColor={selectedColor} item={item} />
 
           <ProductInfoPanel
