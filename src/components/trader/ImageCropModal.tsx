@@ -4,7 +4,7 @@ import type { Area, Point } from "react-easy-crop";
 
 export const MIN_IMG_WIDTH = 400;
 export const MIN_IMG_HEIGHT = 400;
-export const CROP_ASPECT = 1; // 1:1 square
+export const CROP_ASPECT = 4 / 5; // matches product card image area (4:5)
 
 /** Validate an image File's natural dimensions. Returns null if OK, or an error string. */
 export function validateImageDimensions(file: File): Promise<string | null> {
@@ -94,7 +94,7 @@ export default function ImageCropModal({
         </div>
 
         <p className="font-['Montserrat'] text-xs text-gray-text">
-          Drag to reposition · Pinch or scroll to zoom · Crop is 1:1 square
+          Drag to reposition · Pinch or scroll to zoom · Crop is 4:5 (matches product card)
         </p>
 
         {/* Crop area */}
