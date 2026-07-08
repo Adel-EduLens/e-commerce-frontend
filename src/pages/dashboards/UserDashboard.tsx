@@ -43,7 +43,7 @@ function ProductGallery({ title, products = [], onNavigate }: { title: string; p
       <div className="w-full overflow-hidden rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-foreground p-2">
         <div className="flex gap-2">
           {/* Main image */}
-          <div className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
+          <div className="w-1/2 shrink-0 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
             <img
               className="absolute inset-0 w-full h-full object-contain p-2"
               src={mainImage}
