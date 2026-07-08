@@ -18,6 +18,7 @@ function ProductRow({ indexes }: { indexes: number[] }) {
       {indexes.map((index) => (
         <ProductCard
           key={index}
+          productId={`men-collection-${index}`}
           title="Amber Blaze Classic Tee"
           sizeLabel="Min.order: 50 pieces"
           price="$250-450"

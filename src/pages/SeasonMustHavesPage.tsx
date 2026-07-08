@@ -18,7 +18,7 @@ export default function SeasonMustHavesPage() {
 
   const { user, isAuthenticated } = useAuthStore();
 
-  const [filterState, setFilterState] = useState<FilterValues>({ search: "" });
+  const [filterState, setFilterState] = useState<FilterValues>({ search: "", priceMax: "", priceMin: '' });
 
   const [page, setPage] = useState(1);
 
@@ -119,6 +119,7 @@ export default function SeasonMustHavesPage() {
           {data?.products.map((product) => (
             <ProductCard
               key={product.id}
+              productId={product.id}
               title={product.name}
               price={`$${product.price}`}
               imageSrc={product.images[0]?.url}

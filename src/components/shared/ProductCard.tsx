@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Star } from "../ui/star";
 import { asset } from "../../lib/utils";
 import { MdCompare } from "react-icons/md";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 import {
   addCompareProduct,
@@ -12,6 +12,7 @@ import {
 } from "../../utils/compareStorage";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useCartStore } from "../../store/useCartStore";
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
@@ -100,13 +101,20 @@ export default function ProductCard({
   const [isCompared, setIsCompared] = useState(false);
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const { data: wishlistStatus } = useWishlistStatus(productType, productId);
+  const actualProductId =
+    productId ||
+    (to ? to.split("/").filter(Boolean).pop() : "") ||
+    title ||
+    "unknown-id";
+
+  const { data: wishlistStatus } = useWishlistStatus(productType, actualProductId);
   const toggleWishlist = useToggleWishlist();
   const isWishlisted = Boolean(wishlistStatus?.isWishlisted);
+  const addItem = useCartStore((s) => s.addItem);
 
   useEffect(() => {
-    setIsCompared(isProductCompared(productId));
-  }, [productId]);
+    setIsCompared(isProductCompared(actualProductId));
+  }, [actualProductId]);
 
   const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -116,7 +124,7 @@ export default function ProductCard({
       navigate("/login");
       return;
     }
-    toggleWishlist.mutate({ productType, productId });
+    toggleWishlist.mutate({ productType, productId: actualProductId });
   };
 
   const handleCompare = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -125,11 +133,11 @@ export default function ProductCard({
 
     try {
       if (isCompared) {
-        removeCompareProduct(productId);
+        removeCompareProduct(actualProductId);
         setIsCompared(false);
         toast.success("Removed from compare");
       } else {
-        addCompareProduct(productId);
+        addCompareProduct(actualProductId);
         setIsCompared(true);
         toast.success("Added to compare");
       }
@@ -137,6 +145,28 @@ export default function ProductCard({
       toast.error("You can compare up to 4 products.");
     }
   };
+
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
+    
+    addItem({
+      id: `${actualProductId}-default-default`,
+      productId: actualProductId,
+      title,
+      unitPrice: numPrice,
+      currency: "EGP",
+      size: sizeLabel || "Default",
+      color: "Default",
+      colorHex: "#000",
+      imageSrc,
+      quantity: 1,
+    });
+    
+    toast.success("Added to cart");
+  };
+
   return (
     <Link
       to={to}
@@ -216,6 +246,15 @@ export default function ProductCard({
             className={`transition-colors ${isWishlisted ? "text-red-500" : "text-slate-400"}`}
             fill={isWishlisted ? "currentColor" : "none"}
           />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          aria-label="Add to cart"
+          className="absolute bottom-2 right-2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground text-foreground"
+        >
+          <ShoppingCart size={18} />
         </button>
       </div>
 

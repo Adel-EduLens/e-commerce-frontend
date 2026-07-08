@@ -91,6 +91,7 @@ export default function ProductsSection({
           {data?.products.map((product) => (
             <ProductCard
               key={product.id}
+              productId={product.id}
               title={product.name}
               price={`$${product.price}`}
               imageSrc={product.images[0]?.url}
