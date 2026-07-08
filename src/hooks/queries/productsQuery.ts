@@ -1,5 +1,6 @@
-import { useQuery ,useQueries } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
+import { useAuthStore } from "../../store/useAuthStore";
 
 export interface Product {
   id: string;
@@ -12,6 +13,8 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   sizeguide?: string;
+  sku?: string;
+  stock?: number;
   isMustHave?: boolean;
   isFlashDeals?: boolean;
   flashDealPrice?: number;
@@ -130,5 +133,82 @@ export const useCompareProducts = (ids: string[]) => {
       queryFn: () => getProduct(id),
       enabled: !!id,
     })),
+  });
+};
+
+const getTraderProducts = async (traderId: string | number): Promise<Product[]> => {
+  const { data } = await api.get("/products", { params: { traderId, limit: 1000 } });
+  return data.data?.products ?? [];
+};
+
+export const useTraderProducts = () => {
+  const user = useAuthStore.getState().user;
+  return useQuery({
+    queryKey: ["trader-products", user?.id],
+    queryFn: () => getTraderProducts(user!.id),
+    enabled: !!user?.id,
+  });
+};
+
+export interface ProductFormData {
+  name: string;
+  description?: string;
+  price: number;
+  categoryId: string;
+  brandId?: string;
+  images: { url: string; color: string }[];
+  sizes: string[];
+  colors: string[];
+  sku?: string;
+  stock?: number;
+  isMustHave?: boolean;
+  isFlashDeals?: boolean;
+}
+
+const createProduct = async (body: ProductFormData) => {
+  const { data } = await api.post("/products", body);
+  return data.data;
+};
+
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+const updateProduct = async ({ id, ...body }: Partial<ProductFormData> & { id: string }) => {
+  const { data } = await api.patch(`/products/${id}`, body);
+  return data.data;
+};
+
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+const deleteProduct = async (id: string) => {
+  const { data } = await api.delete(`/products/${id}`);
+  return data.data;
+};
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
   });
 };
