@@ -28,8 +28,12 @@ export function useToggleWishlist() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ productType, productId }: { productType: WishlistProductType; productId: number | string }) =>
-      wishlistApi.toggleWishlist({ productType, productId }),
+    mutationFn: async ({ productType, productId }: { productType: WishlistProductType; productId: number | string }) => {
+      const { user, token } = useAuthStore.getState()
+      console.log('[Wishlist] user:', user)
+      console.log('[Wishlist] token:', token || localStorage.getItem('token'))
+      return wishlistApi.toggleWishlist({ productType, productId })
+    },
     onSuccess: async (_data, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['wishlist'] }),
