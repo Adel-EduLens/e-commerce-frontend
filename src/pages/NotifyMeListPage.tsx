@@ -1,73 +1,185 @@
-import { Trash2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
-const placeholderProduct =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='166' viewBox='0 0 140 166'%3E%3Crect width='140' height='166' fill='%23D9D9D9'/%3E%3C/svg%3E";
+import { Trash2, Bell, Package, Loader2 } from "lucide-react";
+import { useNotifyMeList, useNotifyMeUnsubscribe } from "../hooks/useNotifyMe";
+import { useNavigate } from "react-router-dom";
 
-function ProductRequestCard() {
-  const { t } = useTranslation("notify");
+const formatCurrency = (amount: number) =>
+  `${new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(amount)} EGP`;
+
+function ProductRequestCard({
+  notification,
+  onRemove,
+  isRemoving,
+}: {
+  notification: any;
+  onRemove: () => void;
+  isRemoving: boolean;
+}) {
+  const navigate = useNavigate();
+  const product = notification.product;
+  const mainImage =
+    product?.images?.find((img: any) => img.isMain)?.url ||
+    product?.images?.[0]?.url ||
+    "";
+
   return (
-    <div className="flex items-start gap-4 rounded-lg bg-white p-2 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <img
-        className="h-32 w-28 sm:h-40 sm:w-36 rounded-lg object-cover shrink-0"
-        src={placeholderProduct}
-        alt="Amber Blaze Classic Tee"
-        draggable={false}
-      />
-      <div className="flex flex-1 flex-col gap-2 py-2">
-        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
-          Amber Blaze Classic Tee
-        </div>
-        <div className="font-['Montserrat'] text-base sm:text-xl font-semibold text-foreground">
-          $250
+    <div className="flex items-start gap-4 rounded-2xl bg-card p-4 border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] transition-all hover:shadow-md">
+      <button
+        type="button"
+        onClick={() => navigate(`/product-details/${product?.id}`)}
+        className="h-32 w-28 sm:h-40 sm:w-36 rounded-xl overflow-hidden bg-gray-light shrink-0 cursor-pointer"
+      >
+        {mainImage ? (
+          <img
+            className="h-full w-full object-cover"
+            src={mainImage}
+            alt={product?.name || "Product"}
+            draggable={false}
+          />
+        ) : (
+          <div className="h-full w-full flex items-center justify-center">
+            <Package className="h-10 w-10 text-gray-text" />
+          </div>
+        )}
+      </button>
+
+      <div className="flex flex-1 flex-col gap-2 py-1">
+        <button
+          type="button"
+          onClick={() => navigate(`/product-details/${product?.id}`)}
+          className="font-['Montserrat'] text-base sm:text-lg font-semibold text-foreground text-left hover:underline"
+        >
+          {product?.name || "Unknown Product"}
+        </button>
+
+        <div className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
+          {product?.price ? formatCurrency(product.price) : "—"}
         </div>
 
-        <div className="inline-flex flex-wrap items-center gap-4 rounded-lg bg-white p-2 outline outline-1 outline-offset-[-1px] outline-[#E0E0E0]">
-          <div className="font-['Montserrat'] text-sm sm:text-base text-[#1A1A1A]">
-            <span className="font-medium">{t("Size")}: </span>
-            <span className="font-bold">XXL</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
-              {t("Color")}:
-            </div>
-            <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-[#FECACA]" />
-          </div>
+        <div className="flex flex-wrap items-center gap-2 mt-1">
+          {product?.stock > 0 ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 border border-primary px-3 py-1 font-['Montserrat'] text-xs font-semibold text-foreground">
+              <span className="h-2 w-2 rounded-full bg-primary" />
+              Back in Stock!
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-card border border-stroke px-3 py-1 font-['Montserrat'] text-xs font-semibold text-urgent">
+              <span className="h-2 w-2 rounded-full bg-urgent animate-pulse" />
+              Still Out of Stock
+            </span>
+          )}
         </div>
-        <div className="font-['Montserrat'] text-xs sm:text-sm font-semibold text-[#6B7280]">
-          {t("Requested on")} Sep 30, 2025
+
+        <div className="font-['Montserrat'] text-xs text-gray-text mt-1">
+          Requested on{" "}
+          {new Date(notification.createdAt).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}
         </div>
       </div>
-      <button className="shrink-0 h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-full bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] flex items-center justify-center">
-        <Trash2
-          className="h-4 w-4 sm:h-6 sm:w-6 text-[#B91C1C]"
-          strokeWidth={1.5}
-        />
+
+      <button
+        type="button"
+        onClick={onRemove}
+        disabled={isRemoving}
+        className="shrink-0 h-9 w-9 sm:h-10 sm:w-10 overflow-hidden rounded-full bg-card border border-stroke shadow-sm hover:bg-gray-light transition-all flex items-center justify-center disabled:opacity-50"
+        aria-label="Remove notification"
+      >
+        {isRemoving ? (
+          <Loader2 className="h-4 w-4 animate-spin text-gray-text" />
+        ) : (
+          <Trash2
+            className="h-4 w-4 sm:h-5 sm:w-5 text-urgent"
+            strokeWidth={1.5}
+          />
+        )}
       </button>
     </div>
   );
 }
 
-function NotifyMePanel() {
-  const { t } = useTranslation("notify");
+function EmptyState() {
+  const navigate = useNavigate();
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-6">
-      <div className="flex flex-col gap-3">
-
-        <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
-          {t("NOTIFY ME LIST")}
+    <div className="flex flex-col items-center justify-center gap-5 py-16">
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/20 border border-primary">
+        <Bell className="h-10 w-10 text-primary-foreground" />
+      </div>
+      <div className="text-center">
+        <div className="font-['Montserrat'] text-2xl font-bold text-foreground mb-2">
+          No Notifications Yet
         </div>
-        <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-[#1A1A1A]">
-          {t("You'll be notified as soon as these items come back in stock.")}
+        <div className="font-['Montserrat'] text-base text-gray-text max-w-sm">
+          When you subscribe to out-of-stock products, they'll appear here so you
+          never miss a restock.
         </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <ProductRequestCard />
-        <ProductRequestCard />
-      </div>
+      <button
+        type="button"
+        onClick={() => navigate("/products")}
+        className="rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground hover:opacity-90 transition"
+      >
+        Browse Products
+      </button>
     </div>
   );
 }
 
 export default function NotifyMeListPage() {
-  return <NotifyMePanel />;
+  const { data: notifications = [], isLoading, isError } = useNotifyMeList();
+  const unsubscribeMutation = useNotifyMeUnsubscribe();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-20 font-['Montserrat'] text-base text-urgent">
+        Failed to load notifications. Please try again.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3">
+          <Bell className="h-7 w-7 text-foreground" />
+          <h1 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
+            Notify Me List
+          </h1>
+        </div>
+        <p className="font-['Montserrat'] text-base text-gray-text">
+          You'll be notified as soon as these items come back in stock.
+        </p>
+      </div>
+
+      {notifications.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="flex flex-col gap-4">
+          {notifications.map((notification: any) => (
+            <ProductRequestCard
+              key={notification.id}
+              notification={notification}
+              onRemove={() => unsubscribeMutation.mutate(notification.id)}
+              isRemoving={
+                unsubscribeMutation.isPending &&
+                unsubscribeMutation.variables === notification.id
+              }
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

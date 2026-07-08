@@ -3,7 +3,7 @@ import { Star } from "../ui/star";
 import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
-import { Heart, RotateCcw, Tag, Truck } from "lucide-react";
+import { Heart, RotateCcw, Tag, Truck, Bell, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useCartStore } from "../../store/useCartStore";
@@ -19,6 +19,8 @@ import {
   removeCompareProduct,
   isProductCompared,
 } from "../../utils/compareStorage";
+import { useNotifyMeCheck, useNotifyMeSubscribe } from "../../hooks/useNotifyMe";
+import { useAuthStore } from "../../store/useAuthStore";
 type ProductInfoPanelProps = {
   selectedColor: string;
   setSelectedColor: (color: string) => void;
@@ -59,6 +61,21 @@ export function ProductInfoPanel({
     };
     func();
   }, [item]);
+
+  const isOutOfStock = (item.stock ?? 0) <= 0;
+  const user = useAuthStore((state) => state.user);
+  const { data: notifyStatus } = useNotifyMeCheck(item.id);
+  const subscribeMutation = useNotifyMeSubscribe();
+  const isAlreadySubscribed = notifyStatus?.isSubscribed ?? false;
+
+  const handleNotifyMe = () => {
+    if (!user) {
+      toast.error("Please login to get notified");
+      navigate("/login");
+      return;
+    }
+    subscribeMutation.mutate(item.id);
+  };
 
   const getColorValue = (color: string) => {
     const option = new Option();
@@ -320,6 +337,36 @@ export function ProductInfoPanel({
         </div>
       </div>
       {/* CTAs */}
+      {isOutOfStock ? (
+        <div className="w-full flex flex-col gap-3">
+          <div className="flex items-center gap-2 rounded-2xl bg-card border border-stroke px-4 py-3">
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-urgent animate-pulse" />
+            <span className="font-['Montserrat'] text-sm font-semibold text-urgent">
+              Out of Stock
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={handleNotifyMe}
+            disabled={isAlreadySubscribed || subscribeMutation.isPending}
+            className={`flex w-full items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5 font-['Montserrat'] text-base font-bold transition-all ${
+              isAlreadySubscribed
+                ? "bg-primary/20 text-foreground border border-primary cursor-default"
+                : "bg-primary text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl"
+            }`}
+          >
+            {subscribeMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Bell className="h-5 w-5" fill={isAlreadySubscribed ? "currentColor" : "none"} />
+            )}
+            <span>
+              {isAlreadySubscribed ? "You'll Be Notified" : "Notify Me When Available"}
+            </span>
+          </button>
+        </div>
+      ) : (
+        <>
       <button
         type="button"
         onClick={handleCompare}
@@ -374,6 +421,8 @@ export function ProductInfoPanel({
           </span>
         </button>
       </div>
+        </>
+      )}
       {/* Delivery info */}
       <div className="flex w-full max-w-[320px] flex-col items-start justify-start gap-4">
         <div className="inline-flex items-center justify-start gap-1.5">
