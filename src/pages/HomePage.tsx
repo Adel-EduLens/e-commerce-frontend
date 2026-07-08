@@ -55,7 +55,6 @@ function HeroSection() {
       {/* Desktop layout */}
       <div className="relative hidden lg:block h-[978px]">
         <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-secondary" />
-        <div className="absolute left-[30px] top-[367.19px] h-32 w-[504.79px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-secondary" />
         <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
           <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-foreground">
             Discover

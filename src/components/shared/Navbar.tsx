@@ -123,7 +123,7 @@ export default function Navbar() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
             <Link
               to="/bag"
-              className="relative flex shrink-0 items-center justify-center"
+              className="relative flex shrink-0 items-center justify-center mr-2.5 md:mr-0"
             >
               <ShoppingBag
                 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
