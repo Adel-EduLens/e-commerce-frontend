@@ -268,15 +268,21 @@ export function ProductInfoPanel({
                 key={size.id}
                 type="button"
                 onClick={() => setSelectedSize(size.size)}
-                className={`relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full outline outline-1 outline-offset-[-1px] outline-stroke ${
+                className={`relative flex size-8 items-center justify-center overflow-hidden rounded-full outline outline-1 outline-offset-[-1px] outline-stroke ${
                   size.size === selectedSize ? "bg-primary" : ""
                 }`}
               >
-                <span className="font-['Poppins'] text-lg font-normal text-foreground sm:text-xl">
+                <span
+                  className={`font-['Poppins']  font-normal text-foreground 
+                  ${size.size.toLocaleLowerCase() === "xxl" || size.size.toLocaleLowerCase() === "xxs" ? "text-sm" : "text-lg sm:text-xl"}
+                  
+                  `}
+                >
                   {size.size}
                 </span>
               </button>
             ))}
+           
           </div>
         </div>
       )}
@@ -314,46 +320,46 @@ export function ProductInfoPanel({
         </div>
       </div>
       {/* CTAs */}
-      <div className="flex  w-full flex-wrap items-center justify-start gap-3 sm:gap-4">
+      <button
+        type="button"
+        onClick={handleCompare}
+        className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 outline outline-1 outline-offset-[-1px] transition-all sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start ${
+          isCompared
+            ? "bg-primary text-primary-foreground outline-primary"
+            : "bg-card text-foreground outline-stroke hover:bg-primary hover:text-primary-foreground"
+        }`}
+      >
+        <Scale className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2} />
+        <span className="font-['Montserrat'] text-xs font-semibold sm:text-base">
+          {isCompared ? t("removeFromCompare") : t("addToCompare")}
+        </span>
+      </button>
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-start sm:gap-4">
         <button
           type="button"
           onClick={handleToggleFavorite}
-          className="flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl bg-card px-3 py-3 outline outline-1 outline-offset-[-1px] outline-stroke sm:px-4 sm:py-4"
+          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start"
         >
           <Heart
-            className="h-6 w-6 text-foreground"
+            className="h-5 w-5 text-foreground sm:h-6 sm:w-6"
             strokeWidth={2}
             fill={isFavorite ? "currentColor" : "none"}
           />
-
-          <span className="font-['Montserrat'] text-sm  font-semibold text-foreground sm:text-base">
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground sm:text-base">
             {t("addToFavorite")}
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={handleCompare}
-          className={`flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl px-3 py-3 outline outline-1 outline-offset-[-1px] transition-all sm:px-4 sm:py-4 ${
-            isCompared
-              ? "bg-primary text-primary-foreground outline-primary"
-              : "bg-card text-foreground outline-stroke hover:bg-primary hover:text-primary-foreground"
-          }`}
-        >
-          <Scale className="h-6 w-6" strokeWidth={2} />
-
-          <span className="font-['Montserrat'] text-sm font-semibold sm:text-base">
-            {isCompared ? t("removeFromCompare") : t("addToCompare")}
           </span>
         </button>
 
         <button
           type="button"
           onClick={handleAddToCart}
-          className="flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl bg-card px-3 py-3 outline outline-1 outline-offset-[-1px] outline-stroke sm:px-4 sm:py-4"
+          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start"
         >
-          <BsBag className="h-6 w-6 text-foreground" fill="currentColor" />
-
-          <span className="font-['Montserrat'] text-sm font-semibold text-foreground sm:text-base">
+          <BsBag
+            className="h-5 w-5 text-foreground sm:h-6 sm:w-6"
+            fill="currentColor"
+          />
+          <span className="font-['Montserrat'] text-xs font-semibold text-foreground sm:text-base">
             {t("addToCart")}
           </span>
         </button>
@@ -361,14 +367,13 @@ export function ProductInfoPanel({
         <button
           type="button"
           onClick={handleBuyNow}
-          className="flex items-center justify-start gap-2 whitespace-nowrap rounded-2xl bg-primary px-3 py-3 sm:px-4 sm:py-4"
+          className="col-span-2 flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-3 py-3 sm:col-span-1 sm:rounded-2xl sm:px-5 sm:py-3.5"
         >
-          <span className="font-['Montserrat'] text-sm font-semibold text-foreground sm:text-base">
+          <span className="font-['Montserrat'] text-sm font-bold text-primary-foreground sm:text-base">
             {t("buyNow")}
           </span>
         </button>
       </div>
-
       {/* Delivery info */}
       <div className="flex w-full max-w-[320px] flex-col items-start justify-start gap-4">
         <div className="inline-flex items-center justify-start gap-1.5">
