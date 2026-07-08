@@ -27,6 +27,13 @@ export interface InventoryItem {
   sizes: string[];
   colors: string[];
   minOrder: number;
+  isMustHave: boolean;
+  isFlashDeals: boolean;
+  flashDealPrice: number | null;
+  flashDealEndsAt: string | null;
+  isBestDeal: boolean;
+  isMostPopular: boolean;
+  isPremiumCollection: boolean;
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────

@@ -163,6 +163,8 @@ export interface ProductFormData {
   stock?: number;
   isMustHave?: boolean;
   isFlashDeals?: boolean;
+  flashDealPrice?: number | null;
+  flashDealEndsAt?: string | null;
 }
 
 const createProduct = async (body: ProductFormData) => {

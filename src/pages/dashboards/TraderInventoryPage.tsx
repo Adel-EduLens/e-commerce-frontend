@@ -45,6 +45,13 @@ export default function TraderInventoryPage() {
       sizes: p.sizes?.map((s) => s.size) ?? [],
       colors: p.colors?.map((c) => c.color) ?? [],
       minOrder: 1,
+      isMustHave: p.isMustHave ?? false,
+      isFlashDeals: p.isFlashDeals ?? false,
+      flashDealPrice: p.flashDealPrice ?? null,
+      flashDealEndsAt: p.flashDealEndsAt ?? null,
+      isBestDeal: false,
+      isMostPopular: false,
+      isPremiumCollection: false,
     })),
     ...traderWholesales.map((w) => ({
       id: w.id,
@@ -65,6 +72,13 @@ export default function TraderInventoryPage() {
       sizes: [],
       colors: [],
       minOrder: w.minOrder ?? 1,
+      isMustHave: false,
+      isFlashDeals: false,
+      flashDealPrice: null,
+      flashDealEndsAt: null,
+      isBestDeal: w.isBestDeal ?? false,
+      isMostPopular: w.isMostPopular ?? false,
+      isPremiumCollection: w.isPremiumCollection ?? false,
     })),
   ];
 
