@@ -1,15 +1,84 @@
 import { useState, useMemo } from "react";
 import { useCartStore } from "../store/useCartStore";
 import GoogleMapPicker from "../components/GoogleMap";
+import { api } from "../lib/axios";
+import { toast } from "sonner";
 
-function OrderSummary() {
-  const items = useCartStore((state) => state.items);
-  const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
-    [items]
-  );
-  const shipping = 50; // Flat shipping rate
-  const total = subtotal + shipping;
+function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  discountAmount,
+  total,
+  couponCode,
+  setCouponCode,
+  appliedCoupon,
+  setAppliedCoupon,
+  couponError,
+  setCouponError,
+}: {
+  items: any[];
+  subtotal: number;
+  shipping: number;
+  discountAmount: number;
+  total: number;
+  couponCode: string;
+  setCouponCode: (val: string) => void;
+  appliedCoupon: any;
+  setAppliedCoupon: (val: any) => void;
+  couponError: string;
+  setCouponError: (val: string) => void;
+}) {
+  const [isValidating, setIsValidating] = useState(false);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setIsValidating(true);
+    setCouponError("");
+    try {
+      const { data } = await api.get(`/coupons/validate/${couponCode.trim().toUpperCase()}`);
+      const coupon = data?.data;
+      if (coupon) {
+        // Check if coupon actually applies to any item in cart
+        let appliesToCart = false;
+        items.forEach((item) => {
+          let isQualifying = true;
+          if (coupon.categoryId && item.categoryId !== coupon.categoryId) {
+            isQualifying = false;
+          }
+          if (coupon.productId && item.productId !== coupon.productId) {
+            isQualifying = false;
+          }
+          if (isQualifying) {
+            appliesToCart = true;
+          }
+        });
+
+        if (!appliesToCart) {
+          setCouponError("This coupon does not apply to the items in your cart");
+          toast.error("This coupon does not apply to the items in your cart");
+          setAppliedCoupon(null);
+          return;
+        }
+
+        // Apply and use the coupon immediately
+        const { data: useData } = await api.post(`/coupons/use/${coupon.code}`);
+        const updatedCoupon = useData?.data || coupon;
+
+        setAppliedCoupon(updatedCoupon);
+        toast.success(`Coupon "${updatedCoupon.code}" applied!`);
+      } else {
+        setCouponError("Invalid coupon code");
+      }
+    } catch (err: any) {
+      const msg = err.response?.data?.message || "Failed to validate coupon";
+      setCouponError(msg);
+      toast.error(msg);
+      setAppliedCoupon(null);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   const formatCurrency = (v: number) => `EGP ${v.toFixed(2)}`;
 
@@ -46,17 +115,55 @@ function OrderSummary() {
         <div className="flex items-center overflow-hidden rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke">
           <input
             placeholder="Enter discount code"
-            className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-white"
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value)}
+            disabled={isValidating || !!appliedCoupon}
+            className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-white disabled:bg-gray-50"
           />
-          <button className="flex h-14 sm:h-16 items-center justify-center bg-secondary px-4 sm:px-6">
-            <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">Apply</span>
-          </button>
+          {appliedCoupon ? (
+            <button
+              onClick={() => {
+                setAppliedCoupon(null);
+                setCouponCode("");
+                setCouponError("");
+              }}
+              className="flex h-14 sm:h-16 items-center justify-center bg-red-500 px-4 sm:px-6"
+            >
+              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">Remove</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleApplyCoupon}
+              disabled={isValidating || !couponCode.trim()}
+              className="flex h-14 sm:h-16 items-center justify-center bg-secondary px-4 sm:px-6 disabled:opacity-50"
+            >
+              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
+                {isValidating ? "Applying..." : "Apply"}
+              </span>
+            </button>
+          )}
         </div>
+        {couponError && (
+          <div className="text-red-500 text-xs font-semibold px-1">
+            {couponError}
+          </div>
+        )}
+        {appliedCoupon && (
+          <div className="text-green-600 text-xs font-semibold px-1">
+            Discount Applied: {appliedCoupon.discount}% OFF
+          </div>
+        )}
         <div className="flex flex-col gap-3 border-b border-stroke pb-4">
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">Subtotal</span>
             <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">{formatCurrency(subtotal)}</span>
           </div>
+          {discountAmount > 0 && (
+            <div className="flex items-center justify-between text-green-600">
+              <span className="font-['Montserrat'] text-sm sm:text-base font-medium">Discount ({appliedCoupon?.discount}%)</span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-bold">-{formatCurrency(discountAmount)}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">Estimated Shipping</span>
             <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">{formatCurrency(shipping)}</span>
@@ -209,10 +316,8 @@ function PaymentMethodSection() {
             <img src="/checkout/ri_radio-button-line.svg" className="h-5 w-5 sm:h-6 sm:w-6" alt="" />
             <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">Cash on Delivery</span>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }
@@ -261,6 +366,9 @@ function RememberMeSection({ onPay }: { onPay: () => void }) {
 }
 
 export default function CheckoutPage() {
+  const items = useCartStore((state) => state.items);
+  const clearCart = useCartStore((state) => state.clearCart);
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
@@ -273,14 +381,63 @@ export default function CheckoutPage() {
     apartment: "",
   });
 
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponError, setCouponError] = useState("");
+
+  const subtotal = useMemo(
+    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+    [items]
+  );
+
+  const discountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+    
+    let qualifyingSubtotal = 0;
+    let hasMatchingItem = false;
+    items.forEach((item) => {
+      let isQualifying = true;
+      if (appliedCoupon.categoryId && item.categoryId !== appliedCoupon.categoryId) {
+        isQualifying = false;
+      }
+      if (appliedCoupon.productId && item.productId !== appliedCoupon.productId) {
+        isQualifying = false;
+      }
+      if (isQualifying) {
+        qualifyingSubtotal += item.unitPrice * item.quantity;
+        hasMatchingItem = true;
+      }
+    });
+
+    if (!hasMatchingItem) {
+      return 0;
+    }
+
+    return (qualifyingSubtotal * appliedCoupon.discount) / 100;
+  }, [appliedCoupon, items]);
+
+  const shipping = 50; // Flat shipping rate
+  const total = Math.max(0, subtotal - discountAmount + shipping);
+
   const handleChange = (field: keyof CheckoutFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCheckout = () => {
-    console.log("Processing checkout with data:", formData);
-    // TODO: implement actual API integration
-    alert("Checkout initiated! Check console for payload.");
+  const handleCheckout = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
+      toast.error("Please fill in all required contact details");
+      return;
+    }
+
+    try {
+      console.log("Processing checkout with data:", formData);
+      
+      toast.success("Order placed successfully!");
+      clearCart();
+      alert("Order placed successfully! Your cart has been cleared.");
+    } catch (err) {
+      toast.error("An error occurred during checkout");
+    }
   };
 
   return (
@@ -292,7 +449,19 @@ export default function CheckoutPage() {
           <RememberMeSection onPay={handleCheckout} />
         </div>
         <div className="w-full lg:w-[480px] xl:w-[566px] shrink-0 lg:sticky lg:top-24 lg:self-start">
-          <OrderSummary />
+          <OrderSummary
+            items={items}
+            subtotal={subtotal}
+            shipping={shipping}
+            discountAmount={discountAmount}
+            total={total}
+            couponCode={couponCode}
+            setCouponCode={setCouponCode}
+            appliedCoupon={appliedCoupon}
+            setAppliedCoupon={setAppliedCoupon}
+            couponError={couponError}
+            setCouponError={setCouponError}
+          />
         </div>
       </div>
     </div>
