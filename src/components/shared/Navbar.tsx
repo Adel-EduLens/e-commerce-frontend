@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCartStore } from '../../store/useCartStore'
 import { useTranslation } from 'react-i18next'
 import { asset } from '../../lib/utils';
@@ -19,17 +19,21 @@ export default function Navbar() {
   const { t } = useTranslation("navbar");
   const location = useLocation()
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
+  const searchParams = new URLSearchParams(location.search)
+  const urlSearch = searchParams.get('search') ?? ''
+  const [searchQuery, setSearchQuery] = useState(urlSearch)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const items = useCartStore((state) => state.items)
   const itemCount = items.length
 
+  useEffect(() => {
+    setSearchQuery(urlSearch)
+  }, [urlSearch])
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/season-must-haves?search=${encodeURIComponent(searchQuery.trim())}`)
-      setMobileMenuOpen(false)
-    }
+    navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+    setMobileMenuOpen(false)
   }
 
   return (

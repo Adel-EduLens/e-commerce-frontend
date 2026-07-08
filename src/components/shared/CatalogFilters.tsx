@@ -20,6 +20,7 @@ export type FilterValues = Record<string, string | null> & {
 type CatalogFiltersProps = {
   className?: string;
   filters?: FilterConfig[];
+  initialValues?: Partial<FilterValues>;
   onFilterChange?: (values: FilterValues) => void;
 };
 
@@ -154,12 +155,37 @@ function buildInitialValues(filters: FilterConfig[]): FilterValues {
 export default function CatalogFilters({
   className = "",
   filters = [],
+  initialValues,
   onFilterChange,
 }: CatalogFiltersProps) {
   const { t } = useTranslation("filters");
-  const [values, setValues] = useState<FilterValues>(() =>
-    buildInitialValues(filters),
-  );
+  const [values, setValues] = useState<FilterValues>(() => {
+    const base = buildInitialValues(filters);
+    return {
+      ...base,
+      ...initialValues,
+      search: initialValues?.search ?? base.search,
+      priceMin: initialValues?.priceMin ?? base.priceMin,
+      priceMax: initialValues?.priceMax ?? base.priceMax,
+    } as FilterValues;
+  });
+
+  // Synchronize state when initialValues change from parent
+  useEffect(() => {
+    if (initialValues) {
+      setValues((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        for (const key of Object.keys(initialValues)) {
+          if (initialValues[key] !== prev[key]) {
+            next[key] = initialValues[key] as any;
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+    }
+  }, [initialValues]);
 
   const prevKeysRef = useRef("");
   const currentKeys = (Array.isArray(filters) ? filters : []).map((f) => f.key).join(",");
