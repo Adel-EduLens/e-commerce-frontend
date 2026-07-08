@@ -3,6 +3,7 @@ import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
 import { useCreateProduct, useUpdateProduct } from "../../hooks/queries/productsQuery";
 import { useCreateWholesale, useUpdateWholesale } from "../../hooks/queries/wholesaleQuery";
+import ImageCropModal, { validateImageDimensions, MIN_IMG_WIDTH, MIN_IMG_HEIGHT } from "./ImageCropModal";
 import {
   type InventoryItem,
   type InventoryStatus,
@@ -86,17 +87,38 @@ export function ColorImageUpload({
   onChange: (color: string, file: File) => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropFileName, setCropFileName] = useState("");
+  const [dimError, setDimError] = useState("");
+
+  const handleFile = async (file: File) => {
+    setDimError("");
+    const err = await validateImageDimensions(file);
+    if (err) { setDimError(err); return; }
+    setCropFileName(file.name);
+    setCropSrc(URL.createObjectURL(file));
+  };
+
   return (
     <div className="flex flex-col items-center gap-1">
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          fileName={cropFileName}
+          onConfirm={(croppedFile) => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+            onChange(color, croppedFile);
+          }}
+          onCancel={() => { URL.revokeObjectURL(cropSrc); setCropSrc(null); }}
+        />
+      )}
       <input
         ref={ref}
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (f) onChange(color, f);
-        }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
       />
       <button
         type="button"
@@ -112,6 +134,12 @@ export function ColorImageUpload({
         )}
         <span>{color}</span>
       </button>
+      {dimError && (
+        <p className="text-center font-['Montserrat'] text-[10px] leading-tight text-red-600">{dimError}</p>
+      )}
+      {!dimError && !preview && (
+        <p className="font-['Montserrat'] text-[10px] text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
+      )}
     </div>
   );
 }
@@ -139,6 +167,9 @@ export function AddItemModal({
   const [colorPreviews, setColorPreviews] = useState<Record<string, string>>({});
   const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
   const [wholesalePreview, setWholesalePreview] = useState("");
+  const [wholesaleCropSrc, setWholesaleCropSrc] = useState<string | null>(null);
+  const [wholesaleCropName, setWholesaleCropName] = useState("");
+  const [wholesaleDimError, setWholesaleDimError] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
   const [isMustHave, setIsMustHave] = useState(false);
   const [isFlashDeals, setIsFlashDeals] = useState(false);
@@ -342,9 +373,32 @@ export function AddItemModal({
 
           {type === "wholesale" && (
             <>
+              {wholesaleCropSrc && (
+                <ImageCropModal
+                  imageSrc={wholesaleCropSrc}
+                  fileName={wholesaleCropName}
+                  onConfirm={(croppedFile) => {
+                    URL.revokeObjectURL(wholesaleCropSrc);
+                    setWholesaleCropSrc(null);
+                    setWholesaleFile(croppedFile);
+                    setWholesalePreview(URL.createObjectURL(croppedFile));
+                  }}
+                  onCancel={() => { URL.revokeObjectURL(wholesaleCropSrc); setWholesaleCropSrc(null); }}
+                />
+              )}
               <div>
                 <input ref={wholesaleRef} type="file" accept="image/*" className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setWholesaleFile(f); setWholesalePreview(URL.createObjectURL(f)); }} />
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!f) return;
+                    setWholesaleDimError("");
+                    const err = await validateImageDimensions(f);
+                    if (err) { setWholesaleDimError(err); return; }
+                    setWholesaleCropName(f.name);
+                    setWholesaleCropSrc(URL.createObjectURL(f));
+                  }}
+                />
                 <button type="button" onClick={() => wholesaleRef.current?.click()}
                   className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1">
                   {wholesalePreview ? (
@@ -355,9 +409,11 @@ export function AddItemModal({
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <span>Click to upload image *</span>
+                      <span className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</span>
                     </>
                   )}
                 </button>
+                {wholesaleDimError && <p className="mt-1 font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>}
               </div>
               <input placeholder="Min order quantity" type="number" min="1" value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
                 className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
@@ -426,6 +482,9 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
 
   const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
   const [wholesalePreview, setWholesalePreview] = useState(item.image);
+  const [wholesaleCropSrc, setWholesaleCropSrc] = useState<string | null>(null);
+  const [wholesaleCropName, setWholesaleCropName] = useState("");
+  const [wholesaleDimError, setWholesaleDimError] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -594,9 +653,32 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
 
           {item.type === "wholesale" && (
             <>
+              {wholesaleCropSrc && (
+                <ImageCropModal
+                  imageSrc={wholesaleCropSrc}
+                  fileName={wholesaleCropName}
+                  onConfirm={(croppedFile) => {
+                    URL.revokeObjectURL(wholesaleCropSrc);
+                    setWholesaleCropSrc(null);
+                    setWholesaleFile(croppedFile);
+                    setWholesalePreview(URL.createObjectURL(croppedFile));
+                  }}
+                  onCancel={() => { URL.revokeObjectURL(wholesaleCropSrc); setWholesaleCropSrc(null); }}
+                />
+              )}
               <div>
                 <input ref={wholesaleRef} type="file" accept="image/*" className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setWholesaleFile(f); setWholesalePreview(URL.createObjectURL(f)); }} />
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!f) return;
+                    setWholesaleDimError("");
+                    const err = await validateImageDimensions(f);
+                    if (err) { setWholesaleDimError(err); return; }
+                    setWholesaleCropName(f.name);
+                    setWholesaleCropSrc(URL.createObjectURL(f));
+                  }}
+                />
                 <button type="button" onClick={() => wholesaleRef.current?.click()}
                   className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1">
                   {wholesalePreview ? (
@@ -607,10 +689,12 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       <span>Click to change image</span>
+                      <span className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</span>
                     </>
                   )}
                 </button>
-                {wholesalePreview && (
+                {wholesaleDimError && <p className="mt-1 font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>}
+                {wholesalePreview && !wholesaleDimError && (
                   <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">Click image to replace</p>
                 )}
               </div>
