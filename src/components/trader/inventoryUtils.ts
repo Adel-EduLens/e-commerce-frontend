@@ -38,7 +38,7 @@ export interface InventoryItem {
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
-export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+export const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "XXL"];
 export const COLOR_OPTIONS = [
   "Black", "White", "Red", "Blue", "Green", "Yellow",
   "Orange", "Purple", "Pink", "Gray", "Brown", "Beige", "Navy",
