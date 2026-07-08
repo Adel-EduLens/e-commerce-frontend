@@ -63,21 +63,7 @@ export default function ComparePage() {
           ))}
         </div>
       ) : (
-        <div
-          className={`
-            grid
-            gap-6
-            ${
-              products.length === 1
-                ? "grid-cols-1"
-                : products.length === 2
-                  ? "md:grid-cols-2"
-                  : products.length === 3
-                    ? "md:grid-cols-2 xl:grid-cols-3"
-                    : "md:grid-cols-2 xl:grid-cols-4"
-            }
-          `}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
           {products.map((product) => {
             if (!product) return null;
             return (

@@ -146,14 +146,19 @@ export function ProductInfoPanel({
         <p className="max-w-[420px] font-['Montserrat'] text-sm font-normal leading-6 text-foreground">
           {isDescriptionExpanded
             ? description
-            : `${description.slice(0, 116)}...`}{" "}
-          <button
-            type="button"
-            onClick={() => setIsDescriptionExpanded((prev) => !prev)}
-            className="font-semibold text-foreground"
-          >
-            {isDescriptionExpanded ? t("showLess") : t("readMore")}
-          </button>
+            : description.length > 116
+              ? `${description.slice(0, 116)}...`
+              : description}
+
+          {description.length > 116 && (
+            <button
+              type="button"
+              onClick={() => setIsDescriptionExpanded((prev) => !prev)}
+              className="ml-1 font-semibold text-foreground"
+            >
+              {isDescriptionExpanded ? t("showLess") : t("readMore")}
+            </button>
+          )}
         </p>
       )}
 
