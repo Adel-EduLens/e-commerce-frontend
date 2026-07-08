@@ -134,7 +134,7 @@ function NotificationBell() {
   ) : null;
 
   return (
-    <div className="hidden md:block relative shrink-0">
+    <div className="relative shrink-0">
       <button
         ref={btnRef}
         type="button"
