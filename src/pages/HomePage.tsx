@@ -355,7 +355,7 @@ function VoteSection() {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden lg:block relative h-[1242px] mt-8">
+      <div className="hidden lg:block relative h-[1242px] ">
         <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-primary">
           <VoteRings />
           {!current ? (
@@ -412,9 +412,8 @@ function VoteSection() {
                       key={design.id}
                       type="button"
                       onClick={() => setCurrentIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${
-                        index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-[#D0D5DD]'
-                      }`}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-[#D0D5DD]'
+                        }`}
                     />
                   ))}
                 </div>

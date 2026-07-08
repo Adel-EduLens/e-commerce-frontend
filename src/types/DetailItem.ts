@@ -11,6 +11,7 @@ export type DetailItem = {
   brandName?: string | null;
   sizeguide?: string | null;
   minOrder?: number;
+  stock?: number;
 
   category: {
     id: string;

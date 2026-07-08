@@ -1,13 +1,13 @@
-import { useAuthStore } from "../store/useAuthStore";
-import { useCategories } from "../hooks/queries/categoriesQuery";
-import {
-  useNotifications,
-  useCategorySubscriptions,
-  useToggleCategorySubscription,
-  useMarkAllRead,
-  useMarkRead,
-} from "../hooks/queries/notificationQuery";
+import { Bell, Trash2, Check, CheckCheck, Package, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  useUserNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+  useDeleteNotification,
+} from "../hooks/useUserNotifications";
+import { useCategories } from "../hooks/queries/categoriesQuery";
+import { useCategorySubscriptions } from "../hooks/queries/notificationQuery";
 import { useTranslation } from "react-i18next";
 
 const COLLECTION_LABELS = ["Men", "Women", "Kids"];
@@ -17,154 +17,237 @@ const COLLECTION_IMAGES: Record<string, string> = {
   Kids: "/home-page/image%209.png",
 };
 
-function NotificationsPanel() {
-  const { t } = useTranslation("notifications");
-  const user = useAuthStore((s) => s.user);
+
+function NotificationCard({
+  notification,
+  onMarkRead,
+  onDelete,
+  isDeleting,
+}: {
+  notification: any;
+  onMarkRead: () => void;
+  onDelete: () => void;
+  isDeleting: boolean;
+}) {
   const navigate = useNavigate();
-  const isUser = user?.role === "user";
 
-  const { data: categories = [] } = useCategories();
-  const { data: subscribedIds = [] } = useCategorySubscriptions();
-  const { subscribe, unsubscribe } = useToggleCategorySubscription();
-  const { data: notifData } = useNotifications();
-  const markRead = useMarkRead();
-  const markAllRead = useMarkAllRead();
-
-  const notifications = notifData?.notifications ?? [];
-  const unread = notifData?.unread ?? 0;
-
-  const collectionCategories = categories.filter((c) =>
-    COLLECTION_LABELS.includes(c.name)
-  );
-
-  if (!isUser) {
-    return (
-      <div className="flex flex-col items-center gap-4 py-16">
-        <p className="font-['Montserrat'] text-lg text-gray-text">
-          Sign in to manage your notifications.
-        </p>
-        <button
-          onClick={() => navigate("/login")}
-          className="rounded-xl bg-primary px-6 py-3 font-['Montserrat'] font-semibold text-foreground"
-        >
-          Sign In
-        </button>
-      </div>
-    );
-  }
+  const timeAgo = (date: string) => {
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
 
   return (
-    <div className="flex w-full max-w-xl flex-col gap-8">
-      {/* Collection toggles */}
-      <div className="flex flex-col gap-6">
-        <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-          {t("NOTIFICATIONS")}
+    <div
+      className={`flex items-start gap-4 rounded-2xl p-4 border transition-all ${notification.isRead
+        ? "bg-card border-stroke"
+        : "bg-primary/5 border-primary/30"
+        }`}
+    >
+      {/* Image or Icon */}
+      <div className="h-14 w-14 rounded-xl overflow-hidden bg-gray-light shrink-0 flex items-center justify-center">
+        {notification.imageUrl ? (
+          <img
+            src={notification.imageUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+          />
+        ) : (
+          <Package className="h-7 w-7 text-gray-text" />
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col gap-1 min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+            {notification.title}
+          </h3>
+          {!notification.isRead && (
+            <span className="shrink-0 h-2.5 w-2.5 rounded-full bg-primary mt-1.5" />
+          )}
         </div>
-        <div className="flex flex-col gap-4 sm:gap-6">
-          {collectionCategories.map((cat) => {
-            const enabled = subscribedIds.includes(cat.id);
-            return (
-              <div key={cat.id} className="flex items-center gap-4 sm:gap-5">
-                <img
-                  src={COLLECTION_IMAGES[cat.name] ?? ""}
-                  className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover object-top shrink-0"
-                  alt={cat.name}
-                  draggable={false}
-                />
-                <div className="flex flex-1 items-center justify-between py-3 sm:py-4">
-                  <div className="font-['Montserrat'] text-lg sm:text-2xl font-medium text-foreground">
-                    {t(cat.name)}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      enabled ? unsubscribe(cat.id) : subscribe(cat.id)
-                    }
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${
-                      enabled ? "bg-primary" : "bg-stroke"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${
-                        enabled ? "translate-x-6" : "translate-x-1"
-                      }`}
-                    />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+
+        <p className="font-['Montserrat'] text-xs sm:text-sm text-gray-text leading-relaxed">
+          {notification.message}
+        </p>
+
+        <div className="flex items-center gap-3 mt-1">
+          <span className="font-['Montserrat'] text-xs text-gray-text">
+            {timeAgo(notification.createdAt)}
+          </span>
+
+          {notification.productId && (
+            <button
+              type="button"
+              onClick={() =>
+                navigate(`/product-details/${notification.productId}`)
+              }
+              className="font-['Montserrat'] text-xs font-semibold text-primary-foreground bg-primary rounded-lg px-2.5 py-1 hover:opacity-90 transition"
+            >
+              View Product
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Received notifications */}
-      {notifications.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-['Montserrat'] text-xl font-bold text-foreground">
-              Recent Notifications
-              {unread > 0 && (
-                <span className="ml-2 rounded-full bg-primary px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-foreground">
-                  {unread}
-                </span>
-              )}
-            </h2>
-            {unread > 0 && (
-              <button
-                onClick={() => markAllRead.mutate()}
-                className="font-['Montserrat'] text-sm text-gray-text underline hover:text-foreground transition"
-              >
-                Mark all read
-              </button>
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            {notifications.map((n) => (
-              <div
-                key={n.id}
-                onClick={() => {
-                  if (!n.isRead) markRead.mutate(n.id);
-                  if (n.productId) navigate(`/product-details/${n.productId}`);
-                }}
-                className={`flex items-start gap-3 rounded-xl border p-3 transition cursor-pointer hover:bg-gray-50 ${
-                  n.isRead ? "border-stroke bg-white" : "border-primary/30 bg-primary/5"
-                }`}
-              >
-                {n.imageUrl ? (
-                  <img
-                    src={n.imageUrl}
-                    className="h-12 w-12 rounded-lg object-cover shrink-0"
-                    alt=""
-                  />
-                ) : (
-                  <div className="h-12 w-12 rounded-lg bg-secondary shrink-0 flex items-center justify-center">
-                    <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className={`font-['Montserrat'] text-sm font-semibold ${n.isRead ? "text-foreground" : "text-foreground"}`}>
-                    {n.title}
-                  </p>
-                  <p className="font-['Montserrat'] text-xs text-gray-text mt-0.5">{n.body}</p>
-                  <p className="font-['Montserrat'] text-xs text-gray-text mt-1">
-                    {new Date(n.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
-                {!n.isRead && (
-                  <div className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Actions */}
+      <div className="flex flex-col gap-1.5 shrink-0">
+        {!notification.isRead && (
+          <button
+            type="button"
+            onClick={onMarkRead}
+            className="h-8 w-8 rounded-full bg-card border border-stroke flex items-center justify-center hover:bg-gray-light transition"
+            title="Mark as read"
+          >
+            <Check className="h-4 w-4 text-gray-text" />
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={isDeleting}
+          className="h-8 w-8 rounded-full bg-card border border-stroke flex items-center justify-center hover:bg-gray-light transition disabled:opacity-50"
+          title="Delete"
+        >
+          {isDeleting ? (
+            <Loader2 className="h-4 w-4 animate-spin text-gray-text" />
+          ) : (
+            <Trash2 className="h-4 w-4 text-urgent" />
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EmptyNotifications() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-4 py-16">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-light">
+        <Bell className="h-8 w-8 text-gray-text" />
+      </div>
+      <div className="font-['Montserrat'] text-xl font-bold text-foreground">
+        No Notifications
+      </div>
+      <div className="font-['Montserrat'] text-sm text-gray-text text-center max-w-xs">
+        You're all caught up! Notifications about restocked products will appear
+        here.
+      </div>
     </div>
   );
 }
 
 export default function NotificationsPage() {
-  return <NotificationsPanel />;
+  const { data: notifications = [], isLoading, isError } = useUserNotifications();
+  const markReadMutation = useMarkNotificationRead();
+  const { t } = useTranslation("notifications");
+  const markAllReadMutation = useMarkAllNotificationsRead();
+  const deleteMutation = useDeleteNotification();
+  const { data: categories = [] } = useCategories();
+  const collectionCategories = categories.filter((c) =>
+    COLLECTION_LABELS.includes(c.name)
+  );
+
+  const { data: subscribedIds = [] } = useCategorySubscriptions();
+  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center py-20 font-['Montserrat'] text-base text-urgent">
+        Failed to load notifications. Please try again.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-6">
+          <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
+            {t("NOTIFICATIONS")}
+          </div>
+          <div className="flex flex-col gap-4 sm:gap-6">
+            {collectionCategories.map((cat) => {
+              const enabled = subscribedIds.includes(cat.id);
+              return (
+                <div key={cat.id} className="flex items-center gap-4 sm:gap-5">
+                  <img
+                    src={COLLECTION_IMAGES[cat.name] ?? ""}
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover object-top shrink-0"
+                    alt={cat.name}
+                    draggable={false}
+                  />
+                  <div className="flex flex-1 items-center justify-between py-3 sm:py-4">
+                    <div className="font-['Montserrat'] text-lg sm:text-2xl font-medium text-foreground">
+                      {t(cat.name)}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => console.log("clicked")}
+                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${enabled ? "bg-primary" : "bg-stroke"
+                        }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${enabled ? "translate-x-6" : "translate-x-1"
+                          }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+
+        {unreadCount > 0 && (
+          <button
+            type="button"
+            onClick={() => markAllReadMutation.mutate()}
+            disabled={markAllReadMutation.isPending}
+            className="flex items-center gap-1.5 rounded-xl bg-card border border-stroke px-3 py-2 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
+          >
+            <CheckCheck className="h-4 w-4" />
+            Mark all read
+          </button>
+        )}
+      </div>
+
+      {/* List */}
+      {notifications.length === 0 ? (
+        <EmptyNotifications />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {notifications.map((notification: any) => (
+            <NotificationCard
+              key={notification.id}
+              notification={notification}
+              onMarkRead={() => markReadMutation.mutate(notification.id)}
+              onDelete={() => deleteMutation.mutate(notification.id)}
+              isDeleting={
+                deleteMutation.isPending &&
+                deleteMutation.variables === notification.id
+              }
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
