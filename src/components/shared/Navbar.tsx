@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCartStore } from '../../store/useCartStore'
 import { useTranslation } from 'react-i18next'
 import { asset } from '../../lib/utils';
@@ -19,17 +19,21 @@ export default function Navbar() {
   const { t } = useTranslation("navbar");
   const location = useLocation()
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
+  const searchParams = new URLSearchParams(location.search)
+  const urlSearch = searchParams.get('search') ?? ''
+  const [searchQuery, setSearchQuery] = useState(urlSearch)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const items = useCartStore((state) => state.items)
   const itemCount = items.length
 
+  useEffect(() => {
+    setSearchQuery(urlSearch)
+  }, [urlSearch])
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/season-must-haves?search=${encodeURIComponent(searchQuery.trim())}`)
-      setMobileMenuOpen(false)
-    }
+    navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+    setMobileMenuOpen(false)
   }
 
   return (
@@ -43,7 +47,7 @@ export default function Navbar() {
             draggable={false}
           />
         </Link>
-        <div className="ms-6 hidden lg:inline-flex items-center justify-start gap-4">
+        <div className="ms-6 me-4 hidden lg:inline-flex items-center justify-start gap-4">
           {navLinks.map((item) => {
             const isActive =
               item.label === 'Home'
@@ -57,7 +61,8 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 to={item.path}
-                className={`font-['Montserrat'] text-base xl:text-lg font-semibold transition-colors whitespace-nowrap ${isActive
+
+                className={`font-['Montserrat'] text-base xl:text-lg font-semibold whitespace-nowrap transition-colors ${isActive
                   ? 'flex items-center justify-center gap-2.5 rounded-lg bg-primary px-4 py-2 text-foreground'
                   : 'text-foreground hover:text-primary'
                   }`}
@@ -153,7 +158,7 @@ export default function Navbar() {
           })}
           <div className="flex items-center gap-4 border-t border-stroke pt-3 sm:hidden">
             <Link to="/compare" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">
-              <MdCompare className="h-5 w-5"  />
+              <MdCompare className="h-5 w-5" />
               <span className="font-['Montserrat'] text-sm font-medium">Compare</span>
             </Link>
             <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-foreground">

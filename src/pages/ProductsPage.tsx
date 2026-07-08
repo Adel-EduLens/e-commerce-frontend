@@ -29,8 +29,14 @@ export default function ProductsPage() {
 
   const { filters: filter2 } = useHomeFilters();
 
+  const [searchParams] = useSearchParams();
+
+  const urlSearch = searchParams.get("search") ?? "";
+  const urlCategoryName = searchParams.get("category") ?? "";
+  const filter = searchParams.get("filter") ?? "";
+
   const [filters, setFilters] = useState<FilterValues>({
-    search: "",
+    search: urlSearch,
     category: null,
     brand: null,
     size: null,
@@ -38,11 +44,6 @@ export default function ProductsPage() {
     priceMin: null,
     priceMax: null,
   });
-
-  const [searchParams] = useSearchParams();
-
-  const urlCategoryName = searchParams.get("category") ?? "";
-  const filter = searchParams.get("filter") ?? "";
 
   const effectiveCategoryName = filters.category ?? urlCategoryName;
 
@@ -80,6 +81,13 @@ export default function ProductsPage() {
     page,
     limit: 16,
   });
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      search: urlSearch,
+    }));
+  }, [urlSearch]);
 
   useEffect(() => {
     const func = async () => {
@@ -128,7 +136,11 @@ export default function ProductsPage() {
       </div>
 
       <div className="mt-8">
-        <CatalogFilters filters={filter2} onFilterChange={setFilters} />
+        <CatalogFilters
+          filters={filter2}
+          initialValues={filters}
+          onFilterChange={setFilters}
+        />
       </div>
 
       {isLoading && (
