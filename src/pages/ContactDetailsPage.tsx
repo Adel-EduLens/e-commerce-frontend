@@ -1,11 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, PenLine, Plus, RotateCcwKey, Trash2, X } from "lucide-react";
+import { Check, PenLine, Plus, RotateCcwKey, X, Trash2  } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useOutletContext } from "react-router-dom";
 import type { AccountLayoutContext } from "../layouts/AccountLayout";
 import { useAuthStore } from "../store/useAuthStore";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"; 
+import {
+  useMyAddresses,
+  useAddAddress,
+  useUpdateAddress,
+  useDeleteAddress,
+} from "../hooks/queries/addressQuery";
+import { Modal } from "../components/ui/modal";
+import type { AxiosError } from "axios";
 
 type ContactForm = {
   name: string;
@@ -15,35 +23,12 @@ type ContactForm = {
 
 type AddressItem = {
   id: string;
-  label: string;
-  value: string;
+  country: string;
+  city: string;
+  area: string;
+  streetAddress: string;
+  apartment?: string | null;
 };
-
-const ADDRESS_STORAGE_KEY = "contact-details-addresses";
-const defaultAddresses: AddressItem[] = [
-  { id: "home", label: "Home", value: "21 Example St, Cairo" },
-  { id: "work", label: "Work", value: "15 Business Rd, Giza" },
-];
-
-function loadStoredAddresses(): AddressItem[] {
-  if (typeof window === "undefined") {
-    return defaultAddresses;
-  }
-
-  const stored = window.localStorage.getItem(ADDRESS_STORAGE_KEY);
-
-  if (!stored) {
-    return defaultAddresses;
-  }
-
-  try {
-    const parsed = JSON.parse(stored) as AddressItem[];
-
-    return Array.isArray(parsed) && parsed.length ? parsed : defaultAddresses;
-  } catch {
-    return defaultAddresses;
-  }
-}
 
 function FieldLabel({ children }: { children: string }) {
   return (
@@ -52,31 +37,51 @@ function FieldLabel({ children }: { children: string }) {
     </div>
   );
 }
-
 function DetailField({
   label,
   value,
   isEditing = false,
   onChange,
   type = "text",
+  options,
 }: {
   label: string;
   value: string;
   isEditing?: boolean;
   onChange?: (value: string) => void;
   type?: "text" | "email" | "tel";
+  options?: string[];
 }) {
   return (
     <div className="flex self-stretch flex-col items-start justify-start gap-4">
       <FieldLabel>{label}</FieldLabel>
+
       <div className="inline-flex items-center justify-start gap-2.5 self-stretch overflow-hidden border-b border-stroke pb-4">
         {isEditing ? (
-          <input
-            type={type}
-            value={value}
-            onChange={(event) => onChange?.(event.target.value)}
-            className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none placeholder:text-gray-text"
-          />
+          options ? (
+            <select
+              value={value}
+              onChange={(event) => onChange?.(event.target.value)}
+              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none"
+            >
+              <option value="" disabled>
+                Select {label}
+              </option>
+
+              {options.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type={type}
+              value={value}
+              onChange={(event) => onChange?.(event.target.value)}
+              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none placeholder:text-gray-text"
+            />
+          )
         ) : (
           <div className="font-['Montserrat'] text-xl font-medium text-foreground">
             {value}
@@ -141,20 +146,22 @@ function SectionHeader({
     </div>
   );
 }
-
 function AddressCard({
   address,
   isEditing,
   draft,
+  isNew = false,
+  isAddressLoading = false,
   onEdit,
   onSave,
-  onCancel,
   onDelete,
   onDraftChange,
 }: {
   address: AddressItem;
   isEditing: boolean;
   draft: AddressItem;
+  isNew?: boolean;
+  isAddressLoading?: boolean;
   onEdit: () => void;
   onSave: () => void;
   onCancel: () => void;
@@ -162,55 +169,126 @@ function AddressCard({
   onDraftChange: (value: AddressItem) => void;
 }) {
   const { t } = useTranslation("contact");
-  return (
-    <div className="flex w-full max-w-xl flex-col items-start justify-start gap-4 rounded-2xl bg-white p-5 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-      <div className="inline-flex w-full items-center justify-between">
+  const current = isEditing ? draft : address;
 
-        <div className="font-['Montserrat'] text-lg font-semibold text-[#1A1A1A]">
-          {isEditing ? t("Editing Address") : t(address.label)}
+  const summary = [
+    address.streetAddress,
+    address.area,
+    address.city,
+    address.country,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  return (
+    <div
+      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${
+        isAddressLoading ? "pointer-eve nts-none opacity-50" : ""
+      }`}
+    >
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <span className="mb-1 inline-flex rounded-full bg-[#F2F4F7] px-2.5 py-1 text-[11px] font-medium text-[#667085]">
+            {t("Address")}
+          </span>
+
+          <h3 className="truncate text-base font-semibold text-[#1A1A1A]">
+            {isEditing
+              ? isNew
+                ? t("Adding Address")
+                : t("Editing Address")
+              : summary || t("No address details")}
+          </h3>
         </div>
-        <div className="inline-flex items-center justify-start gap-1">
-          {isEditing ? (
-            <>
-              <IconButton
-                icon={Check}
-                label={t("Save address")}
-                tone="success"
-                onClick={onSave}
-              />
-              <IconButton
-                icon={X}
-                label={t("Cancel address")}
-                onClick={onCancel}
-              />
-            </>
-          ) : (
-            <IconButton
-              icon={PenLine}
-              label={t("Edit address")}
-              onClick={onEdit}
-            />
-          )}
-          <IconButton
-            icon={Trash2}
-            label={t("Delete address")}
-            tone="danger"
-            onClick={onDelete}
+
+       <div className="flex items-center gap-1">
+  {!isEditing && (
+    <>
+      <IconButton
+      icon={PenLine}
+      label={t("Edit address")}
+      onClick={onEdit} 
+      />
+      <IconButton
+      icon={Trash2} 
+      tone="danger"
+      label={t("Edit address")}
+      onClick={onDelete} 
+      />
+
+      </>
+  )}
+</div>
+      </div>
+      {/* Details */}
+      <div className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-[#F2F4F7] pt-4 sm:grid-cols-2">
+        <DetailField
+          label={t("Country")}
+          value={current.country}
+          isEditing={isEditing}
+          options={["Egypt", "Saudi Arabia", "UAE"]}
+          onChange={(value) =>
+            onDraftChange({
+              ...draft,
+              country: value,
+            })
+          }
+        />
+
+        <DetailField
+          label={t("City")}
+          value={current.city}
+          isEditing={isEditing}
+          onChange={(value) => onDraftChange({ ...draft, city: value })}
+        />
+
+        <DetailField
+          label={t("Area")}
+          value={current.area}
+          isEditing={isEditing}
+          onChange={(value) => onDraftChange({ ...draft, area: value })}
+        />
+
+        <DetailField
+          label={t("Apartment")}
+          value={current.apartment ?? ""}
+          isEditing={isEditing}
+          onChange={(value) => onDraftChange({ ...draft, apartment: value })}
+        />
+
+        <div className="sm:col-span-2">
+          <DetailField
+            label={t("Street Address")}
+            value={current.streetAddress}
+            isEditing={isEditing}
+            onChange={(value) =>
+              onDraftChange({
+                ...draft,
+                streetAddress: value,
+              })
+            }
           />
         </div>
       </div>
-      <DetailField
-        label={t("Label")}
-        value={isEditing ? draft.label : address.label}
-        isEditing={isEditing}
-        onChange={(value) => onDraftChange({ ...draft, label: value })}
-      />
-      <DetailField
-        label={t("Address")}
-        value={isEditing ? draft.value : address.value}
-        isEditing={isEditing}
-        onChange={(value) => onDraftChange({ ...draft, value })}
-      />
+      {isEditing && (
+  <div className="sm:col-span-2 mt-4 flex justify-end">
+    <button
+      type="button"
+      onClick={onSave}
+      disabled={isAddressLoading}
+      className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-['Montserrat'] text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {isAddressLoading ? (
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      ) : (
+        <Check className="h-5 w-5" />
+      )}
+
+      {isNew ? t("Add Address") : t("Save Address")}
+    </button>
+  </div>
+)} 
     </div>
   );
 }
@@ -225,33 +303,48 @@ export default function ContactDetailsPage() {
     phone: String(user?.phone ?? "+201024941663"),
   });
   const [contactDraft, setContactDraft] = useState<ContactForm>(contactDetails);
-  const [addresses, setAddresses] =
-    useState<AddressItem[]>(loadStoredAddresses);
+  const { data: addresses = [], isLoading: isAddressesLoading } =
+    useMyAddresses();
+
+  const { mutate: addAddress, isPending: isAddingAddress } = useAddAddress();
+
+  const { mutate: updateAddress, isPending: isUpdatingAddress } =
+    useUpdateAddress();
+
+  const { mutate: deleteAddress, isPending: isDeletingAddress } =
+    useDeleteAddress();
+  const isAddressLoading =
+    isAddingAddress || isUpdatingAddress || isDeletingAddress;
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
-  const [addressDraft, setAddressDraft] = useState<AddressItem>({
+  const emptyAddress: AddressItem = {
     id: "",
-    label: "",
-    value: "",
-  });
+    country: "",
+    city: "",
+    area: "",
+    streetAddress: "",
+    apartment: "",
+  };
 
+  const [addressDraft, setAddressDraft] = useState(emptyAddress);
+  const [isAdding, setIsAdding] = useState(false);
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    const func = async () => {
+      if (!user) {
+        return;
+      }
 
-    const nextDetails = {
-      name: String(user.name ?? "Maan Galal"),
-      email: String(user.email ?? "maan@example.com"),
-      phone: String(user.phone ?? "+201024941663"),
+      const nextDetails = {
+        name: String(user.name ?? "Maan Galal"),
+        email: String(user.email ?? "maan@example.com"),
+        phone: String(user.phone ?? "+201024941663"),
+      };
+
+      setContactDetails(nextDetails);
+      setContactDraft(nextDetails);
     };
-
-    setContactDetails(nextDetails);
-    setContactDraft(nextDetails);
+    func();
   }, [user]);
-
-  useEffect(() => {
-    window.localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(addresses));
-  }, [addresses]);
 
   const footerTop = useMemo(
     () => 970 + Math.max(addresses.length - 2, 0) * 210,
@@ -311,65 +404,96 @@ export default function ContactDetailsPage() {
   };
 
   const handleStartEditingAddress = (address: AddressItem) => {
+    setIsAdding(false);
     setEditingAddressId(address.id);
     setAddressDraft(address);
+    setAddressModalOpen(true);
   };
 
   const handleCancelEditingAddress = () => {
     setEditingAddressId(null);
-    setAddressDraft({ id: "", label: "", value: "" });
+    setAddressDraft(emptyAddress);
+    setAddressModalOpen(false);
+    setIsAdding(false);
   };
-
   const handleSaveAddress = (addressId: string) => {
-    const trimmedLabel = addressDraft.label.trim();
-    const trimmedValue = addressDraft.value.trim();
+    const trimmedStreet = addressDraft.streetAddress.trim();
+    const trimmedCity = addressDraft.city.trim();
 
-    if (!trimmedLabel || !trimmedValue) {
-      toast.error(t("Please complete the address label and value"));
+    if (!trimmedStreet || !trimmedCity) {
+      toast.error(t("Please complete the address details"));
       return;
     }
 
-    const nextAddress = {
-      ...addressDraft,
-      id: addressId,
-      label: trimmedLabel,
-      value: trimmedValue,
-    };
-
-    setAddresses((currentAddresses) =>
-      currentAddresses.map((address) =>
-        address.id === addressId ? nextAddress : address,
-      ),
+    updateAddress(
+      {
+        id: addressId,
+        data: {
+          country: addressDraft.country,
+          city: trimmedCity,
+          area: addressDraft.area,
+          streetAddress: trimmedStreet,
+          apartment: addressDraft.apartment ?? "",
+        },
+      },
+      {
+        onSuccess() {
+          handleCancelEditingAddress();
+          toast.success(t("Address updated"));
+        },
+        onError(error) {
+          const axiosError = error as AxiosError<{ message?: string }>;
+          toast.error(
+            axiosError.response?.data?.message || t("Failed to update address"),
+          );
+        },
+      },
     );
-    handleCancelEditingAddress();
-    toast.success(t("Address updated"));
   };
 
   const handleDeleteAddress = (addressId: string) => {
-    setAddresses((currentAddresses) =>
-      currentAddresses.filter((address) => address.id !== addressId),
-    );
+    deleteAddress(addressId, {
+      onSuccess() {
+        toast.success(t("Address removed"));
 
-    if (editingAddressId === addressId) {
-      handleCancelEditingAddress();
-    }
-
-    toast.success(t("Address removed"));
+        if (editingAddressId === addressId) {
+          handleCancelEditingAddress();
+        }
+      },
+    });
   };
 
   const handleAddAddress = () => {
-    const nextId = `address-${Date.now()}`;
-    const nextAddress = {
-      id: nextId,
-      label: t("New Address"),
-      value: "",
-    };
-
-    setAddresses((currentAddresses) => [...currentAddresses, nextAddress]);
-    setEditingAddressId(nextId);
-    setAddressDraft(nextAddress);
+    setAddressDraft(emptyAddress);
+    setEditingAddressId(null);
+    setIsAdding(true);
+    setAddressModalOpen(true);
   };
+  const handleCreateAddress = () => {
+    addAddress(
+      {
+        country: addressDraft.country,
+        city: addressDraft.city,
+        area: addressDraft.area,
+        streetAddress: addressDraft.streetAddress,
+        apartment: addressDraft.apartment ?? undefined,
+      },
+      {
+        onSuccess() {
+          handleCancelEditingAddress();
+          toast.success(t("Address added"));
+        },
 
+        onError(error) {
+          const axiosError = error as AxiosError<{ message?: string }>;
+
+          toast.error(
+            axiosError.response?.data?.message || t("Failed to add address"),
+          );
+        },
+      },
+    );
+  };
   const handleResetPassword = () => {
     toast.message("Password reset flow is coming soon");
   };
@@ -450,21 +574,58 @@ export default function ContactDetailsPage() {
           {t("Add Address")}
         </button>
       </SectionHeader>
-      <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-6">
-        {addresses.map((address) => (
-          <AddressCard
-            key={address.id}
-            address={address}
-            isEditing={editingAddressId === address.id}
-            draft={editingAddressId === address.id ? addressDraft : address}
-            onEdit={() => handleStartEditingAddress(address)}
-            onSave={() => handleSaveAddress(address.id)}
-            onCancel={handleCancelEditingAddress}
-            onDelete={() => handleDeleteAddress(address.id)}
-            onDraftChange={setAddressDraft}
-          />
-        ))}
-      </div>
+      {isAddressesLoading && (
+        <div className="p-10 text-center">{t("loadding")}</div>
+      )}
+      {!isAddressesLoading && addresses && addresses.length === 0 && (
+        <div className="p-10 text-center">{t("noAddredddddsses")}</div>
+      )}
+
+      {addresses && addresses.length > 0 && (
+        <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-6">
+          {addresses.map((address) => (
+            <AddressCard
+              key={address.id}
+              address={address}
+              isEditing={editingAddressId === address.id}
+              isAddressLoading={isAddressLoading}
+              draft={editingAddressId === address.id ? addressDraft : address}
+              onEdit={() => handleStartEditingAddress(address)}
+              onSave={() => handleSaveAddress(address.id)}
+              onCancel={handleCancelEditingAddress}
+              onDelete={() => handleDeleteAddress(address.id)}
+              onDraftChange={setAddressDraft}
+            />
+          ))}
+        </div>
+      )}
+      <Modal
+        isOpen={addressModalOpen}
+        onClose={handleCancelEditingAddress}
+        title={isAdding ? t("Add Address") : t("Edit Address")}
+      >
+        <AddressCard
+          address={
+            isAdding
+              ? emptyAddress
+              : (addresses.find((item) => item.id === editingAddressId) ??
+                emptyAddress)
+          }
+          draft={addressDraft}
+          isEditing
+          isNew={isAdding}
+          isAddressLoading={isAddingAddress}
+          onEdit={() => {}}
+          onDraftChange={setAddressDraft}
+          onCancel={handleCancelEditingAddress}
+          onDelete={() => {}}
+          onSave={
+            isAdding
+              ? handleCreateAddress
+              : () => handleSaveAddress(editingAddressId!)
+          }
+        />
+      </Modal>
     </div>
   );
 }

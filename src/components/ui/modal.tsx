@@ -32,7 +32,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
       onClick={onClose}
     >
       <div
-        className=" relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-card sm:max-h-[90vh] sm:w-full sm:max-w-lg sm:rounded-2xl"
+        className=" relative flex max-h-[92vh] w-full flex-col rounded-t-2xl bg-card sm:max-h-[90vh] sm:w-full sm:max-w-lg sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-stroke px-4 py-3 sm:px-5">
