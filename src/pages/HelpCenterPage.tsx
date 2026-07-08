@@ -1,15 +1,7 @@
 import { ChevronRight, Mail, MessageSquare, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-
-const categories = [
-  "Orders & Shipping",
-  "Payments & Wallet",
-  "Returns & Refunds",
-  "Wholesale & Dropshipping",
-  "Account & Profile",
-  "Technical Issues",
-];
+import { useUserHelpCenterCategories } from "../hooks/queries/helpCenterQuery";
 
 function CategoryCard({ title }: { title: string }) {
   const { t } = useTranslation("helpCenter");
@@ -33,6 +25,16 @@ function CategoryCard({ title }: { title: string }) {
 
 function HelpCenterPanel() {
   const { t } = useTranslation("helpCenter");
+  const { data: categories = [], isLoading } = useUserHelpCenterCategories();
+
+  if (isLoading) {
+    return (
+      <div className="flex w-full items-center justify-center p-10">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
@@ -42,8 +44,8 @@ function HelpCenterPanel() {
         {t("Categories")}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {categories.map((title) => (
-          <CategoryCard key={title} title={title} />
+        {categories.map((cat) => (
+          <CategoryCard key={cat.id} title={cat.name} />
         ))}
       </div>
       <div className="flex flex-col gap-4">

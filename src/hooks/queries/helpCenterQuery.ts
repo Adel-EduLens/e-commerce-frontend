@@ -28,3 +28,28 @@ export const useAdminHelpCenterVideos = () => {
     },
   });
 };
+
+export type HelpCenterCategory = {
+  id: string;
+  name: string;
+};
+
+export const useHelpCenterCategories = () => {
+  return useQuery<HelpCenterCategory[]>({
+    queryKey: ['help-center', 'admin', 'categories'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/help-center/category');
+      return data?.data || [];
+    },
+  });
+};
+
+export const useUserHelpCenterCategories = () => {
+  return useQuery<HelpCenterCategory[]>({
+    queryKey: ['help-center', 'user', 'categories'],
+    queryFn: async () => {
+      const { data } = await api.get('/user/help-center/categories');
+      return data?.data || [];
+    },
+  });
+};
