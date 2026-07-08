@@ -23,6 +23,7 @@ export default function TraderProductsPage() {
     product: p.name,
     category: p.category?.name ?? "",
     categoryId: p.categoryId,
+    brandId: p.brand?.id ?? "",
     stock: p.stock ?? 0,
     sku: p.sku ?? "",
     price: `$${p.price}`,

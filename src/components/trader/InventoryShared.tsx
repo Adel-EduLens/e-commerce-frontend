@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
+import { useBrands } from "../../hooks/queries/brandsQuery";
 import { useCreateProduct, useUpdateProduct } from "../../hooks/queries/productsQuery";
 import { useCreateWholesale, useUpdateWholesale } from "../../hooks/queries/wholesaleQuery";
 import {
@@ -126,6 +127,7 @@ export function AddItemModal({
   const [type, setType] = useState<ProductType>(lockedType ?? "product");
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [brandId, setBrandId] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [sku, setSku] = useState("");
@@ -149,6 +151,7 @@ export function AddItemModal({
   const [error, setError] = useState("");
 
   const { data: categories = [] } = useCategories();
+  const { data: brands = [] } = useBrands();
   const createProduct = useCreateProduct();
   const createWholesale = useCreateWholesale();
   const isSaving = createProduct.isPending || createWholesale.isPending;
@@ -192,13 +195,14 @@ export function AddItemModal({
         }
         setUploading(false);
         await createProduct.mutateAsync({
-          name, description, price: Number(price), categoryId, images,
-          sizes: selectedSizes, colors: selectedColors,
+          name, description, price: Number(price), categoryId,
+          brandId: brandId || undefined,
+          images, sizes: selectedSizes, colors: selectedColors,
           sku: sku || undefined, stock: stock ? Number(stock) : 0,
           isMustHave,
           isFlashDeals,
-          flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,
-          flashDealEndsAt: isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
+          flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : undefined,
+          flashDealEndsAt: isFlashDeals && flashDealEndsAt ? flashDealEndsAt : undefined,
         });
       } else {
         const wholesaleUrl = await uploadImageFile(wholesaleFile!);
@@ -250,6 +254,14 @@ export function AddItemModal({
             <option value="">Select category *</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
+
+          {type === "product" && (
+            <select value={brandId} onChange={(e) => setBrandId(e.target.value)}
+              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
+              <option value="">Select brand (optional)</option>
+              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          )}
 
           <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}
             rows={2} className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none" />
@@ -387,6 +399,7 @@ export function AddItemModal({
 export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose: () => void }) {
   const [name, setName] = useState(item.product);
   const [categoryId, setCategoryId] = useState(item.categoryId);
+  const [brandId, setBrandId] = useState(item.brandId);
   const [description, setDescription] = useState(item.description);
   const [price, setPrice] = useState(String(item.priceNum));
   const [stock, setStock] = useState(String(item.stock));
@@ -418,6 +431,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
   const [error, setError] = useState("");
 
   const { data: categories = [] } = useCategories();
+  const { data: brands = [] } = useBrands();
   const updateProduct = useUpdateProduct();
   const updateWholesale = useUpdateWholesale();
   const isSaving = updateProduct.isPending || updateWholesale.isPending;
@@ -451,6 +465,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
         setUploading(false);
         await updateProduct.mutateAsync({
           id: item.id, name, description, price: Number(price), categoryId,
+          brandId: brandId || undefined,
           images, sizes: selectedSizes, colors: selectedColors,
           sku: sku || undefined, stock: Number(stock),
           isMustHave,
@@ -494,6 +509,14 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
             <option value="">Select category</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
+
+          {item.type === "product" && (
+            <select value={brandId} onChange={(e) => setBrandId(e.target.value)}
+              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
+              <option value="">Select brand (optional)</option>
+              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          )}
 
           <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}
             rows={2} className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none" />

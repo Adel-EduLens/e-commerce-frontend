@@ -27,10 +27,7 @@ export default function TraderLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const avatar =
-    typeof user?.avatar === "string" && user.avatar
-      ? user.avatar
-      : traderAsset("unsplash_8Vt2haq8NSQ.png");
+  const avatar = typeof user?.avatar === "string" && user.avatar ? user.avatar : null;
 
   const handleLogout = () => {
     clearAuth();
@@ -84,7 +81,15 @@ export default function TraderLayout() {
             <div className="mt-4 space-y-4 shrink-0">
               <div className="rounded-[24px] bg-white/6 p-3">
                 <div className="flex items-center gap-3">
-                  <img className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" src={avatar} alt={user?.name || "Trader"} />
+                  {avatar ? (
+                    <img className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10" src={avatar} alt={user?.name || "Trader"} />
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 ring-2 ring-white/10">
+                      <svg className="h-7 w-7 text-white/50" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className="truncate font-['Montserrat'] text-sm font-semibold text-white">{user?.name || "Maan Hassan"}</p>
                     <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-primary">{user?.role || "trader"}</p>
@@ -115,7 +120,15 @@ export default function TraderLayout() {
                   <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" fill="currentColor" />
                 </svg>
               </button>
-              <img className="h-12 w-12 rounded-full object-cover" src={avatar} alt="Profile" />
+              {avatar ? (
+                <img className="h-12 w-12 rounded-full object-cover" src={avatar} alt="Profile" />
+              ) : (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-stroke bg-gray-100">
+                  <svg className="h-7 w-7 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                  </svg>
+                </div>
+              )}
             </div>
           </div>
           

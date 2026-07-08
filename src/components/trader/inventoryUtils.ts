@@ -27,6 +27,7 @@ export interface InventoryItem {
   sizes: string[];
   colors: string[];
   minOrder: number;
+  brandId: string;
   isMustHave: boolean;
   isFlashDeals: boolean;
   flashDealPrice: number | null;
