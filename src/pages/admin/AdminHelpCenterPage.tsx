@@ -7,17 +7,11 @@ import {
   FaYoutube,
 } from 'react-icons/fa'
 import { api } from '../../lib/axios'
-import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 
-const CATEGORIES = [
-  'Orders & Shipping',
-  'Payments & Wallet',
-  'Returns & Refunds',
-  'Wholesale & Dropshipping',
-  'Account & Profile',
-  'Technical Issues',
-]
+import { useAdminHelpCenterVideos, useHelpCenterCategories, type HelpCenterCategory } from '../../hooks/queries/helpCenterQuery';
+import { useQueryClient } from '@tanstack/react-query';
+import { handleApiError } from '../../lib/utils';
 
 function extractYoutubeId(input: string): string | null {
   const trimmed = input.trim()
@@ -37,9 +31,11 @@ type HelpVideo = {
 function CategorySelect({
   value,
   onChange,
+  categories,
 }: {
   value: string | null
   onChange: (value: string) => void
+  categories: HelpCenterCategory[]
 }) {
   const [open, setOpen] = useState(false)
 
@@ -63,21 +59,27 @@ function CategorySelect({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => {
-                  onChange(category)
-                  setOpen(false)
-                }}
-                className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-gray-light ${value === category ? 'text-foreground' : 'text-gray-text'
-                  }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex max-h-60 w-full flex-col overflow-y-auto rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
+            {categories.length === 0 ? (
+              <div className="px-4 py-3 text-left font-['Montserrat'] text-sm text-gray-text">
+                No categories available. Please add one first.
+              </div>
+            ) : (
+              categories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(category.name)
+                    setOpen(false)
+                  }}
+                  className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-gray-light ${value === category.name ? 'text-foreground' : 'text-gray-text'
+                    }`}
+                >
+                  {category.name}
+                </button>
+              ))
+            )}
           </div>
         </>
       )}
@@ -89,10 +91,12 @@ function AddVideoForm({
   editingVideo,
   onAdded,
   onCancelEdit,
+  categories,
 }: {
   editingVideo: HelpVideo | null
   onAdded: () => void
   onCancelEdit: () => void
+  categories: HelpCenterCategory[]
 }) {
   const [title, setTitle] = useState(editingVideo?.title ?? '')
   const [youtubeInput, setYoutubeInput] = useState(
@@ -208,7 +212,7 @@ function AddVideoForm({
         <label className="font-['Montserrat'] text-sm font-medium ">
           Category
         </label>
-        <CategorySelect value={category} onChange={setCategory} />
+        <CategorySelect value={category} onChange={setCategory} categories={categories} />
       </div>
 
       <div className="flex items-center gap-3">
@@ -308,14 +312,41 @@ function VideoList({
   )
 }
 
-import { useAdminHelpCenterVideos } from '../../hooks/queries/helpCenterQuery';
-import { useQueryClient } from '@tanstack/react-query';
-import { handleApiError } from '../../lib/utils';
-
 export default function AddHelpVideoPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const queryClient = useQueryClient();
   const { data: videos = [] } = useAdminHelpCenterVideos();
+  const { data: categories = [] } = useHelpCenterCategories();
+
+  const [newCategoryName, setNewCategoryName] = useState('')
+
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return
+    try {
+      const res = await api.post('/admin/help-center/category', {
+        name: newCategoryName.trim(),
+      })
+      if (res.status === 201) {
+        toast.success('Category added successfully')
+        setNewCategoryName('')
+        queryClient.invalidateQueries({ queryKey: ['help-center', 'admin', 'categories'] })
+      }
+    } catch (error) {
+      handleApiError(error, 'Failed to add category');
+    }
+  }
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      const res = await api.delete(`/admin/help-center/category/${id}`)
+      if (res.status === 200) {
+        toast.success('Category deleted successfully')
+        queryClient.invalidateQueries({ queryKey: ['help-center', 'admin', 'categories'] })
+      }
+    } catch (error) {
+      handleApiError(error, 'Failed to delete category');
+    }
+  }
 
   const handelFetchVideos = () => {
     queryClient.invalidateQueries({ queryKey: ['help-center', 'admin'] });
@@ -334,7 +365,53 @@ export default function AddHelpVideoPage() {
         editingVideo={editingVideo}
         onAdded={handelFetchVideos}
         onCancelEdit={() => setEditingId(null)}
+        categories={categories}
       />
+
+      <div className="flex w-full flex-col gap-6 rounded-2xl ">
+        <div className="font-['Montserrat'] text-2xl font-semibold ">
+          Manage Categories
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={newCategoryName}
+            onChange={(e) => setNewCategoryName(e.target.value)}
+            placeholder="New Category Name"
+            className="flex-1 rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={handleAddCategory}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-['Montserrat'] text-base font-semibold text-foreground"
+          >
+            <FaPlus className="h-4 w-4" />
+            Add
+          </button>
+        </div>
+
+        {categories.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-2">
+            {categories.map((cat) => (
+              <div
+                key={cat.id}
+                className="flex items-center gap-2 rounded-full bg-gray-light py-2 pl-4 pr-2 outline outline-1 outline-offset-[-1px] outline-stroke"
+              >
+                <span className="font-['Montserrat'] text-sm font-medium text-foreground">
+                  {cat.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteCategory(cat.id)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-gray-text hover:bg-stroke hover:text-red-500"
+                >
+                  <FaTrash className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-col gap-4">
         <div className="font-['Montserrat'] text-2xl font-semibold text-foreground">
