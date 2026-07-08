@@ -35,7 +35,7 @@ function NotificationBell() {
     if (!btnRef.current) return;
     const rect = btnRef.current.getBoundingClientRect();
     setCoords({
-      top: rect.bottom + window.scrollY + 10,
+      top: rect.bottom + 10,
       right: window.innerWidth - rect.right,
     });
   };
