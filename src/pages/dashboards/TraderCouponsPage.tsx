@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Trash2, Plus, Calendar, Tag, Percent, ShoppingBag, Eye, ChevronDown, X } from "lucide-react";
 import { api } from "../../lib/axios";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useCoupons } from "../../hooks/queries/couponsQuery";
 import type { Coupon } from "../../hooks/queries/couponsQuery";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
@@ -152,14 +152,47 @@ export default function TraderCouponsPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [usageLimit, setUsageLimit] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCouponForModal, setSelectedCouponForModal] = useState<Coupon | null>(null);
 
+  // TanStack Query Mutations
+  const createCouponMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const { data } = await api.post("/coupons", payload);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Coupon created successfully!");
+      // Reset form
+      setCode("");
+      setDiscount(10);
+      setValidUntil("");
+      setSelectedCategory("");
+      setSelectedProduct("");
+      setUsageLimit("");
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+    },
+    onError: (error) => {
+      handleApiError(error, "Failed to create coupon");
+    }
+  });
 
-  const handleCreateCoupon = async (e: React.FormEvent) => {
+  const toggleCouponMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const { data } = await api.patch(`/coupons/${id}`, { isActive });
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Coupon ${variables.isActive ? "activated" : "deactivated"} successfully`);
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+    },
+    onError: (error) => {
+      handleApiError(error, "Failed to update coupon status");
+    }
+  });
+
+  const handleCreateCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim()) {
       toast.error("Coupon code is required");
@@ -174,46 +207,20 @@ export default function TraderCouponsPage() {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
-      const payload = {
-        code: code.trim().toUpperCase(),
-        discount: Number(discount),
-        validUntil: new Date(validUntil).toISOString(),
-        categoryId: selectedCategory || null,
-        productId: selectedProduct || null,
-        usageLimit: usageLimit ? Number(usageLimit) : null,
-      };
+    const payload = {
+      code: code.trim().toUpperCase(),
+      discount: Number(discount),
+      validUntil: new Date(validUntil).toISOString(),
+      categoryId: selectedCategory || null,
+      productId: selectedProduct || null,
+      usageLimit: usageLimit ? Number(usageLimit) : null,
+    };
 
-      await api.post("/coupons", payload);
-      toast.success("Coupon created successfully!");
-
-      // Reset form
-      setCode("");
-      setDiscount(10);
-      setValidUntil("");
-      setSelectedCategory("");
-      setSelectedProduct("");
-      setUsageLimit("");
-
-      queryClient.invalidateQueries({ queryKey: ['coupons'] });
-    } catch (error) {
-      handleApiError(error, "Failed to create coupon");
-    } finally {
-      setIsSubmitting(false);
-    }
+    createCouponMutation.mutate(payload);
   };
 
-  const handleDeleteCoupon = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this coupon?")) return;
-
-    try {
-      await api.delete(`/coupons/${id}`);
-      toast.success("Coupon deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ['coupons'] });
-    } catch (error) {
-      toast.error("Failed to delete coupon");
-    }
+  const handleToggleCouponActive = (id: string, currentStatus: boolean) => {
+    toggleCouponMutation.mutate({ id, isActive: !currentStatus });
   };
 
   return (
@@ -227,7 +234,7 @@ export default function TraderCouponsPage() {
           <div>
             <p className="text-sm font-semibold text-gray-text">Active Coupons</p>
             <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
-              {coupons.filter(c => new Date(c.validUntil) > new Date()).length}
+              {coupons.filter(c => c.isActive && new Date(c.validUntil) > new Date()).length}
             </p>
           </div>
         </div>
@@ -326,10 +333,10 @@ export default function TraderCouponsPage() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={createCouponMutation.isPending}
               className="w-full h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50"
             >
-              {isSubmitting ? "Creating..." : "Create Coupon"}
+              {createCouponMutation.isPending ? "Creating..." : "Create Coupon"}
             </button>
           </form>
         </div>
@@ -395,7 +402,11 @@ export default function TraderCouponsPage() {
                           {new Date(coupon.validUntil).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-4">
-                          {isExpired ? (
+                          {!coupon.isActive ? (
+                            <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+                              Inactive
+                            </span>
+                          ) : isExpired ? (
                             <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
                               Expired
                             </span>
@@ -423,13 +434,22 @@ export default function TraderCouponsPage() {
                             >
                               <Eye className="h-5 w-5" />
                             </button>
+                            {/* Toggle switch for active status */}
                             <button
                               type="button"
-                              onClick={() => handleDeleteCoupon(coupon.id)}
-                              className="text-red-500 hover:text-red-700 transition"
-                              aria-label="Delete coupon"
+                              onClick={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
+                              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                                coupon.isActive ? "bg-green-500" : "bg-gray-300"
+                              }`}
+                              role="switch"
+                              aria-checked={coupon.isActive}
+                              title={coupon.isActive ? "Deactivate Coupon" : "Activate Coupon"}
                             >
-                              <Trash2 className="h-5 w-5" />
+                              <span
+                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                  coupon.isActive ? "translate-x-5" : "translate-x-0"
+                                }`}
+                              />
                             </button>
                           </div>
                         </td>

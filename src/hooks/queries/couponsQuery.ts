@@ -26,6 +26,7 @@ export interface Coupon {
   usageLimit: number | null;
   usedCount: number;
   usages?: CouponUsage[];
+  isActive: boolean;
   createdAt: string;
 }
 

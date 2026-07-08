@@ -71,20 +71,7 @@ function HeroSection() {
           </div>
         </div>
         <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
-          <div className="absolute left-0 top-0 h-64 w-[597px] overflow-hidden bg-background opacity-75">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Inter'] text-2xl font-medium text-foreground">
-              step into the spotlight with our latest drop. each piece is made to
-              turn heads while keeping you comfortable from day to night.
-              <br />
-            </div>
-            <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
-              <AssetImage
-                file="medium-shot-man-posing-with-blue-background 1_2.png"
-                className="absolute left-[1px] top-0 h-60 w-[222px]"
-              />
-            </div>
-          </div>
-          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-background">
+          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-background rounded-3xl border border-stroke shadow-sm">
             <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-foreground">
               step into the spotlight with our latest drop. each piece is made to
               turn heads while keeping you comfortable from day to night.
@@ -340,15 +327,17 @@ function VoteSection() {
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center"
+                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center cursor-pointer hover:opacity-95 transition"
                 >
                   <AssetImage file="weui_arrow-filled-2.svg" className="h-6 w-3" />
                 </button>
                 <div className="flex items-center gap-1">
                   {designs.map((design, index) => (
-                    <div
+                    <button
                       key={design.id}
-                      className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-secondary' : 'bg-white'}`}
+                      type="button"
+                      onClick={() => setCurrentIndex(index)}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-white hover:bg-white/80'}`}
                     />
                   ))}
                 </div>
@@ -356,7 +345,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center"
+                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center cursor-pointer hover:opacity-95 transition"
                 >
                   <AssetImage file="weui_arrow-filled.svg" className="h-6 w-3" />
                 </button>
@@ -405,13 +394,13 @@ function VoteSection() {
             </>
           )}
           {current && (
-            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white">
-              <div className="absolute left-[12px] top-[12px] inline-flex items-center justify-start gap-4">
+            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white flex items-center justify-center shadow-md">
+              <div className="flex items-center justify-start gap-4">
                 <button
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary cursor-pointer hover:opacity-95 transition"
                 >
                   <AssetImage
                     file="weui_arrow-filled-2.svg"
@@ -420,10 +409,13 @@ function VoteSection() {
                 </button>
                 <div className="flex items-center justify-start gap-1">
                   {designs.map((design, index) => (
-                    <div
+                    <button
                       key={design.id}
-                      className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-primary' : 'bg-stroke'
-                        }`}
+                      type="button"
+                      onClick={() => setCurrentIndex(index)}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${
+                        index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-[#D0D5DD]'
+                      }`}
                     />
                   ))}
                 </div>
@@ -431,7 +423,7 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary cursor-pointer hover:opacity-95 transition"
                 >
                   <AssetImage
                     file="weui_arrow-filled.svg"
