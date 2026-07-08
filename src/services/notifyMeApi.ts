@@ -1,23 +1,25 @@
 import { api } from '../lib/axios'
 
+export type NotifyMeTargetType = 'SHOP_RESTOCK' | 'RETAIL_RESTOCK' | 'WHOLESALE_RESTOCK' | 'CATEGORY'
+
 export const notifyMeApi = {
-  async getUserNotifications() {
-    const response = await api.get('/notify-me/user')
+  async getSubscriptions() {
+    const response = await api.get('/notify-me')
     return response.data
   },
 
-  async subscribe(productId: string) {
-    const response = await api.post('/notify-me', { productId })
+  async check(targetType: NotifyMeTargetType, targetId: string) {
+    const response = await api.get('/notify-me/check', { params: { targetType, targetId } })
     return response.data
   },
 
-  async unsubscribe(notificationId: number) {
-    const response = await api.delete(`/notify-me/${notificationId}`)
+  async subscribe(targetType: NotifyMeTargetType, targetId: string) {
+    const response = await api.post('/notify-me', { targetType, targetId })
     return response.data
   },
 
-  async checkSubscription(productId: string) {
-    const response = await api.get(`/notify-me/check/${productId}`)
+  async unsubscribe(targetType: NotifyMeTargetType, targetId: string) {
+    const response = await api.delete('/notify-me', { data: { targetType, targetId } })
     return response.data
   },
 }

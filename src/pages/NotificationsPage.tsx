@@ -7,7 +7,7 @@ import {
   useDeleteNotification,
 } from "../hooks/useUserNotifications";
 import { useCategories } from "../hooks/queries/categoriesQuery";
-import { useCategorySubscriptions } from "../hooks/queries/notificationQuery";
+import { useCategorySubscriptions, useToggleCategorySubscription } from "../hooks/queries/notificationQuery";
 import { useTranslation } from "react-i18next";
 
 const COLLECTION_LABELS = ["Men", "Women", "Kids"];
@@ -156,6 +156,7 @@ export default function NotificationsPage() {
   );
 
   const { data: subscribedIds = [] } = useCategorySubscriptions();
+  const { subscribe, unsubscribe } = useToggleCategorySubscription();
   const unreadCount = notifications.filter((n: any) => !n.isRead).length;
 
   if (isLoading) {
@@ -182,33 +183,29 @@ export default function NotificationsPage() {
           <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
             {t("NOTIFICATIONS")}
           </div>
-          <div className="flex flex-col gap-4 sm:gap-6">
+          <div className="grid grid-cols-3 gap-4">
             {collectionCategories.map((cat) => {
               const enabled = subscribedIds.includes(cat.id);
               return (
-                <div key={cat.id} className="flex items-center gap-4 sm:gap-5">
+                <div key={cat.id} className="flex flex-col items-center gap-3 rounded-2xl border border-stroke bg-card p-4">
                   <img
                     src={COLLECTION_IMAGES[cat.name] ?? ""}
-                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full object-cover object-top shrink-0"
+                    className="h-16 w-16 rounded-full object-cover object-top"
                     alt={cat.name}
                     draggable={false}
                   />
-                  <div className="flex flex-1 items-center justify-between py-3 sm:py-4">
-                    <div className="font-['Montserrat'] text-lg sm:text-2xl font-medium text-foreground">
-                      {t(cat.name)}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => console.log("clicked")}
-                      className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${enabled ? "bg-primary" : "bg-stroke"
-                        }`}
-                    >
-                      <span
-                        className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${enabled ? "translate-x-6" : "translate-x-1"
-                          }`}
-                      />
-                    </button>
+                  <div className="font-['Montserrat'] text-base font-medium text-foreground text-center">
+                    {t(cat.name)}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => enabled ? unsubscribe(cat.id) : subscribe(cat.id)}
+                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${enabled ? "bg-primary" : "bg-stroke"}`}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${enabled ? "translate-x-6" : "translate-x-1"}`}
+                    />
+                  </button>
                 </div>
               );
             })}

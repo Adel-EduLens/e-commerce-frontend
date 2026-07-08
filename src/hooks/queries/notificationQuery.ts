@@ -21,19 +21,20 @@ export const useNotifications = () =>
   useQuery({ queryKey: ['notifications'], queryFn: getNotifications })
 
 const getSubscriptions = async () => {
-  const { data } = await api.get('/notifications/subscriptions')
-  return data.data as string[]
+  const { data } = await api.get('/notify-me')
+  const subs = (data.data || []) as { targetType: string; targetId: string; isActive: boolean }[]
+  return subs.filter(s => s.targetType === 'CATEGORY' && s.isActive).map(s => s.targetId)
 }
 
 export const useCategorySubscriptions = () =>
   useQuery({ queryKey: ['notification-subscriptions'], queryFn: getSubscriptions })
 
 const subscribe = async (categoryId: string) => {
-  await api.post('/notifications/subscriptions', { categoryId })
+  await api.post('/notify-me', { targetType: 'CATEGORY', targetId: categoryId })
 }
 
 const unsubscribe = async (categoryId: string) => {
-  await api.delete(`/notifications/subscriptions/${categoryId}`)
+  await api.delete('/notify-me', { data: { targetType: 'CATEGORY', targetId: categoryId } })
 }
 
 export const useToggleCategorySubscription = () => {
