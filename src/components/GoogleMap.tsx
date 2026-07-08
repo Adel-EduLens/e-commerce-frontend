@@ -209,25 +209,6 @@ export default function GoogleMapPicker({
           Pin your location on the map
         </span>
         <div className="flex gap-2">
-          {searchQuery && searchQuery.replace(/,/g, '').trim().length > 0 && (
-            <button
-              type="button"
-              onClick={async () => {
-                setIsSearching(true);
-                const coords = await forwardGeocode(searchQuery);
-                if (coords) {
-                  setPendingMarker(coords);
-                  mapRef.current?.flyTo(coords, 15);
-                }
-                setIsSearching(false);
-              }}
-              disabled={isSearching}
-              className="flex items-center gap-1.5 rounded-lg border border-stroke px-3 py-1.5 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
-            >
-              <Search className="h-3.5 w-3.5" />
-              {isSearching ? "Searching..." : "Locate form address"}
-            </button>
-          )}
           <button
             type="button"
             onClick={() => handleUseCurrentLocation(true)}
