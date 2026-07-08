@@ -34,6 +34,7 @@ export type ProductCardProps = {
   isFlashDeals?: boolean;
   productId?: string;
   productType?: 'SHOP' | 'WHOLESALE';
+  showTypeBadge?: boolean;
 };
 
 function useCountdown(endsAt?: string) {
@@ -87,6 +88,7 @@ export default function ProductCard({
   isFlashDeals = false,
   productId = "",
   productType = "SHOP",
+  showTypeBadge = false,
 }: ProductCardProps) {
   const rootTone = featured ? accentClassName : "bg-white";
   const mediaTone = featured ? accentClassName : "bg-background";
@@ -163,9 +165,9 @@ export default function ProductCard({
         </button>
         {/* Badges Container */}
         <div className="absolute left-2 top-2 flex flex-col gap-2 items-start z-30">
-          {productType && (
-            <div className={`rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${productType === 'WHOLESALE' ? 'bg-primary text-primary-foreground' : 'bg-gray-text'}`}>
-              {productType === 'WHOLESALE' ? 'Wholesale' : 'Retail'}
+          {showTypeBadge && productType === 'WHOLESALE' && (
+            <div className="rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm bg-primary text-primary-foreground">
+              Wholesale
             </div>
           )}
           {/* Flash deal countdown badge */}

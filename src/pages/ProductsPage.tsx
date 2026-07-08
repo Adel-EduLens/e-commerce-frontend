@@ -153,9 +153,9 @@ export default function ProductsPage() {
             isMustHave={product.isMustHave}
             isFlashDeals={product.isFlashDeals}
             flashDealPrice={product.flashDealPrice}
-            flashDealEndsAt={product.flashDealEndsAt}
             rating={product.rating}
             productType="SHOP"
+            showTypeBadge={!!filters.search}
             to={`/product-details/${product.id}`}
           />
         );
@@ -175,6 +175,7 @@ export default function ProductsPage() {
             featured={wholesale.rating >= 4}
             rating={wholesale.rating}
             productType="WHOLESALE"
+            showTypeBadge={!!filters.search}
             to={`/wholesale/${wholesale.id}`}
           />
         );
