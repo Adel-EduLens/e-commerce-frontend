@@ -142,7 +142,7 @@ export function ProductInfoPanel({
   };
 
   const handleBuyNow = () => {
-    toast.success(t("checkout"));
+    handleAddToCart();
     navigate("/checkout");
   };
   const handleCompare = () => {

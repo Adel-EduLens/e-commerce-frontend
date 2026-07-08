@@ -110,7 +110,16 @@ export default function ProductCard({
   const { data: wishlistStatus } = useWishlistStatus(productType, actualProductId);
   const toggleWishlist = useToggleWishlist();
   const isWishlisted = Boolean(wishlistStatus?.isWishlisted);
+  const cartItems = useCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
+  const removeItem = useCartStore((s) => s.removeItem);
+
+  const existingCartItem = cartItems.find(
+    (item) =>
+      item.productId === actualProductId ||
+      item.id === `${actualProductId}-default-default`
+  );
+  const isInCart = Boolean(existingCartItem);
 
   useEffect(() => {
     setIsCompared(isProductCompared(actualProductId));
@@ -146,25 +155,31 @@ export default function ProductCard({
     }
   };
 
-  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleToggleCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
-    
-    addItem({
-      id: `${actualProductId}-default-default`,
-      productId: actualProductId,
-      title,
-      unitPrice: numPrice,
-      currency: "EGP",
-      size: sizeLabel || "Default",
-      color: "Default",
-      colorHex: "#000",
-      imageSrc,
-      quantity: 1,
-    });
-    
-    toast.success("Added to cart");
+
+    if (existingCartItem) {
+      removeItem(existingCartItem.id);
+      toast.success("Removed from cart");
+    } else {
+      const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
+
+      addItem({
+        id: `${actualProductId}-default-default`,
+        productId: actualProductId,
+        title,
+        unitPrice: numPrice,
+        currency: "EGP",
+        size: sizeLabel || "Default",
+        color: "Default",
+        colorHex: "#000",
+        imageSrc,
+        quantity: 1,
+      });
+
+      toast.success("Added to cart");
+    }
   };
 
   return (
@@ -187,7 +202,7 @@ export default function ProductCard({
           aria-label={isCompared ? "Remove from compare" : "Add to compare"}
           className={`absolute bottom-2 left-2 z-30 flex h-10 w-10 items-center justify-center rounded-full outline outline-1 outline-gray-light transition-all ${
             isCompared
-              ? "bg-primary text-primary-foregro und"
+              ? "bg-primary text-primary-foreground"
               : "bg-white text-foreground hover:bg-primary hover:text-primary-foreground"
           }`}
         >
@@ -250,9 +265,13 @@ export default function ProductCard({
 
         <button
           type="button"
-          onClick={handleAddToCart}
-          aria-label="Add to cart"
-          className="absolute bottom-2 right-2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground text-foreground"
+          onClick={handleToggleCart}
+          aria-label={isInCart ? "Remove from cart" : "Add to cart"}
+          className={`absolute bottom-2 right-2 z-20 flex h-10 w-10 items-center justify-center rounded-full outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 ${
+            isInCart
+              ? "bg-primary text-primary-foreground"
+              : "bg-white text-foreground hover:bg-primary hover:text-primary-foreground"
+          }`}
         >
           <ShoppingCart size={18} />
         </button>
