@@ -3,8 +3,105 @@ import { useCartStore } from "../store/useCartStore";
 import GoogleMapPicker from "../components/GoogleMap";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
-import { MapPin, CheckCircle2, Compass, Loader2 } from "lucide-react";
+import {
+  MapPin,
+  CheckCircle2,
+  Compass,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useMyAddresses } from "../hooks/queries/addressQuery";
+import type { Address } from "../hooks/queries/addressQuery";
+type SavedAddressesSectionProps = {
+  addresses: Address[];
+  selectedAddressId: string | null;
+  onSelect: (address: Address) => void;
+};
+function SavedAddressesSection({
+  addresses,
+  selectedAddressId,
+  onSelect,
+}: SavedAddressesSectionProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-2xl border border-stroke bg-card">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between p-5"
+      >
+        <div>
+          <h3 className="font-semibold text-foreground">Saved Addresses</h3>
+
+          <p className="text-sm text-gray-text">
+            {addresses.length} saved address
+            {addresses.length !== 1 && "es"}
+          </p>
+        </div>
+
+        <ChevronDown className={`transition ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="border-t border-stroke p-5">
+          <div className="grid gap-4 md:grid-cols-2">
+            {addresses.map((address) => {
+              const active = selectedAddressId === address.id;
+
+              return (
+                <button
+                  key={address.id}
+                  type="button"
+                  onClick={() => onSelect(address)}
+                  className={`
+          rounded-xl
+          border
+          p-4
+          text-left
+          transition-all
+          duration-300
+
+          ${
+            active
+              ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
+              : "border-stroke bg-card hover:border-primary/40"
+          }
+        `}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-semibold text-foreground">
+                        {address.area}
+                      </h4>
+
+                      <p className="mt-1 text-sm text-gray-text">
+                        {address.streetAddress}
+                      </p>
+
+                      {address.apartment && (
+                        <p className="text-sm text-gray-text">
+                          Apt {address.apartment}
+                        </p>
+                      )}
+
+                      <p className="mt-2 text-xs text-gray-text">
+                        {address.city}, {address.country}
+                      </p>
+                    </div>
+
+                    {active && <CheckCircle2 className="text-primary" />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function OrderSummary({
   items,
@@ -38,7 +135,9 @@ function OrderSummary({
     setIsValidating(true);
     setCouponError("");
     try {
-      const { data } = await api.get(`/coupons/validate/${couponCode.trim().toUpperCase()}`);
+      const { data } = await api.get(
+        `/coupons/validate/${couponCode.trim().toUpperCase()}`,
+      );
       const coupon = data?.data;
       if (coupon) {
         // Check if coupon actually applies to any item in cart
@@ -57,7 +156,9 @@ function OrderSummary({
         });
 
         if (!appliesToCart) {
-          setCouponError("This coupon does not apply to the items in your cart");
+          setCouponError(
+            "This coupon does not apply to the items in your cart",
+          );
           toast.error("This coupon does not apply to the items in your cart");
           setAppliedCoupon(null);
           return;
@@ -88,7 +189,10 @@ function OrderSummary({
     <div className="w-full flex flex-col gap-8 rounded-2xl bg-white px-4 py-6 outline outline-1 outline-offset-[-1px] outline-stroke">
       <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
         {items.map((item) => (
-          <div key={item.id} className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2">
+          <div
+            key={item.id}
+            className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
+          >
             <div className="relative shrink-0">
               <img
                 className="h-24 w-20 sm:h-28 sm:w-24 rounded object-cover bg-gray-100"
@@ -96,7 +200,9 @@ function OrderSummary({
                 alt={item.title}
               />
               <div className="absolute -right-2 -top-1 h-6 w-6 overflow-hidden rounded-lg bg-[#0F1115] flex items-center justify-center">
-                <span className="font-['Montserrat'] text-sm font-semibold text-primary">{item.quantity}</span>
+                <span className="font-['Montserrat'] text-sm font-semibold text-primary">
+                  {item.quantity}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-2 py-1">
@@ -131,7 +237,9 @@ function OrderSummary({
               }}
               className="flex h-14 sm:h-16 items-center justify-center bg-red-500 px-4 sm:px-6"
             >
-              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">Remove</span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
+                Remove
+              </span>
             </button>
           ) : (
             <button
@@ -157,27 +265,47 @@ function OrderSummary({
         )}
         <div className="flex flex-col gap-3 border-b border-stroke pb-4">
           <div className="flex items-center justify-between">
-            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">Subtotal</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">{formatCurrency(subtotal)}</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
+              Subtotal
+            </span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+              {formatCurrency(subtotal)}
+            </span>
           </div>
           {discountAmount > 0 && (
             <div className="flex items-center justify-between text-green-600">
-              <span className="font-['Montserrat'] text-sm sm:text-base font-medium">Discount ({appliedCoupon?.discount}%)</span>
-              <span className="font-['Montserrat'] text-sm sm:text-base font-bold">-{formatCurrency(discountAmount)}</span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-medium">
+                Discount ({appliedCoupon?.discount}%)
+              </span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-bold">
+                -{formatCurrency(discountAmount)}
+              </span>
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">Estimated Shipping</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">{formatCurrency(shipping)}</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
+              Estimated Shipping
+            </span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+              {formatCurrency(shipping)}
+            </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">Estimated Taxes</span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">Included</span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
+              Estimated Taxes
+            </span>
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+              Included
+            </span>
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Total</span>
-          <span className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">{formatCurrency(total)}</span>
+          <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">
+            Total
+          </span>
+          <span className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
+            {formatCurrency(total)}
+          </span>
         </div>
       </div>
     </div>
@@ -187,14 +315,30 @@ function OrderSummary({
 function DropdownArrow() {
   return (
     <div className="relative h-6 w-0 origin-top-left rotate-90 overflow-hidden">
-      <img src="/checkout/weui_arrow-filled-1.svg" className="absolute left-0 top-0 h-6 w-6" alt="" />
+      <img
+        src="/checkout/weui_arrow-filled-1.svg"
+        className="absolute left-0 top-0 h-6 w-6"
+        alt=""
+      />
     </div>
   );
 }
 
-function FormInput({ placeholder, value, onChange, className = "" }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; className?: string }) {
+function FormInput({
+  placeholder,
+  value,
+  onChange,
+  className = "",
+}: {
+  placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+}) {
   return (
-    <div className={`flex h-14 sm:h-16 items-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}>
+    <div
+      className={`flex h-14 sm:h-16 items-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+    >
       <input
         type="text"
         placeholder={placeholder}
@@ -206,19 +350,39 @@ function FormInput({ placeholder, value, onChange, className = "" }: { placehold
   );
 }
 
-function FormSelect({ placeholder, value, onChange, options = [], className = "" }: { placeholder: string; value?: string; onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void; options?: string[]; className?: string }) {
+function FormSelect({
+  placeholder,
+  value,
+  onChange,
+  options = [],
+  className = "",
+}: {
+  placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options?: string[];
+  className?: string;
+}) {
   return (
-    <div className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}>
+    <div
+      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+    >
       <select
         value={value}
         onChange={onChange}
         className="w-full h-full px-4 appearance-none bg-transparent font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10"
       >
-        <option value="" disabled className="text-gray-text">{placeholder}</option>
+        <option value="" disabled className="text-gray-text">
+          {placeholder}
+        </option>
         {options.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
         ))}
-        {value && !options.includes(value) && <option value={value}>{value}</option>}
+        {value && !options.includes(value) && (
+          <option value={value}>{value}</option>
+        )}
       </select>
       <div className="absolute right-4 z-0 pointer-events-none">
         <DropdownArrow />
@@ -240,34 +404,92 @@ type CheckoutFormData = {
   mapAddress?: string;
   latitude?: string;
   longitude?: string;
+  isAddressesLoading?: boolean;
 };
 
 function DeliverySection({
   data,
   onChange,
+  addresses,
+  selectedAddressId,
+  isAddressesLoading,
+  onSelectAddress,
 }: {
   data: CheckoutFormData;
   onChange: (field: keyof CheckoutFormData, value: string) => void;
-}) {
 
+  addresses: Address[];
+  selectedAddressId: string | null;
+  onSelectAddress: (address: Address) => void;
+}) {
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
-      <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">DELIVERY</h2>
+      <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">
+        DELIVERY
+      </h2>
       <div className="flex flex-col gap-4 sm:gap-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormInput placeholder="First name" value={data.firstName} onChange={e => onChange("firstName", e.target.value)} />
-          <FormInput placeholder="Last name" value={data.lastName} onChange={e => onChange("lastName", e.target.value)} />
+          <FormInput
+            placeholder="First name"
+            value={data.firstName}
+            onChange={(e) => onChange("firstName", e.target.value)}
+          />
+          <FormInput
+            placeholder="Last name"
+            value={data.lastName}
+            onChange={(e) => onChange("lastName", e.target.value)}
+          />
         </div>
-        <FormInput placeholder="Phone Number" value={data.phone} onChange={e => onChange("phone", e.target.value)} />
-        <FormInput placeholder="Email Address" value={data.email} onChange={e => onChange("email", e.target.value)} />
+        <FormInput
+          placeholder="Phone Number"
+          value={data.phone}
+          onChange={(e) => onChange("phone", e.target.value)}
+        />
+        <FormInput
+          placeholder="Email Address"
+          value={data.email}
+          onChange={(e) => onChange("email", e.target.value)}
+        />
+        {isAddressesLoading && (
+          <div className="p-10 text-center">Saved Addresses are loading...</div>
+        )}
+        {!isAddressesLoading && addresses && addresses.length > 0 && (
+          <SavedAddressesSection
+            addresses={addresses}
+            selectedAddressId={selectedAddressId}
+            onSelect={onSelectAddress}
+          />
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormSelect placeholder="Country" value={data.country} onChange={e => onChange("country", e.target.value)} options={["Egypt", "Saudi Arabia", "UAE"]} />
-          <FormSelect placeholder="City" value={data.city} onChange={e => onChange("city", e.target.value)} options={["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"]} />
+          <FormSelect
+            placeholder="Country"
+            value={data.country}
+            onChange={(e) => onChange("country", e.target.value)}
+            options={["Egypt", "Saudi Arabia", "UAE"]}
+          />
+          <FormSelect
+            placeholder="City"
+            value={data.city}
+            onChange={(e) => onChange("city", e.target.value)}
+            options={["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"]}
+          />
         </div>
-        <FormInput placeholder="Area" value={data.area} onChange={e => onChange("area", e.target.value)} />
+        <FormInput
+          placeholder="Area"
+          value={data.area}
+          onChange={(e) => onChange("area", e.target.value)}
+        />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormInput placeholder="Street Address" value={data.streetAddress} onChange={e => onChange("streetAddress", e.target.value)} />
-          <FormInput placeholder="Apartment" value={data.apartment} onChange={e => onChange("apartment", e.target.value)} />
+          <FormInput
+            placeholder="Street Address"
+            value={data.streetAddress}
+            onChange={(e) => onChange("streetAddress", e.target.value)}
+          />
+          <FormInput
+            placeholder="Apartment"
+            value={data.apartment}
+            onChange={(e) => onChange("apartment", e.target.value)}
+          />
         </div>
 
         {/* Confirmed Map Location Field */}
@@ -283,7 +505,12 @@ function DeliverySection({
             <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-50/50 dark:bg-zinc-900/50 text-gray-text transition-all duration-300">
               <Compass className="h-5 w-5 text-gray-400 animate-pulse shrink-0" />
               <p className="font-['Montserrat'] text-xs sm:text-sm font-medium">
-                No location confirmed yet. Please select your delivery location on the map below and click <span className="font-semibold text-foreground">Confirm Location</span>.
+                No location confirmed yet. Please select your delivery location
+                on the map below and click{" "}
+                <span className="font-semibold text-foreground">
+                  Confirm Location
+                </span>
+                .
               </p>
             </div>
           ) : (
@@ -301,7 +528,8 @@ function DeliverySection({
                     </span>
                     {data.latitude && data.longitude && (
                       <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-green-700 dark:text-green-300">
-                        {parseFloat(data.latitude).toFixed(5)}, {parseFloat(data.longitude).toFixed(5)}
+                        {parseFloat(data.latitude).toFixed(5)},{" "}
+                        {parseFloat(data.longitude).toFixed(5)}
                       </span>
                     )}
                   </div>
@@ -315,16 +543,24 @@ function DeliverySection({
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">Select on Map</div>
+          <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+            Select on Map
+          </div>
           <GoogleMapPicker
             onLocationPick={(loc) => {
               // Set the confirmed address field and coordinates
-              const fullAddr = loc.displayAddress || [loc.streetAddress, loc.area, loc.city].filter(Boolean).join(", ");
+              const fullAddr =
+                loc.displayAddress ||
+                [loc.streetAddress, loc.area, loc.city]
+                  .filter(Boolean)
+                  .join(", ");
               onChange("mapAddress", fullAddr);
               if (loc.lat) onChange("latitude", loc.lat.toString());
               if (loc.lng) onChange("longitude", loc.lng.toString());
             }}
-            searchQuery={[data.streetAddress, data.city, data.country].filter(Boolean).join(", ")}
+            searchQuery={[data.streetAddress, data.city, data.country]
+              .filter(Boolean)
+              .join(", ")}
           />
         </div>
       </div>
@@ -336,7 +572,9 @@ function PaymentMethodSection() {
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
       <div className="flex flex-col gap-2">
-        <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">PAYMENT METHOD</h2>
+        <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">
+          PAYMENT METHOD
+        </h2>
         <p className="font-['Montserrat'] text-base sm:text-xl font-medium text-gray-text">
           All transactions are secure and encrypted.
         </p>
@@ -344,14 +582,30 @@ function PaymentMethodSection() {
       <div className="rounded-lg bg-gray-light outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden">
         <div className="flex items-center justify-between p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-secondary">
           <div className="flex items-center gap-2.5">
-            <img src="/checkout/ri_radio-button-line.svg" className="h-5 w-5 sm:h-6 sm:w-6" alt="" />
-            <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">Credit card</span>
+            <img
+              src="/checkout/ri_radio-button-line.svg"
+              className="h-5 w-5 sm:h-6 sm:w-6"
+              alt=""
+            />
+            <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+              Credit card
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <img src="/checkout/logos_visaelectron.svg" className="h-6 w-8 sm:h-8 sm:w-10" alt="Visa" />
-            <img src="/checkout/logos_mastercard.svg" className="h-6 w-8 sm:h-8 sm:w-10" alt="Mastercard" />
+            <img
+              src="/checkout/logos_visaelectron.svg"
+              className="h-6 w-8 sm:h-8 sm:w-10"
+              alt="Visa"
+            />
+            <img
+              src="/checkout/logos_mastercard.svg"
+              className="h-6 w-8 sm:h-8 sm:w-10"
+              alt="Mastercard"
+            />
             <div className="flex h-6 w-8 sm:h-8 sm:w-10 items-center justify-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke">
-              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">+3</span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+                +3
+              </span>
             </div>
           </div>
         </div>
@@ -365,8 +619,14 @@ function PaymentMethodSection() {
         </div>
         <div className="flex items-center justify-between rounded-b-lg bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
           <div className="flex items-center gap-2.5">
-            <img src="/checkout/ri_radio-button-line.svg" className="h-5 w-5 sm:h-6 sm:w-6" alt="" />
-            <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">Cash on Delivery</span>
+            <img
+              src="/checkout/ri_radio-button-line.svg"
+              className="h-5 w-5 sm:h-6 sm:w-6"
+              alt=""
+            />
+            <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+              Cash on Delivery
+            </span>
           </div>
         </div>
       </div>
@@ -374,21 +634,37 @@ function PaymentMethodSection() {
   );
 }
 
-function RememberMeSection({ onPay, loading }: { onPay: () => void; loading: boolean }) {
+function RememberMeSection({
+  onPay,
+  loading,
+}: {
+  onPay: () => void;
+  loading: boolean;
+}) {
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
-      <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">REMEMBER ME</h2>
+      <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">
+        REMEMBER ME
+      </h2>
       <div className="flex flex-col gap-4">
         <div className="flex items-center rounded-lg bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
           <div className="flex items-center gap-2.5">
-            <img src="/checkout/ri_radio-button-line.svg" className="h-5 w-5 sm:h-6 sm:w-6" alt="" />
+            <img
+              src="/checkout/ri_radio-button-line.svg"
+              className="h-5 w-5 sm:h-6 sm:w-6"
+              alt=""
+            />
             <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
               Save my information for a faster checkout
             </span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <img src="/checkout/material-symbols_lock-outline.svg" className="h-4 w-4" alt="" />
+          <img
+            src="/checkout/material-symbols_lock-outline.svg"
+            className="h-4 w-4"
+            alt=""
+          />
           <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-gray-text">
             Secure and encrypted
           </span>
@@ -403,7 +679,8 @@ function RememberMeSection({ onPay, loading }: { onPay: () => void; loading: boo
             Terms of Service
           </span>
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-            {" "}&amp;{" "}
+            {" "}
+            &amp;{" "}
           </span>
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-[#0284C7] underline">
             Privacy Policy
@@ -417,10 +694,14 @@ function RememberMeSection({ onPay, loading }: { onPay: () => void; loading: boo
           {loading ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin text-foreground" />
-              <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Processing...</span>
+              <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">
+                Processing...
+              </span>
             </>
           ) : (
-            <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Pay now</span>
+            <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">
+              Pay now
+            </span>
           )}
         </button>
       </div>
@@ -451,13 +732,21 @@ export default function CheckoutPage() {
     longitude: "",
   });
 
+  const { data: addresses = [], isLoading: isAddressesLoading } =
+    useMyAddresses();
+
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null,
+  );
+
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(initialCoupon);
   const [couponError, setCouponError] = useState("");
 
   const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
-    [items]
+    () =>
+      items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+    [items],
   );
 
   const discountAmount = useMemo(() => {
@@ -467,10 +756,16 @@ export default function CheckoutPage() {
     let hasMatchingItem = false;
     items.forEach((item) => {
       let isQualifying = true;
-      if (appliedCoupon.categoryId && item.categoryId !== appliedCoupon.categoryId) {
+      if (
+        appliedCoupon.categoryId &&
+        item.categoryId !== appliedCoupon.categoryId
+      ) {
         isQualifying = false;
       }
-      if (appliedCoupon.productId && item.productId !== appliedCoupon.productId) {
+      if (
+        appliedCoupon.productId &&
+        item.productId !== appliedCoupon.productId
+      ) {
         isQualifying = false;
       }
       if (isQualifying) {
@@ -495,16 +790,28 @@ export default function CheckoutPage() {
 
   const handleCheckout = async () => {
     if (isSubmitting) return;
-    if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.phone ||
+      !formData.email
+    ) {
       toast.error("Please fill in all required contact details");
       return;
     }
-    if (!formData.country || !formData.city || !formData.area || !formData.streetAddress) {
+    if (
+      !formData.country ||
+      !formData.city ||
+      !formData.area ||
+      !formData.streetAddress
+    ) {
       toast.error("Please fill in all delivery address details");
       return;
     }
     if (!formData.mapAddress) {
-      toast.error("Please select and confirm your delivery location on the map");
+      toast.error(
+        "Please select and confirm your delivery location on the map",
+      );
       return;
     }
 
@@ -518,7 +825,7 @@ export default function CheckoutPage() {
         total,
         couponCode: appliedCoupon?.code || null,
         paymentMethod: "COD", // Defaulting to Cash on Delivery for this checkout flow
-        items: items.map(item => ({
+        items: items.map((item) => ({
           productId: item.productId,
           title: item.title,
           unitPrice: item.unitPrice,
@@ -537,7 +844,8 @@ export default function CheckoutPage() {
       navigate("/my-orders");
     } catch (err: any) {
       console.error("Order creation failed:", err);
-      const errMsg = err.response?.data?.message || "An error occurred during checkout";
+      const errMsg =
+        err.response?.data?.message || "An error occurred during checkout";
       toast.error(errMsg);
     } finally {
       setIsSubmitting(false);
@@ -548,7 +856,24 @@ export default function CheckoutPage() {
     <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
         <div className="flex-1 flex flex-col gap-8 sm:gap-12">
-          <DeliverySection data={formData} onChange={handleChange} />
+          <DeliverySection
+            data={formData}
+            onChange={handleChange}
+            addresses={addresses}
+            selectedAddressId={selectedAddressId}
+            onSelectAddress={(address) => {
+              setSelectedAddressId(address.id);
+
+              setFormData((prev) => ({
+                ...prev,
+                country: address.country,
+                city: address.city,
+                area: address.area,
+                streetAddress: address.streetAddress,
+                apartment: address.apartment ?? "",
+              }));
+            }}
+          />
           <PaymentMethodSection />
           <RememberMeSection onPay={handleCheckout} loading={isSubmitting} />
         </div>
