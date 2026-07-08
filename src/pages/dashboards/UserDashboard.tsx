@@ -1,6 +1,6 @@
 import { useAuthStore } from "../../store/useAuthStore";
 import { asset } from '../../lib/utils';
-import ProductsSection from "../../components/shared/ProductsSection";
+import { RecommedProducts } from "../../components/product/recommedProducts";
 import { useWishlist } from "../../hooks/useWishlist";
 import { useRecentStore } from "../../store/useRecentStore";
 import { useProducts } from "../../hooks/queries/productsQuery";
@@ -112,13 +112,9 @@ export default function UserDashboard() {
         />
       </div>
 
-      <ProductsSection
-        title="Recommended for You"
-        navigateTo="/products?filter=flash-deals"
-        query={{
-          filter: "flash-deals",
-        }}
-      />
+      <div className="mt-8">
+        <RecommedProducts />
+      </div>
     </div>
   );
 }

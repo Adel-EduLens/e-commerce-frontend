@@ -123,7 +123,7 @@ export function CompareCard({
         <InfoRow
           icon={<ShoppingBag size={18} />}
           label={t("card.brand")}
-          value={product.brand.name}
+          value={product.brand?.name ?? '—'}
         />
 
         {/* Category */}
