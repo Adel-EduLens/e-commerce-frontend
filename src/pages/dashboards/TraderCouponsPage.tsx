@@ -155,6 +155,7 @@ export default function TraderCouponsPage() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCouponForModal, setSelectedCouponForModal] = useState<Coupon | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // TanStack Query Mutations
   const createCouponMutation = useMutation({
@@ -171,6 +172,7 @@ export default function TraderCouponsPage() {
       setSelectedCategory("");
       setSelectedProduct("");
       setUsageLimit("");
+      setIsCreateModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
     },
     onError: (error) => {
@@ -225,7 +227,23 @@ export default function TraderCouponsPage() {
 
   return (
     <div className="space-y-6">
-      {/* ── Heading / Stat cards ── */}
+      {/* ── Heading / Create Coupon Trigger ── */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="font-['Montserrat'] text-2xl font-bold text-foreground">Trader Coupons</h1>
+          <p className="text-sm text-gray-text">Manage, activate/deactivate, and view your store coupons.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer shadow-sm"
+        >
+          <Plus className="h-5 w-5" style={{ strokeWidth: 3 }} />
+          <span>Create Coupon</span>
+        </button>
+      </div>
+
+      {/* ── Stat cards ── */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
@@ -260,207 +278,127 @@ export default function TraderCouponsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* ── Create Coupon Form ── */}
-        <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm h-fit">
-          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-            <Plus className="h-5 w-5 text-primary" style={{ strokeWidth: 3 }} />
-            Create Coupon
-          </h2>
-          <form onSubmit={handleCreateCoupon} className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-text mb-1">Coupon Code</label>
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="e.g. SUMMER30"
-                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
-              />
-            </div>
+      {/* ── Coupons List Table ── */}
+      <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm w-full">
+        <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
+          Coupon Management
+        </h2>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-text mb-1">Discount (%)</label>
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={discount}
-                onChange={(e) => setDiscount(Number(e.target.value))}
-                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-text mb-1">Valid Until</label>
-              <input
-                type="datetime-local"
-                value={validUntil}
-                onChange={(e) => setValidUntil(e.target.value)}
-                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-text mb-1">Usage Limit (Optional)</label>
-              <input
-                type="number"
-                min="1"
-                value={usageLimit}
-                onChange={(e) => setUsageLimit(e.target.value)}
-                placeholder="e.g. 100 (Blank for unlimited)"
-                className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
-              />
-            </div>
-
-            <SearchableSelect
-              label="Category Restriction (Optional)"
-              placeholder="Search or select category..."
-              options={categories}
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              emptyLabel="No Restriction (Applies to all)"
-            />
-
-            <SearchableSelect
-              label="Product Restriction (Optional)"
-              placeholder="Search or select product..."
-              options={products}
-              value={selectedProduct}
-              onChange={setSelectedProduct}
-              emptyLabel="No Restriction (Applies to all)"
-            />
-
-            <button
-              type="submit"
-              disabled={createCouponMutation.isPending}
-              className="w-full h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50"
-            >
-              {createCouponMutation.isPending ? "Creating..." : "Create Coupon"}
-            </button>
-          </form>
-        </div>
-
-        {/* ── Coupons List Table ── */}
-        <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm lg:col-span-2">
-          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
-            Coupon Management
-          </h2>
-
-          {loading ? (
-            <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-              Loading coupons...
-            </div>
-          ) : coupons.length === 0 ? (
-            <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-              No coupons created yet. Use the left form to add your first coupon!
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
-                    <th className="py-3 pr-4">Code</th>
-                    <th className="py-3 px-4">Discount</th>
-                    <th className="py-3 px-4">Restrictions</th>
-                    <th className="py-3 px-4">Uses / Limit</th>
-                    <th className="py-3 px-4">Expiry</th>
-                    <th className="py-3 px-4">Status</th>
-                    <th className="py-3 pl-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {coupons.map((coupon) => {
-                    const isExpired = new Date(coupon.validUntil) <= new Date();
-                    return (
-                      <tr key={coupon.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-background transition">
-                        <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
-                          {coupon.code}
-                        </td>
-                        <td className="py-4 px-4 font-['Montserrat'] font-semibold">
-                          {coupon.discount}% OFF
-                        </td>
-                        <td className="py-4 px-4">
-                          {coupon.product ? (
-                            <span className="inline-flex items-center gap-1 rounded-xl bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs text-blue-600 font-medium">
-                              <ShoppingBag className="h-3 w-3" />
-                              {coupon.product.name}
-                            </span>
-                          ) : coupon.category ? (
-                            <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
-                              <Tag className="h-3 w-3" />
-                              {coupon.category.name}
-                            </span>
-                          ) : (
-                            <span className="text-gray-text text-xs">Global Coupon</span>
-                          )}
-                        </td>
-                        <td className="py-4 px-4 font-['Montserrat'] text-xs font-semibold text-gray-text">
-                          {coupon.usedCount} / {coupon.usageLimit !== null ? coupon.usageLimit : "∞"}
-                        </td>
-                        <td className="py-4 px-4 font-['Montserrat'] text-xs text-gray-text">
-                          {new Date(coupon.validUntil).toLocaleDateString()}
-                        </td>
-                        <td className="py-4 px-4">
-                          {!coupon.isActive ? (
-                            <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
-                              Inactive
-                            </span>
-                          ) : isExpired ? (
-                            <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
-                              Expired
-                            </span>
-                          ) : coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit ? (
-                            <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
-                              Limit Reached
-                            </span>
-                          ) : (
-                            <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
-                              Active
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 pl-4 text-right">
-                          <div className="flex items-center justify-end gap-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedCouponForModal(coupon);
-                                setIsModalOpen(true);
-                              }}
-                              className="text-[#667085] hover:text-primary transition"
-                              aria-label="View coupon usages"
-                              title="View usages"
-                            >
-                              <Eye className="h-5 w-5" />
-                            </button>
-                            {/* Toggle switch for active status */}
-                            <button
-                              type="button"
-                              onClick={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
-                              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                                coupon.isActive ? "bg-green-500" : "bg-gray-300"
+        {loading ? (
+          <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
+            Loading coupons...
+          </div>
+        ) : coupons.length === 0 ? (
+          <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
+            No coupons created yet. Use the left form to add your first coupon!
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
+                  <th className="py-3 pr-4">Code</th>
+                  <th className="py-3 px-4">Discount</th>
+                  <th className="py-3 px-4">Restrictions</th>
+                  <th className="py-3 px-4">Uses / Limit</th>
+                  <th className="py-3 px-4">Expiry</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Used By</th>
+                  <th className="py-3 pl-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {coupons.map((coupon) => {
+                  const isExpired = new Date(coupon.validUntil) <= new Date();
+                  return (
+                    <tr key={coupon.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-background transition">
+                      <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
+                        {coupon.code}
+                      </td>
+                      <td className="py-4 px-4 font-['Montserrat'] font-semibold">
+                        {coupon.discount}% OFF
+                      </td>
+                      <td className="py-4 px-4">
+                        {coupon.product ? (
+                          <span className="inline-flex items-center gap-1 rounded-xl bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs text-blue-600 font-medium">
+                            <ShoppingBag className="h-3 w-3" />
+                            {coupon.product.name}
+                          </span>
+                        ) : coupon.category ? (
+                          <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
+                            <Tag className="h-3 w-3" />
+                            {coupon.category.name}
+                          </span>
+                        ) : (
+                          <span className="text-gray-text text-xs">Global Coupon</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4 font-['Montserrat'] text-xs font-semibold text-gray-text">
+                        {coupon.usedCount} / {coupon.usageLimit !== null ? coupon.usageLimit : "∞"}
+                      </td>
+                      <td className="py-4 px-4 font-['Montserrat'] text-xs text-gray-text">
+                        {new Date(coupon.validUntil).toLocaleDateString()}
+                      </td>
+                      <td className="py-4 px-4">
+                        {!coupon.isActive ? (
+                          <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+                            Inactive
+                          </span>
+                        ) : isExpired ? (
+                          <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
+                            Expired
+                          </span>
+                        ) : coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit ? (
+                          <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                            Limit Reached
+                          </span>
+                        ) : (
+                          <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
+                            Active
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCouponForModal(coupon);
+                            setIsModalOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 text-secondary hover:bg-primary/20 transition text-xs font-semibold cursor-pointer"
+                          aria-label="View coupon usages"
+                          title="View usages"
+                        >
+                          <Eye className="h-4 w-4" />
+                          <span>View Usages</span>
+                        </button>
+                      </td>
+                      <td className="py-4 pl-4 text-right">
+                        <div className="flex items-center justify-end gap-3">
+                          {/* Toggle switch for active status */}
+                          <button
+                            type="button"
+                            onClick={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
+                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${coupon.isActive ? "bg-green-500" : "bg-gray-300"
                               }`}
-                              role="switch"
-                              aria-checked={coupon.isActive}
-                              title={coupon.isActive ? "Deactivate Coupon" : "Activate Coupon"}
-                            >
-                              <span
-                                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                  coupon.isActive ? "translate-x-5" : "translate-x-0"
+                            role="switch"
+                            aria-checked={coupon.isActive}
+                            title={coupon.isActive ? "Deactivate Coupon" : "Activate Coupon"}
+                          >
+                            <span
+                              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${coupon.isActive ? "translate-x-5" : "translate-x-0"
                                 }`}
-                              />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* ── Coupon Usages Modal ── */}
@@ -532,6 +470,109 @@ export default function TraderCouponsPage() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create Coupon Modal ── */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl border border-stroke bg-white p-6 shadow-xl animate-scale-up max-h-[90vh] overflow-y-auto animate-duration-200">
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-text hover:text-foreground transition cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            <h2 className="font-['Montserrat'] text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+              <Plus className="h-6 w-6 text-primary" style={{ strokeWidth: 3 }} />
+              Create New Coupon
+            </h2>
+
+            <form onSubmit={handleCreateCoupon} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-text mb-1">Coupon Code</label>
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="e.g. SUMMER30"
+                  className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-text mb-1">Discount (%)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={discount}
+                  onChange={(e) => setDiscount(Number(e.target.value))}
+                  className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-text mb-1">Valid Until</label>
+                <input
+                  type="datetime-local"
+                  value={validUntil}
+                  onChange={(e) => setValidUntil(e.target.value)}
+                  className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-text mb-1">Usage Limit (Optional)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={usageLimit}
+                  onChange={(e) => setUsageLimit(e.target.value)}
+                  placeholder="e.g. 100 (Blank for unlimited)"
+                  className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
+                />
+              </div>
+
+              <SearchableSelect
+                label="Category Restriction (Optional)"
+                placeholder="Search or select category..."
+                options={categories}
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                emptyLabel="No Restriction (Applies to all)"
+              />
+
+              <SearchableSelect
+                label="Product Restriction (Optional)"
+                placeholder="Search or select product..."
+                options={products}
+                value={selectedProduct}
+                onChange={setSelectedProduct}
+                emptyLabel="No Restriction (Applies to all)"
+              />
+
+              <div className="pt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="flex-1 h-12 border border-stroke text-foreground hover:bg-background font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={createCouponMutation.isPending}
+                  className="flex-1 h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50 cursor-pointer"
+                >
+                  {createCouponMutation.isPending ? "Creating..." : "Create Coupon"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
