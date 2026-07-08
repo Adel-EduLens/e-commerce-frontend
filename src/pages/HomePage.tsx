@@ -469,9 +469,10 @@ export function HomePage() {
       <CategoriesSection />
       <ProductsSection
         title="Recommended for You"
-        navigateTo="/products?filter=flash-deals"
+        navigateTo="/products"
         query={{
-          filter: "flash-deals",
+          sortBy: "rating",
+          sortOrder: "desc",
         }}
       />
       <VoteSection />

@@ -35,6 +35,13 @@ export default function TraderProductsPage() {
     sizes: p.sizes?.map((s) => s.size) ?? [],
     colors: p.colors?.map((c) => c.color) ?? [],
     minOrder: 1,
+    isMustHave: p.isMustHave ?? false,
+    isFlashDeals: p.isFlashDeals ?? false,
+    flashDealPrice: p.flashDealPrice ?? null,
+    flashDealEndsAt: p.flashDealEndsAt ?? null,
+    isBestDeal: false,
+    isMostPopular: false,
+    isPremiumCollection: false,
   }));
 
   const errorMessages = isError

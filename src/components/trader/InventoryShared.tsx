@@ -138,6 +138,13 @@ export function AddItemModal({
   const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
   const [wholesalePreview, setWholesalePreview] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
+  const [isMustHave, setIsMustHave] = useState(false);
+  const [isFlashDeals, setIsFlashDeals] = useState(false);
+  const [flashDealPrice, setFlashDealPrice] = useState("");
+  const [flashDealEndsAt, setFlashDealEndsAt] = useState("");
+  const [isBestDeal, setIsBestDeal] = useState(false);
+  const [isMostPopular, setIsMostPopular] = useState(false);
+  const [isPremiumCollection, setIsPremiumCollection] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -188,6 +195,10 @@ export function AddItemModal({
           name, description, price: Number(price), categoryId, images,
           sizes: selectedSizes, colors: selectedColors,
           sku: sku || undefined, stock: stock ? Number(stock) : 0,
+          isMustHave,
+          isFlashDeals,
+          flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,
+          flashDealEndsAt: isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
         });
       } else {
         const wholesaleUrl = await uploadImageFile(wholesaleFile!);
@@ -195,7 +206,7 @@ export function AddItemModal({
         await createWholesale.mutateAsync({
           name, description, price: Number(price), categoryId,
           brand: "", minOrder: Number(minOrder) || 1,
-          isBestDeal: false, isMostPopular: false, isPremiumCollection: false,
+          isBestDeal, isMostPopular, isPremiumCollection,
           images: [{ url: wholesaleUrl }],
           sku: sku || undefined, stock: stock ? Number(stock) : 0,
         });
@@ -254,6 +265,53 @@ export function AddItemModal({
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
 
           {type === "product" && (
+            <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
+              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Product Attributes</p>
+              {/* Must Have toggle */}
+              <div className="flex items-center justify-between">
+                <span className="font-['Montserrat'] text-sm text-foreground">Must Have</span>
+                <button
+                  type="button"
+                  onClick={() => setIsMustHave((v) => !v)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${isMustHave ? "bg-primary" : "bg-gray-200"}`}
+                >
+                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+              {/* Flash Deal toggle */}
+              <div className="flex items-center justify-between">
+                <span className="font-['Montserrat'] text-sm text-foreground">Flash Deal</span>
+                <button
+                  type="button"
+                  onClick={() => setIsFlashDeals((v) => !v)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${isFlashDeals ? "bg-primary" : "bg-gray-200"}`}
+                >
+                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+              {/* Flash deal extra fields */}
+              {isFlashDeals && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <input
+                    placeholder="Deal price *"
+                    type="number"
+                    min="0"
+                    value={flashDealPrice}
+                    onChange={(e) => setFlashDealPrice(e.target.value)}
+                    className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                  />
+                  <input
+                    type="datetime-local"
+                    value={flashDealEndsAt}
+                    onChange={(e) => setFlashDealEndsAt(e.target.value)}
+                    className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {type === "product" && (
             <>
               <MultiSelect label="Select sizes *" options={SIZE_OPTIONS} selected={selectedSizes} onChange={setSelectedSizes} />
               <MultiSelect label="Select colors *" options={COLOR_OPTIONS} selected={selectedColors} onChange={handleColorsChange} />
@@ -291,6 +349,25 @@ export function AddItemModal({
               </div>
               <input placeholder="Min order quantity" type="number" min="1" value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
                 className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Wholesale Attributes</p>
+                {([
+                  { label: "Best Deal", value: isBestDeal, set: setIsBestDeal },
+                  { label: "Most Popular", value: isMostPopular, set: setIsMostPopular },
+                  { label: "Premium Collection", value: isPremiumCollection, set: setIsPremiumCollection },
+                ] as const).map(({ label, value, set }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <span className="font-['Montserrat'] text-sm text-foreground">{label}</span>
+                    <button
+                      type="button"
+                      onClick={() => set((v) => !v)}
+                      className={`relative h-6 w-11 rounded-full transition-colors ${value ? "bg-primary" : "bg-gray-200"}`}
+                    >
+                      <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </>
           )}
 
@@ -317,6 +394,15 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
   const [selectedSizes, setSelectedSizes] = useState<string[]>(item.sizes);
   const [selectedColors, setSelectedColors] = useState<string[]>(item.colors);
   const [minOrder, setMinOrder] = useState(String(item.minOrder));
+  const [isMustHave, setIsMustHave] = useState(item.isMustHave);
+  const [isFlashDeals, setIsFlashDeals] = useState(item.isFlashDeals);
+  const [flashDealPrice, setFlashDealPrice] = useState(item.flashDealPrice != null ? String(item.flashDealPrice) : "");
+  const [flashDealEndsAt, setFlashDealEndsAt] = useState(
+    item.flashDealEndsAt ? item.flashDealEndsAt.slice(0, 16) : ""
+  );
+  const [isBestDeal, setIsBestDeal] = useState(item.isBestDeal);
+  const [isMostPopular, setIsMostPopular] = useState(item.isMostPopular);
+  const [isPremiumCollection, setIsPremiumCollection] = useState(item.isPremiumCollection);
 
   const [colorFiles, setColorFiles] = useState<Record<string, File>>({});
   const [colorPreviews, setColorPreviews] = useState<Record<string, string>>(() => {
@@ -367,6 +453,10 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
           id: item.id, name, description, price: Number(price), categoryId,
           images, sizes: selectedSizes, colors: selectedColors,
           sku: sku || undefined, stock: Number(stock),
+          isMustHave,
+          isFlashDeals,
+          flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,
+          flashDealEndsAt: isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
         });
       } else {
         const wholesaleUrl = wholesaleFile ? await uploadImageFile(wholesaleFile) : item.image;
@@ -375,7 +465,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
           id: item.id, name, description, price: Number(price), categoryId,
           images: [{ url: wholesaleUrl }], minOrder: Number(minOrder) || 1,
           sku: sku || undefined, stock: Number(stock),
-          brand: "", isBestDeal: false, isMostPopular: false, isPremiumCollection: false,
+          brand: "", isBestDeal, isMostPopular, isPremiumCollection,
         });
       }
       onClose();
@@ -419,6 +509,50 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
 
           {item.type === "product" && (
+            <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
+              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Product Attributes</p>
+              <div className="flex items-center justify-between">
+                <span className="font-['Montserrat'] text-sm text-foreground">Must Have</span>
+                <button
+                  type="button"
+                  onClick={() => setIsMustHave((v) => !v)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${isMustHave ? "bg-primary" : "bg-gray-200"}`}
+                >
+                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-['Montserrat'] text-sm text-foreground">Flash Deal</span>
+                <button
+                  type="button"
+                  onClick={() => setIsFlashDeals((v) => !v)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${isFlashDeals ? "bg-primary" : "bg-gray-200"}`}
+                >
+                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+              </div>
+              {isFlashDeals && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <input
+                    placeholder="Deal price *"
+                    type="number"
+                    min="0"
+                    value={flashDealPrice}
+                    onChange={(e) => setFlashDealPrice(e.target.value)}
+                    className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                  />
+                  <input
+                    type="datetime-local"
+                    value={flashDealEndsAt}
+                    onChange={(e) => setFlashDealEndsAt(e.target.value)}
+                    className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {item.type === "product" && (
             <>
               <MultiSelect label="Sizes" options={SIZE_OPTIONS} selected={selectedSizes} onChange={setSelectedSizes} />
               <MultiSelect label="Colors" options={COLOR_OPTIONS} selected={selectedColors} onChange={handleColorsChange} />
@@ -459,6 +593,25 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
               </div>
               <input placeholder="Min order quantity" type="number" min="1" value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
                 className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Wholesale Attributes</p>
+                {([
+                  { label: "Best Deal", value: isBestDeal, set: setIsBestDeal },
+                  { label: "Most Popular", value: isMostPopular, set: setIsMostPopular },
+                  { label: "Premium Collection", value: isPremiumCollection, set: setIsPremiumCollection },
+                ] as const).map(({ label, value, set }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <span className="font-['Montserrat'] text-sm text-foreground">{label}</span>
+                    <button
+                      type="button"
+                      onClick={() => set((v) => !v)}
+                      className={`relative h-6 w-11 rounded-full transition-colors ${value ? "bg-primary" : "bg-gray-200"}`}
+                    >
+                      <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </>
           )}
 
@@ -699,8 +852,30 @@ export function InventoryTablePanel({
                 <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}>Cards</span>
               </button>
             </div>
-            <button type="button"
-              className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
+            <button
+              type="button"
+              onClick={() => {
+                const headers = showTypeFilter
+                  ? ["Product", "Category", "Type", "Stock", "SKU", "Price", "Date", "Status"]
+                  : ["Product", "Category", "Stock", "SKU", "Price", "Date", "Status"];
+                const rows = filtered.map((i) =>
+                  showTypeFilter
+                    ? [i.product, i.category, i.type, i.stock, i.sku, i.priceNum, i.date, i.status]
+                    : [i.product, i.category, i.stock, i.sku, i.priceNum, i.date, i.status]
+                );
+                const csv = [headers, ...rows]
+                  .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+                  .join("\n");
+                const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${title.replace(/\s+/g, "_").toLowerCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+            >
               <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
               Export
             </button>

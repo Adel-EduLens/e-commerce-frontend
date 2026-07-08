@@ -138,6 +138,13 @@ export default function TraderWholesalePage() {
     sizes: [],
     colors: [],
     minOrder: w.minOrder ?? 1,
+    isMustHave: false,
+    isFlashDeals: false,
+    flashDealPrice: null,
+    flashDealEndsAt: null,
+    isBestDeal: w.isBestDeal ?? false,
+    isMostPopular: w.isMostPopular ?? false,
+    isPremiumCollection: w.isPremiumCollection ?? false,
   }));
 
   const topSellingProducts = traderWholesales.slice(0, 3).map((w, idx) => ({
