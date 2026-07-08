@@ -53,7 +53,7 @@ function ProductGallery({ title, products = [], onNavigate }: { title: string; p
           </div>
           {/* Thumbnail column */}
           {thumbnailProducts.length > 0 && (
-            <div className="hidden sm:flex w-24 flex-col gap-2">
+            <div className="hidden sm:flex flex-1 flex-col gap-2">
               {thumbnailProducts.map((prod, i) => (
                 <div key={i} className="flex-1 bg-background rounded-lg overflow-hidden aspect-square relative flex items-center justify-center">
                   <img
