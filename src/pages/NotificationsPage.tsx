@@ -176,43 +176,12 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-6">
-      {/* Header */}
+    <div className="flex w-full max-w-2xl flex-col gap-8">
+      {/* Title row */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-6">
-          <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-            {t("NOTIFICATIONS")}
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {collectionCategories.map((cat) => {
-              const enabled = subscribedIds.includes(cat.id);
-              return (
-                <div key={cat.id} className="flex flex-col items-center gap-3 rounded-2xl border border-stroke bg-card p-4">
-                  <img
-                    src={COLLECTION_IMAGES[cat.name] ?? ""}
-                    className="h-16 w-16 rounded-full object-cover object-top"
-                    alt={cat.name}
-                    draggable={false}
-                  />
-                  <div className="font-['Montserrat'] text-base font-medium text-foreground text-center">
-                    {t(cat.name)}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => enabled ? unsubscribe(cat.id) : subscribe(cat.id)}
-                    className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 ${enabled ? "bg-primary" : "bg-stroke"}`}
-                  >
-                    <span
-                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 ${enabled ? "translate-x-6" : "translate-x-1"}`}
-                    />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+        <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
+          {t("NOTIFICATIONS")}
         </div>
-
-
         {unreadCount > 0 && (
           <button
             type="button"
@@ -225,6 +194,45 @@ export default function NotificationsPage() {
           </button>
         )}
       </div>
+
+      {/* Category subscription cards */}
+      {collectionCategories.length > 0 && (
+        <div className="flex gap-3">
+          {collectionCategories.map((cat) => {
+            const enabled = subscribedIds.includes(cat.id);
+            return (
+              <div
+                key={cat.id}
+                className="flex flex-1 items-center gap-2 rounded-xl bg-card border border-stroke px-3 py-2"
+              >
+                <img
+                  src={COLLECTION_IMAGES[cat.name] ?? ""}
+                  className="h-8 w-8 rounded-full object-cover object-top shrink-0"
+                  alt={cat.name}
+                  draggable={false}
+                />
+                <span className="flex-1 font-['Montserrat'] text-sm font-medium text-foreground truncate">
+                  {t(cat.name)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => enabled ? unsubscribe(cat.id) : subscribe(cat.id)}
+                  aria-label={enabled ? `Unsubscribe from ${cat.name}` : `Subscribe to ${cat.name}`}
+                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
+                    enabled ? "bg-primary" : "bg-stroke"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
+                      enabled ? "translate-x-4" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* List */}
       {notifications.length === 0 ? (
