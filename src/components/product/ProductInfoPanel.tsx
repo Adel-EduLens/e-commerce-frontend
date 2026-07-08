@@ -70,7 +70,8 @@ export function ProductInfoPanel({
 
   const isOutOfStock = (item.stock ?? 0) <= 0;
   const user = useAuthStore((state) => state.user);
-  const { data: notifyStatus } = useNotifyMeCheck(item.id);
+  const notifyMeTargetType = productType === 'WHOLESALE' ? 'WHOLESALE_RESTOCK' as const : 'SHOP_RESTOCK' as const
+  const { data: notifyStatus } = useNotifyMeCheck(notifyMeTargetType, item.id);
   const subscribeMutation = useNotifyMeSubscribe();
   const isAlreadySubscribed = notifyStatus?.isSubscribed ?? false;
 
@@ -80,7 +81,7 @@ export function ProductInfoPanel({
       navigate("/login");
       return;
     }
-    subscribeMutation.mutate(item.id);
+    subscribeMutation.mutate({ targetType: notifyMeTargetType, targetId: item.id });
   };
 
   const getColorValue = (color: string) => {
