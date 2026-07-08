@@ -126,6 +126,7 @@ export default function TraderWholesalePage() {
     product: w.name,
     category: w.category?.name ?? "",
     categoryId: w.categoryId,
+    brandId: "",
     stock: w.stock ?? 0,
     sku: w.sku ?? "",
     price: `$${w.price}`,
