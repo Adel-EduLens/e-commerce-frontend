@@ -3,6 +3,8 @@ import { useCartStore } from "../store/useCartStore";
 import GoogleMapPicker from "../components/GoogleMap";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
+import { MapPin, CheckCircle2, Compass, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function OrderSummary({
   items,
@@ -235,6 +237,9 @@ type CheckoutFormData = {
   area: string;
   streetAddress: string;
   apartment: string;
+  mapAddress?: string;
+  latitude?: string;
+  longitude?: string;
 };
 
 function DeliverySection({
@@ -264,15 +269,62 @@ function DeliverySection({
           <FormInput placeholder="Street Address" value={data.streetAddress} onChange={e => onChange("streetAddress", e.target.value)} />
           <FormInput placeholder="Apartment" value={data.apartment} onChange={e => onChange("apartment", e.target.value)} />
         </div>
+
+        {/* Confirmed Map Location Field */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-secondary shrink-0" />
+            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+              Confirmed Delivery Coordinates
+            </span>
+          </div>
+
+          {!data.mapAddress ? (
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-50/50 dark:bg-zinc-900/50 text-gray-text transition-all duration-300">
+              <Compass className="h-5 w-5 text-gray-400 animate-pulse shrink-0" />
+              <p className="font-['Montserrat'] text-xs sm:text-sm font-medium">
+                No location confirmed yet. Please select your delivery location on the map below and click <span className="font-semibold text-foreground">Confirm Location</span>.
+              </p>
+            </div>
+          ) : (
+            <div className="relative overflow-hidden rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/10 dark:from-green-500/10 dark:to-emerald-500/10 p-4 sm:p-5 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] transition-all duration-300">
+              <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-green-500/5 blur-xl pointer-events-none" />
+
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+                <div className="flex-1 space-y-1.5 min-w-0">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <span className="font-['Montserrat'] text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                      Confirmed Map Address
+                    </span>
+                    {data.latitude && data.longitude && (
+                      <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-green-700 dark:text-green-300">
+                        {parseFloat(data.latitude).toFixed(5)}, {parseFloat(data.longitude).toFixed(5)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground leading-relaxed break-words">
+                    {data.mapAddress}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-col gap-4">
           <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">Select on Map</div>
           <GoogleMapPicker
             onLocationPick={(loc) => {
-              if (loc.city) onChange("city", loc.city);
-              if (loc.area) onChange("area", loc.area);
-              if (loc.streetAddress) onChange("streetAddress", loc.streetAddress);
+              // Set the confirmed address field and coordinates
+              const fullAddr = loc.displayAddress || [loc.streetAddress, loc.area, loc.city].filter(Boolean).join(", ");
+              onChange("mapAddress", fullAddr);
+              if (loc.lat) onChange("latitude", loc.lat.toString());
+              if (loc.lng) onChange("longitude", loc.lng.toString());
             }}
-            searchQuery={[data.streetAddress, data.area, data.city, data.country].filter(Boolean).join(", ")}
+            searchQuery={[data.streetAddress, data.city, data.country].filter(Boolean).join(", ")}
           />
         </div>
       </div>
@@ -322,7 +374,7 @@ function PaymentMethodSection() {
   );
 }
 
-function RememberMeSection({ onPay }: { onPay: () => void }) {
+function RememberMeSection({ onPay, loading }: { onPay: () => void; loading: boolean }) {
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
       <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">REMEMBER ME</h2>
@@ -357,8 +409,19 @@ function RememberMeSection({ onPay }: { onPay: () => void }) {
             Privacy Policy
           </span>
         </div>
-        <button onClick={onPay} className="w-full h-14 sm:h-16 flex items-center justify-center rounded-2xl bg-primary">
-          <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Pay now</span>
+        <button
+          onClick={onPay}
+          disabled={loading}
+          className="w-full h-14 sm:h-16 flex items-center justify-center rounded-2xl bg-primary disabled:opacity-70 disabled:cursor-not-allowed gap-2.5 transition-all"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin text-foreground" />
+              <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Processing...</span>
+            </>
+          ) : (
+            <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Pay now</span>
+          )}
         </button>
       </div>
     </div>
@@ -366,8 +429,10 @@ function RememberMeSection({ onPay }: { onPay: () => void }) {
 }
 
 export default function CheckoutPage() {
+  const navigate = useNavigate();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
@@ -379,6 +444,9 @@ export default function CheckoutPage() {
     area: "",
     streetAddress: "",
     apartment: "",
+    mapAddress: "",
+    latitude: "",
+    longitude: "",
   });
 
   const [couponCode, setCouponCode] = useState("");
@@ -392,7 +460,7 @@ export default function CheckoutPage() {
 
   const discountAmount = useMemo(() => {
     if (!appliedCoupon) return 0;
-    
+
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
     items.forEach((item) => {
@@ -424,19 +492,53 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = async () => {
+    if (isSubmitting) return;
     if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
       toast.error("Please fill in all required contact details");
       return;
     }
+    if (!formData.country || !formData.city || !formData.area || !formData.streetAddress) {
+      toast.error("Please fill in all delivery address details");
+      return;
+    }
+    if (!formData.mapAddress) {
+      toast.error("Please select and confirm your delivery location on the map");
+      return;
+    }
 
     try {
-      console.log("Processing checkout with data:", formData);
-      
-      toast.success("Order placed successfully!");
+      setIsSubmitting(true);
+      const orderPayload = {
+        ...formData,
+        subtotal,
+        discount: discountAmount,
+        shipping,
+        total,
+        couponCode: appliedCoupon?.code || null,
+        paymentMethod: "COD", // Defaulting to Cash on Delivery for this checkout flow
+        items: items.map(item => ({
+          productId: item.productId,
+          title: item.title,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          size: item.size || null,
+          color: item.color || null,
+          imageSrc: item.imageSrc || null,
+        })),
+      };
+
+      console.log("Sending order payload to backend:", orderPayload);
+      await api.post("/orders", orderPayload);
+
+      toast.success("Order placed successfully! Your cart has been cleared.");
       clearCart();
-      alert("Order placed successfully! Your cart has been cleared.");
-    } catch (err) {
-      toast.error("An error occurred during checkout");
+      navigate("/my-orders");
+    } catch (err: any) {
+      console.error("Order creation failed:", err);
+      const errMsg = err.response?.data?.message || "An error occurred during checkout";
+      toast.error(errMsg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -446,7 +548,7 @@ export default function CheckoutPage() {
         <div className="flex-1 flex flex-col gap-8 sm:gap-12">
           <DeliverySection data={formData} onChange={handleChange} />
           <PaymentMethodSection />
-          <RememberMeSection onPay={handleCheckout} />
+          <RememberMeSection onPay={handleCheckout} loading={isSubmitting} />
         </div>
         <div className="w-full lg:w-[480px] xl:w-[566px] shrink-0 lg:sticky lg:top-24 lg:self-start">
           <OrderSummary
