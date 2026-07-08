@@ -13,6 +13,7 @@ type ProductType = "product" | "wholesale";
 interface InventoryItem {
   id: string;
   image: string;
+  imagesByColor: { url: string; color?: string }[];
   product: string;
   category: string;
   categoryId: string;
@@ -121,6 +122,55 @@ function MultiSelect({
   );
 }
 
+function ColorImageUpload({
+  color,
+  preview,
+  onChange,
+}: {
+  color: string;
+  preview: string;
+  onChange: (color: string, file: File) => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <input
+        ref={ref}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) onChange(color, f);
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => ref.current?.click()}
+        className="w-full rounded-xl border-2 border-dashed border-stroke py-3 font-['Montserrat'] text-xs text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
+      >
+        {preview ? (
+          <img src={preview} alt={color} className="h-14 w-14 rounded-lg object-cover" />
+        ) : (
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+        <span>{color}</span>
+      </button>
+    </div>
+  );
+}
+
+async function uploadImageFile(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append("image", file);
+  const { data } = await api.post("/upload/product-image", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.data.url;
+}
+
 // Edit Item Modal
 interface EditItemModalProps {
   item: InventoryItem;
@@ -137,11 +187,25 @@ function EditItemModal({ item, onClose }: EditItemModalProps) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>(item.sizes);
   const [selectedColors, setSelectedColors] = useState<string[]>(item.colors);
   const [minOrder, setMinOrder] = useState(String(item.minOrder));
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(item.image);
+
+  // Per-color image state for products
+  const initPreviews = () => {
+    const map: Record<string, string> = {};
+    item.imagesByColor.forEach((img) => {
+      if (img.color) map[img.color] = img.url;
+    });
+    return map;
+  };
+  const [colorFiles, setColorFiles] = useState<Record<string, File>>({});
+  const [colorPreviews, setColorPreviews] = useState<Record<string, string>>(initPreviews);
+
+  // Single image for wholesale
+  const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
+  const [wholesalePreview, setWholesalePreview] = useState<string>(item.image);
+  const wholesaleRef = useRef<HTMLInputElement>(null);
+
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categories = [] } = useCategories();
   const updateProduct = useUpdateProduct();
@@ -149,52 +213,73 @@ function EditItemModal({ item, onClose }: EditItemModalProps) {
 
   const isSaving = updateProduct.isPending || updateWholesale.isPending;
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+  const handleColorImage = (color: string, file: File) => {
+    setColorFiles((prev) => ({ ...prev, [color]: file }));
+    setColorPreviews((prev) => ({ ...prev, [color]: URL.createObjectURL(file) }));
   };
 
-  const uploadImage = async (): Promise<string> => {
-    if (!imageFile) return item.image;
-    const formData = new FormData();
-    formData.append("image", imageFile);
-    const { data } = await api.post("/upload/product-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  // Keep previews in sync when colors change
+  const handleColorsChange = (colors: string[]) => {
+    setSelectedColors(colors);
+    setColorFiles((prev) => {
+      const next: Record<string, File> = {};
+      colors.forEach((c) => { if (prev[c]) next[c] = prev[c]; });
+      return next;
     });
-    return data.data.url;
+    setColorPreviews((prev) => {
+      const next: Record<string, string> = {};
+      colors.forEach((c) => { if (prev[c]) next[c] = prev[c]; });
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (item.type === "product" && selectedColors.length > 0) {
+      const missing = selectedColors.filter((c) => !colorPreviews[c]);
+      if (missing.length > 0) {
+        setError(`Please upload an image for: ${missing.join(", ")}`);
+        return;
+      }
+    }
+
     try {
       setUploading(true);
-      const imageUrl = await uploadImage();
-      setUploading(false);
 
       if (item.type === "product") {
+        const images: { url: string; color: string }[] = [];
+        for (const color of selectedColors) {
+          const file = colorFiles[color];
+          const url = file ? await uploadImageFile(file) : (colorPreviews[color] ?? "");
+          images.push({ url, color });
+        }
+        setUploading(false);
         await updateProduct.mutateAsync({
           id: item.id,
           name,
           description,
           price: Number(price),
           categoryId,
-          images: [{ url: imageUrl, color: selectedColors[0] ?? "default" }],
-          sizes: selectedSizes.length > 0 ? selectedSizes : item.sizes,
-          colors: selectedColors.length > 0 ? selectedColors : item.colors,
+          images,
+          sizes: selectedSizes,
+          colors: selectedColors,
           sku: sku || undefined,
           stock: Number(stock),
         });
       } else {
+        const wholesaleUrl = wholesaleFile
+          ? await uploadImageFile(wholesaleFile)
+          : item.image;
+        setUploading(false);
         await updateWholesale.mutateAsync({
           id: item.id,
           name,
           description,
           price: Number(price),
           categoryId,
-          images: [{ url: imageUrl }],
+          images: [{ url: wholesaleUrl }],
           minOrder: Number(minOrder) || 1,
           sku: sku || undefined,
           stock: Number(stock),
@@ -269,46 +354,72 @@ function EditItemModal({ item, onClose }: EditItemModalProps) {
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
           />
 
-          {/* Image upload */}
-          <div>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
-            >
-              {imagePreview ? (
-                <img src={imagePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
-              ) : (
-                <>
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span>Click to change image</span>
-                </>
-              )}
-            </button>
-            {imagePreview && (
-              <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">Click image to replace</p>
-            )}
-          </div>
-
           {item.type === "product" && (
             <>
               <MultiSelect label="Sizes" options={SIZE_OPTIONS} selected={selectedSizes} onChange={setSelectedSizes} />
-              <MultiSelect label="Colors" options={COLOR_OPTIONS} selected={selectedColors} onChange={setSelectedColors} />
+              <MultiSelect label="Colors" options={COLOR_OPTIONS} selected={selectedColors} onChange={handleColorsChange} />
+              {selectedColors.length > 0 && (
+                <div>
+                  <p className="mb-2 font-['Montserrat'] text-xs font-semibold text-foreground">Image per color *</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {selectedColors.map((color) => (
+                      <ColorImageUpload
+                        key={color}
+                        color={color}
+                        preview={colorPreviews[color] ?? ""}
+                        onChange={handleColorImage}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
 
           {item.type === "wholesale" && (
-            <input
-              placeholder="Min order quantity"
-              type="number"
-              min="1"
-              value={minOrder}
-              onChange={(e) => setMinOrder(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-            />
+            <>
+              <div>
+                <input
+                  ref={wholesaleRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    setWholesaleFile(f);
+                    setWholesalePreview(URL.createObjectURL(f));
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => wholesaleRef.current?.click()}
+                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
+                >
+                  {wholesalePreview ? (
+                    <img src={wholesalePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
+                  ) : (
+                    <>
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span>Click to change image</span>
+                    </>
+                  )}
+                </button>
+                {wholesalePreview && (
+                  <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">Click image to replace</p>
+                )}
+              </div>
+              <input
+                placeholder="Min order quantity"
+                type="number"
+                min="1"
+                value={minOrder}
+                onChange={(e) => setMinOrder(e.target.value)}
+                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
+            </>
           )}
 
           {error && <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>}
@@ -318,7 +429,7 @@ function EditItemModal({ item, onClose }: EditItemModalProps) {
             disabled={isSaving || uploading}
             className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
           >
-            {uploading ? "Uploading image..." : isSaving ? "Saving..." : "Save Changes"}
+            {uploading ? "Uploading images..." : isSaving ? "Saving..." : "Save Changes"}
           </button>
         </form>
       </div>
@@ -342,11 +453,18 @@ function AddItemModal({ onClose }: AddItemModalProps) {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [minOrder, setMinOrder] = useState("1");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>("");
+
+  // Per-color images for products
+  const [colorFiles, setColorFiles] = useState<Record<string, File>>({});
+  const [colorPreviews, setColorPreviews] = useState<Record<string, string>>({});
+
+  // Single image for wholesale
+  const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
+  const [wholesalePreview, setWholesalePreview] = useState<string>("");
+  const wholesaleRef = useRef<HTMLInputElement>(null);
+
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: categories = [] } = useCategories();
   const createProduct = useCreateProduct();
@@ -354,54 +472,74 @@ function AddItemModal({ onClose }: AddItemModalProps) {
 
   const isSaving = createProduct.isPending || createWholesale.isPending;
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
+  const handleColorImage = (color: string, file: File) => {
+    setColorFiles((prev) => ({ ...prev, [color]: file }));
+    setColorPreviews((prev) => ({ ...prev, [color]: URL.createObjectURL(file) }));
   };
 
-  const uploadImage = async (): Promise<string> => {
-    if (!imageFile) throw new Error("No image selected");
-    const formData = new FormData();
-    formData.append("image", imageFile);
-    const { data } = await api.post("/upload/product-image", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
+  const handleColorsChange = (colors: string[]) => {
+    setSelectedColors(colors);
+    setColorFiles((prev) => {
+      const next: Record<string, File> = {};
+      colors.forEach((c) => { if (prev[c]) next[c] = prev[c]; });
+      return next;
     });
-    return data.data.url;
+    setColorPreviews((prev) => {
+      const next: Record<string, string> = {};
+      colors.forEach((c) => { if (prev[c]) next[c] = prev[c]; });
+      return next;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!name || !categoryId || !price || !imageFile) {
-      setError("Name, category, price and image are required.");
+    if (!name || !categoryId || !price) {
+      setError("Name, category and price are required.");
       return;
     }
-    if (type === "product" && (selectedSizes.length === 0 || selectedColors.length === 0)) {
-      setError("Please select at least one size and one color.");
-      return;
+    if (type === "product") {
+      if (selectedSizes.length === 0 || selectedColors.length === 0) {
+        setError("Please select at least one size and one color.");
+        return;
+      }
+      const missing = selectedColors.filter((c) => !colorFiles[c]);
+      if (missing.length > 0) {
+        setError(`Please upload an image for: ${missing.join(", ")}`);
+        return;
+      }
+    } else {
+      if (!wholesaleFile) {
+        setError("Please upload an image.");
+        return;
+      }
     }
 
     try {
       setUploading(true);
-      const imageUrl = await uploadImage();
-      setUploading(false);
 
       if (type === "product") {
+        const images: { url: string; color: string }[] = [];
+        for (const color of selectedColors) {
+          const url = await uploadImageFile(colorFiles[color]);
+          images.push({ url, color });
+        }
+        setUploading(false);
         await createProduct.mutateAsync({
           name,
           description,
           price: Number(price),
           categoryId,
-          images: [{ url: imageUrl, color: selectedColors[0] ?? "default" }],
+          images,
           sizes: selectedSizes,
           colors: selectedColors,
           sku: sku || undefined,
           stock: stock ? Number(stock) : 0,
         });
       } else {
+        const wholesaleUrl = await uploadImageFile(wholesaleFile!);
+        setUploading(false);
         await createWholesale.mutateAsync({
           name,
           description,
@@ -412,7 +550,7 @@ function AddItemModal({ onClose }: AddItemModalProps) {
           isBestDeal: false,
           isMostPopular: false,
           isPremiumCollection: false,
-          images: [{ url: imageUrl }],
+          images: [{ url: wholesaleUrl }],
           sku: sku || undefined,
           stock: stock ? Number(stock) : 0,
         });
@@ -500,59 +638,69 @@ function AddItemModal({ onClose }: AddItemModalProps) {
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
           />
 
-          {/* Image upload */}
-          <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
-            >
-              {imagePreview ? (
-                <img src={imagePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
-              ) : (
-                <>
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <span>Click to upload image *</span>
-                </>
-              )}
-            </button>
-          </div>
-
           {type === "product" && (
             <>
-              <MultiSelect
-                label="Select sizes *"
-                options={SIZE_OPTIONS}
-                selected={selectedSizes}
-                onChange={setSelectedSizes}
-              />
-              <MultiSelect
-                label="Select colors *"
-                options={COLOR_OPTIONS}
-                selected={selectedColors}
-                onChange={setSelectedColors}
-              />
+              <MultiSelect label="Select sizes *" options={SIZE_OPTIONS} selected={selectedSizes} onChange={setSelectedSizes} />
+              <MultiSelect label="Select colors *" options={COLOR_OPTIONS} selected={selectedColors} onChange={handleColorsChange} />
+              {selectedColors.length > 0 && (
+                <div>
+                  <p className="mb-2 font-['Montserrat'] text-xs font-semibold text-foreground">Image per color *</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {selectedColors.map((color) => (
+                      <ColorImageUpload
+                        key={color}
+                        color={color}
+                        preview={colorPreviews[color] ?? ""}
+                        onChange={handleColorImage}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
 
           {type === "wholesale" && (
-            <input
-              placeholder="Min order quantity"
-              type="number"
-              min="1"
-              value={minOrder}
-              onChange={(e) => setMinOrder(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-            />
+            <>
+              <div>
+                <input
+                  ref={wholesaleRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    setWholesaleFile(f);
+                    setWholesalePreview(URL.createObjectURL(f));
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => wholesaleRef.current?.click()}
+                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
+                >
+                  {wholesalePreview ? (
+                    <img src={wholesalePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
+                  ) : (
+                    <>
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <span>Click to upload image *</span>
+                    </>
+                  )}
+                </button>
+              </div>
+              <input
+                placeholder="Min order quantity"
+                type="number"
+                min="1"
+                value={minOrder}
+                onChange={(e) => setMinOrder(e.target.value)}
+                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
+            </>
           )}
 
           {error && <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>}
@@ -562,7 +710,7 @@ function AddItemModal({ onClose }: AddItemModalProps) {
             disabled={isSaving || uploading}
             className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
           >
-            {uploading ? "Uploading image..." : isSaving ? "Saving..." : "Add Item"}
+            {uploading ? "Uploading images..." : isSaving ? "Saving..." : "Add Item"}
           </button>
         </form>
       </div>
@@ -599,6 +747,7 @@ export default function TraderInventoryPage() {
     ...traderProducts.map((p) => ({
       id: p.id,
       image: p.images[0]?.url ?? "",
+      imagesByColor: p.images.map((img) => ({ url: img.url, color: img.color ?? undefined })),
       product: p.name,
       category: p.category?.name ?? "",
       categoryId: p.categoryId,
@@ -618,6 +767,7 @@ export default function TraderInventoryPage() {
     ...traderWholesales.map((w) => ({
       id: w.id,
       image: w.images[0]?.url ?? "",
+      imagesByColor: w.images.map((img) => ({ url: img.url, color: img.color ?? undefined })),
       product: w.name,
       category: w.category?.name ?? "",
       categoryId: w.categoryId,
