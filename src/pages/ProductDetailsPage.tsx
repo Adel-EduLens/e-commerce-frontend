@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useRecommendationStore } from "../store/useRecommendationStore";
+import { useAddSignalMutation } from "../hooks/queries/recommendQuery";
 import { useAddRecentlyViewed } from "../hooks/useRecentlyViewed";
 
 import { useProduct } from "../hooks/queries/productsQuery";
@@ -17,7 +17,7 @@ export default function ProductDetailsPage() {
   const { id } = useParams();
   const { data: product, isPending, isError } = useProduct(id);
   const { data: reviews = [] } = useReviews(id);
-  const addSignal = useRecommendationStore((s) => s.addSignal);
+  const { mutate: addSignal } = useAddSignalMutation();
   const { mutate: addRecentlyViewed } = useAddRecentlyViewed();
 
   const [selectedColor, setSelectedColor] = useState("");
@@ -36,7 +36,7 @@ export default function ProductDetailsPage() {
 
   useEffect(() => {
     if (product) {
-      addSignal(product.id, product.categoryId, "view");
+      addSignal({ productId: product.id, categoryId: product.categoryId, type: "view" });
       addRecentlyViewed({ productType: "SHOP", productId: product.id });
     }
   }, [addSignal, product, product?.id, addRecentlyViewed]);

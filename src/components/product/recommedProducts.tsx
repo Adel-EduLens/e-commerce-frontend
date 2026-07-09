@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import { ProductCard } from "../shared";
 
 import { useProducts } from "../../hooks/queries/productsQuery";
-import { useRecommendationStore } from "../../store/useRecommendationStore";
-import { useShallow } from "zustand/react/shallow";
+import { useTopCategories } from "../../hooks/queries/recommendQuery";
+import { useAuthStore } from "../../store/useAuthStore";
 import { ViewAllButton } from "../ui/ViewAllButton";
 import { useNavigate } from "react-router-dom";
 
@@ -17,9 +17,8 @@ export function RecommedProducts({
   currentCategoryId,
 }: RecommedProductsProps) {
   const navigate = useNavigate();
-  const topCategories = useRecommendationStore(
-    useShallow((s) => s.getTopCategories(3))
-  );
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { data: topCategories = [], isLoading: isTopCategoriesLoading } = useTopCategories(3);
 
   // Pick the best category to fetch from: top weighted category (excluding current if possible)
   const targetCategoryId = useMemo(() => {
@@ -30,7 +29,7 @@ export function RecommedProducts({
 
   const hasHistory = topCategories.length > 0;
 
-  const { data, isLoading } = useProducts(
+  const { data, isLoading: isProductsLoading } = useProducts(
     hasHistory && targetCategoryId
       ? { categoryId: targetCategoryId, limit: 8 }
       : { sortBy: "rating", sortOrder: "desc", limit: 8 },
@@ -42,6 +41,8 @@ export function RecommedProducts({
       .filter((p) => p.id !== currentProductId)
       .slice(0, 4);
   }, [data, currentProductId]);
+
+  const isLoading = isProductsLoading || (isAuthenticated && isTopCategoriesLoading);
 
   if (isLoading) {
     return (
