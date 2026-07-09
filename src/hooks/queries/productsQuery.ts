@@ -84,6 +84,42 @@ type ProductsResponse = {
   };
 };
 
+/** Transform flat API response into the nested colors structure the frontend expects */
+function transformProduct(raw: any): Product {
+  if (!raw) return raw;
+  const flatImages = raw.images || [];
+  const flatSizes = raw.sizes || [];
+  const flatColors = raw.colors || [];
+  const productStock = raw.stock ?? 0;
+
+  // If colors already have nested images/variants, return as-is
+  if (flatColors.length > 0 && flatColors[0].images) {
+    return raw;
+  }
+
+  const colors: ProductColor[] = flatColors.map((c: any) => {
+    const colorName = c.colorName || c.color || '';
+    return {
+      ...c,
+      colorName,
+      images: flatImages
+        .filter((img: any) => img.color === colorName)
+        .map((img: any) => ({
+          id: img.id,
+          imageUrl: img.url || img.imageUrl || '',
+          url: img.url || img.imageUrl || '',
+        })),
+      variants: flatSizes.map((s: any) => ({
+        id: s.id,
+        size: s.size,
+        quantity: s.quantity ?? productStock,
+      })),
+    };
+  });
+
+  return { ...raw, colors };
+}
+
 const getProducts = async (
   params: ProductsQuery
 ): Promise<ProductsResponse> => {
@@ -91,7 +127,11 @@ const getProducts = async (
     params,
   });
 
-  return data.data;
+  const result = data.data;
+  if (result?.products) {
+    result.products = result.products.map(transformProduct);
+  }
+  return result;
 };
 
 export const useProducts = (params: ProductsQuery) => {
@@ -102,7 +142,7 @@ export const useProducts = (params: ProductsQuery) => {
 };
 const getProduct = async (id: string): Promise<Product> => {
   const { data } = await api.get(`/products/${id}`);
-  return data.data;
+  return transformProduct(data.data);
 };
 
 export const useProduct = (id?: string) => {
@@ -144,7 +184,7 @@ export const useCompareProducts = (ids: string[]) => {
 
 const getTraderProducts = async (traderId: string | number): Promise<Product[]> => {
   const { data } = await api.get("/products", { params: { traderId, limit: 1000 } });
-  return data.data?.products ?? [];
+  return (data.data?.products ?? []).map(transformProduct);
 };
 
 export const useTraderProducts = () => {
@@ -175,9 +215,7 @@ export interface ProductFormData {
 
 const createProduct = async (body: ProductFormData | FormData) => {
   const isFormData = body instanceof FormData;
-  const { data } = await api.post(isFormData ? "/trader/products" : "/products", body, {
-    headers: isFormData ? { "Content-Type": "multipart/form-data" } : undefined,
-  });
+  const { data } = await api.post(isFormData ? "/trader/products" : "/products", body);
   return data.data;
 };
 
@@ -229,9 +267,7 @@ export const useAddProductColor = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ productId, formData }: { productId: string; formData: FormData }) => {
-      const { data } = await api.post(`/trader/products/${productId}/colors`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.post(`/trader/products/${productId}/colors`, formData);
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -263,9 +299,7 @@ export const useReplaceProductColorImages = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
-      const { data } = await api.put(`/trader/products/colors/${colorId}/images`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.put(`/trader/products/colors/${colorId}/images`, formData);
       return data.data;
     },
     onSuccess: (_, variables) => {
@@ -282,9 +316,7 @@ export const useAddProductColorImages = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
-      const { data } = await api.post(`/trader/products/colors/${colorId}/images`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.post(`/trader/products/colors/${colorId}/images`, formData);
       return data.data;
     },
     onSuccess: (_, variables) => {

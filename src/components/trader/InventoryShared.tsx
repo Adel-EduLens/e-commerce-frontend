@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
 import {
@@ -513,7 +514,8 @@ export function AddItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                setError(`${pc.color} Image: ${err}`);
+                                toast.error(`${pc.color} Image: ${err}`);
+                                e.target.value = "";
                                 return;
                               }
                               setCropState({
@@ -950,14 +952,14 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                 <div key={color.id} className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50">
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="inline-block w-3 h-3 rounded-full border border-stroke" style={{ backgroundColor: color.colorName.toLowerCase() }} />
-                      {color.colorName}
+                      <span className="inline-block w-3 h-3 rounded-full border border-stroke" style={{ backgroundColor: (color.colorName || (color as any).color || '').toLowerCase() }} />
+                      {color.colorName || (color as any).color}
                     </h4>
                     <button
                       type="button"
                       disabled={deleteColorMutation.isPending}
                       onClick={async () => {
-                        if (confirm(`Are you sure you want to delete color "${color.colorName}"?`)) {
+                        if (confirm(`Are you sure you want to delete color "${color.colorName || (color as any).color}"?`)) {
                           try {
                             await deleteColorMutation.mutateAsync({ colorId: color.id, productId: product.id });
                           } catch (err: any) {
@@ -977,7 +979,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                     <div className="flex flex-wrap gap-2 items-center">
                       {color.images?.map((img) => (
                         <div key={img.id} className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
-                          <img src={img.imageUrl || img.url} alt={color.colorName} className="w-full h-full object-cover" />
+                          <img src={img.imageUrl || img.url} alt={color.colorName || (color as any).color} className="w-full h-full object-cover" />
                           <button
                             type="button"
                             disabled={deleteImageMutation.isPending}
@@ -1012,7 +1014,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                setError(`Image dimensions: ${err}`);
+                                toast.error(`Image dimensions: ${err}`);
                                 return;
                               }
                               const fd = new FormData();
@@ -1203,7 +1205,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                setError(`New color image: ${err}`);
+                                toast.error(`New color image: ${err}`);
                                 return;
                               }
                               setNewColorCropState({

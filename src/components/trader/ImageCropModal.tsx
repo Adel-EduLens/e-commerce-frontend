@@ -2,8 +2,8 @@ import Cropper from "react-easy-crop";
 import { useCallback, useState } from "react";
 import type { Area, Point } from "react-easy-crop";
 
-export const MIN_IMG_WIDTH = 400;
-export const MIN_IMG_HEIGHT = 400;
+export const MIN_IMG_WIDTH = 100;
+export const MIN_IMG_HEIGHT = 100;
 export const CROP_ASPECT = 4 / 5; // matches product card image area (4:5)
 
 /** Validate an image File's natural dimensions. Returns null if OK, or an error string. */
