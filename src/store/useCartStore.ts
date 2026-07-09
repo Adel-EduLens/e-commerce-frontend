@@ -36,13 +36,17 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     // 1. Optimistic local state update
     set((state) => {
       const existingItem = state.items.find(
-        (currentItem) => currentItem.id === item.id
+        (currentItem) =>
+          currentItem.id === item.id ||
+          (currentItem.productId === item.productId &&
+            (currentItem.size || "") === (item.size || "") &&
+            (currentItem.color || "") === (item.color || ""))
       );
 
       if (existingItem) {
         return {
           items: state.items.map((currentItem) =>
-            currentItem.id === item.id
+            currentItem.id === existingItem.id
               ? {
                   ...currentItem,
                   quantity: currentItem.quantity + item.quantity,
@@ -195,7 +199,10 @@ export const useCartStore = create<CartStore>()((set, get) => ({
   },
 
   setItems: (items) => {
-    set({ items });
+    const currentItems = get().items;
+    if (JSON.stringify(currentItems) !== JSON.stringify(items)) {
+      set({ items });
+    }
   },
 }));
 

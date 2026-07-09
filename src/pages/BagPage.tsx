@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import { useCart } from "../hooks/useCart";
 import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
@@ -409,6 +410,7 @@ function FavoritesSection({
 export default function BagPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { isLoading } = useCart();
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const incrementQuantity = useCartStore((state) => state.incrementQuantity);
@@ -560,10 +562,17 @@ export default function BagPage() {
       <div className="flex flex-col lg:flex-row gap-8 items-start mb-16">
         {/* Left Side: Bag Items */}
         <div className="flex-1 w-full flex flex-col gap-6">
-          {items.length ? (
+          {isLoading && items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="mt-4 font-['Montserrat'] text-base font-semibold text-gray-text">
+                Loading bag items...
+              </p>
+            </div>
+          ) : items.length ? (
             items.map((item) => (
               <BagItemCard
-                key={item.id}
+                key={`${item.productId}-${item.size || 'none'}-${item.color || 'none'}`}
                 item={item}
                 onRemove={() => handleRemoveItem(item)}
                 onIncrease={() => incrementQuantity(item.id)}

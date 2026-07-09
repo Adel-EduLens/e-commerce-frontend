@@ -1,5 +1,7 @@
 import { useState, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore } from "../store/useCartStore";
+import { useCart } from "../hooks/useCart";
 import GoogleMapPicker from "../components/GoogleMap";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
@@ -63,11 +65,10 @@ function SavedAddressesSection({
           transition-all
           duration-300
 
-          ${
-            active
-              ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
-              : "border-stroke bg-card hover:border-primary/40"
-          }
+          ${active
+                      ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
+                      : "border-stroke bg-card hover:border-primary/40"
+                    }
         `}
                 >
                   <div className="flex justify-between items-start">
@@ -190,7 +191,7 @@ function OrderSummary({
       <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
         {items.map((item) => (
           <div
-            key={item.id}
+            key={`${item.productId}-${item.size || 'none'}-${item.color || 'none'}`}
             className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
           >
             <div className="relative shrink-0">
@@ -419,6 +420,7 @@ function DeliverySection({
   onChange: (field: keyof CheckoutFormData, value: string) => void;
 
   addresses: Address[];
+  isAddressesLoading?: boolean;
   selectedAddressId: string | null;
   onSelectAddress: (address: Address) => void;
 }) {
@@ -712,6 +714,7 @@ function RememberMeSection({
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const initialCoupon = location.state?.appliedCoupon || null;
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
@@ -732,12 +735,24 @@ export default function CheckoutPage() {
     longitude: "",
   });
 
+  const { isLoading: isCartLoading } = useCart();
   const { data: addresses = [], isLoading: isAddressesLoading } =
     useMyAddresses();
 
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null,
   );
+
+  if (isCartLoading || isAddressesLoading) {
+    return (
+      <div className="flex h-[75vh] w-full flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
+        <p className="font-['Montserrat'] text-lg font-semibold text-foreground">
+          Preparing checkout...
+        </p>
+      </div>
+    );
+  }
 
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(initialCoupon);
@@ -839,8 +854,10 @@ export default function CheckoutPage() {
       console.log("Sending order payload to backend:", orderPayload);
       await api.post("/orders", orderPayload);
 
+      await clearCart();
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+
       toast.success("Order placed successfully! Your cart has been cleared.");
-      clearCart();
       navigate("/my-orders");
     } catch (err: any) {
       console.error("Order creation failed:", err);
