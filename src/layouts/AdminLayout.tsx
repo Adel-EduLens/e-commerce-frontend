@@ -60,17 +60,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
               <Award size={18} />
               <span>Prize</span>
             </button>
-            <button
-              onClick={() => navigate('/dashboard/admin/help-center')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${
-                isActive('/dashboard/admin/help-center')
-                  ? 'bg-primary/15 text-primary font-semibold'
-                  : 'text-gray-text hover:bg-gray-light'
-              }`}
-            >
-              <Award size={18} />
-              <span>Help Center</span>
-            </button>
+
             <button
               onClick={() => navigate('/dashboard/admin/designs')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-left transition-colors ${

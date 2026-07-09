@@ -19,6 +19,7 @@ const sidebarItems = [
   { label: "Finance", icon: "material-symbols_finance-rounded.svg", path: "/dashboard/trader/finance" },
   { label: "Notifications", icon: "ion_notifications-outline.svg", path: "/dashboard/trader/notifications" },
   { label: "Analytics", icon: "grommet-icons_analytics.svg", path: "/dashboard/trader/analytics" },
+  { label: "Help Center", icon: "help-circle.svg", path: "/dashboard/trader/help-center" },
   { label: "Store Settings", icon: "solar_settings-linear.svg", path: "/dashboard/trader/settings" },
 ] as const;
 

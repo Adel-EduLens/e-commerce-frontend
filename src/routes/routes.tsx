@@ -28,6 +28,7 @@ import TraderStoreSettingsPage from "../pages/dashboards/TraderStoreSettingsPage
 import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
 import TraderLayout from "../components/layout/TraderLayout";
 import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
+import TraderHelpCenterPage from "../pages/dashboards/TraderHelpCenterPage";
 import UserDashboard from "../pages/dashboards/UserDashboard";
 import RecentlyViewedPage from "../pages/RecentlyViewedPage";
 import MyOrdersPage from "../pages/MyOrdersPage";
@@ -243,16 +244,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: "dashboard/admin/help-center",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout>
-              <AdminHelpCenterPage />
-            </AdminLayout>
-          </ProtectedRoute>
-        ),
-      },
+
       {
         path: "dashboard/admin/login",
         element: <AdminLoginPage />,
@@ -341,6 +333,10 @@ export const router = createBrowserRouter([
           {
             path: "settings",
             element: <TraderStoreSettingsPage />,
+          },
+          {
+            path: "help-center",
+            element: <TraderHelpCenterPage />,
           },
         ],
       },
