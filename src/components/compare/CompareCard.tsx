@@ -20,12 +20,19 @@ interface CompareCardProps {
 
 export function CompareCard({ product, onRemove }: CompareCardProps) {
   const image =
-    product.images[0]?.url || "https://placehold.co/600x600?text=No+Image";
+    product.colors?.[0]?.images?.[0]?.imageUrl ||
+    product.colors?.[0]?.images?.[0]?.url ||
+    product.images?.[0]?.url ||
+    "https://placehold.co/600x600?text=No+Image";
 
   const hasFlashDeal =
     product.isFlashDeals &&
     product.flashDealPrice &&
     product.flashDealPrice < product.price;
+
+  const uniqueSizes = Array.from(
+    new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])
+  );
 
   const { t } = useTranslation("compare");
 
@@ -142,7 +149,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            {product.colors.length > 0 ? (
+            {product.colors && product.colors.length > 0 ? (
               product.colors.map((color) => (
                 <span
                   key={color.id}
@@ -157,7 +164,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
                     text-foreground
                   "
                 >
-                  {color.color}
+                  {color.colorName}
                 </span>
               ))
             ) : (
@@ -175,10 +182,10 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
           </div>
 
           <div className="flex flex-wrap gap-1.5">
-            {product.sizes.length > 0 ? (
-              product.sizes.map((size) => (
+            {uniqueSizes.length > 0 ? (
+              uniqueSizes.map((size) => (
                 <span
-                  key={size.id}
+                  key={size}
                   className="
                     rounded-full
                     border
@@ -190,7 +197,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
                     font-medium
                   "
                 >
-                  {size.size}
+                  {size}
                 </span>
               ))
             ) : (

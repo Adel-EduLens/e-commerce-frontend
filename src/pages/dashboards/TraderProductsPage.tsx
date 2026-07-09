@@ -16,34 +16,51 @@ export default function TraderProductsPage() {
 
   const deleteProduct = useDeleteProduct();
 
-  const items: InventoryItem[] = traderProducts.map((p) => ({
-    id: p.id,
-    image: p.images[0]?.url ?? "",
-    imagesByColor: p.images.map((img) => ({ url: img.url, color: img.color ?? undefined })),
-    product: p.name,
-    category: p.category?.name ?? "",
-    categoryId: p.categoryId,
-    brandId: p.brand?.id ?? "",
-    stock: p.stock ?? 0,
-    sku: p.sku ?? "",
-    price: `$${p.price}`,
-    priceNum: p.price,
-    date: new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-    createdAtRaw: new Date(p.createdAt).getTime(),
-    status: getStatus(p.stock ?? 0),
-    type: "product" as const,
-    description: p.description ?? "",
-    sizes: p.sizes?.map((s) => s.size) ?? [],
-    colors: p.colors?.map((c) => c.color) ?? [],
-    minOrder: 1,
-    isMustHave: p.isMustHave ?? false,
-    isFlashDeals: p.isFlashDeals ?? false,
-    flashDealPrice: p.flashDealPrice ?? null,
-    flashDealEndsAt: p.flashDealEndsAt ?? null,
-    isBestDeal: false,
-    isMostPopular: false,
-    isPremiumCollection: false,
-  }));
+  const items: InventoryItem[] = traderProducts.map((p) => {
+    const allImages = p.colors?.flatMap((c) =>
+      (c.images || []).map((img) => ({
+        url: img.url || img.imageUrl || "",
+        color: c.colorName,
+      }))
+    ) ?? [];
+
+    const totalStock = p.colors?.reduce(
+      (sum, c) => sum + (c.variants?.reduce((s, v) => s + v.quantity, 0) ?? 0),
+      0
+    ) ?? 0;
+
+    const uniqueSizes = Array.from(new Set(p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []));
+    const uniqueColors = Array.from(new Set(p.colors?.map((c) => c.colorName) ?? []));
+
+    return {
+      id: p.id,
+      image: allImages[0]?.url ?? "",
+      imagesByColor: allImages,
+      product: p.name,
+      category: p.category?.name ?? "",
+      categoryId: p.categoryId,
+      brandId: p.brand?.id ?? "",
+      stock: totalStock,
+      sku: p.sku ?? "",
+      price: `$${p.price}`,
+      priceNum: p.price,
+      date: new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      createdAtRaw: new Date(p.createdAt).getTime(),
+      status: getStatus(totalStock),
+      type: "product" as const,
+      description: p.description ?? "",
+      sizes: uniqueSizes,
+      colors: uniqueColors,
+      minOrder: 1,
+      isMustHave: p.isMustHave ?? false,
+      isFlashDeals: p.isFlashDeals ?? false,
+      flashDealPrice: p.flashDealPrice ?? null,
+      flashDealEndsAt: p.flashDealEndsAt ?? null,
+      isBestDeal: false,
+      isMostPopular: false,
+      isPremiumCollection: false,
+    };
+  });
 
   const errorMessages = isError
     ? [(errorMsg as any)?.response?.data?.message ?? (errorMsg as any)?.message ?? "Failed to load products"]

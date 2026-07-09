@@ -72,3 +72,7 @@ export const useUpdateReview = (productId: string) => {
     },
   });
 };
+
+export const useProductReviews = (productId?: string) => {
+  return useReviews(productId);
+};

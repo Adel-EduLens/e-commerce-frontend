@@ -1,95 +1,109 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Star } from "../ui/star";
 import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
-import { Heart, RotateCcw, Tag, Truck, Bell, Loader2 } from "lucide-react";
+import { Heart, Tag, Truck, RotateCcw, Scale } from "lucide-react";
 import { toast } from "sonner";
-
 import { useCartStore } from "../../store/useCartStore";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
-
-import { ArrowCircle } from "./ui/ArrowCircle";
-import { Modal } from "../ui/modal";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
-
-import { Scale } from "lucide-react";
 import {
   addCompareProduct,
   removeCompareProduct,
   isProductCompared,
 } from "../../utils/compareStorage";
-import { useNotifyMeCheck, useNotifyMeSubscribe } from "../../hooks/useNotifyMe";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useState } from "react";
+
 type ProductInfoPanelProps = {
   selectedColor: string;
-  setSelectedColor: (color: string) => void;
+  onColorChange: (color: string) => void;
+  selectedSize: string;
+  setSelectedSize: (size: string) => void;
+  quantity: number;
+  setQuantity: (qty: number) => void;
   item: DetailItem;
   reviewCount?: number;
   productType?: 'SHOP' | 'WHOLESALE';
+  rawProduct?: any;
 };
 
 export function ProductInfoPanel({
   selectedColor,
-  setSelectedColor,
+  onColorChange,
+  selectedSize,
+  setSelectedSize,
+  quantity,
+  setQuantity,
   item,
   reviewCount = 0,
   productType = 'SHOP',
+  rawProduct,
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
-
   const addItem = useCartStore((state) => state.addItem);
 
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-
-  const { data: wishlistStatus } = useWishlistStatus(productType, item.id)
-  const toggleWishlist = useToggleWishlist()
-  const isFavorite = Boolean(wishlistStatus?.isWishlisted)
+  const { data: wishlistStatus } = useWishlistStatus(productType, item.id);
+  const toggleWishlist = useToggleWishlist();
+  const isFavorite = Boolean(wishlistStatus?.isWishlisted);
 
   const { t } = useTranslation("productDetails");
 
   const [isCompared, setIsCompared] = useState(false);
+
   useEffect(() => {
-    const func = async () => {
-      setIsCompared(isProductCompared(item.id));
-    };
-    func();
+    setIsCompared(isProductCompared(item.id));
   }, [item.id]);
+
+  // Retrieve sizes & stock quantity for the currently selected color
+  const colorObj = rawProduct?.colors?.find(
+    (c: any) =>
+      c.colorName &&
+      selectedColor &&
+      c.colorName.toLowerCase() === selectedColor.toLowerCase()
+  );
+  const colorVariants = colorObj?.variants || [];
+  
+  // Find currently selected size variant info
+  const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
+  const availableStock = selectedVariant ? selectedVariant.quantity : 0;
+
+  // Guard quantity: cannot exceed availableStock
   useEffect(() => {
-    const func = async () => {
-      if (item.sizes.length > 0) {
-        setSelectedSize(item.sizes[0].size);
-      }
-    };
-    func();
-  }, [item]);
-
-  const isOutOfStock = (item.stock ?? 0) <= 0;
-  const user = useAuthStore((state) => state.user);
-  const notifyMeTargetType = productType === 'WHOLESALE' ? 'WHOLESALE_RESTOCK' as const : 'SHOP_RESTOCK' as const
-  const { data: notifyStatus } = useNotifyMeCheck(notifyMeTargetType, item.id);
-  const subscribeMutation = useNotifyMeSubscribe();
-  const isAlreadySubscribed = notifyStatus?.isSubscribed ?? false;
-
-  const handleNotifyMe = () => {
-    if (!user) {
-      toast.error("Please login to get notified");
-      navigate("/login");
-      return;
+    if (availableStock > 0 && quantity > availableStock) {
+      setQuantity(availableStock);
+    } else if (availableStock === 0) {
+      setQuantity(1);
     }
-    subscribeMutation.mutate({ targetType: notifyMeTargetType, targetId: item.id });
-  };
+  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity]);
 
-  const getColorValue = (color: string) => {
-    const option = new Option();
-    option.style.color = color;
+  // Flash deal price calculation
+  const hasFlashDeal =
+    rawProduct?.isFlashDeals &&
+    rawProduct?.flashDealPrice &&
+    rawProduct?.flashDealPrice < item.price;
 
-    return option.style.color ? color : "#D1D5DB";
-  };
+  const activePrice = hasFlashDeal ? rawProduct.flashDealPrice : item.price;
+  const oldPrice = hasFlashDeal ? item.price : null;
+  const discountPercent = hasFlashDeal
+    ? Math.round(((item.price - rawProduct.flashDealPrice) / item.price) * 100)
+    : null;
+
+  // Stock status styling
+  const stockLabel =
+    availableStock === 0
+      ? "Out of Stock"
+      : availableStock <= 5
+      ? "Low Stock"
+      : "In Stock";
+      
+  const stockBadgeClass =
+    availableStock === 0
+      ? "text-red-600 bg-red-50 border-red-200"
+      : availableStock <= 5
+      ? "text-amber-600 bg-amber-50 border-amber-200"
+      : "text-green-600 bg-green-50 border-green-200";
 
   const handleShare = async () => {
     try {
@@ -105,17 +119,22 @@ export function ProductInfoPanel({
       { productType, productId: item.id },
       {
         onSuccess: (data) => {
-          toast.success(data.isWishlisted ? t("favoriteAdded") : t("favoriteRemoved"))
+          toast.success(data.isWishlisted ? t("favoriteAdded") : t("favoriteRemoved"));
         },
       }
-    )
+    );
   };
 
   const handleAddToCart = () => {
+    if (availableStock <= 0) {
+      toast.error("This option is currently out of stock.");
+      return;
+    }
+
     const matchingImage = item.images.find(
       (image) =>
         image.color &&
-        image.color.toLowerCase() === selectedColor.toLowerCase(),
+        image.color.toLowerCase() === selectedColor.toLowerCase()
     );
 
     addItem({
@@ -123,12 +142,12 @@ export function ProductInfoPanel({
       productId: item.id,
       categoryId: item.category.id,
       title: item.name,
-      unitPrice: item.price,
+      unitPrice: activePrice,
       currency: "EGP",
       size: selectedSize,
       color: selectedColor,
-      colorHex: "#000000",
-      imageSrc: matchingImage?.url ?? item.images[0]?.url ?? "",
+      colorHex: selectedColor,
+      imageSrc: matchingImage?.url || item.images[0]?.url || "",
       quantity,
     });
 
@@ -137,14 +156,19 @@ export function ProductInfoPanel({
         count: quantity,
         size: selectedSize,
         color: selectedColor,
-      }),
+      })
     );
   };
 
   const handleBuyNow = () => {
+    if (availableStock <= 0) {
+      toast.error("This option is currently out of stock.");
+      return;
+    }
     handleAddToCart();
     navigate("/checkout");
   };
+
   const handleCompare = () => {
     try {
       if (isCompared) {
@@ -161,109 +185,96 @@ export function ProductInfoPanel({
       toast.error("You can compare up to 4 products.");
     }
   };
-  const description = item.description ?? "";
 
   return (
-    <div className="flex felx-1 w-full flex-col items-start justify-start gap-4 lg:w-[33%]">
-      <h1 className="font-['Montserrat'] text-xl font-semibold text-foreground sm:text-2xl">
-        {item.name}
-      </h1>
-
-      {description && (
-        <p className="max-w-[420px] font-['Montserrat'] text-sm font-normal leading-6 text-foreground">
-          {isDescriptionExpanded
-            ? description
-            : description.length > 116
-              ? `${description.slice(0, 116)}...`
-              : description}
-
-          {description.length > 116 && (
-            <button
-              type="button"
-              onClick={() => setIsDescriptionExpanded((prev) => !prev)}
-              className="ml-1 font-semibold text-foreground"
-            >
-              {isDescriptionExpanded ? t("showLess") : t("readMore")}
-            </button>
-          )}
-        </p>
-      )}
-
-      <div className="font-['Montserrat'] text-xl font-semibold text-foreground sm:text-2xl">
-        {item.price} EGP
+    <div className="flex flex-col gap-6 w-full font-['Montserrat'] select-none">
+      {/* Brand & Title */}
+      <div className="flex flex-col gap-1">
+        {item.brandName && (
+          <span className="text-xs uppercase tracking-wider font-bold text-gray-text flex items-center gap-1.5">
+            <Tag className="h-3.5 w-3.5" />
+            {item.brandName}
+          </span>
+        )}
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+          {item.name}
+        </h1>
       </div>
 
-      {item.brandName && (
-        <div className="inline-flex items-center justify-start gap-2">
-          <Tag className="h-6 w-6 text-foreground" strokeWidth={1.5} />
-
-          <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-            {item.brandName}
-          </div>
-        </div>
-      )}
-
-      <div className="flex w-full items-center justify-start gap-4 sm:gap-[73px]">
-        <div className="flex items-center justify-start gap-2">
-          <div className="font-['Montserrat'] text-base font-semibold text-foreground">
-            {item.rating}
-          </div>
-
+      {/* Ratings & Review summary */}
+      <div className="flex items-center gap-4 flex-wrap text-sm">
+        <div className="flex items-center gap-1 bg-gray-50 border border-stroke rounded-lg px-2 py-1">
+          <span className="font-bold text-foreground">{item.rating}</span>
           <div className="flex">
             {Array.from({ length: 5 }).map((_, index) => {
               const fill = Math.min(1, Math.max(0, item.rating - index));
-              return <Star key={index} fill={fill} />;
+              return <Star key={index} fill={fill} size={14} />;
             })}
           </div>
-
-          <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-            {reviewCount} {t("reviews")}
-          </div>
         </div>
-
+        <span className="text-gray-text hover:underline cursor-pointer">
+          {reviewCount} {t("reviews")}
+        </span>
         <button
           type="button"
           onClick={handleShare}
-          className="flex items-center justify-start gap-2"
+          className="flex items-center gap-1 hover:text-primary ml-auto text-gray-text"
         >
-          <RiShareForwardLine className="h-6 w-6 fill-foreground text-foreground" />
-
-          <div className="font-['Montserrat'] text-base font-medium text-foreground">
-            {t("share")}
-          </div>
+          <RiShareForwardLine className="h-5 w-5" />
+          <span>{t("share")}</span>
         </button>
       </div>
-      {/* Color */}
 
+      {/* Description */}
+      <p className="text-sm font-normal leading-relaxed text-gray-text">
+        {item.description}
+      </p>
+
+      <hr className="border-stroke" />
+
+      {/* Prices & Discount badge */}
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <span className="text-3xl font-extrabold text-foreground">
+          {activePrice} EGP
+        </span>
+        {oldPrice && (
+          <>
+            <span className="text-lg text-gray-text line-through">
+              {oldPrice} EGP
+            </span>
+            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+              {discountPercent}% OFF
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Colors Selector */}
       {item.colors.length > 0 && (
-        <div className="flex flex-col items-start justify-start gap-2">
-          <div className="font-['Montserrat'] text-lg text-foreground sm:text-xl">
-            <span className="font-medium text-gray-text">{t("color")}:</span>{" "}
-            <span className="font-normal text-foreground">{selectedColor}</span>
+        <div className="flex flex-col gap-2">
+          <div className="text-sm font-semibold text-gray-text uppercase tracking-wider">
+            {t("color")}: <span className="text-foreground normal-case font-bold">{selectedColor}</span>
           </div>
-
-          <div className="flex items-center justify-start gap-2">
+          <div className="flex items-center gap-3">
             {item.colors.map((color) => {
               const isSelected =
+                selectedColor &&
+                color.color &&
                 selectedColor.toLowerCase() === color.color.toLowerCase();
-
               return (
                 <button
                   key={color.id}
                   type="button"
-                  onClick={() => setSelectedColor(color.color)}
-                  className="relative h-6 w-6"
-                  aria-label={`Select ${color.color} color`}
+                  onClick={() => onColorChange(color.color)}
+                  className={`w-8 h-8 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
+                    isSelected ? "border-primary scale-110 shadow-sm" : "border-transparent"
+                  }`}
+                  title={color.color}
                 >
-                  <div
-                    className="absolute left-0 top-0 h-6 w-6 rounded-full border"
-                    style={{ backgroundColor: getColorValue(color.color) }}
-                    title={color.color}
+                  <span
+                    className="w-full h-full rounded-full border border-black/10 inline-block"
+                    style={{ backgroundColor: color.color ? color.color.toLowerCase() : "#ddd" }}
                   />
-
-                  {isSelected && (
-                    <div className="absolute left-[1px] top-[1px] h-[22px] w-[22px] rounded-full border-2 border-card" />
-                  )}
                 </button>
               );
             })}
@@ -271,214 +282,135 @@ export function ProductInfoPanel({
         </div>
       )}
 
-      {/* Size */}
-      {item.sizes.length > 0 && (
-        <div className="flex w-full flex-wrap items-start justify-start gap-x-10 gap-y-2 sm:gap-x-[167px]">
-          <div className="font-['Montserrat'] text-lg text-foreground sm:text-xl">
-            <span className="font-medium text-gray-text">{t("size")}:</span>{" "}
-            <span className="font-normal text-foreground">{selectedSize}</span>
+      {/* Sizes Selector */}
+      {colorVariants.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="text-sm font-semibold text-gray-text uppercase tracking-wider">
+            {t("size")}: <span className="text-foreground normal-case font-bold">{selectedSize}</span>
           </div>
-
-          {item.sizeguide !== undefined && (
-            <button
-              type="button"
-              onClick={() => setIsSizeGuideOpen(true)}
-              className="font-['Montserrat'] text-base font-medium text-gray-text underline"
-            >
-              {t("sizeGuide")}
-            </button>
-          )}
-
-          <div className="flex items-center justify-start gap-2.5">
-            {item.sizes.map((size) => (
-              <button
-                key={size.id}
-                type="button"
-                onClick={() => setSelectedSize(size.size)}
-                className={`relative flex size-8 items-center justify-center overflow-hidden rounded-full outline outline-1 outline-offset-[-1px] outline-stroke ${
-                  size.size === selectedSize ? "bg-primary" : ""
-                }`}
-              >
-                <span
-                  className={`font-['Poppins']  font-normal text-foreground 
-                  ${size.size.toLocaleLowerCase() === "xxl" || size.size.toLocaleLowerCase() === "xxs" ? "text-sm" : "text-lg sm:text-xl"}
-                  
-                  `}
+          <div className="flex flex-wrap gap-2">
+            {colorVariants.map((variant: any) => {
+              const isSelected = variant.size === selectedSize;
+              const isOutOfStock = variant.quantity <= 0;
+              return (
+                <button
+                  key={variant.size}
+                  type="button"
+                  disabled={isOutOfStock}
+                  onClick={() => setSelectedSize(variant.size)}
+                  className={`h-10 min-w-10 rounded-xl px-3 font-semibold text-sm transition-all border outline-none ${
+                    isSelected
+                      ? "bg-primary text-foreground border-primary scale-[1.02] shadow-sm"
+                      : isOutOfStock
+                      ? "bg-gray-100 text-gray-300 border-gray-200 line-through cursor-not-allowed opacity-50"
+                      : "bg-white text-foreground border-stroke hover:border-gray-text"
+                  }`}
                 >
-                  {size.size}
-                </span>
-              </button>
-            ))}
-           
+                  {variant.size}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Quantity */}
-      <div className="flex flex-col items-start justify-start gap-2">
-        <div className="font-['Montserrat'] text-lg font-medium text-gray-text sm:text-xl">
+      {/* Stock Status Badge */}
+      <div className="flex items-center">
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${stockBadgeClass}`}>
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          {stockLabel} ({availableStock} units)
+        </span>
+      </div>
+
+      {/* Quantity Selector */}
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-semibold text-gray-text uppercase tracking-wider">
           {t("quantity")}:
-        </div>
-
-        <div className="inline-flex items-center justify-start gap-4 rounded-3xl bg-gray-light p-2">
+        </span>
+        <div className="inline-flex items-center border border-stroke rounded-xl bg-gray-50 p-1">
           <button
             type="button"
-            onClick={() =>
-              setQuantity((current) =>
-                Math.max(item.minOrder ?? 1, current - 1),
-              )
-            }
-            aria-label={t("decreaseQuantity")}
+            disabled={availableStock <= 0}
+            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white border border-transparent hover:border-stroke disabled:opacity-40"
           >
-            <ArrowCircle direction="prev" />
+            -
           </button>
-
-          <div className="font-['Montserrat'] text-lg font-medium text-foreground sm:text-xl">
-            {quantity}
-          </div>
-
+          <span className="w-10 text-center font-bold text-foreground">
+            {availableStock <= 0 ? 0 : quantity}
+          </span>
           <button
             type="button"
-            onClick={() => setQuantity((current) => Math.min(10, current + 1))}
-            aria-label={t("increaseQuantity")}
+            disabled={availableStock <= 0 || quantity >= availableStock}
+            onClick={() => setQuantity(quantity + 1)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white border border-transparent hover:border-stroke disabled:opacity-40"
           >
-            <ArrowCircle />
+            +
           </button>
         </div>
       </div>
-      {/* CTAs */}
-      {isOutOfStock ? (
-        <div className="w-full flex flex-col gap-3">
-          <div className="flex items-center gap-2 rounded-2xl bg-card border border-stroke px-4 py-3">
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-urgent animate-pulse" />
-            <span className="font-['Montserrat'] text-sm font-semibold text-urgent">
-              Out of Stock
-            </span>
-          </div>
+
+      <hr className="border-stroke" />
+
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-3">
+        <div className="flex gap-3">
           <button
             type="button"
-            onClick={handleNotifyMe}
-            disabled={isAlreadySubscribed || subscribeMutation.isPending}
-            className={`flex w-full items-center justify-center gap-2.5 rounded-2xl px-5 py-3.5 font-['Montserrat'] text-base font-bold transition-all ${
-              isAlreadySubscribed
-                ? "bg-primary/20 text-foreground border border-primary cursor-default"
-                : "bg-primary text-primary-foreground hover:opacity-90 shadow-lg hover:shadow-xl"
+            disabled={availableStock <= 0}
+            onClick={handleAddToCart}
+            className="flex-1 h-12 bg-card text-foreground border border-stroke hover:bg-gray-50 rounded-xl font-bold flex items-center justify-center gap-2 hover:border-gray-text disabled:opacity-50 transition"
+          >
+            <BsBag className="h-5 w-5" />
+            {t("addToCart")}
+          </button>
+          <button
+            type="button"
+            disabled={availableStock <= 0}
+            onClick={handleBuyNow}
+            className="flex-1 h-12 bg-primary text-foreground rounded-xl font-bold flex items-center justify-center hover:opacity-90 disabled:opacity-50 transition"
+          >
+            {t("buyNow")}
+          </button>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={handleToggleFavorite}
+            className="flex-1 h-10 bg-card hover:bg-gray-50 text-gray-text hover:text-foreground border border-stroke rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
+          >
+            <Heart className={`h-4 w-4 ${isFavorite ? "text-red-500 fill-red-500" : ""}`} />
+            {isFavorite ? "Wishlisted" : t("addToFavorite")}
+          </button>
+          <button
+            type="button"
+            onClick={handleCompare}
+            className={`flex-1 h-10 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+              isCompared
+                ? "bg-primary text-foreground border-primary"
+                : "bg-card hover:bg-gray-50 text-gray-text hover:text-foreground border-stroke"
             }`}
           >
-            {subscribeMutation.isPending ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Bell className="h-5 w-5" fill={isAlreadySubscribed ? "currentColor" : "none"} />
-            )}
-            <span>
-              {isAlreadySubscribed ? "You'll Be Notified" : "Notify Me When Available"}
-            </span>
+            <Scale className="h-4 w-4" />
+            {isCompared ? "Compared" : t("addToCompare")}
           </button>
         </div>
-      ) : (
-        <>
-      <button
-        type="button"
-        onClick={handleCompare}
-        className={`flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 outline outline-1 outline-offset-[-1px] transition-all sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start ${
-          isCompared
-            ? "bg-primary text-primary-foreground outline-primary"
-            : "bg-card text-foreground outline-stroke hover:bg-primary hover:text-primary-foreground"
-        }`}
-      >
-        <Scale className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2} />
-        <span className="font-['Montserrat'] text-xs font-semibold sm:text-base">
-          {isCompared ? t("removeFromCompare") : t("addToCompare")}
-        </span>
-      </button>
-      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-start sm:gap-4">
-        <button
-          type="button"
-          onClick={handleToggleFavorite}
-          disabled={toggleWishlist.isPending}
-          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start disabled:opacity-70"
-        >
-          <Heart
-            className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors ${isFavorite ? "text-red-500" : "text-foreground"}`}
-            strokeWidth={2}
-            fill={isFavorite ? "currentColor" : "none"}
-          />
-          <span className="font-['Montserrat'] text-xs font-semibold text-foreground sm:text-base">
-            {isFavorite ? t("removeFromFavorite") : t("addToFavorite")}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          className="flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-card px-3 py-2.5 outline outline-1 outline-offset-[-1px] outline-stroke sm:rounded-2xl sm:px-4 sm:py-3.5 sm:justify-start"
-        >
-          <BsBag
-            className="h-5 w-5 text-foreground sm:h-6 sm:w-6"
-            fill="currentColor"
-          />
-          <span className="font-['Montserrat'] text-xs font-semibold text-foreground sm:text-base">
-            {t("addToCart")}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleBuyNow}
-          className="col-span-2 flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-primary px-3 py-3 sm:col-span-1 sm:rounded-2xl sm:px-5 sm:py-3.5"
-        >
-          <span className="font-['Montserrat'] text-sm font-bold text-primary-foreground sm:text-base">
-            {t("buyNow")}
-          </span>
-        </button>
       </div>
-        </>
-      )}
-      {/* Delivery info */}
-      <div className="flex w-full max-w-[320px] flex-col items-start justify-start gap-4">
-        <div className="inline-flex items-center justify-start gap-1.5">
-          <Truck
-            className="h-8 w-8 shrink-0 text-foreground"
-            fill="currentColor"
-          />
 
-          <div className="font-['Montserrat'] text-sm font-medium leading-6">
-            <span className="text-urgent">
-              {t("deliveryTitle")}
-              <br />
-            </span>
-
-            <span className="text-foreground">{t("deliverySubtitle")}</span>
+      {/* Additional Details */}
+      <div className="flex flex-col gap-3 bg-gray-50 border border-stroke rounded-xl p-4 mt-2">
+        <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-text">
+          <Truck className="h-5 w-5 text-foreground shrink-0" />
+          <div>
+            <span className="font-bold text-foreground">{t("deliveryTitle")}</span> — {t("deliverySubtitle")}
           </div>
         </div>
-
-        <div className="inline-flex items-center justify-start gap-1.5">
-          <RotateCcw className="h-8 w-8 shrink-0 text-foreground" />
-
-          <div className="font-['Poppins'] text-sm font-medium leading-6 text-foreground">
-            {t("freeReturns")}
-          </div>
+        <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-text">
+          <RotateCcw className="h-5 w-5 text-foreground shrink-0" />
+          <div className="font-bold text-foreground">{t("freeReturns")}</div>
         </div>
       </div>
-      {item.sizeguide !== undefined && (
-        <Modal
-          isOpen={isSizeGuideOpen}
-          onClose={() => setIsSizeGuideOpen(false)}
-          title="Size Guide"
-        >
-          {item.sizeguide ? (
-            <img
-              src={item.sizeguide}
-              alt="Size Guide"
-              className="w-full rounded-lg"
-            />
-          ) : (
-            <p className="font-['Montserrat'] text-sm text-gray-text">
-              {t("sizeGuideUnavailable")}
-            </p>
-          )}
-        </Modal>
-      )}
     </div>
   );
 }

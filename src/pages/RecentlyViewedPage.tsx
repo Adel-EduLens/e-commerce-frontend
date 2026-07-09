@@ -40,8 +40,8 @@ export default function RecentlyViewedPage() {
                 to={p.productType === 'RETAIL' ? `/retail/${item.slug || item.id}` : p.productType === 'WHOLESALE' ? `/wholesale/${item.id}` : `/products/${item.id}`}
                 title={item.name}
                 price={`$${Number(item.price).toFixed(2)}`}
-                imageSrc={item.images?.[0]?.url || item.images?.[0]}
-                sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name}
+                imageSrc={item.colors?.[0]?.images?.[0]?.imageUrl || item.colors?.[0]?.images?.[0]?.url || item.images?.[0]?.url || item.images?.[0]}
+                sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name || Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ")}
                 rating={item.rating || item.averageRating}
               />
             );

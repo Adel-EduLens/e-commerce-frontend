@@ -94,8 +94,8 @@ export default function ProductsSection({
               productId={product.id}
               title={product.name}
               price={`$${product.price}`}
-              imageSrc={product.images[0]?.url}
-              sizeLabel={product.sizes.map((s) => s.size).join(" - ")}
+              imageSrc={product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url || product.images?.[0]?.url}
+              sizeLabel={Array.from(new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).join(" - ")}
               featured={product.rating >= 4}
               isMustHave={product.isMustHave}
               isFlashDeals={product.isFlashDeals}

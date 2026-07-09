@@ -52,8 +52,8 @@ export default function SeasonMustHavesPage() {
 
   const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category.name))], [allProducts]);
   const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
-  const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.sizes.map((s) => s.size)))], [allProducts]);
-  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors.map((c) => c.color)))], [allProducts]);
+  const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []))], [allProducts]);
+  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.map((c) => c.colorName) ?? []))], [allProducts]);
   const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
 
   const filterConfigs = useMemo(
@@ -122,10 +122,8 @@ export default function SeasonMustHavesPage() {
               productId={product.id}
               title={product.name}
               price={`$${product.price}`}
-              imageSrc={product.images[0]?.url}
-              sizeLabel={product.sizes
-                .map((size) => size.size)
-                .join(" - ")}
+              imageSrc={product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url || product.images?.[0]?.url}
+              sizeLabel={Array.from(new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).join(" - ")}
               featured={product.rating >= 4}
               rating={product.rating}
               to={`/product-details/${product.id}`}

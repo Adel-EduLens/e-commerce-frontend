@@ -2,6 +2,24 @@ import { useMutation, useQuery, useQueries, useQueryClient } from "@tanstack/rea
 import { api } from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 
+export interface ProductColor {
+  id: string;
+  colorName: string;
+  colorCode?: string | null;
+  images: {
+    id: string;
+    imageUrl: string;
+    isPrimary?: boolean;
+    url?: string;
+  }[];
+  variants: {
+    id: string;
+    size: string;
+    quantity: number;
+    sku?: string | null;
+  }[];
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -14,7 +32,6 @@ export interface Product {
   updatedAt: string;
   sizeguide?: string;
   sku?: string;
-  stock?: number;
   isMustHave?: boolean;
   isFlashDeals?: boolean;
   flashDealPrice?: number;
@@ -38,18 +55,7 @@ export interface Product {
     color?: string;
     productId: string;
   }[];
-
-  sizes: {
-    id: string;
-    size: string;
-    productId: string;
-  }[];
-
-  colors: {
-    id: string;
-    color: string;
-    productId: string;
-  }[];
+  colors: ProductColor[];
 }
 
 export type ProductsQuery = {
@@ -167,8 +173,11 @@ export interface ProductFormData {
   flashDealEndsAt?: string | null;
 }
 
-const createProduct = async (body: ProductFormData) => {
-  const { data } = await api.post("/products", body);
+const createProduct = async (body: ProductFormData | FormData) => {
+  const isFormData = body instanceof FormData;
+  const { data } = await api.post(isFormData ? "/trader/products" : "/products", body, {
+    headers: isFormData ? { "Content-Type": "multipart/form-data" } : undefined,
+  });
   return data.data;
 };
 
@@ -183,7 +192,8 @@ export const useCreateProduct = () => {
   });
 };
 
-const updateProduct = async ({ id, ...body }: Partial<ProductFormData> & { id: string }) => {
+const updateProduct = async ({ id, ...body }: Partial<ProductFormData> & { id: string } | FormData & { id: string }) => {
+  const isFormData = body instanceof FormData;
   const { data } = await api.patch(`/products/${id}`, body);
   return data.data;
 };
@@ -213,4 +223,152 @@ export const useDeleteProduct = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
+};
+
+export const useAddProductColor = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ productId, formData }: { productId: string; formData: FormData }) => {
+      const { data } = await api.post(`/trader/products/${productId}/colors`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useDeleteProductColor = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colorId }: { colorId: string; productId?: string }) => {
+      const { data } = await api.delete(`/trader/products/colors/${colorId}`);
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useReplaceProductColorImages = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
+      const { data } = await api.put(`/trader/products/colors/${colorId}/images`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useAddProductColorImages = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
+      const { data } = await api.post(`/trader/products/colors/${colorId}/images`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useDeleteProductImage = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ imageId }: { imageId: string; productId?: string }) => {
+      const { data } = await api.delete(`/trader/products/images/${imageId}`);
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useUpdateProductSizeQuantity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ variantId, quantity }: { variantId: string; quantity: number; productId?: string }) => {
+      const { data } = await api.patch(`/trader/products/variants/${variantId}`, { quantity });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useAddProductSize = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colorId, size, quantity, sku }: { colorId: string; size: string; quantity: number; sku?: string; productId?: string }) => {
+      const { data } = await api.post(`/trader/products/colors/${colorId}/sizes`, { size, quantity, sku });
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useDeleteProductSize = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ variantId }: { variantId: string; productId?: string }) => {
+      const { data } = await api.delete(`/trader/products/variants/${variantId}`);
+      return data.data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
+      if (variables.productId) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+};
+
+export const useProductDetails = (id?: string) => {
+  return useProduct(id);
+};
+
+export const useRecommendedProducts = (query: ProductsQuery) => {
+  return useProducts(query);
 };
