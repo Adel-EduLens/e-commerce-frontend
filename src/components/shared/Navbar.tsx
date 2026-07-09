@@ -9,6 +9,7 @@ import { Scale } from "lucide-react";
 import { getCompareProducts } from "../../utils/compareStorage";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useMarkAllRead, useNotifications } from "../../hooks/queries/notificationQuery";
+import { useCart } from "../../hooks/useCart";
 
 const navLinks = [
   { label: "home", path: "/" },
@@ -168,6 +169,9 @@ export default function Navbar() {
   const items = useCartStore((state) => state.items);
   const itemCount = items.length;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  // Fetch/sync cart when user is authenticated
+  useCart();
 
   const [compareItemsCount, setCompareItemsCount] = useState(
     getCompareProducts().length,

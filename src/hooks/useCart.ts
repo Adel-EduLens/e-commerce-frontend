@@ -5,13 +5,34 @@ import { useCartStore } from '../store/useCartStore'
 import type { AddRetailCartPayload } from '../types/cart'
 import type { CartItem } from '../types/cart'
 
+import { useAuthStore } from '../store/useAuthStore'
+
 export function useCart() {
+  const setItems = useCartStore((state) => state.setItems);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useQuery({
-    queryKey: ['cart'],
+    queryKey: ['cart', isAuthenticated],
     queryFn: async () => {
-      const data = await cartApi.getCart()
-      return data
+      if (!isAuthenticated) return null;
+      const data = await cartApi.getCart();
+      if (data && data.data && data.data.items) {
+        setItems(data.data.items.map((item: any) => ({
+          id: item.id,
+          productId: item.productId,
+          title: item.title,
+          unitPrice: item.price,
+          currency: 'EGP',
+          size: item.size || '',
+          color: item.color || '',
+          colorHex: '',
+          imageSrc: item.imageSrc,
+          quantity: item.quantity
+        })));
+      }
+      return data;
     },
+    enabled: isAuthenticated,
   })
 }
 
@@ -25,14 +46,7 @@ export function useAddRetailProductToCart() {
         await cartApi.addRetailProductToCart(payload.apiPayload)
         return payload.cartItem
       },
-      onSuccess: (cartItem: CartItem) => {
-        addItem({
-          ...cartItem,
-          productId: String(cartItem.productId || cartItem.retailProductId || ''),
-          size: cartItem.size || '',
-          color: cartItem.color || '',
-          colorHex: cartItem.colorHex || '',
-        })
+      onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ['cart'] })
         queryClient.invalidateQueries({ queryKey: ['retailProduct'] })
         queryClient.invalidateQueries({ queryKey: ['products'] })
