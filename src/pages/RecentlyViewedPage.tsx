@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { useRecentStore } from "../store/useRecentStore";
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import ProductCard from "../components/shared/ProductCard";
 
 export default function RecentlyViewedPage() {
-  const products = useRecentStore((s) => s.products);
-  const clearRecent = useRecentStore((s) => s.clearRecent);
+  const { data, isLoading } = useRecentlyViewed();
+  const products = data?.data || [];
 
   return (
     <div className="w-full">
@@ -12,18 +12,11 @@ export default function RecentlyViewedPage() {
         <h1 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
           Recently Viewed
         </h1>
-        {products.length > 0 && (
-          <button
-            type="button"
-            onClick={clearRecent}
-            className="font-['Montserrat'] text-sm text-gray-text hover:text-foreground transition-colors"
-          >
-            Clear all
-          </button>
-        )}
       </div>
 
-      {products.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center py-24">Loading...</div>
+      ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
           <p className="font-['Montserrat'] text-lg font-semibold text-gray-text">
             No recently viewed products yet
@@ -37,18 +30,22 @@ export default function RecentlyViewedPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.map((p) => (
-            <ProductCard
-              key={p.id}
-              productId={p.id}
-              to={`/products/${p.id}`}
-              title={p.name}
-              price={`$${p.price.toFixed(2)}`}
-              imageSrc={p.images?.[0]?.url}
-              sizeLabel={p.sizes?.[0]?.size}
-              rating={p.rating}
-            />
-          ))}
+          {products.map((p: any) => {
+            const item = p.product;
+            if (!item) return null;
+            return (
+              <ProductCard
+                key={p.id}
+                productId={item.id}
+                to={p.productType === 'RETAIL' ? `/retail/${item.slug || item.id}` : p.productType === 'WHOLESALE' ? `/wholesale/${item.id}` : `/products/${item.id}`}
+                title={item.name}
+                price={`$${Number(item.price).toFixed(2)}`}
+                imageSrc={item.images?.[0]?.url || item.images?.[0]}
+                sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name}
+                rating={item.rating || item.averageRating}
+              />
+            );
+          })}
         </div>
       )}
     </div>

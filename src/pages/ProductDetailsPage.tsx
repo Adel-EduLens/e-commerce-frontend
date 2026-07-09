@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useRecommendationStore } from "../store/useRecommendationStore";
-import { useRecentStore } from "../store/useRecentStore";
+import { useAddRecentlyViewed } from "../hooks/useRecentlyViewed";
 
 import { useProduct } from "../hooks/queries/productsQuery";
 import { useParams } from "react-router-dom";
@@ -18,6 +18,7 @@ export default function ProductDetailsPage() {
   const { data: product, isPending, isError } = useProduct(id);
   const { data: reviews = [] } = useReviews(id);
   const addSignal = useRecommendationStore((s) => s.addSignal);
+  const { mutate: addRecentlyViewed } = useAddRecentlyViewed();
 
   const [selectedColor, setSelectedColor] = useState("");
 
@@ -36,15 +37,9 @@ export default function ProductDetailsPage() {
   useEffect(() => {
     if (product) {
       addSignal(product.id, product.categoryId, "view");
-      useRecentStore.getState().addProduct({
-        id: String(product.id),
-        name: product.name,
-        price: Number(product.price) || 0,
-        images: product.images || [],
-        sizes: product.sizes || [],
-      });
+      addRecentlyViewed({ productType: "SHOP", productId: product.id });
     }
-  }, [addSignal, product, product?.id]);
+  }, [addSignal, product, product?.id, addRecentlyViewed]);
 
 
   if (isPending) return <div className="p-10 text-center">{t("loading")}</div>;

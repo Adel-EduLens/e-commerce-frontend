@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 import { api } from "../lib/axios";
-import { useRecentStore } from "../store/useRecentStore";
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/useAuthStore";
 import { useWishlist } from "../hooks/useWishlist";
@@ -314,7 +314,14 @@ function FavoritesSection({
   onSelectTab: (tab: BagTab) => void;
 }) {
   const { t } = useTranslation("bag");
-  const recentProducts = useRecentStore((state) => state.products);
+  const { data: recentlyViewedData } = useRecentlyViewed();
+  const apiRecentlyViewed = Array.isArray(recentlyViewedData?.data)
+    ? recentlyViewedData.data.map((item: any) => {
+        const product = item.product;
+        if (!product) return null;
+        return { ...product, _productType: item.productType };
+      }).filter(Boolean)
+    : [];
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
@@ -325,7 +332,7 @@ function FavoritesSection({
       }).filter(Boolean)
     : [];
 
-  const allProducts = selectedTab === "favorites" ? apiFavorites : recentProducts;
+  const allProducts = selectedTab === "favorites" ? apiFavorites : apiRecentlyViewed;
   const products = allProducts.slice(0, 4);
   const viewAllLink = selectedTab === "favorites" ? "/favorites" : "/recently-viewed";
 

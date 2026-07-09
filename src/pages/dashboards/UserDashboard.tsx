@@ -2,7 +2,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { asset } from '../../lib/utils';
 import { RecommedProducts } from "../../components/product/recommedProducts";
 import { useWishlist } from "../../hooks/useWishlist";
-import { useRecentStore } from "../../store/useRecentStore";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useProducts } from "../../hooks/queries/productsQuery";
 import { useNavigate } from "react-router-dom";
 
@@ -86,9 +86,13 @@ export default function UserDashboard() {
     : [];
   const favoriteProducts = apiFavorites.length > 0 ? apiFavorites : defaultProducts.slice(0, 4);
 
-  const recentProducts = useRecentStore((s) => s.products);
-  const viewedProducts = recentProducts.length > 0
-    ? recentProducts
+  const { data: recentlyViewedData } = useRecentlyViewed();
+  const apiRecentlyViewed = Array.isArray(recentlyViewedData?.data)
+    ? recentlyViewedData.data.map((item: any) => item.product).filter(Boolean)
+    : [];
+
+  const viewedProducts = apiRecentlyViewed.length > 0
+    ? apiRecentlyViewed
     : (defaultProducts.slice(4, 8).length > 0 ? defaultProducts.slice(4, 8) : defaultProducts.slice(0, 4));
 
   return (

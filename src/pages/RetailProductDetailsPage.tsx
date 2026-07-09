@@ -8,7 +8,7 @@ import { useAuthStore } from '../store/useAuthStore'
 import { useAddRetailProductToCart } from '../hooks/useCart'
 import { useRateProduct } from '../hooks/useRateProduct'
 import ProductRatingStars from '../components/rating/ProductRatingStars'
-import { useRecentStore } from '../store/useRecentStore'
+import { useAddRecentlyViewed } from '../hooks/useRecentlyViewed'
 
 function toNumber(value: any) {
   const n = Number(value)
@@ -35,6 +35,8 @@ export default function RetailProductDetailsPage() {
   const [isRatingSubmitting, setIsRatingSubmitting] = useState(false)
   const [ratingValue, setRatingValue] = useState(0)
 
+  const { mutate: addRecentlyViewed } = useAddRecentlyViewed()
+
   useEffect(() => {
     if (!isAuthenticated || !user) {
       navigate('/login')
@@ -44,15 +46,9 @@ export default function RetailProductDetailsPage() {
   useEffect(() => {
     if (product) {
       setRatingValue(Number(product?.userRating ?? product?.myRating ?? product?.rating ?? product?.averageRating ?? 0))
-      useRecentStore.getState().addProduct({
-        id: String(product.id),
-        name: product.name,
-        price: Number(product.price) || 0,
-        images: product.images || [],
-        sizes: product.sizes || [],
-      })
+      addRecentlyViewed({ productType: 'RETAIL', productId: product.id })
     }
-  }, [product?.id, product?.userRating, product?.myRating, product?.rating, product?.averageRating, product?.name, product?.price, product?.images, product?.sizes])
+  }, [product?.id, product?.userRating, product?.myRating, product?.rating, product?.averageRating, addRecentlyViewed])
 
   const images = Array.isArray(product?.images) ? product.images : []
   const colors = Array.isArray(product?.colors) ? product.colors : []
