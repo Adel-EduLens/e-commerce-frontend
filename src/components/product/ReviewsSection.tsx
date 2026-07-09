@@ -195,7 +195,7 @@ export function ReviewsSection() {
   }
   if (isError) {
     return (
-      <div className="flex justify-center py-10 font-['Montserrat'] text-red-600">
+      <div className="flex justify-center py-10 font-['Montserrat'] text-[#E8192C]">
         {t("couldNotLoadReviews")}
       </div>
     );
@@ -203,30 +203,24 @@ export function ReviewsSection() {
 
   return (
     <section className="flex w-full flex-col gap-6 font-['Montserrat'] select-none">
-      {/* Header, stars summary, and write button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stroke pb-6">
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-2xl font-bold text-foreground">
-            Customer Reviews
-          </h2>
-          {reviews.length > 0 ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold text-foreground">{averageRating}</span>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <h2 className="text-xl font-bold text-[#1a1a1a]">Reviews</h2>
+          {reviews.length > 0 && (
+            <>
+              <span className="text-lg font-bold text-[#1a1a1a]">{averageRating}</span>
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, index) => {
-                  const fill = Math.min(
-                    1,
-                    Math.max(0, Number(averageRating) - index)
-                  );
-                  return <Star key={index} fill={fill} size={18} />;
+                  const fill = Math.min(1, Math.max(0, Number(averageRating) - index));
+                  return <Star key={index} fill={fill} size={16} />;
                 })}
               </div>
-              <span className="text-sm font-semibold text-gray-text">
-                ({reviews.length} Reviews)
-              </span>
-            </div>
-          ) : (
-            <span className="text-sm text-gray-text">{t("noReviews")}</span>
+              <span className="text-sm text-[#888]">({reviews.length} Reviews)</span>
+            </>
+          )}
+          {reviews.length === 0 && (
+            <span className="text-sm text-[#888]">{t("noReviews")}</span>
           )}
         </div>
 
@@ -234,7 +228,7 @@ export function ReviewsSection() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-foreground hover:opacity-90 transition w-fit"
+            className="rounded-md bg-[#E8192C] px-5 py-2 text-sm font-bold text-white hover:bg-[#c8001f] transition w-fit"
           >
             {myReview ? t("editYourReview") : t("writeReview")}
           </button>
@@ -251,20 +245,19 @@ export function ReviewsSection() {
 
       {reviews.length > 0 && (
         <>
-          {/* Filtering and sorting */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="text-sm font-semibold text-gray-text">
+          {/* Filter & Sort row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="text-xs text-[#888]">
               Showing {paginatedReviews.length} of {visibleReviews.length} reviews
             </div>
-
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <select
                 value={filterValue}
                 onChange={(e) => {
                   setFilterValue(e.target.value as ReviewFilterValue);
-                  setPageSize(3); // Reset page size on filter change
+                  setPageSize(3);
                 }}
-                className="rounded-xl border border-stroke bg-white px-3 py-2 text-sm font-medium text-foreground outline-none cursor-pointer focus:border-primary"
+                className="rounded-md border border-[#ddd] bg-white px-3 py-1.5 text-xs font-medium text-[#1a1a1a] outline-none cursor-pointer"
               >
                 {FILTER_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -272,14 +265,13 @@ export function ReviewsSection() {
                   </option>
                 ))}
               </select>
-
               <select
                 value={sortValue}
                 onChange={(e) => {
                   setSortValue(e.target.value as ReviewSortValue);
-                  setPageSize(3); // Reset page size on sort change
+                  setPageSize(3);
                 }}
-                className="rounded-xl border border-stroke bg-white px-3 py-2 text-sm font-medium text-foreground outline-none cursor-pointer focus:border-primary"
+                className="rounded-md border border-[#ddd] bg-white px-3 py-1.5 text-xs font-medium text-[#1a1a1a] outline-none cursor-pointer"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -290,23 +282,26 @@ export function ReviewsSection() {
             </div>
           </div>
 
-          {/* Paginated Reviews Feed */}
-          <div className="flex w-full flex-col gap-4">
+          {/* Reviews Grid — 2 columns */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {paginatedReviews.map((review) => renderReviewCard(review))}
           </div>
 
-          {/* Load More Button */}
+          {/* View More */}
           {visibleReviews.length > pageSize && (
-            <button
-              type="button"
-              onClick={() => setPageSize((prev) => prev + 3)}
-              className="mx-auto rounded-xl border border-stroke bg-white px-6 py-2.5 text-sm font-bold text-foreground hover:bg-gray-50 transition"
-            >
-              Load More Reviews
-            </button>
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setPageSize((prev) => prev + 3)}
+                className="rounded-md border border-[#ddd] bg-white px-8 py-2.5 text-sm font-bold text-[#1a1a1a] hover:border-[#999] transition"
+              >
+                View More
+              </button>
+            </div>
           )}
         </>
       )}
     </section>
   );
 }
+

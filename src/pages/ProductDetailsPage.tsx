@@ -21,18 +21,41 @@ export default function ProductDetailsPage() {
   const { mutate: addRecentlyViewed } = useAddRecentlyViewed();
 
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
   const {t} = useTranslation("productDetails");
 
-
+  // Initialize selected values on product load
   useEffect(() => {
-    const func = ()=>{
-      if (product && product.colors.length > 0 && !selectedColor) {
-        setSelectedColor(product.colors[0].color);
-      }
+    if (product && product.colors && product.colors.length > 0) {
+      const firstColor = product.colors[0];
+      setSelectedColor(firstColor.colorName || firstColor.color || "");
+      
+      const firstAvailableSize = firstColor.variants?.find((v: any) => v.quantity > 0)?.size || firstColor.variants?.[0]?.size || "";
+      setSelectedSize(firstAvailableSize);
+
+      const firstImage = firstColor.images?.[0]?.imageUrl || firstColor.images?.[0]?.url || "";
+      setSelectedImage(firstImage);
+      
+      setQuantity(1);
     }
-    func()
-  }, [product, selectedColor]);
+  }, [product]);
+
+  const handleColorChange = (colorName: string) => {
+    setSelectedColor(colorName);
+    const colorObj = product?.colors?.find((c: any) => (c.colorName || c.color) === colorName);
+    if (colorObj) {
+      const firstAvailableSize = colorObj.variants?.find((v: any) => v.quantity > 0)?.size || colorObj.variants?.[0]?.size || "";
+      setSelectedSize(firstAvailableSize);
+      
+      const firstImage = colorObj.images?.[0]?.imageUrl || colorObj.images?.[0]?.url || "";
+      setSelectedImage(firstImage);
+      
+      setQuantity(1);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -50,6 +73,17 @@ export default function ProductDetailsPage() {
     ...product,
     brandName: product.brand?.name ?? null,
     sizeguide: product.sizeguide,
+    images: product.colors?.flatMap((c: any) =>
+      (c.images || []).map((img: any) => ({
+        id: img.id,
+        url: img.url || img.imageUrl || "",
+        color: c.colorName || c.color || "",
+      }))
+    ) ?? [],
+    colors: (product.colors || []).map((c: any) => ({
+      id: c.id,
+      color: c.colorName || c.color || "",
+    })),
   };
 
   return (
@@ -60,13 +94,23 @@ export default function ProductDetailsPage() {
         </div>
 
         <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-8">
-          <ProductGallery selectedColor={selectedColor} item={item} />
+          <ProductGallery
+            selectedColor={selectedColor}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            item={item}
+          />
 
           <ProductInfoPanel
             selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+            onColorChange={handleColorChange}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+            quantity={quantity}
+            setQuantity={setQuantity}
             item={item}
             reviewCount={reviews.length}
+            rawProduct={product}
           />
         </div>
         <ReviewsSection />

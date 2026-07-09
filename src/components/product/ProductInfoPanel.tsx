@@ -187,75 +187,69 @@ export function ProductInfoPanel({
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full font-['Montserrat'] select-none">
-      {/* Brand & Title */}
+    <div className="flex flex-col gap-5 w-full font-['Montserrat'] select-none">
+
+      {/* Product Name */}
       <div className="flex flex-col gap-1">
-        {item.brandName && (
-          <span className="text-xs uppercase tracking-wider font-bold text-gray-text flex items-center gap-1.5">
-            <Tag className="h-3.5 w-3.5" />
-            {item.brandName}
-          </span>
-        )}
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+        <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] leading-snug">
           {item.name}
         </h1>
+        {item.description && (
+          <p className="text-xs text-[#888] leading-relaxed mt-1 line-clamp-2">
+            {item.description}
+          </p>
+        )}
       </div>
 
-      {/* Ratings & Review summary */}
-      <div className="flex items-center gap-4 flex-wrap text-sm">
-        <div className="flex items-center gap-1 bg-gray-50 border border-stroke rounded-lg px-2 py-1">
-          <span className="font-bold text-foreground">{item.rating}</span>
-          <div className="flex">
-            {Array.from({ length: 5 }).map((_, index) => {
-              const fill = Math.min(1, Math.max(0, item.rating - index));
-              return <Star key={index} fill={fill} size={14} />;
-            })}
-          </div>
+      {/* Rating row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1">
+          {Array.from({ length: 5 }).map((_, index) => {
+            const fill = Math.min(1, Math.max(0, item.rating - index));
+            return <Star key={index} fill={fill} size={15} />;
+          })}
         </div>
-        <span className="text-gray-text hover:underline cursor-pointer">
-          {reviewCount} {t("reviews")}
-        </span>
+        <span className="text-sm font-semibold text-[#1a1a1a]">{item.rating}</span>
+        <span className="text-sm text-[#888]">({reviewCount} {t("reviews")})</span>
         <button
           type="button"
-          onClick={handleShare}
-          className="flex items-center gap-1 hover:text-primary ml-auto text-gray-text"
+          onClick={handleCompare}
+          className="ml-auto text-xs text-[#E8192C] hover:underline font-semibold"
         >
-          <RiShareForwardLine className="h-5 w-5" />
-          <span>{t("share")}</span>
+          {isCompared ? "✓ In Comparison" : "+ Add to Product Comparison"}
         </button>
       </div>
 
-      {/* Description */}
-      <p className="text-sm font-normal leading-relaxed text-gray-text">
-        {item.description}
-      </p>
-
-      <hr className="border-stroke" />
-
-      {/* Prices & Discount badge */}
+      {/* Price */}
       <div className="flex items-baseline gap-3 flex-wrap">
-        <span className="text-3xl font-extrabold text-foreground">
-          {activePrice} EGP
+        <span className="text-2xl font-extrabold text-[#1a1a1a]">
+          {activePrice.toLocaleString()} EGP
         </span>
         {oldPrice && (
           <>
-            <span className="text-lg text-gray-text line-through">
-              {oldPrice} EGP
-            </span>
-            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+            <span className="text-base text-[#aaa] line-through">{oldPrice.toLocaleString()} EGP</span>
+            <span className="bg-[#fff0f0] text-[#E8192C] text-xs font-bold px-2 py-0.5 rounded">
               {discountPercent}% OFF
             </span>
           </>
         )}
       </div>
 
-      {/* Colors Selector */}
+      {/* Brand */}
+      {item.brandName && (
+        <div className="flex items-center gap-2 py-2 border-t border-b border-[#f0f0f0]">
+          <span className="text-xs font-bold text-[#888] uppercase tracking-wider">Brand:</span>
+          <span className="text-sm font-bold text-[#1a1a1a] uppercase tracking-wide">{item.brandName}</span>
+        </div>
+      )}
+
+      {/* Colors */}
       {item.colors.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-sm font-semibold text-gray-text uppercase tracking-wider">
-            {t("color")}: <span className="text-foreground normal-case font-bold">{selectedColor}</span>
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider">
+            COLOR: <span className="text-[#1a1a1a] normal-case font-bold">{selectedColor}</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
             {item.colors.map((color) => {
               const isSelected =
                 selectedColor &&
@@ -266,27 +260,35 @@ export function ProductInfoPanel({
                   key={color.id}
                   type="button"
                   onClick={() => onColorChange(color.color)}
-                  className={`w-8 h-8 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
-                    isSelected ? "border-primary scale-110 shadow-sm" : "border-transparent"
-                  }`}
                   title={color.color}
+                  className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
+                    isSelected ? "border-[#E8192C]" : "border-[#ddd] hover:border-[#999]"
+                  }`}
                 >
                   <span
-                    className="w-full h-full rounded-full border border-black/10 inline-block"
+                    className="w-full h-full rounded-full inline-block border border-black/10"
                     style={{ backgroundColor: color.color ? color.color.toLowerCase() : "#ddd" }}
                   />
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={handleShare}
+              className="ml-auto text-xs text-[#888] hover:text-[#E8192C] flex items-center gap-1"
+            >
+              <RiShareForwardLine className="h-4 w-4" />
+              Size Guide
+            </button>
           </div>
         </div>
       )}
 
-      {/* Sizes Selector */}
+      {/* Sizes */}
       {colorVariants.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-sm font-semibold text-gray-text uppercase tracking-wider">
-            {t("size")}: <span className="text-foreground normal-case font-bold">{selectedSize}</span>
+          <div className="text-xs font-bold text-[#555] uppercase tracking-wider">
+            SIZE: <span className="text-[#1a1a1a] normal-case font-bold">{selectedSize}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
@@ -298,12 +300,12 @@ export function ProductInfoPanel({
                   type="button"
                   disabled={isOutOfStock}
                   onClick={() => setSelectedSize(variant.size)}
-                  className={`h-10 min-w-10 rounded-xl px-3 font-semibold text-sm transition-all border outline-none ${
+                  className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
                     isSelected
-                      ? "bg-primary text-foreground border-primary scale-[1.02] shadow-sm"
+                      ? "bg-[#1a1a1a] text-white border-[#1a1a1a]"
                       : isOutOfStock
-                      ? "bg-gray-100 text-gray-300 border-gray-200 line-through cursor-not-allowed opacity-50"
-                      : "bg-white text-foreground border-stroke hover:border-gray-text"
+                      ? "bg-[#f5f5f5] text-[#ccc] border-[#eee] line-through cursor-not-allowed"
+                      : "bg-white text-[#1a1a1a] border-[#ddd] hover:border-[#999]"
                   }`}
                 >
                   {variant.size}
@@ -314,101 +316,81 @@ export function ProductInfoPanel({
         </div>
       )}
 
-      {/* Stock Status Badge */}
-      <div className="flex items-center">
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${stockBadgeClass}`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          {stockLabel} ({availableStock} units)
-        </span>
-      </div>
-
-      {/* Quantity Selector */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-semibold text-gray-text uppercase tracking-wider">
-          {t("quantity")}:
-        </span>
-        <div className="inline-flex items-center border border-stroke rounded-xl bg-gray-50 p-1">
+      {/* Quantity */}
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold text-[#555] uppercase tracking-wider">QUANTITY:</span>
+        <div className="inline-flex items-center border border-[#ddd] rounded-md bg-white">
           <button
             type="button"
             disabled={availableStock <= 0}
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white border border-transparent hover:border-stroke disabled:opacity-40"
+            className="w-8 h-8 flex items-center justify-center font-bold text-[#555] hover:bg-[#f5f5f5] disabled:opacity-40 rounded-l-md"
           >
-            -
+            −
           </button>
-          <span className="w-10 text-center font-bold text-foreground">
+          <span className="w-10 text-center font-bold text-[#1a1a1a] text-sm border-x border-[#ddd]">
             {availableStock <= 0 ? 0 : quantity}
           </span>
           <button
             type="button"
             disabled={availableStock <= 0 || quantity >= availableStock}
             onClick={() => setQuantity(quantity + 1)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white border border-transparent hover:border-stroke disabled:opacity-40"
+            className="w-8 h-8 flex items-center justify-center font-bold text-[#555] hover:bg-[#f5f5f5] disabled:opacity-40 rounded-r-md"
           >
             +
           </button>
         </div>
+        {/* Stock badge */}
+        <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded ${stockBadgeClass}`}>
+          {stockLabel}
+        </span>
       </div>
 
-      <hr className="border-stroke" />
+      {/* Favorite */}
+      <button
+        type="button"
+        onClick={handleToggleFavorite}
+        className={`flex items-center gap-2 text-sm font-semibold w-fit transition ${
+          isFavorite ? "text-[#E8192C]" : "text-[#888] hover:text-[#E8192C]"
+        }`}
+      >
+        <Heart className={`h-4 w-4 ${isFavorite ? "fill-[#E8192C] text-[#E8192C]" : ""}`} />
+        {isFavorite ? "Wishlisted" : t("addToFavorite")}
+      </button>
 
       {/* Action Buttons */}
-      <div className="flex flex-col gap-3">
-        <div className="flex gap-3">
-          <button
-            type="button"
-            disabled={availableStock <= 0}
-            onClick={handleAddToCart}
-            className="flex-1 h-12 bg-card text-foreground border border-stroke hover:bg-gray-50 rounded-xl font-bold flex items-center justify-center gap-2 hover:border-gray-text disabled:opacity-50 transition"
-          >
-            <BsBag className="h-5 w-5" />
-            {t("addToCart")}
-          </button>
-          <button
-            type="button"
-            disabled={availableStock <= 0}
-            onClick={handleBuyNow}
-            className="flex-1 h-12 bg-primary text-foreground rounded-xl font-bold flex items-center justify-center hover:opacity-90 disabled:opacity-50 transition"
-          >
-            {t("buyNow")}
-          </button>
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={handleToggleFavorite}
-            className="flex-1 h-10 bg-card hover:bg-gray-50 text-gray-text hover:text-foreground border border-stroke rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition"
-          >
-            <Heart className={`h-4 w-4 ${isFavorite ? "text-red-500 fill-red-500" : ""}`} />
-            {isFavorite ? "Wishlisted" : t("addToFavorite")}
-          </button>
-          <button
-            type="button"
-            onClick={handleCompare}
-            className={`flex-1 h-10 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-              isCompared
-                ? "bg-primary text-foreground border-primary"
-                : "bg-card hover:bg-gray-50 text-gray-text hover:text-foreground border-stroke"
-            }`}
-          >
-            <Scale className="h-4 w-4" />
-            {isCompared ? "Compared" : t("addToCompare")}
-          </button>
-        </div>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          disabled={availableStock <= 0}
+          onClick={handleAddToCart}
+          className="flex-1 h-11 bg-[#E8192C] text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#c8001f] disabled:opacity-50 transition"
+        >
+          <BsBag className="h-4 w-4" />
+          {t("addToCart")}
+        </button>
+        <button
+          type="button"
+          disabled={availableStock <= 0}
+          onClick={handleBuyNow}
+          className="flex-1 h-11 bg-[#1a1a1a] text-white rounded-md font-bold text-sm flex items-center justify-center hover:bg-black disabled:opacity-50 transition"
+        >
+          {t("buyNow")}
+        </button>
       </div>
 
-      {/* Additional Details */}
-      <div className="flex flex-col gap-3 bg-gray-50 border border-stroke rounded-xl p-4 mt-2">
-        <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-text">
-          <Truck className="h-5 w-5 text-foreground shrink-0" />
+      {/* Shipping Info */}
+      <div className="flex flex-col gap-2 pt-2 border-t border-[#f0f0f0]">
+        <div className="flex items-start gap-3 text-xs text-[#555]">
+          <Truck className="h-4 w-4 text-[#1a1a1a] shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold text-foreground">{t("deliveryTitle")}</span> — {t("deliverySubtitle")}
+            <span className="font-bold text-[#1a1a1a]">{t("deliveryTitle")}</span>
+            {" "}— {t("deliverySubtitle")}
           </div>
         </div>
-        <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-text">
-          <RotateCcw className="h-5 w-5 text-foreground shrink-0" />
-          <div className="font-bold text-foreground">{t("freeReturns")}</div>
+        <div className="flex items-center gap-3 text-xs text-[#555]">
+          <RotateCcw className="h-4 w-4 text-[#1a1a1a] shrink-0" />
+          <span className="font-bold text-[#1a1a1a]">{t("freeReturns")}</span>
         </div>
       </div>
     </div>
