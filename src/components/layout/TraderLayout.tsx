@@ -11,6 +11,7 @@ const sidebarItems = [
   { label: "Dropshipping", icon: "streamline-flex_shipping-box-2.svg", path: "/dashboard/trader/dropshipping" },
   { label: "Wholesale", icon: "system-uicons_boxes.svg", path: "/dashboard/trader/wholesale" },
   { label: "Brand Partners", icon: "mdi_partnership-outline.svg", path: "/dashboard/trader/brand-partners" },
+  { label: "Categories", icon: "carbon_category-2.svg", path: "/dashboard/trader/categories" },
   { label: "Products", icon: "streamline-ultimate_products-gifts.svg", path: "/dashboard/trader/products" },
   { label: "Orders", icon: "carbon_follow-up-work-order.svg", path: "/dashboard/trader/orders" },
   { label: "Inventory", icon: "material-symbols_inventory.svg", path: "/dashboard/trader/inventory" },

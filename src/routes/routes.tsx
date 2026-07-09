@@ -57,6 +57,8 @@ import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
 
 import ComparePage from "../pages/ComparePage";
 
+import TraderCategoriesPage from "../pages/dashboards/TraderCategoriesPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -284,6 +286,10 @@ export const router = createBrowserRouter([
           {
             path: "retail",
             element: <TraderRetailPage />,
+          },
+          {
+            path: "categories",
+            element: <TraderCategoriesPage />,
           },
           {
             path: "products",
