@@ -1,4 +1,11 @@
-import { Bell, Trash2, Check, CheckCheck, Package, Loader2 } from "lucide-react";
+import {
+  Bell,
+  Trash2,
+  Check,
+  CheckCheck,
+  Package,
+  Loader2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   useUserNotifications,
@@ -7,16 +14,11 @@ import {
   useDeleteNotification,
 } from "../hooks/useUserNotifications";
 import { useCategories } from "../hooks/queries/categoriesQuery";
-import { useCategorySubscriptions, useToggleCategorySubscription } from "../hooks/queries/notificationQuery";
+import {
+  useCategorySubscriptions,
+  useToggleCategorySubscription,
+} from "../hooks/queries/notificationQuery";
 import { useTranslation } from "react-i18next";
-
-const COLLECTION_LABELS = ["Men", "Women", "Kids"];
-const COLLECTION_IMAGES: Record<string, string> = {
-  Men: "/home-page/image%208.png",
-  Women: "/home-page/image%207.png",
-  Kids: "/home-page/image%209.png",
-};
-
 
 function NotificationCard({
   notification,
@@ -44,10 +46,11 @@ function NotificationCard({
 
   return (
     <div
-      className={`flex items-start gap-4 rounded-2xl p-4 border transition-all ${notification.isRead
-        ? "bg-card border-stroke"
-        : "bg-primary/5 border-primary/30"
-        }`}
+      className={`flex items-start gap-4 rounded-2xl p-4 border transition-all ${
+        notification.isRead
+          ? "bg-card border-stroke"
+          : "bg-primary/5 border-primary/30"
+      }`}
     >
       {/* Image or Icon */}
       <div className="h-14 w-14 rounded-xl overflow-hidden bg-gray-light shrink-0 flex items-center justify-center">
@@ -145,15 +148,17 @@ function EmptyNotifications() {
 }
 
 export default function NotificationsPage() {
-  const { data: notifications = [], isLoading, isError } = useUserNotifications();
+  const {
+    data: notifications = [],
+    isLoading,
+    isError,
+  } = useUserNotifications();
   const markReadMutation = useMarkNotificationRead();
   const { t } = useTranslation("notifications");
   const markAllReadMutation = useMarkAllNotificationsRead();
   const deleteMutation = useDeleteNotification();
-  const { data: categories = [] } = useCategories();
-  const collectionCategories = categories.filter((c) =>
-    COLLECTION_LABELS.includes(c.name)
-  );
+  const { data: categories = [], isLoading: isCategoriesLoading } =
+    useCategories();
 
   const { data: subscribedIds = [] } = useCategorySubscriptions();
   const { subscribe, unsubscribe } = useToggleCategorySubscription();
@@ -196,9 +201,14 @@ export default function NotificationsPage() {
       </div>
 
       {/* Category subscription cards */}
-      {collectionCategories.length > 0 && (
+      {isCategoriesLoading && (
+        <div className="flex items-center justify-center py-20 gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      )}
+      {!isCategoriesLoading && categories.length > 0 && (
         <div className="flex gap-3">
-          {collectionCategories.map((cat) => {
+          {categories.map((cat) => {
             const enabled = subscribedIds.includes(cat.id);
             return (
               <div
@@ -206,7 +216,7 @@ export default function NotificationsPage() {
                 className="flex flex-1 items-center gap-2 rounded-xl bg-card border border-stroke px-3 py-2"
               >
                 <img
-                  src={COLLECTION_IMAGES[cat.name] ?? ""}
+                  src={cat.image ?? ""}
                   className="h-8 w-8 rounded-full object-cover object-top shrink-0"
                   alt={cat.name}
                   draggable={false}
@@ -216,8 +226,14 @@ export default function NotificationsPage() {
                 </span>
                 <button
                   type="button"
-                  onClick={() => enabled ? unsubscribe(cat.id) : subscribe(cat.id)}
-                  aria-label={enabled ? `Unsubscribe from ${cat.name}` : `Subscribe to ${cat.name}`}
+                  onClick={() =>
+                    enabled ? unsubscribe(cat.id) : subscribe(cat.id)
+                  }
+                  aria-label={
+                    enabled
+                      ? `Unsubscribe from ${cat.name}`
+                      : `Subscribe to ${cat.name}`
+                  }
                   className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
                     enabled ? "bg-primary" : "bg-stroke"
                   }`}
