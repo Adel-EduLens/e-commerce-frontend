@@ -59,6 +59,8 @@ import ComparePage from "../pages/ComparePage";
 
 import TraderCategoriesPage from "../pages/dashboards/TraderCategoriesPage";
 
+import CreateYourDesignPage from "../pages/CreateYourDesignPage";
+import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -97,6 +99,22 @@ export const router = createBrowserRouter([
         element: (
           <UserLayout>
             <ProductsPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "createYourDesign",
+        element: (
+          <UserLayout>
+            <CreateYourDesignPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "/createYourDesign/:id",
+        element: (
+          <UserLayout>
+            <CreateYourDesignDetailPage />
           </UserLayout>
         ),
       },
