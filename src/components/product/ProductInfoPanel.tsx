@@ -200,11 +200,11 @@ export function ProductInfoPanel({
 
       {/* Product Name */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] leading-snug">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground leading-snug">
           {item.name}
         </h1>
         {item.description && (
-          <p className="text-xs text-[#888] leading-relaxed mt-1 line-clamp-2">
+          <p className="text-xs text-gray-text leading-relaxed mt-1 line-clamp-2">
             {item.description}
           </p>
         )}
@@ -218,12 +218,12 @@ export function ProductInfoPanel({
             return <Star key={index} fill={fill} size={15} />;
           })}
         </div>
-        <span className="text-sm font-semibold text-[#1a1a1a]">{item.rating}</span>
-        <span className="text-sm text-[#888]">({reviewCount} {t("reviews")})</span>
+        <span className="text-sm font-semibold text-foreground">{item.rating}</span>
+        <span className="text-sm text-gray-text">({reviewCount} {t("reviews")})</span>
         <button
           type="button"
           onClick={handleCompare}
-          className="ml-auto text-xs text-[#E8192C] hover:underline font-semibold"
+          className="ml-auto text-xs text-primary hover:underline font-semibold"
         >
           {isCompared ? "✓ In Comparison" : "+ Add to Product Comparison"}
         </button>
@@ -231,13 +231,13 @@ export function ProductInfoPanel({
 
       {/* Price */}
       <div className="flex items-baseline gap-3 flex-wrap">
-        <span className="text-2xl font-extrabold text-[#1a1a1a]">
+        <span className="text-2xl font-extrabold text-foreground">
           {activePrice.toLocaleString()} EGP
         </span>
         {oldPrice && (
           <>
-            <span className="text-base text-[#aaa] line-through">{oldPrice.toLocaleString()} EGP</span>
-            <span className="bg-[#fff0f0] text-[#E8192C] text-xs font-bold px-2 py-0.5 rounded">
+            <span className="text-base text-gray-text line-through">{oldPrice.toLocaleString()} EGP</span>
+            <span className="bg-primary-tint text-primary text-xs font-bold px-2 py-0.5 rounded">
               {discountPercent}% OFF
             </span>
           </>
@@ -246,17 +246,17 @@ export function ProductInfoPanel({
 
       {/* Brand */}
       {item.brandName && (
-        <div className="flex items-center gap-2 py-2 border-t border-b border-[#f0f0f0]">
-          <span className="text-xs font-bold text-[#888] uppercase tracking-wider">Brand:</span>
-          <span className="text-sm font-bold text-[#1a1a1a] uppercase tracking-wide">{item.brandName}</span>
+        <div className="flex items-center gap-2 py-2 border-t border-b border-stroke">
+          <span className="text-xs font-bold text-gray-text uppercase tracking-wider">Brand:</span>
+          <span className="text-sm font-bold text-foreground uppercase tracking-wide">{item.brandName}</span>
         </div>
       )}
 
       {/* Colors */}
       {item.colors.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-xs font-bold text-[#555] uppercase tracking-wider">
-            COLOR: <span className="text-[#1a1a1a] normal-case font-bold">{selectedColor}</span>
+          <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
+            COLOR: <span className="text-foreground normal-case font-bold">{selectedColor}</span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {item.colors.map((color) => {
@@ -271,7 +271,7 @@ export function ProductInfoPanel({
                   onClick={() => onColorChange(color.color)}
                   title={color.color}
                   className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
-                    isSelected ? "border-[#E8192C]" : "border-[#ddd] hover:border-[#999]"
+                    isSelected ? "border-primary" : "border-stroke hover:border-gray-text"
                   }`}
                 >
                   <span
@@ -284,7 +284,7 @@ export function ProductInfoPanel({
             <button
               type="button"
               onClick={handleShare}
-              className="ml-auto text-xs text-[#888] hover:text-[#E8192C] flex items-center gap-1"
+              className="ml-auto text-xs text-gray-text hover:text-primary flex items-center gap-1"
             >
               <RiShareForwardLine className="h-4 w-4" />
               Size Guide
@@ -296,8 +296,8 @@ export function ProductInfoPanel({
       {/* Sizes */}
       {colorVariants.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-xs font-bold text-[#555] uppercase tracking-wider">
-            SIZE: <span className="text-[#1a1a1a] normal-case font-bold">{selectedSize}</span>
+          <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
+            SIZE: <span className="text-foreground normal-case font-bold">{selectedSize}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
@@ -311,10 +311,10 @@ export function ProductInfoPanel({
                   onClick={() => setSelectedSize(variant.size)}
                   className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
                     isSelected
-                      ? "bg-[#1a1a1a] text-white border-[#1a1a1a]"
+                      ? "bg-foreground text-background border-foreground"
                       : isOutOfStock
-                      ? "bg-[#f5f5f5] text-[#ccc] border-[#eee] line-through cursor-not-allowed"
-                      : "bg-white text-[#1a1a1a] border-[#ddd] hover:border-[#999]"
+                      ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
+                      : "bg-card text-foreground border-stroke hover:border-gray-text"
                   }`}
                 >
                   {variant.size}
@@ -327,24 +327,24 @@ export function ProductInfoPanel({
 
       {/* Quantity */}
       <div className="flex items-center gap-3">
-        <span className="text-xs font-bold text-[#555] uppercase tracking-wider">QUANTITY:</span>
-        <div className="inline-flex items-center border border-[#ddd] rounded-md bg-white">
+        <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">QUANTITY:</span>
+        <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
             disabled={availableStock <= 0}
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            className="w-8 h-8 flex items-center justify-center font-bold text-[#555] hover:bg-[#f5f5f5] disabled:opacity-40 rounded-l-md"
+            className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-l-md"
           >
             −
           </button>
-          <span className="w-10 text-center font-bold text-[#1a1a1a] text-sm border-x border-[#ddd]">
+          <span className="w-10 text-center font-bold text-foreground text-sm border-x border-stroke">
             {availableStock <= 0 ? 0 : quantity}
           </span>
           <button
             type="button"
             disabled={availableStock <= 0 || quantity >= availableStock}
             onClick={() => setQuantity(quantity + 1)}
-            className="w-8 h-8 flex items-center justify-center font-bold text-[#555] hover:bg-[#f5f5f5] disabled:opacity-40 rounded-r-md"
+            className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-r-md"
           >
             +
           </button>
@@ -360,10 +360,10 @@ export function ProductInfoPanel({
         type="button"
         onClick={handleToggleFavorite}
         className={`flex items-center gap-2 text-sm font-semibold w-fit transition ${
-          isFavorite ? "text-[#E8192C]" : "text-[#888] hover:text-[#E8192C]"
+          isFavorite ? "text-primary" : "text-gray-text hover:text-primary"
         }`}
       >
-        <Heart className={`h-4 w-4 ${isFavorite ? "fill-[#E8192C] text-[#E8192C]" : ""}`} />
+        <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
         {isFavorite ? "Wishlisted" : t("addToFavorite")}
       </button>
 
@@ -373,7 +373,7 @@ export function ProductInfoPanel({
           type="button"
           disabled={availableStock <= 0}
           onClick={handleAddToCart}
-          className="flex-1 h-11 bg-[#E8192C] text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-[#c8001f] disabled:opacity-50 transition"
+          className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed disabled:opacity-50 transition"
         >
           <BsBag className="h-4 w-4" />
           {t("addToCart")}
@@ -382,24 +382,24 @@ export function ProductInfoPanel({
           type="button"
           disabled={availableStock <= 0}
           onClick={handleBuyNow}
-          className="flex-1 h-11 bg-[#1a1a1a] text-white rounded-md font-bold text-sm flex items-center justify-center hover:bg-black disabled:opacity-50 transition"
+          className="flex-1 h-11 bg-foreground text-background rounded-md font-bold text-sm flex items-center justify-center hover:opacity-90 disabled:opacity-50 transition"
         >
           {t("buyNow")}
         </button>
       </div>
 
       {/* Shipping Info */}
-      <div className="flex flex-col gap-2 pt-2 border-t border-[#f0f0f0]">
-        <div className="flex items-start gap-3 text-xs text-[#555]">
-          <Truck className="h-4 w-4 text-[#1a1a1a] shrink-0 mt-0.5" />
+      <div className="flex flex-col gap-2 pt-2 border-t border-stroke">
+        <div className="flex items-start gap-3 text-xs text-foreground/80">
+          <Truck className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
           <div>
-            <span className="font-bold text-[#1a1a1a]">{t("deliveryTitle")}</span>
+            <span className="font-bold text-foreground">{t("deliveryTitle")}</span>
             {" "}— {t("deliverySubtitle")}
           </div>
         </div>
-        <div className="flex items-center gap-3 text-xs text-[#555]">
-          <RotateCcw className="h-4 w-4 text-[#1a1a1a] shrink-0" />
-          <span className="font-bold text-[#1a1a1a]">{t("freeReturns")}</span>
+        <div className="flex items-center gap-3 text-xs text-foreground/80">
+          <RotateCcw className="h-4 w-4 text-foreground shrink-0" />
+          <span className="font-bold text-foreground">{t("freeReturns")}</span>
         </div>
       </div>
     </div>

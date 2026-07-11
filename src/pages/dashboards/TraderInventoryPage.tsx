@@ -308,11 +308,12 @@ export default function TraderInventoryPage() {
             </h3>
             <div className="flex flex-col gap-3 mb-5">
               {[
-                { label: t("inStock"), count: `${inStock} ${t("items")}` },
-                { label: t("lowStock"), count: `${lowStock} ${t("items")}` },
+                { label: t("inStock"), count: `${inStock} ${t("items")}`, dot: "text-emerald-700" },
+                { label: t("lowStock"), count: `${lowStock} ${t("items")}`, dot: "text-yellow-500" },
                 {
                   label: t("outOfStock"),
                   count: `${outOfStock} ${t("items")}`,
+                  dot: "text-red-500",
                 },
               ].map((row) => (
                 <div

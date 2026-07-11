@@ -60,7 +60,7 @@ function orderStatusPill(status: Order["status"]) {
 /* ─── Donut Chart ────────────────────────────────────────────────────────── */
 function DonutChart() {
   const segments = [
-    { label: "New", value: 30, color: "#BBFF63" },
+    { label: "New", value: 30, color: "#A81324" },
     { label: "One-time", value: 25, color: "#FCD34D" },
     { label: "At-risk", value: 30, color: "#7DD3FC" },
     { label: "Other", value: 15, color: "#E5E7EB" },
@@ -112,7 +112,7 @@ function DonutChart() {
 /* ─── Overview Panel (Horizontal Bars) ──────────────────────────────────── */
 function OverviewPanel() {
   const rows = [
-    { label: "Returning", pct: 62, color: "#BBFF63" },
+    { label: "Returning", pct: 62, color: "#A81324" },
     { label: "New", pct: 38, color: "#7DD3FC" },
   ];
   return (
@@ -140,7 +140,7 @@ function OverviewPanel() {
           <p className="font-['Montserrat'] text-[10px] text-gray-text">since last month</p>
         </div>
       </div>
-      <p className="rounded-xl bg-[#F0FDF4] px-3 py-2 font-['Montserrat'] text-xs text-emerald-700">
+      <p className="rounded-xl bg-green-50 px-3 py-2 font-['Montserrat'] text-xs text-emerald-700">
         Returning customers increased by 8% vs last month.
       </p>
     </div>
@@ -322,7 +322,7 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
                 <th className="px-4 py-3">
                   <div className="h-5 w-5 rounded-md border border-primary bg-secondary flex items-center justify-center">
                     <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6.5l2.5 2.5 4.5-5" stroke="#BBFF63" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M2.5 6.5l2.5 2.5 4.5-5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
@@ -459,7 +459,7 @@ export default function TraderCustomersPage() {
                 </label>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-xl bg-secondary px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:bg-[#1F2937]"
+                  className="flex items-center gap-2 rounded-xl bg-secondary px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:opacity-90"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
                     <path d="M2 3h12M2 8h8M2 13h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />

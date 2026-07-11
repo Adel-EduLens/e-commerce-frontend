@@ -186,7 +186,7 @@ export default function ProductsPage() {
 
   return (
     <div className="w-full">
-      <div className="font-['Montserrat'] text-5xl font-bold text-[#1A1A1A] sm:text-8xl">
+      <div className="font-['Montserrat'] text-5xl font-bold text-foreground sm:text-8xl">
         {t(pageTitle)}
       </div>
 

@@ -200,7 +200,7 @@ function OrderSummary({
                 src={item.imageSrc || "/checkout/Rectangle%203.png"}
                 alt={item.title}
               />
-              <div className="absolute -right-2 -top-1 h-6 w-6 overflow-hidden rounded-lg bg-[#0F1115] flex items-center justify-center">
+              <div className="absolute -right-2 -top-1 h-6 w-6 overflow-hidden rounded-lg bg-secondary flex items-center justify-center">
                 <span className="font-['Montserrat'] text-sm font-semibold text-primary">
                   {item.quantity}
                 </span>
@@ -677,14 +677,14 @@ function RememberMeSection({
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
             By submitting your order, you agree to our{" "}
           </span>
-          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-[#0284C7] underline">
+          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info underline">
             Terms of Service
           </span>
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
             {" "}
             &amp;{" "}
           </span>
-          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-[#0284C7] underline">
+          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info underline">
             Privacy Policy
           </span>
         </div>

@@ -34,7 +34,7 @@ function Toggle({
       className="relative h-[20px] w-[40px] shrink-0 cursor-pointer overflow-hidden rounded-[36.5px] border-[0.5px] border-gray-light transition-colors"
       style={{
         backgroundColor: checked
-          ? 'var(--primary, #bbff63)'
+          ? 'var(--primary, #A81324)'
           : 'var(--gray-light, #ededed)',
       }}
     >
@@ -214,7 +214,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       <input
                         type="email"
                         placeholder={t('fields.email.placeholder')}
-                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                         {...registerLogin('email')}
                       />
                       {loginErrors.email && (
@@ -234,7 +234,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                           <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder={t('fields.password.placeholder')}
-                            className="h-full w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                            className="h-full w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                             {...registerLogin('password')}
                           />
                           <button
@@ -270,7 +270,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                           </div>
                           <Link
                             to="#"
-                            className="flex-1 text-end font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-[#007aff]"
+                            className="flex-1 text-end font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-info"
                           >
                             {t('forgotPassword')}
                           </Link>
@@ -285,7 +285,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="flex w-full items-center justify-center rounded-[16px] bg-[#0f1115] py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                    className="flex w-full items-center justify-center rounded-[16px] bg-secondary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
                     {isLoading ? t('login.submitting') : t('login.submit')}
                   </button>
@@ -293,7 +293,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     <span className="text-foreground">
                       {t('login.noAccount')}
                     </span>
-                    <Link to="/signup" className="text-[#007aff] text-end">
+                    <Link to="/signup" className="text-info text-end">
                       {t('login.signupLink')}
                     </Link>
                   </div>
@@ -301,7 +301,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     <span className="text-foreground">Are you a seller?</span>
                     <Link
                       to="/trader/login"
-                      className="text-[#007aff] text-end"
+                      className="text-info text-end"
                     >
                       login
                     </Link>
@@ -309,14 +309,14 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
                     <button
                       type="button"
-                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                      className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
                     >
                       <FaFacebookSquare size={24} color="#1877F2 " />
                       {t('socials.facebook')}
                     </button>
                     <button
                       type="button"
-                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                      className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
                     >
                       <FcGoogle size={24} />
                       {t('socials.google')}
@@ -351,7 +351,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       <input
                         type="email"
                         placeholder={t('fields.email.placeholder')}
-                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                         {...registerSignup('email')}
                       />
                       {signupErrors.email && (
@@ -369,7 +369,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       <input
                         type="text"
                         placeholder={t('fields.phone.placeholder')}
-                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                         {...registerSignup('phone')}
                       />
                       {signupErrors.phone && (
@@ -387,7 +387,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       <input
                         type="text"
                         placeholder={t('fields.name.placeholder')}
-                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                        className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                         {...registerSignup('name')}
                       />
                       {signupErrors.name && (
@@ -403,7 +403,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                         {t('fields.role.label')}
                       </label>
                       <select
-                        className="h-[56px] w-full cursor-pointer appearance-none rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none"
+                        className="h-[56px] w-full cursor-pointer appearance-none rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none"
                         {...registerSignup('role')}
                       >
                         <option value="user">
@@ -430,7 +430,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                           <input
                             type={showPassword ? 'text' : 'password'}
                             placeholder={t('fields.password.placeholder')}
-                            className="h-full w-full rounded-[16px] border-[0.5px] border-[#e5e5e5] bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                            className="h-full w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
                             {...registerSignup('password')}
                           />
                           <button
@@ -470,7 +470,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                   <button
                     type="submit"
                     disabled={isLoading || !agreeTerms}
-                    className="flex w-full items-center justify-center rounded-[16px] bg-[#0f1115] py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                    className="flex w-full items-center justify-center rounded-[16px] bg-secondary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                   >
                     {isLoading ? t('signup.submitting') : t('signup.submit')}
                   </button>
@@ -478,21 +478,21 @@ export default function AuthPage({ mode }: AuthPageProps) {
                     <span className="text-foreground">
                       {t('signup.hasAccount')}
                     </span>
-                    <Link to="/login" className="text-[#007aff] text-end">
+                    <Link to="/login" className="text-info text-end">
                       {t('signup.loginLink')}
                     </Link>
                   </div>
                   <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
                     <button
                       type="button"
-                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                      className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
                     >
                       <FaFacebookSquare size={24} color="#1877F2 " />
                       {t('socials.facebook')}
                     </button>
                     <button
                       type="button"
-                      className="flex gap-x-4 bg-[#0f1115] rounded-[14px] py-4 flex-1 justify-center"
+                      className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
                     >
                       <FcGoogle size={24} />
                       {t('socials.google')}

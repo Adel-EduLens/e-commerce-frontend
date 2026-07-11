@@ -60,16 +60,16 @@ export function RecommedProducts({
   return (
     <section className="flex flex-col items-start justify-start gap-6 sm:gap-8 w-full font-['Montserrat'] select-none mt-10">
       <div className="w-full">
-        <h2 className="text-2xl font-bold text-[#1a1a1a] md:text-3xl sm:text-4xl">
+        <h2 className="text-2xl font-bold text-foreground md:text-3xl sm:text-4xl">
           Recommended for You
         </h2>
         <div className="mt-4 flex flex-col gap-2">
-          <span className="text-sm font-medium text-[#333]">Filter by</span>
+          <span className="text-sm font-medium text-foreground/80">Filter by</span>
           <div className="flex flex-wrap items-center gap-3">
             {["Category", "Size", "Color", "Price"].map((filterName) => (
               <div
                 key={filterName}
-                className="flex items-center justify-between gap-2 rounded-lg bg-[#f5f5f5] px-4 py-2 text-sm font-medium text-[#555] cursor-pointer hover:bg-[#ebebeb] transition"
+                className="flex items-center justify-between gap-2 rounded-lg bg-background px-4 py-2 text-sm font-medium text-foreground/80 cursor-pointer hover:bg-gray-light transition"
               >
                 {filterName}
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,10 +93,10 @@ export function RecommedProducts({
             return (
               <div
                 key={product.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-[#ebebeb] bg-white shadow-sm hover:shadow-md transition-all duration-300"
+                className="group flex flex-col overflow-hidden rounded-xl border border-stroke bg-card shadow-sm hover:shadow-md transition-all duration-300"
               >
                 {/* Image Section */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#e6e6e6] cursor-pointer" onClick={() => navigate(`/product-details/${product.id}`)}>
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-light cursor-pointer" onClick={() => navigate(`/product-details/${product.id}`)}>
                   <img
                     src={imageSrc}
                     alt={product.name}
@@ -115,27 +115,27 @@ export function RecommedProducts({
 
                 {/* Content Section */}
                 <div className="flex flex-col p-4 flex-1">
-                  <h3 className="text-base font-semibold text-[#1a1a1a] line-clamp-1 cursor-pointer hover:text-[#E8192C] transition" onClick={() => navigate(`/product-details/${product.id}`)}>
+                  <h3 className="text-base font-semibold text-foreground line-clamp-1 cursor-pointer hover:text-primary transition" onClick={() => navigate(`/product-details/${product.id}`)}>
                     {product.name}
                   </h3>
-                  <p className="mt-1 text-xs text-[#888] line-clamp-2">
+                  <p className="mt-1 text-xs text-gray-text line-clamp-2">
                     {product.description || "High-end product tailored for you"}
                   </p>
 
                   <div className="mt-3 flex items-end justify-between">
-                    <span className="rounded border border-[#ddd] px-2 py-0.5 text-[10px] font-medium text-[#555]">
+                    <span className="rounded border border-stroke px-2 py-0.5 text-[10px] font-medium text-foreground/80">
                       {sizeLabel}
                     </span>
                     <div className="flex items-baseline gap-0.5">
-                      <span className="text-lg font-bold text-[#b91c1c]">{product.price}</span>
-                      <span className="text-xs font-semibold text-[#b91c1c]">EGP</span>
+                      <span className="text-lg font-bold text-primary">{product.price}</span>
+                      <span className="text-xs font-semibold text-primary">EGP</span>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => navigate(`/product-details/${product.id}`)}
-                    className="mt-4 w-full rounded-md bg-[#b91c1c] py-2 text-sm font-bold text-white hover:bg-[#991b1b] transition"
+                    className="mt-4 w-full rounded-md bg-primary py-2 text-sm font-bold text-white hover:bg-primary-pressed transition"
                   >
                     Book Now
                   </button>
@@ -146,7 +146,7 @@ export function RecommedProducts({
         </div>
         <button
           onClick={() => navigate(`/products?category=${encodeURIComponent("kids")}`)}
-          className="mt-2 rounded-md border border-[#b91c1c] px-8 py-2 text-sm font-bold text-[#b91c1c] hover:bg-[#fff0f0] transition"
+          className="mt-2 rounded-md border border-primary px-8 py-2 text-sm font-bold text-primary hover:bg-primary-tint transition"
         >
           View More
         </button>

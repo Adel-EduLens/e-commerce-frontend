@@ -3,7 +3,7 @@ import { useState } from "react";
 // ─── Data ──────────────────────────────────────────────────────────────────
 
 const orderStatus = [
-  { label: "New", share: 35, color: "#BBFF63" },
+  { label: "New", share: 35, color: "#A81324" },
   { label: "Confirmed", share: 25, color: "#FCD34D" },
   { label: "Shipped", share: 30, color: "#7DD3FC" },
   { label: "Delivered", share: 10, color: "#A855F7" },

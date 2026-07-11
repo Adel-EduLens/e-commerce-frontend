@@ -186,7 +186,7 @@ export default function ProductCard({
     <Link
       to={to}
       aria-label={`Open details for ${title}`}
-      className={`group relative block w-full overflow-hidden rounded-2xl shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#BBFF63]/60 ${rootTone} ${className}`}
+      className={`group relative block w-full overflow-hidden rounded-2xl shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 ${rootTone} ${className}`}
     >
       <div
         className={`relative mx-2 mt-2 overflow-hidden rounded-lg ${mediaTone} aspect-[4/5]`}

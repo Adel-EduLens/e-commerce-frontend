@@ -22,42 +22,153 @@
   --color-ink: var(--ink);
   --color-info: var(--info);
   --color-urgent: var(--urgent);
+
+  /* --- Brand & Theme additions --- */
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-gray-pressed: var(--color-gray-pressed);
+  --color-primary-pressed: var(--color-primary-pressed);
+  --color-primary-tint: var(--color-primary-tint);
+  --color-error: var(--color-error);
+  --color-warning: var(--color-warning);
+  --color-success: var(--color-success);
+
+  /* --- Direct Color Palette Tokens from Figma variables image --- */
+  --color-burgundy-core: var(--color-burgundy-core);
+  --color-burgundy-dark: var(--color-burgundy-dark);
+  --color-burgundy-light: var(--color-burgundy-light);
+  --color-burgundy-tint: var(--color-burgundy-tint);
+  --color-core-black: var(--color-core-black);
+  --color-charcoal: var(--color-charcoal);
+  --color-dark-gray: var(--color-dark-gray);
+  --color-mid-gray: var(--color-mid-gray);
+  --color-gray-600: var(--color-gray-600);
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-200: var(--color-gray-200);
+  --color-gray-100: var(--color-gray-100);
+  --color-gray-50: var(--color-gray-50);
+  --color-off-white: var(--color-off-white);
+  --color-pure-white: var(--color-pure-white);
 }
 
 :root {
-  --primary: #bbff63;
-  --primary-foreground: #1a1a1a;
-  --secondary: #1a1a1a;
-  --secondary-foreground: #ffffff;
-  --background: #f9fafb;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --stroke: #e0e0e0;
-  --gray-light: #ededed;
-  --gray-text: #555555;
+  /* --- Text ------------------------------------------------------------ */
+  --color-text-primary: #1A1A1A;      /* light Text */
+  --color-text-secondary: #6B7280;    /* gray text-Secondary txt */
+
+  /* --- Surfaces ---------------------------------------------------------- */
+  --color-background: #F9FAFB;        /* light Background */
+  --color-card: #FFFFFF;              /* light card */
+
+  /* --- Borders / Grays --------------------------------------------------- */
+  --color-stroke: #E0E0E0;            /* Stroke light */
+  --color-gray: #EDEDED;              /* gray light */
+  --color-gray-pressed: #D9D9D9;      /* Gray Pressed */
+
+  /* --- Primary (Brand) ---------------------------------------------------- */
+  --color-primary: #A81324;           /* primary_light mode */
+  --color-primary-pressed: #6E0C18;   /* Primary Pressed */
+  --color-primary-tint: #FFF0F0;      /* Background Tint */
+
+  /* --- Semantic / Functional ----------------------------------------------- */
+  --color-error: #E31B23;             /* Erorr */
+  --color-warning: #F79009;           /* Warning */
+  --color-success: #12B76A;           /* Success */
+  --color-info: #0EA5E9;              /* Info */
+
+  /* --- Direct Color Palette Tokens from Figma variables image (Light) --- */
+  --color-burgundy-core: #A81324;
+  --color-burgundy-dark: #6E0C18;
+  --color-burgundy-light: #C4293B;
+  --color-burgundy-tint: #FFF0F0;
+  --color-core-black: #0D0D0D;
+  --color-charcoal: #1A1A1A;
+  --color-dark-gray: #2E2E2E;
+  --color-mid-gray: #4A4A4A;
+  --color-gray-600: #666666;
+  --color-gray-400: #AAAAAA;
+  --color-gray-200: #D9D9D9;
+  --color-gray-100: #F0F0F0;
+  --color-gray-50: #F5F5F5;
+  --color-off-white: #FAFAFA;
+  --color-pure-white: #FFFFFF;
+
+  /* --- Compatibility Mappings for Existing System --- */
+  --primary: var(--color-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-text-primary);
+  --secondary-foreground: var(--color-background);
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-card);
+  --stroke: var(--color-stroke);
+  --gray-light: var(--color-gray);
+  --gray-text: var(--color-text-secondary);
   --shadow: #1e252d1a;
   --ink: #0f1115;
-  --info: #87c3ff;
-  --urgent: #d6001c;
+  --info: var(--color-info);
+  --urgent: var(--color-error);
 
   font-family: 'Inter', sans-serif;
 }
 
-.dark {
-  --primary: #bbff63;
-  --primary-foreground: #1a1a1a;
-  --secondary: #ffffff;
-  --secondary-foreground: #1a1a1a;
-  --background: #0f1115;
-  --foreground: #ffffff;
-  --card: #1c1f24;
-  --stroke: #2a2d35;
-  --gray-light: #1c1f24;
-  --gray-text: #bbbbbb;
+.dark, [data-theme="dark"] {
+  /* --- Text ------------------------------------------------------------ */
+  --color-text-primary: #FFFFFF;      /* dark text */
+  --color-text-secondary: #A0A0A0;    /* gray text dark */
+
+  /* --- Surfaces ---------------------------------------------------------- */
+  --color-background: #0F1115;        /* dark background */
+  --color-card: #1C1F24;              /* dark card */
+
+  /* --- Borders / Grays --------------------------------------------------- */
+  --color-stroke: #2E3238;            /* dark stroke */
+  --color-gray: #2A2E35;              /* gray dark */
+  --color-gray-pressed: #44464A;      /* Dark Gray Pressed */
+
+  /* --- Primary (Brand) ---------------------------------------------------- */
+  --color-primary: #BF1629;           /* primary_Dark mode */
+  --color-primary-pressed: #6E0C18;   /* Primary Pressed (same as light) */
+  --color-primary-tint: #FFF0F0;      /* Background Tint (same as light — no dark variant defined) */
+
+  /* --- Semantic / Functional (unchanged across modes) ----------------------- */
+  --color-error: #E31B23;
+  --color-warning: #F79009;
+  --color-success: #12B76A;
+  --color-info: #0EA5E9;
+
+  /* --- Direct Color Palette Tokens from Figma variables image (Dark) --- */
+  --color-burgundy-core: #BF1629;
+  --color-burgundy-dark: #6E0C18;
+  --color-burgundy-light: #C4293B;
+  --color-burgundy-tint: #FFF0F0;
+  --color-core-black: #FFFFFF;
+  --color-charcoal: #1C1F24;
+  --color-dark-gray: #2A2E35;
+  --color-mid-gray: #2E3238;
+  --color-gray-600: #A0A0A0;
+  --color-gray-400: #666666;
+  --color-gray-200: #2E3238;
+  --color-gray-100: #1C1F24;
+  --color-gray-50: #0F1115;
+  --color-off-white: #0F1115;
+  --color-pure-white: #1C1F24;
+
+  /* --- Compatibility Mappings for Existing System --- */
+  --primary: var(--color-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-text-primary);
+  --secondary-foreground: var(--color-background);
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-card);
+  --stroke: var(--color-stroke);
+  --gray-light: var(--color-gray);
+  --gray-text: var(--color-text-secondary);
   --shadow: #0000004d;
   --ink: #f9fafb;
-  --info: #87c3ff;
-  --urgent: #ef4444;
+  --info: var(--color-info);
+  --urgent: var(--color-error);
 }
 
 /* Dark mode layout and structural color overrides */

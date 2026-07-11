@@ -145,7 +145,7 @@ function RevenueChannelChart() {
 
 function FinanceDonutChart() {
   const segments = [
-    { label: "Retail", value: 35, color: "#BBFF63" },
+    { label: "Retail", value: 35, color: "#A81324" },
     { label: "Wholesales", value: 25, color: "#FCD34D" },
     { label: "Dropship", value: 30, color: "#7DD3FC" },
     { label: "Brands", value: 10, color: "#C084FC" },

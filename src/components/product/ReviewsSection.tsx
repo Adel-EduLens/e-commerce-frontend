@@ -195,7 +195,7 @@ export function ReviewsSection() {
   }
   if (isError) {
     return (
-      <div className="flex justify-center py-10 font-['Montserrat'] text-[#E8192C]">
+      <div className="flex justify-center py-10 font-['Montserrat'] text-primary">
         {t("couldNotLoadReviews")}
       </div>
     );
@@ -206,21 +206,21 @@ export function ReviewsSection() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-xl font-bold text-[#1a1a1a]">Reviews</h2>
+          <h2 className="text-xl font-bold text-foreground">Reviews</h2>
           {reviews.length > 0 && (
             <>
-              <span className="text-lg font-bold text-[#1a1a1a]">{averageRating}</span>
+              <span className="text-lg font-bold text-foreground">{averageRating}</span>
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, index) => {
                   const fill = Math.min(1, Math.max(0, Number(averageRating) - index));
                   return <Star key={index} fill={fill} size={16} />;
                 })}
               </div>
-              <span className="text-sm text-[#888]">({reviews.length} Reviews)</span>
+              <span className="text-sm text-gray-text">({reviews.length} Reviews)</span>
             </>
           )}
           {reviews.length === 0 && (
-            <span className="text-sm text-[#888]">{t("noReviews")}</span>
+            <span className="text-sm text-gray-text">{t("noReviews")}</span>
           )}
         </div>
 
@@ -228,7 +228,7 @@ export function ReviewsSection() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="rounded-md bg-[#E8192C] px-5 py-2 text-sm font-bold text-white hover:bg-[#c8001f] transition w-fit"
+            className="rounded-md bg-primary px-5 py-2 text-sm font-bold text-white hover:bg-primary-pressed transition w-fit"
           >
             {myReview ? t("editYourReview") : t("writeReview")}
           </button>
@@ -247,7 +247,7 @@ export function ReviewsSection() {
         <>
           {/* Filter & Sort row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="text-xs text-[#888]">
+            <div className="text-xs text-gray-text">
               Showing {paginatedReviews.length} of {visibleReviews.length} reviews
             </div>
             <div className="flex items-center gap-2">
@@ -257,7 +257,7 @@ export function ReviewsSection() {
                   setFilterValue(e.target.value as ReviewFilterValue);
                   setPageSize(3);
                 }}
-                className="rounded-md border border-[#ddd] bg-white px-3 py-1.5 text-xs font-medium text-[#1a1a1a] outline-none cursor-pointer"
+                className="rounded-md border border-stroke bg-card px-3 py-1.5 text-xs font-medium text-foreground outline-none cursor-pointer"
               >
                 {FILTER_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -271,7 +271,7 @@ export function ReviewsSection() {
                   setSortValue(e.target.value as ReviewSortValue);
                   setPageSize(3);
                 }}
-                className="rounded-md border border-[#ddd] bg-white px-3 py-1.5 text-xs font-medium text-[#1a1a1a] outline-none cursor-pointer"
+                className="rounded-md border border-stroke bg-card px-3 py-1.5 text-xs font-medium text-foreground outline-none cursor-pointer"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -293,7 +293,7 @@ export function ReviewsSection() {
               <button
                 type="button"
                 onClick={() => setPageSize((prev) => prev + 3)}
-                className="rounded-md border border-[#ddd] bg-white px-8 py-2.5 text-sm font-bold text-[#1a1a1a] hover:border-[#999] transition"
+                className="rounded-md border border-stroke bg-card px-8 py-2.5 text-sm font-bold text-foreground hover:border-gray-text transition"
               >
                 View More
               </button>

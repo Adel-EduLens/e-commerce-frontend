@@ -70,10 +70,10 @@ function LanguageField() {
 function ThemeMockup({ isDark = false }: { isDark?: boolean }) {
   return (
     <div
-      className={`h-36 w-full overflow-hidden ${isDark ? "bg-[#0f1115]" : "bg-white"}`}
+      className={`h-36 w-full overflow-hidden ${isDark ? "bg-background" : "bg-white"}`}
     >
       <div
-        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-[#1c1b2e]" : "bg-background"}`}
+        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-card" : "bg-background"}`}
       >
         <div className="grid grid-cols-2 gap-2 p-2">
           <div className="h-10 bg-primary" />
@@ -110,7 +110,7 @@ function ThemeCard({
           {label}
         </div>
         {selected && (
-          <CheckCircle className="h-5 w-5 fill-[#BBFF63] text-primary" />
+          <CheckCircle className="h-5 w-5 fill-primary text-primary-foreground" />
         )}
       </div>
     </div>

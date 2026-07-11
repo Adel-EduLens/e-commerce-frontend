@@ -90,22 +90,22 @@ export default function RetailPage() {
   ], [categories])
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 text-slate-900">
-      <section className="overflow-hidden rounded-[32px] border border-slate-200 bg-gradient-to-br from-[#F8FFF0] via-white to-[#F7F8FA] p-6 shadow-sm sm:p-8">
+    <div className="mx-auto w-full max-w-6xl space-y-6 text-foreground">
+      <section className="overflow-hidden rounded-[32px] border border-stroke bg-gradient-to-br from-primary-tint/20 via-card to-background p-6 shadow-sm sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center rounded-full border border-[#BBFF63] bg-[#BBFF63]/20 px-3 py-1 text-sm font-medium text-slate-700">
+            <div className="mb-3 inline-flex items-center rounded-full border border-primary bg-primary/10 px-3 py-1 text-sm font-medium text-foreground/80">
               Retail collection
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Discover retail essentials in one polished catalog.
             </h1>
-            <p className="mt-3 text-base text-slate-600 sm:text-lg">
+            <p className="mt-3 text-base text-gray-text sm:text-lg">
               Browse curated products, refine by category or keyword, and find the right item fast.
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm text-slate-600 shadow-sm">
-            <div className="font-semibold text-slate-900">{products.length} products</div>
+          <div className="rounded-2xl border border-stroke bg-card/80 px-4 py-3 text-sm text-gray-text shadow-sm">
+            <div className="font-semibold text-foreground">{products.length} products</div>
             <div>Updated in real time</div>
           </div>
         </div>

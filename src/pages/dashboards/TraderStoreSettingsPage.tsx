@@ -52,7 +52,7 @@ function GeneralInfoTab() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348] disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed disabled:opacity-60"
         >
           {isSaving ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
         </button>
@@ -150,7 +150,7 @@ function ShippingSettingsTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Shipping Settings</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348]">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -239,7 +239,7 @@ function TaxSettingsTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Tax settings</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348]">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -300,7 +300,7 @@ function TeamMembersTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Team Members</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348]">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -372,7 +372,7 @@ function PlaceholderTab({ title }: { title: string }) {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{title}</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-foreground transition hover:bg-[#a5f348]">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
           Save
         </button>
       </div>

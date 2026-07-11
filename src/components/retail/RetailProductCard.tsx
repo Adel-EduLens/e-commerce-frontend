@@ -115,9 +115,9 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
   }
 
   return (
-    <div className="group relative h-[26rem] w-full max-w-[20rem] overflow-hidden rounded-2xl bg-[#BBFF63] shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#BBFF63]/60">
-      <div className="absolute inset-2 z-10 overflow-hidden rounded-[1.25rem] bg-[#BBFF63]">
-        <div className="relative h-[18rem] w-full overflow-hidden rounded-[1.25rem] bg-[#BBFF63]">
+    <div className="group relative h-[26rem] w-full max-w-[20rem] overflow-hidden rounded-2xl bg-primary shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60">
+      <div className="absolute inset-2 z-10 overflow-hidden rounded-[1.25rem] bg-primary">
+        <div className="relative h-[18rem] w-full overflow-hidden rounded-[1.25rem] bg-primary">
           <img
             src={imageUrl}
             alt={product.name}
@@ -134,10 +134,10 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">
-                <div className="font-['Montserrat'] text-base font-medium leading-5 text-[#1A1A1A] truncate">
+                <div className="font-['Montserrat'] text-base font-medium leading-5 text-foreground truncate">
                   {product.name}
                 </div>
-                <div className="shrink-0 text-right text-lg font-semibold text-[#1A1A1A]">
+                <div className="shrink-0 text-right text-lg font-semibold text-foreground">
                   ${unitPrice.toFixed(2)}
                 </div>
               </div>

@@ -111,7 +111,7 @@ const recentAlerts = [
 ];
 
 const categorySegments = [
-  { label: "men", value: 35, color: "#BBFF63" },
+  { label: "men", value: 35, color: "#A81324" },
   { label: "women", value: 25, color: "#FCD34D" },
   { label: "kids", value: 30, color: "#7DD3FC" },
   { label: "craft", value: 10, color: "#C084FC" },

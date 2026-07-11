@@ -105,11 +105,11 @@ export default function Footer({
               ))}
             </div>
 
-            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-[#1A1A1A]">
+            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-medium text-foreground">
               {t("SIGN UP FOR DISCOUNTS + UPDATES")}
             </div>
-            <div className="flex w-full items-center justify-between rounded-2xl bg-[#EDEDED] p-3 sm:p-4">
-              <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-[#6B7280]">
+            <div className="flex w-full items-center justify-between rounded-2xl bg-gray-light p-3 sm:p-4">
+              <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium text-gray-text">
                 {t("Phone Number or Email")}
               </div>
               <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-white">
@@ -124,7 +124,7 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-[#1A1A1A]">
+        <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
           {t("copyright")}
         </div>
       </div>

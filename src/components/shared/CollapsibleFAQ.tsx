@@ -26,7 +26,7 @@ export default function CollapsibleFAQ({
           <div
             key={`${faq.question}-${index}`}
             className={`rounded-2xl p-4 sm:rounded-3xl sm:p-8 transition-colors duration-300 ${
-              isOpen ? "bg-[#1C1B2E]" : "bg-gray-light"
+              isOpen ? "bg-secondary" : "bg-gray-light"
             }`}
           >
             <button

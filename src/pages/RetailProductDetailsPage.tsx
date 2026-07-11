@@ -213,8 +213,8 @@ export default function RetailProductDetailsPage() {
                   onClick={() => setSelectedColorId(c.id)}
                   className={`inline-flex h-10 min-w-[48px] items-center justify-center rounded-full border px-3 text-sm font-medium transition ${
                     String(c.id) === String(selectedColorId)
-                      ? 'border-[#BBFF63] bg-[#BBFF63]/20 text-slate-900'
-                      : 'border-slate-200 bg-white text-slate-700'
+                      ? 'border-primary bg-primary/20 text-foreground'
+                      : 'border-stroke bg-card text-foreground'
                   }`}
                 >
                   {c.name}
@@ -233,8 +233,8 @@ export default function RetailProductDetailsPage() {
                   onClick={() => setSelectedSizeId(s.id)}
                   className={`inline-flex h-10 min-w-[48px] items-center justify-center rounded-full border px-3 text-sm font-medium transition ${
                     String(s.id) === String(selectedSizeId)
-                      ? 'border-[#BBFF63] bg-[#BBFF63]/20 text-slate-900'
-                      : 'border-slate-200 bg-white text-slate-700'
+                      ? 'border-primary bg-primary/20 text-foreground'
+                      : 'border-stroke bg-card text-foreground'
                   }`}
                 >
                   {s.name}
@@ -252,17 +252,17 @@ export default function RetailProductDetailsPage() {
               <button
                 type="button"
                 onClick={() => setQty((current) => Math.max(1, current - 1))}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-card text-foreground"
               >
                 -
               </button>
-              <div className="inline-flex h-10 min-w-[60px] items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-900">
+              <div className="inline-flex h-10 min-w-[60px] items-center justify-center rounded-2xl border border-stroke bg-card text-foreground">
                 {qty}
               </div>
               <button
                 type="button"
                 onClick={() => setQty((current) => current + 1)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-900"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-stroke bg-card text-foreground"
               >
                 +
               </button>
@@ -273,7 +273,7 @@ export default function RetailProductDetailsPage() {
                 type="button"
                 disabled={addRetailProductToCart.isPending}
                 onClick={handleAddToCart}
-                className="inline-flex items-center justify-center rounded-full bg-[#BBFF63] px-6 py-3 text-sm font-semibold text-slate-900 transition disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {addRetailProductToCart.isPending ? 'Adding...' : 'Add to cart'}
               </button>
@@ -287,7 +287,7 @@ export default function RetailProductDetailsPage() {
                     ...(user?.id ? { userId: user.id } : {}),
                   })
                 }}
-                className="inline-flex items-center justify-center rounded-full border border-[#BBFF63] px-6 py-3 text-sm font-semibold text-[#BBFF63]"
+                className="inline-flex items-center justify-center rounded-full border border-primary px-6 py-3 text-sm font-semibold text-primary"
               >
                 Notify me
               </button>

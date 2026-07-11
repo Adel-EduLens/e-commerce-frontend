@@ -300,7 +300,7 @@ function EmptyBagState({ onAddItems }: { onAddItems: () => void }) {
       <button
         type="button"
         onClick={onAddItems}
-        className="rounded-2xl bg-primary px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground hover:bg-[#a8e854] transition"
+        className="rounded-2xl bg-primary px-6 py-4 font-['Montserrat'] text-base font-semibold text-white hover:bg-primary-pressed transition"
       >
         {t("empty.button")}
       </button>

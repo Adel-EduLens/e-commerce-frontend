@@ -105,9 +105,9 @@ function IconButton({
 }) {
   const toneClassName =
     tone === "danger"
-      ? "text-[#DC2626] hover:bg-[#FEE2E2]"
+      ? "text-urgent hover:bg-red-100"
       : tone === "success"
-        ? "text-[#15803D] hover:bg-[#DCFCE7]"
+        ? "text-success hover:bg-green-100"
         : "text-foreground hover:bg-gray-light";
 
   return (
@@ -189,11 +189,11 @@ function AddressCard({
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <span className="mb-1 inline-flex rounded-full bg-[#F2F4F7] px-2.5 py-1 text-[11px] font-medium text-[#667085]">
+          <span className="mb-1 inline-flex rounded-full bg-gray-light px-2.5 py-1 text-[11px] font-medium text-gray-text">
             {t("Address")}
           </span>
 
-          <h3 className="truncate text-base font-semibold text-[#1A1A1A]">
+          <h3 className="truncate text-base font-semibold text-foreground">
             {isEditing
               ? isNew
                 ? t("Adding Address")
@@ -222,7 +222,7 @@ function AddressCard({
 </div>
       </div>
       {/* Details */}
-      <div className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-[#F2F4F7] pt-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-stroke pt-4 sm:grid-cols-2">
         <DetailField
           label={t("Country")}
           value={current.country}
@@ -555,11 +555,11 @@ export default function ContactDetailsPage() {
         >
           <div className="relative h-6 w-6 overflow-hidden">
             <RotateCcwKey
-              className="absolute left-[2px] top-[2px] h-5 w-5 text-[#B91C1C]"
+              className="absolute left-[2px] top-[2px] h-5 w-5 text-urgent"
               strokeWidth={1.8}
             />
           </div>
-          <div className="font-['Montserrat'] text-xl font-medium text-[#B91C1C]">
+          <div className="font-['Montserrat'] text-xl font-medium text-urgent">
             {t("Reset your password")}
           </div>
         </button>

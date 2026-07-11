@@ -109,7 +109,7 @@ function SearchableSelect({
             <button
               type="button"
               onClick={() => handleSelectOption("", "")}
-              className="w-full text-left px-4 py-2.5 font-['Montserrat'] text-sm font-medium hover:bg-gray-50 border-b border-[#F3F4F6] text-gray-text"
+              className="w-full text-left px-4 py-2.5 font-['Montserrat'] text-sm font-medium hover:bg-gray-light border-b border-stroke text-gray-text"
             >
               {emptyLabel}
             </button>
@@ -311,7 +311,7 @@ export default function TraderCouponsPage() {
                 {coupons.map((coupon) => {
                   const isExpired = new Date(coupon.validUntil) <= new Date();
                   return (
-                    <tr key={coupon.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-background transition">
+                    <tr key={coupon.id} className="border-b border-stroke text-sm text-foreground hover:bg-background transition">
                       <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
                         {coupon.code}
                       </td>
@@ -450,7 +450,7 @@ export default function TraderCouponsPage() {
                     </thead>
                     <tbody>
                       {selectedCouponForModal.usages.map((usage) => (
-                        <tr key={usage.id} className="border-b border-[#F3F4F6] text-sm text-[#1D2939] hover:bg-background transition">
+                        <tr key={usage.id} className="border-b border-stroke text-sm text-foreground hover:bg-background transition">
                           <td className="py-3 pr-4 font-['Montserrat'] font-semibold text-foreground">
                             {usage.user.name || "N/A"}
                           </td>

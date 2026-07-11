@@ -312,7 +312,7 @@ function VoteSection() {
                   className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 disabled:opacity-60"
                 >
                   {voting ? (
-                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-secondary/20 border-t-[#1A1A1A]" />
+                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
                   ) : (
                     <div className="font-['Montserrat'] text-xl font-medium text-foreground flex gap-1">
                       <AssetImage file="lucide_vote.svg" className="h-6 w-6" />
@@ -382,7 +382,7 @@ function VoteSection() {
                 className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4 disabled:opacity-60"
               >
                 {voting ? (
-                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-secondary/20 border-t-[#1A1A1A]" />
+                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
                 ) : (
                   <div className="font-['Montserrat'] text-3xl font-medium text-foreground flex gap-1">
                     <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
@@ -412,7 +412,7 @@ function VoteSection() {
                       key={design.id}
                       type="button"
                       onClick={() => setCurrentIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-[#D0D5DD]'
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-gray-pressed'
                         }`}
                     />
                   ))}

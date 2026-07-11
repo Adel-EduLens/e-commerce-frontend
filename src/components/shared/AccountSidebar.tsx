@@ -119,8 +119,8 @@ export default function AccountSidebar() {
         onClick={handleSignOut}
         className="inline-flex cursor-pointer items-center justify-start gap-4 self-stretch p-4 transition-opacity hover:opacity-70"
       >
-        <LogOut className="h-6 w-6 text-[#DC2626]" strokeWidth={1.5} />
-        <div className="font-['Montserrat'] text-lg font-medium text-[#DC2626]">
+        <LogOut className="h-6 w-6 text-urgent" strokeWidth={1.5} />
+        <div className="font-['Montserrat'] text-lg font-medium text-urgent">
           {t("signOut")}
         </div>
       </div>

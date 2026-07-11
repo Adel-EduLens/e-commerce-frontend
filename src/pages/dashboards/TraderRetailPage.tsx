@@ -52,7 +52,7 @@ const revenueSeries = [
 ] as const;
 
 const orderStatus = [
-  { label: "New", share: 35, color: "#BBFF63" },
+  { label: "New", share: 35, color: "#A81324" },
   { label: "Confirmed", share: 25, color: "#FCD34D" },
   { label: "Shipped", share: 30, color: "#7DD3FC" },
   { label: "Delivered", share: 10, color: "#A855F7" },
@@ -120,7 +120,7 @@ const transactions = [
 ] as const;
 
 const customerOverview = [
-  { label: "Returning", value: 62, color: "#BBFF63", delta: "+8.5%", deltaNote: "8% this month", trend: "up" },
+  { label: "Returning", value: 62, color: "#A81324", delta: "+8.5%", deltaNote: "8% this month", trend: "up" },
   { label: "New", value: 38, color: "#7DD3FC", delta: "3%", deltaNote: "since last month", trend: "down" },
 ] as const;
 
@@ -574,7 +574,7 @@ export default function TraderRetailPage() {
                       className="mx-auto flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border border-primary bg-secondary"
                     >
                       {allSelected && (
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="#BBFF63" strokeWidth={2} viewBox="0 0 14 14">
+                        <svg className="h-3.5 w-3.5" fill="none" stroke="var(--primary)" strokeWidth={2} viewBox="0 0 14 14">
                           <path d="M2.92 7 5.5 9.58l5.58-5.58" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       )}

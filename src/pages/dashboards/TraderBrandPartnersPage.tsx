@@ -37,7 +37,7 @@ const barData = [
 ];
 
 const categorySegments = [
-  { label: "Men", value: 35, color: "#BBFF63" },
+  { label: "Men", value: 35, color: "#A81324" },
   { label: "Women", value: 25, color: "#FCD34D" },
   { label: "Kids", value: 30, color: "#7DD3FC" },
   { label: "Craft", value: 10, color: "#C084FC" },
@@ -190,7 +190,7 @@ function BrandPerformanceBar() {
               className="w-full rounded-t-md"
               style={{
                 height: `${(bar.value / maxVal) * 136}px`,
-                background: idx === barData.length - 1 ? "#BBFF63" : "#E5E7EB",
+                background: idx === barData.length - 1 ? "var(--primary)" : "#E5E7EB",
               }}
             />
           </div>
