@@ -1,0 +1,19 @@
+{
+  "inStock": "In Stock",
+  "lowStock": "Low Stock",
+  "outOfStock": "Out of Stock",
+  "totalProducts": "Total Products",
+  "inventoryTable": "Inventory Table",
+  "recentAlerts": "Recent Alerts",
+  "inventorySnapshot": "Inventory Snapshot",
+  "activityLog": "Activity Log",
+  "viewAll": "View All",
+  "items": "items",
+  "addedBy": "Added by",
+  "restockedFromSupplier": "Restocked from supplier",
+  "lowStockAlert": "Low Stock Alert",
+  "onlyItemsLeft": "only {{count}} items left in stock.",
+  "outStock": "Out Stock",
+  "products": "Products",
+  "wholesales": "Wholesales"
+}

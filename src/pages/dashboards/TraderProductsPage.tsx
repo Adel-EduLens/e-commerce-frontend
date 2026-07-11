@@ -83,8 +83,8 @@ export default function TraderProductsPage() {
         onEdit={setEditItem}
         onDelete={(item) => deleteProduct.mutate(item.id)}
         showTypeFilter={false}
-        title="Products Table"
-        addLabel="Add Product"
+        title="productsTable"
+        addLabel="addProduct"
       />
     </>
   );

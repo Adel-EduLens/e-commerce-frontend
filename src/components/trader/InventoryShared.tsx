@@ -15,8 +15,15 @@ import {
   useAddProductSize,
   useDeleteProductSize,
 } from "../../hooks/queries/productsQuery";
-import { useCreateWholesale, useUpdateWholesale } from "../../hooks/queries/wholesaleQuery";
-import ImageCropModal, { validateImageDimensions, MIN_IMG_WIDTH, MIN_IMG_HEIGHT } from "./ImageCropModal";
+import {
+  useCreateWholesale,
+  useUpdateWholesale,
+} from "../../hooks/queries/wholesaleQuery";
+import ImageCropModal, {
+  validateImageDimensions,
+  MIN_IMG_WIDTH,
+  MIN_IMG_HEIGHT,
+} from "./ImageCropModal";
 import {
   type InventoryItem,
   type InventoryStatus,
@@ -29,6 +36,7 @@ import {
   typePill,
   uploadImageFile,
 } from "./inventoryUtils";
+import { useTranslation } from "react-i18next";
 
 // ─── MultiSelect ───────────────────────────────────────────────────────────────
 export function MultiSelect({
@@ -45,7 +53,11 @@ export function MultiSelect({
   const [open, setOpen] = useState(false);
 
   const toggle = (opt: string) => {
-    onChange(selected.includes(opt) ? selected.filter((s) => s !== opt) : [...selected, opt]);
+    onChange(
+      selected.includes(opt)
+        ? selected.filter((s) => s !== opt)
+        : [...selected, opt],
+    );
   };
 
   return (
@@ -60,7 +72,10 @@ export function MultiSelect({
         </span>
         <svg
           className={`h-4 w-4 text-gray-text transition-transform ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <path d="M4 6l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -103,11 +118,14 @@ export function ColorImageUpload({
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropFileName, setCropFileName] = useState("");
   const [dimError, setDimError] = useState("");
-
+  const { t } = useTranslation("traderProduct");
   const handleFile = async (file: File) => {
     setDimError("");
     const err = await validateImageDimensions(file);
-    if (err) { setDimError(err); return; }
+    if (err) {
+      setDimError(err);
+      return;
+    }
     setCropFileName(file.name);
     setCropSrc(URL.createObjectURL(file));
   };
@@ -123,7 +141,10 @@ export function ColorImageUpload({
             setCropSrc(null);
             onChange(color, croppedFile);
           }}
-          onCancel={() => { URL.revokeObjectURL(cropSrc); setCropSrc(null); }}
+          onCancel={() => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+          }}
         />
       )}
       <input
@@ -131,7 +152,11 @@ export function ColorImageUpload({
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }}
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleFile(f);
+          e.target.value = "";
+        }}
       />
       <button
         type="button"
@@ -139,19 +164,40 @@ export function ColorImageUpload({
         className="w-full rounded-xl border-2 border-dashed border-stroke py-3 font-['Montserrat'] text-xs text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1"
       >
         {preview ? (
-          <img src={preview} alt={color} className="h-14 w-14 rounded-lg object-cover" />
+          <img
+            src={preview}
+            alt={color}
+            className="h-14 w-14 rounded-lg object-cover"
+          />
         ) : (
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            className="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         )}
         <span>{color}</span>
       </button>
       {dimError && (
-        <p className="text-center font-['Montserrat'] text-[10px] leading-tight text-red-600">{dimError}</p>
+        <p className="text-center font-['Montserrat'] text-[10px] leading-tight text-red-600">
+          {dimError}
+        </p>
       )}
       {!dimError && !preview && (
-        <p className="font-['Montserrat'] text-[10px] text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
+        <p className="font-['Montserrat'] text-[10px] text-gray-text">
+          {t("minImageSize", {
+            width: MIN_IMG_WIDTH,
+            height: MIN_IMG_HEIGHT,
+          })}
+        </p>
       )}
     </div>
   );
@@ -186,7 +232,7 @@ export function AddItemModal({
   const [productColors, setProductColors] = useState<ProductColor[]>([]);
   const [minOrder, setMinOrder] = useState("1");
   const [description, setDescription] = useState("");
-  
+
   const [cropState, setCropState] = useState<{
     color: string;
     src: string;
@@ -199,7 +245,7 @@ export function AddItemModal({
   const [wholesaleCropName, setWholesaleCropName] = useState("");
   const [wholesaleDimError, setWholesaleDimError] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
-  
+
   const [isMustHave, setIsMustHave] = useState(false);
   const [isFlashDeals, setIsFlashDeals] = useState(false);
   const [flashDealPrice, setFlashDealPrice] = useState("");
@@ -215,7 +261,7 @@ export function AddItemModal({
   const createProduct = useCreateProduct();
   const createWholesale = useCreateWholesale();
   const isSaving = createProduct.isPending || createWholesale.isPending;
-
+  const { t } = useTranslation("traderProduct");
   const handleColorsChange = (colors: string[]) => {
     setSelectedColors(colors);
     setProductColors((prev) => {
@@ -236,8 +282,11 @@ export function AddItemModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!name || !categoryId || !price) { setError("Name, category and price are required."); return; }
-    
+    if (!name || !categoryId || !price) {
+      setError("Name, category and price are required.");
+      return;
+    }
+
     if (type === "product") {
       if (productColors.length === 0) {
         setError("Please select at least one color.");
@@ -255,13 +304,18 @@ export function AddItemModal({
         }
         for (const v of pc.variants) {
           if (v.quantity < 0) {
-            setError(`Quantity for ${pc.color} size ${v.size} cannot be negative.`);
+            setError(
+              `Quantity for ${pc.color} size ${v.size} cannot be negative.`,
+            );
             return;
           }
         }
       }
     } else {
-      if (!wholesaleFile) { setError("Please upload an image."); return; }
+      if (!wholesaleFile) {
+        setError("Please upload an image.");
+        return;
+      }
     }
 
     try {
@@ -275,14 +329,18 @@ export function AddItemModal({
         if (brandId) formData.append("brandId", brandId);
         if (sku) formData.append("sku", sku);
 
-        const calculatedStock = productColors.reduce((sum, c) => sum + c.variants.reduce((s, v) => s + v.quantity, 0), 0);
+        const calculatedStock = productColors.reduce(
+          (sum, c) => sum + c.variants.reduce((s, v) => s + v.quantity, 0),
+          0,
+        );
         formData.append("stock", String(calculatedStock));
 
         if (isMustHave) formData.append("isMustHave", "true");
         if (isFlashDeals) {
           formData.append("isFlashDeals", "true");
           if (flashDealPrice) formData.append("flashDealPrice", flashDealPrice);
-          if (flashDealEndsAt) formData.append("flashDealEndsAt", flashDealEndsAt);
+          if (flashDealEndsAt)
+            formData.append("flashDealEndsAt", flashDealEndsAt);
         }
 
         // Format colors JSON array expected by backend
@@ -310,18 +368,30 @@ export function AddItemModal({
         const wholesaleUrl = await uploadImageFile(wholesaleFile!);
         setUploading(false);
         await createWholesale.mutateAsync({
-          name, description, price: Number(price), categoryId,
-          brand: "", minOrder: Number(minOrder) || 1,
-          isBestDeal, isMostPopular, isPremiumCollection,
+          name,
+          description,
+          price: Number(price),
+          categoryId,
+          brand: "",
+          minOrder: Number(minOrder) || 1,
+          isBestDeal,
+          isMostPopular,
+          isPremiumCollection,
           images: [{ url: wholesaleUrl }],
-          sku: sku || undefined, stock: stock ? Number(stock) : 0,
+          sku: sku || undefined,
+          stock: stock ? Number(stock) : 0,
         });
       }
       onClose();
     } catch (err: unknown) {
       setUploading(false);
-      const e = err as { response?: { data?: { message?: string } }; message?: string };
-      setError(e?.response?.data?.message ?? e?.message ?? "Something went wrong.");
+      const e = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setError(
+        e?.response?.data?.message ?? e?.message ?? t("somethingWentWrong"),
+      );
     }
   };
 
@@ -339,8 +409,8 @@ export function AddItemModal({
               prev.map((pc) =>
                 pc.color === col
                   ? { ...pc, images: [...pc.images, croppedFile] }
-                  : pc
-              )
+                  : pc,
+              ),
             );
           }}
           onCancel={() => {
@@ -351,10 +421,21 @@ export function AddItemModal({
       )}
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
-          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">Add Item</h2>
-          <button type="button" onClick={onClose} className="text-gray-text hover:text-foreground text-xl leading-none">&times;</button>
+          <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
+            Add Item
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-text hover:text-foreground text-xl leading-none"
+          >
+            &times;
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5 overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 p-5 overflow-y-auto"
+        >
           {!lockedType && (
             <div className="flex gap-2">
               {(["product", "wholesale"] as ProductType[]).map((t) => (
@@ -370,65 +451,125 @@ export function AddItemModal({
             </div>
           )}
 
-          <input placeholder="Name *" value={name} onChange={(e) => setName(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+          <input
+            placeholder="Name *"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          />
 
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          >
             <option value="">Select category *</option>
-            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
           </select>
 
           {type === "product" && (
-            <select value={brandId} onChange={(e) => setBrandId(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
+            <select
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
+              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+            >
               <option value="">Select brand (optional)</option>
-              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
             </select>
           )}
 
-          <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}
-            rows={2} className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none" />
+          <textarea
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none"
+          />
 
           <div className="grid grid-cols-2 gap-2">
-            <input placeholder="Price *" type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+            <input
+              placeholder="Price *"
+              type="number"
+              min="0"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+            />
             {type === "wholesale" ? (
-              <input placeholder="Stock" type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)}
-                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <input
+                placeholder="Stock"
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
             ) : (
-              <input placeholder="Stock (Calculated)" type="text" readOnly disabled
-                value={productColors.reduce((sum, c) => sum + c.variants.reduce((s, v) => s + v.quantity, 0), 0) || ""}
-                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed" />
+              <input
+                placeholder="Stock (Calculated)"
+                type="text"
+                readOnly
+                disabled
+                value={
+                  productColors.reduce(
+                    (sum, c) =>
+                      sum + c.variants.reduce((s, v) => s + v.quantity, 0),
+                    0,
+                  ) || ""
+                }
+                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+              />
             )}
           </div>
 
-          <input placeholder="SKU (optional)" value={sku} onChange={(e) => setSku(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+          <input
+            placeholder="SKU (optional)"
+            value={sku}
+            onChange={(e) => setSku(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          />
 
           {type === "product" && (
             <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
-              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Product Attributes</p>
+              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                Product Attributes
+              </p>
               {/* Must Have toggle */}
               <div className="flex items-center justify-between">
-                <span className="font-['Montserrat'] text-sm text-foreground">Must Have</span>
+                <span className="font-['Montserrat'] text-sm text-foreground">
+                  Must Have
+                </span>
                 <button
                   type="button"
                   onClick={() => setIsMustHave((v) => !v)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${isMustHave ? "bg-primary" : "bg-gray-200"}`}
                 >
-                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`} />
+                  <div
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
               {/* Flash Deal toggle */}
               <div className="flex items-center justify-between">
-                <span className="font-['Montserrat'] text-sm text-foreground">Flash Deal</span>
+                <span className="font-['Montserrat'] text-sm text-foreground">
+                  Flash Deal
+                </span>
                 <button
                   type="button"
                   onClick={() => setIsFlashDeals((v) => !v)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${isFlashDeals ? "bg-primary" : "bg-gray-200"}`}
                 >
-                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`} />
+                  <div
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
               {/* Flash deal extra fields */}
@@ -455,18 +596,33 @@ export function AddItemModal({
 
           {type === "product" && (
             <>
-              <MultiSelect label="Select colors *" options={COLOR_OPTIONS} selected={selectedColors} onChange={handleColorsChange} />
-              
+              <MultiSelect
+                label="Select colors *"
+                options={COLOR_OPTIONS}
+                selected={selectedColors}
+                onChange={handleColorsChange}
+              />
+
               {productColors.map((pc, colorIdx) => (
-                <div key={pc.color} className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50">
+                <div
+                  key={pc.color}
+                  className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+                >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="inline-block w-3 h-3 rounded-full border border-stroke" style={{ backgroundColor: pc.color.toLowerCase() }} />
+                      <span
+                        className="inline-block w-3 h-3 rounded-full border border-stroke"
+                        style={{ backgroundColor: pc.color.toLowerCase() }}
+                      />
                       {pc.color}
                     </h4>
                     <button
                       type="button"
-                      onClick={() => handleColorsChange(selectedColors.filter((c) => c !== pc.color))}
+                      onClick={() =>
+                        handleColorsChange(
+                          selectedColors.filter((c) => c !== pc.color),
+                        )
+                      }
                       className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
                     >
                       Remove Color
@@ -475,13 +631,22 @@ export function AddItemModal({
 
                   {/* Multiple Image Upload */}
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Upload Images *</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Upload Images *
+                    </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {pc.images.map((imgFile, imgIdx) => {
                         const previewUrl = URL.createObjectURL(imgFile);
                         return (
-                          <div key={imgIdx} className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
-                            <img src={previewUrl} alt="preview" className="w-full h-full object-cover" />
+                          <div
+                            key={imgIdx}
+                            className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                          >
+                            <img
+                              src={previewUrl}
+                              alt="preview"
+                              className="w-full h-full object-cover"
+                            />
                             <button
                               type="button"
                               onClick={() => {
@@ -489,9 +654,14 @@ export function AddItemModal({
                                 setProductColors((prev) =>
                                   prev.map((item) =>
                                     item.color === pc.color
-                                      ? { ...item, images: item.images.filter((_, idx) => idx !== imgIdx) }
-                                      : item
-                                  )
+                                      ? {
+                                          ...item,
+                                          images: item.images.filter(
+                                            (_, idx) => idx !== imgIdx,
+                                          ),
+                                        }
+                                      : item,
+                                  ),
                                 );
                               }}
                               className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
@@ -504,7 +674,9 @@ export function AddItemModal({
                       {/* Upload Button */}
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
-                        <span className="text-[9px] font-['Montserrat']">Add</span>
+                        <span className="text-[9px] font-['Montserrat']">
+                          Add
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
@@ -530,25 +702,38 @@ export function AddItemModal({
                       </label>
                     </div>
                     {pc.images.length === 0 && (
-                      <p className="text-red-500 font-['Montserrat'] text-[10px]">* At least one image is required</p>
+                      <p className="text-red-500 font-['Montserrat'] text-[10px]">
+                        * At least one image is required
+                      </p>
                     )}
                   </div>
 
                   {/* Variant Table (Sizes & Stock) */}
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Sizes & Quantities *</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      {t("sizesQuantities")}
+                    </p>
                     {pc.variants.length > 0 && (
                       <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
                         <thead>
                           <tr className="bg-secondary text-primary font-bold">
-                            <th className="p-2 border-b border-stroke">Size</th>
-                            <th className="p-2 border-b border-stroke">Quantity</th>
-                            <th className="p-2 border-b border-stroke text-right">Action</th>
+                            <th className="p-2 border-b border-stroke">
+                              {t("size")}
+                            </th>
+                            <th className="p-2 border-b border-stroke">
+                              {t("quantity")}
+                            </th>
+                            <th className="p-2 border-b border-stroke text-right">
+                              {t("action")}
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {pc.variants.map((v, vIdx) => (
-                            <tr key={vIdx} className="bg-white border-b border-stroke last:border-none">
+                            <tr
+                              key={vIdx}
+                              className="bg-white border-b border-stroke last:border-none"
+                            >
                               <td className="p-2 font-semibold">{v.size}</td>
                               <td className="p-2">
                                 <input
@@ -562,12 +747,18 @@ export function AddItemModal({
                                         item.color === pc.color
                                           ? {
                                               ...item,
-                                              variants: item.variants.map((variant, idx) =>
-                                                idx === vIdx ? { ...variant, quantity: qty } : variant
+                                              variants: item.variants.map(
+                                                (variant, idx) =>
+                                                  idx === vIdx
+                                                    ? {
+                                                        ...variant,
+                                                        quantity: qty,
+                                                      }
+                                                    : variant,
                                               ),
                                             }
-                                          : item
-                                      )
+                                          : item,
+                                      ),
                                     );
                                   }}
                                   className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
@@ -580,9 +771,14 @@ export function AddItemModal({
                                     setProductColors((prev) =>
                                       prev.map((item) =>
                                         item.color === pc.color
-                                          ? { ...item, variants: item.variants.filter((_, idx) => idx !== vIdx) }
-                                          : item
-                                      )
+                                          ? {
+                                              ...item,
+                                              variants: item.variants.filter(
+                                                (_, idx) => idx !== vIdx,
+                                              ),
+                                            }
+                                          : item,
+                                      ),
                                     );
                                   }}
                                   className="text-red-500 hover:text-red-700"
@@ -596,7 +792,9 @@ export function AddItemModal({
                       </table>
                     )}
                     {pc.variants.length === 0 && (
-                      <p className="text-red-500 font-['Montserrat'] text-[10px]">* At least one size variant is required</p>
+                      <p className="text-red-500 font-['Montserrat'] text-[10px]">
+                        * At least one size variant is required
+                      </p>
                     )}
 
                     {/* Add Size Controls */}
@@ -605,24 +803,30 @@ export function AddItemModal({
                         id={`add-size-select-${pc.color}`}
                         className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
                       >
-                        <option value="">Select Size</option>
+                        <option value="">{t("size")}</option>
                         {SIZE_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
                         ))}
                       </select>
                       <input
                         type="number"
                         min="0"
                         id={`add-size-qty-${pc.color}`}
-                        placeholder="Qty"
+                        placeholder={t("qty")}
                         defaultValue="10"
                         className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          const sizeSel = document.getElementById(`add-size-select-${pc.color}`) as HTMLSelectElement;
-                          const qtySel = document.getElementById(`add-size-qty-${pc.color}`) as HTMLInputElement;
+                          const sizeSel = document.getElementById(
+                            `add-size-select-${pc.color}`,
+                          ) as HTMLSelectElement;
+                          const qtySel = document.getElementById(
+                            `add-size-qty-${pc.color}`,
+                          ) as HTMLInputElement;
                           const sizeVal = sizeSel?.value;
                           const qtyVal = Number(qtySel?.value || 0);
 
@@ -635,7 +839,9 @@ export function AddItemModal({
                             return;
                           }
                           if (pc.variants.some((v) => v.size === sizeVal)) {
-                            setError(`Size ${sizeVal} already exists for ${pc.color}.`);
+                            setError(
+                              `Size ${sizeVal} already exists for ${pc.color}.`,
+                            );
                             return;
                           }
 
@@ -643,15 +849,21 @@ export function AddItemModal({
                           setProductColors((prev) =>
                             prev.map((item) =>
                               item.color === pc.color
-                                ? { ...item, variants: [...item.variants, { size: sizeVal, quantity: qtyVal }] }
-                                : item
-                            )
+                                ? {
+                                    ...item,
+                                    variants: [
+                                      ...item.variants,
+                                      { size: sizeVal, quantity: qtyVal },
+                                    ],
+                                  }
+                                : item,
+                            ),
                           );
                           sizeSel.value = "";
                         }}
                         className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-white"
                       >
-                        Add Size
+                        {t("addSize")}
                       </button>
                     </div>
                   </div>
@@ -672,55 +884,117 @@ export function AddItemModal({
                     setWholesaleFile(croppedFile);
                     setWholesalePreview(URL.createObjectURL(croppedFile));
                   }}
-                  onCancel={() => { URL.revokeObjectURL(wholesaleCropSrc); setWholesaleCropSrc(null); }}
+                  onCancel={() => {
+                    URL.revokeObjectURL(wholesaleCropSrc);
+                    setWholesaleCropSrc(null);
+                  }}
                 />
               )}
               <div>
-                <input ref={wholesaleRef} type="file" accept="image/*" className="hidden"
+                <input
+                  ref={wholesaleRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
                   onChange={async (e) => {
                     const f = e.target.files?.[0];
                     e.target.value = "";
                     if (!f) return;
                     setWholesaleDimError("");
                     const err = await validateImageDimensions(f);
-                    if (err) { setWholesaleDimError(err); return; }
+                    if (err) {
+                      setWholesaleDimError(err);
+                      return;
+                    }
                     setWholesaleCropName(f.name);
                     setWholesaleCropSrc(URL.createObjectURL(f));
                   }}
                 />
-                <button type="button" onClick={() => wholesaleRef.current?.click()}
-                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white">
+                <button
+                  type="button"
+                  onClick={() => wholesaleRef.current?.click()}
+                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white"
+                >
                   {wholesalePreview ? (
-                    <img src={wholesalePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
+                    <img
+                      src={wholesalePreview}
+                      alt="preview"
+                      className="h-20 w-20 rounded-lg object-cover"
+                    />
                   ) : (
                     <>
-                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg
+                        className="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                       <span>Click to upload image *</span>
-                      <span className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</span>
+                      <span className="font-['Montserrat'] text-xs text-gray-text">
+                        Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px
+                      </span>
                     </>
                   )}
                 </button>
-                {wholesaleDimError && <p className="mt-1 font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>}
+                {wholesaleDimError && (
+                  <p className="mt-1 font-['Montserrat'] text-xs text-red-600">
+                    {wholesaleDimError}
+                  </p>
+                )}
               </div>
-              <input placeholder="Min order quantity" type="number" min="1" value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
-                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <input
+                placeholder="Min order quantity"
+                type="number"
+                min="1"
+                value={minOrder}
+                onChange={(e) => setMinOrder(e.target.value)}
+                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
               <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3 bg-white">
-                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Wholesale Attributes</p>
-                {([
-                  { label: "Best Deal", value: isBestDeal, set: setIsBestDeal },
-                  { label: "Most Popular", value: isMostPopular, set: setIsMostPopular },
-                  { label: "Premium Collection", value: isPremiumCollection, set: setIsPremiumCollection },
-                ] as const).map(({ label, value, set }) => (
-                  <div key={label} className="flex items-center justify-between">
-                    <span className="font-['Montserrat'] text-sm text-foreground">{label}</span>
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Wholesale Attributes
+                </p>
+                {(
+                  [
+                    {
+                      label: t("bestDeal"),
+                      value: isBestDeal,
+                      set: setIsBestDeal,
+                    },
+                    {
+                      label: t("mostPopular"),
+                      value: isMostPopular,
+                      set: setIsMostPopular,
+                    },
+                    {
+                      label: t("premiumCollection"),
+                      value: isPremiumCollection,
+                      set: setIsPremiumCollection,
+                    },
+                  ] as const
+                ).map(({ label, value, set }) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="font-['Montserrat'] text-sm text-foreground">
+                      {label}
+                    </span>
                     <button
                       type="button"
                       onClick={() => set((v) => !v)}
                       className={`relative h-6 w-11 rounded-full transition-colors ${value ? "bg-primary" : "bg-gray-200"}`}
                     >
-                      <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
+                      <div
+                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`}
+                      />
                     </button>
                   </div>
                 ))}
@@ -728,11 +1002,20 @@ export function AddItemModal({
             </>
           )}
 
-          {error && <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>}
+          {error && (
+            <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>
+          )}
 
-          <button type="submit" disabled={isSaving || uploading}
-            className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50">
-            {uploading ? "Uploading images..." : isSaving ? "Saving..." : "Add Item"}
+          <button
+            type="submit"
+            disabled={isSaving || uploading}
+            className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
+          >
+            {uploading
+              ? "Uploading images..."
+              : isSaving
+                ? "Saving..."
+                : "Add Item"}
           </button>
         </form>
       </div>
@@ -741,7 +1024,14 @@ export function AddItemModal({
 }
 
 // ─── Edit Item Modal ───────────────────────────────────────────────────────────
-export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose: () => void }) {
+export function EditItemModal({
+  item,
+  onClose,
+}: {
+  item: InventoryItem;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation("traderProduct");
   const isProductType = item.type === "product";
 
   const [name, setName] = useState(item.product);
@@ -754,18 +1044,24 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
   const [minOrder, setMinOrder] = useState(String(item.minOrder));
   const [isMustHave, setIsMustHave] = useState(item.isMustHave);
   const [isFlashDeals, setIsFlashDeals] = useState(item.isFlashDeals);
-  const [flashDealPrice, setFlashDealPrice] = useState(item.flashDealPrice != null ? String(item.flashDealPrice) : "");
+  const [flashDealPrice, setFlashDealPrice] = useState(
+    item.flashDealPrice != null ? String(item.flashDealPrice) : "",
+  );
   const [flashDealEndsAt, setFlashDealEndsAt] = useState(
-    item.flashDealEndsAt ? item.flashDealEndsAt.slice(0, 16) : ""
+    item.flashDealEndsAt ? item.flashDealEndsAt.slice(0, 16) : "",
   );
   const [isBestDeal, setIsBestDeal] = useState(item.isBestDeal);
   const [isMostPopular, setIsMostPopular] = useState(item.isMostPopular);
-  const [isPremiumCollection, setIsPremiumCollection] = useState(item.isPremiumCollection);
+  const [isPremiumCollection, setIsPremiumCollection] = useState(
+    item.isPremiumCollection,
+  );
 
   // States for new color option addition
   const [newColorName, setNewColorName] = useState("");
   const [newColorImages, setNewColorImages] = useState<File[]>([]);
-  const [newColorVariants, setNewColorVariants] = useState<{ size: string; quantity: number }[]>([]);
+  const [newColorVariants, setNewColorVariants] = useState<
+    { size: string; quantity: number }[]
+  >([]);
   const [newColorCropState, setNewColorCropState] = useState<{
     src: string;
     name: string;
@@ -787,7 +1083,9 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
   const isSaving = updateProduct.isPending || updateWholesale.isPending;
 
   // React Query fetch for nested colors & variants
-  const { data: product, isLoading: productLoading } = useProduct(isProductType ? item.id : undefined);
+  const { data: product, isLoading: productLoading } = useProduct(
+    isProductType ? item.id : undefined,
+  );
 
   // Granular mutation hooks
   const addColorMutation = useAddProductColor();
@@ -805,30 +1103,53 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
     try {
       setUploading(true);
       if (item.type === "product") {
+
         await updateProduct.mutateAsync({
-          id: item.id, name, description, price: Number(price), categoryId,
+          id: item.id,
+          name,
+          description,
+          price: Number(price),
+          categoryId,
           brandId: brandId || undefined,
           sku: sku || undefined,
           isMustHave,
           isFlashDeals,
-          flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,
-          flashDealEndsAt: isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
+          flashDealPrice:
+            isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,
+          flashDealEndsAt:
+            isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
         });
       } else {
-        const wholesaleUrl = wholesaleFile ? await uploadImageFile(wholesaleFile) : item.image;
+        const wholesaleUrl = wholesaleFile
+          ? await uploadImageFile(wholesaleFile)
+          : item.image;
         await updateWholesale.mutateAsync({
-          id: item.id, name, description, price: Number(price), categoryId,
-          images: [{ url: wholesaleUrl }], minOrder: Number(minOrder) || 1,
-          sku: sku || undefined, stock: Number(stock),
-          brand: "", isBestDeal, isMostPopular, isPremiumCollection,
+          id: item.id,
+          name,
+          description,
+          price: Number(price),
+          categoryId,
+          images: [{ url: wholesaleUrl }],
+          minOrder: Number(minOrder) || 1,
+          sku: sku || undefined,
+          stock: Number(stock),
+          brand: "",
+          isBestDeal,
+          isMostPopular,
+          isPremiumCollection,
         });
       }
       setUploading(false);
       onClose();
     } catch (err: unknown) {
       setUploading(false);
-      const e = err as { response?: { data?: { message?: string } }; message?: string };
-      setError(e?.response?.data?.message ?? e?.message ?? "Something went wrong.");
+      const e = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      setError(
+        e?.response?.data?.message ?? e?.message ?? t("somethingWentWrong"),
+      );
     }
   };
 
@@ -852,75 +1173,149 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            Edit {item.type === "product" ? "Product" : "Wholesale"}
+            {t("edit")}{" "}
+            {item.type === "product" ? t("product") : t("wholesale")}
           </h2>
-          <button type="button" onClick={onClose} className="text-gray-text hover:text-foreground text-xl leading-none">&times;</button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-text hover:text-foreground text-xl leading-none"
+          >
+            &times;
+          </button>
         </div>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-5 overflow-y-auto">
-          <input placeholder="Name *" value={name} onChange={(e) => setName(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 p-5 overflow-y-auto"
+        >
+          <input
+            placeholder={t("nameRequired")}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          />
 
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
-            <option value="">Select category</option>
-            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          >
+            <option value="">{t("selectCategory")}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
           </select>
 
           {item.type === "product" && (
-            <select value={brandId} onChange={(e) => setBrandId(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary">
-              <option value="">Select brand (optional)</option>
-              {brands.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            <select
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
+              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+            >
+              <option value="">{t("selectBrandOptional")}</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
             </select>
           )}
 
-          <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}
-            rows={2} className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none" />
+          <textarea
+            placeholder={t("description")}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary resize-none"
+          />
 
           <div className="grid grid-cols-2 gap-2">
-            <input placeholder="Price *" type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
-            
+            <input
+              placeholder={t("priceRequired")}
+              type="number"
+              min="0"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+            />
+
             {item.type === "wholesale" ? (
-              <input placeholder="Stock" type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)}
-                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <input
+                placeholder={t("stock")}
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
             ) : (
-              <input placeholder="Stock (Calculated)" type="text" readOnly disabled
-                value={productLoading ? "Loading..." : product?.colors?.reduce((sum, c) => sum + (c.variants?.reduce((s, v) => s + v.quantity, 0) ?? 0), 0) || ""}
-                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed" />
+              <input
+                placeholder={t("stockCalculated")}
+                type="text"
+                readOnly
+                disabled
+                value={
+                  productLoading
+                    ? "Loading..."
+                    : product?.colors?.reduce(
+                        (sum, c) =>
+                          sum +
+                          (c.variants?.reduce((s, v) => s + v.quantity, 0) ??
+                            0),
+                        0,
+                      ) || ""
+                }
+                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+              />
             )}
           </div>
 
-          <input placeholder="SKU (optional)" value={sku} onChange={(e) => setSku(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+          <input
+            placeholder={t("skuOptional")}
+            value={sku}
+            onChange={(e) => setSku(e.target.value)}
+            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+          />
 
           {item.type === "product" && (
             <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
-              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Product Attributes</p>
+              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                {t("productAttributes")}
+              </p>
               <div className="flex items-center justify-between">
-                <span className="font-['Montserrat'] text-sm text-foreground">Must Have</span>
+                <span className="font-['Montserrat'] text-sm text-foreground">
+                  {t("mustHave")}
+                </span>
                 <button
                   type="button"
                   onClick={() => setIsMustHave((v) => !v)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${isMustHave ? "bg-primary" : "bg-gray-200"}`}
                 >
-                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`} />
+                  <div
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-['Montserrat'] text-sm text-foreground">Flash Deal</span>
+                <span className="font-['Montserrat'] text-sm text-foreground">
+                  {t("flashDeal")}
+                </span>
                 <button
                   type="button"
                   onClick={() => setIsFlashDeals((v) => !v)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${isFlashDeals ? "bg-primary" : "bg-gray-200"}`}
                 >
-                  <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`} />
+                  <div
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
               {isFlashDeals && (
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <input
-                    placeholder="Deal price *"
+                    placeholder={t("dealPrice")}
                     type="number"
                     min="0"
                     value={flashDealPrice}
@@ -940,57 +1335,104 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
 
           {isProductType && (
             <div className="space-y-4">
-              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Product Colors & Variants</p>
-              
+              <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                {t("productColorsAndVariants")}
+              </p>
+
               {productLoading && (
-                <p className="text-gray-text font-['Montserrat'] text-xs">Loading variants...</p>
+                <p className="text-gray-text font-['Montserrat'] text-xs">
+                  {t("loadingVariants")}
+                </p>
               )}
 
               {/* Render existing product colors & variants */}
               {product?.colors?.map((color) => (
-                <div key={color.id} className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50">
+                <div
+                  key={color.id}
+                  className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+                >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
-                      <span className="inline-block w-3 h-3 rounded-full border border-stroke" style={{ backgroundColor: (color.colorName || (color as any).color || '').toLowerCase() }} />
+                      <span
+                        className="inline-block w-3 h-3 rounded-full border border-stroke"
+                        style={{
+                          backgroundColor: (
+                            color.colorName ||
+                            (color as any).color ||
+                            ""
+                          ).toLowerCase(),
+                        }}
+                      />
                       {color.colorName || (color as any).color}
                     </h4>
                     <button
                       type="button"
                       disabled={deleteColorMutation.isPending}
                       onClick={async () => {
-                        if (confirm(`Are you sure you want to delete color "${color.colorName || (color as any).color}"?`)) {
+                        if (
+                          confirm(
+                            `Are you sure you want to delete color "${color.colorName || (color as any).color}"?`,
+                          )
+                        ) {
                           try {
-                            await deleteColorMutation.mutateAsync({ colorId: color.id, productId: product.id });
+                            await deleteColorMutation.mutateAsync({
+                              colorId: color.id,
+                              productId: product.id,
+                            });
                           } catch (err: any) {
-                            setError(err?.response?.data?.message ?? err?.message ?? "Failed to delete color.");
+                            setError(
+                              err?.response?.data?.message ??
+                                err?.message ??
+                                t("failedDeleteColor"),
+                            );
                           }
                         }
                       }}
                       className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat'] disabled:opacity-50"
                     >
-                      {deleteColorMutation.isPending ? "Deleting..." : "Delete Color"}
+                      {deleteColorMutation.isPending
+                        ? "Deleting..."
+                        : "Delete Color"}
                     </button>
                   </div>
 
                   {/* Color Images List */}
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Color Images</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Color Images
+                    </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {color.images?.map((img) => (
-                        <div key={img.id} className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
-                          <img src={img.imageUrl || img.url} alt={color.colorName || (color as any).color} className="w-full h-full object-cover" />
+                        <div
+                          key={img.id}
+                          className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                        >
+                          <img
+                            src={img.imageUrl || img.url}
+                            alt={color.colorName || (color as any).color}
+                            className="w-full h-full object-cover"
+                          />
                           <button
                             type="button"
                             disabled={deleteImageMutation.isPending}
                             onClick={async () => {
                               if (color.images.length <= 1) {
-                                setError("A color variant must have at least one image.");
+                                setError(
+                                  "A color variant must have at least one image.",
+                                );
                                 return;
                               }
                               try {
-                                await deleteImageMutation.mutateAsync({ imageId: img.id, productId: product.id });
+                                await deleteImageMutation.mutateAsync({
+                                  imageId: img.id,
+                                  productId: product.id,
+                                });
                               } catch (err: any) {
-                                setError(err?.response?.data?.message ?? err?.message ?? "Failed to delete image.");
+                                setError(
+                                  err?.response?.data?.message ??
+                                    err?.message ??
+                                    t("failedDeleteImage"),
+                                );
                               }
                             }}
                             className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold disabled:opacity-50"
@@ -999,11 +1441,13 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                           </button>
                         </div>
                       ))}
-                      
+
                       {/* Add Image Picker */}
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
-                        <span className="text-[9px] font-['Montserrat']">Add</span>
+                        <span className="text-[9px] font-['Montserrat']">
+                          {t("add")}
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
@@ -1019,9 +1463,17 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                               const fd = new FormData();
                               fd.append("images", file);
                               try {
-                                await addColorImagesMutation.mutateAsync({ colorId: color.id, formData: fd, productId: product.id });
+                                await addColorImagesMutation.mutateAsync({
+                                  colorId: color.id,
+                                  formData: fd,
+                                  productId: product.id,
+                                });
                               } catch (err: any) {
-                                setError(err?.response?.data?.message ?? err?.message ?? "Failed to add image.");
+                                setError(
+                                  err?.response?.data?.message ??
+                                    err?.message ??
+                                    "Failed to add image.",
+                                );
                               }
                             }
                             e.target.value = "";
@@ -1033,19 +1485,28 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
 
                   {/* Size Variants Table */}
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Sizes & Quantities</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Sizes & Quantities
+                    </p>
                     {color.variants && color.variants.length > 0 && (
                       <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
                         <thead>
                           <tr className="bg-secondary text-primary font-bold">
                             <th className="p-2 border-b border-stroke">Size</th>
-                            <th className="p-2 border-b border-stroke">Quantity</th>
-                            <th className="p-2 border-b border-stroke text-right">Action</th>
+                            <th className="p-2 border-b border-stroke">
+                              Quantity
+                            </th>
+                            <th className="p-2 border-b border-stroke text-right">
+                              Action
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {color.variants.map((v) => (
-                            <tr key={v.id} className="bg-white border-b border-stroke last:border-none">
+                            <tr
+                              key={v.id}
+                              className="bg-white border-b border-stroke last:border-none"
+                            >
                               <td className="p-2 font-semibold">{v.size}</td>
                               <td className="p-2">
                                 <input
@@ -1060,9 +1521,19 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                                       return;
                                     }
                                     try {
-                                      await updateSizeQuantityMutation.mutateAsync({ variantId: v.id, quantity: newQty, productId: product.id });
+                                      await updateSizeQuantityMutation.mutateAsync(
+                                        {
+                                          variantId: v.id,
+                                          quantity: newQty,
+                                          productId: product.id,
+                                        },
+                                      );
                                     } catch (err: any) {
-                                      setError(err?.response?.data?.message ?? err?.message ?? "Failed to update quantity.");
+                                      setError(
+                                        err?.response?.data?.message ??
+                                          err?.message ??
+                                          t("failedUpdateQuantity"),
+                                      );
                                     }
                                   }}
                                   className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
@@ -1074,18 +1545,27 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                                   disabled={deleteSizeMutation.isPending}
                                   onClick={async () => {
                                     if (color.variants.length <= 1) {
-                                      setError("A color variant must have at least one size variant.");
+                                      setError(
+                                        "A color variant must have at least one size variant.",
+                                      );
                                       return;
                                     }
                                     try {
-                                      await deleteSizeMutation.mutateAsync({ variantId: v.id, productId: product.id });
+                                      await deleteSizeMutation.mutateAsync({
+                                        variantId: v.id,
+                                        productId: product.id,
+                                      });
                                     } catch (err: any) {
-                                      setError(err?.response?.data?.message ?? err?.message ?? "Failed to delete size.");
+                                      setError(
+                                        err?.response?.data?.message ??
+                                          err?.message ??
+                                          "Failed to delete size.",
+                                      );
                                     }
                                   }}
                                   className="text-red-500 hover:text-red-700 disabled:opacity-50 font-semibold"
                                 >
-                                  Delete
+                                  {t("delete")}
                                 </button>
                               </td>
                             </tr>
@@ -1102,7 +1582,9 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                       >
                         <option value="">Select Size</option>
                         {SIZE_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
                         ))}
                       </select>
                       <input
@@ -1117,30 +1599,43 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                         type="button"
                         disabled={addSizeMutation.isPending}
                         onClick={async () => {
-                          const sizeSel = document.getElementById(`edit-add-size-${color.id}`) as HTMLSelectElement;
-                          const qtySel = document.getElementById(`edit-add-qty-${color.id}`) as HTMLInputElement;
+                          const sizeSel = document.getElementById(
+                            `edit-add-size-${color.id}`,
+                          ) as HTMLSelectElement;
+                          const qtySel = document.getElementById(
+                            `edit-add-qty-${color.id}`,
+                          ) as HTMLInputElement;
                           const sVal = sizeSel?.value;
                           const qVal = Number(qtySel?.value || 0);
 
                           if (!sVal) {
-                            setError("Select a size.");
+                            setError(t("selectSizeError"));
                             return;
                           }
                           if (qVal < 0) {
-                            setError("Quantity cannot be negative.");
+                            setError(t("negativeQuantity"));
                             return;
                           }
                           if (color.variants.some((v) => v.size === sVal)) {
-                            setError(`Size ${sVal} already exists.`);
+                            setError(t("sizeAlreadyExists"));
                             return;
                           }
 
                           try {
                             setError("");
-                            await addSizeMutation.mutateAsync({ colorId: color.id, size: sVal, quantity: qVal, productId: product.id });
+                            await addSizeMutation.mutateAsync({
+                              colorId: color.id,
+                              size: sVal,
+                              quantity: qVal,
+                              productId: product.id,
+                            });
                             sizeSel.value = "";
                           } catch (err: any) {
-                            setError(err?.response?.data?.message ?? err?.message ?? "Failed to add size.");
+                            setError(
+                              err?.response?.data?.message ??
+                                err?.message ??
+                                "Failed to add size.",
+                            );
                           }
                         }}
                         className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-white disabled:opacity-50"
@@ -1154,17 +1649,21 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
 
               {/* Add New Color Section */}
               <div className="rounded-xl border border-dashed border-stroke p-4 space-y-3 bg-white">
-                <h4 className="font-['Montserrat'] text-xs font-bold text-foreground uppercase tracking-wider">Add New Color Option</h4>
-                
+                <h4 className="font-['Montserrat'] text-xs font-bold text-foreground uppercase tracking-wider">
+                  {t("addNewColorOption")}
+                </h4>
+
                 <div className="flex gap-2 items-center">
                   <select
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
                     className="w-full border border-stroke rounded-xl px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary bg-white"
                   >
-                    <option value="">Select color *</option>
+                    <option value="">{t("color")}</option>
                     {COLOR_OPTIONS.map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -1172,18 +1671,29 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                 {/* Upload Images for New Color */}
                 {newColorName && (
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Upload Images for {newColorName} *</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      {t("uploadImagesForNewColor")} {newColorName} *
+                    </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {newColorImages.map((imgFile, idx) => {
                         const previewUrl = URL.createObjectURL(imgFile);
                         return (
-                          <div key={idx} className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
-                            <img src={previewUrl} alt="preview" className="w-full h-full object-cover" />
+                          <div
+                            key={idx}
+                            className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                          >
+                            <img
+                              src={previewUrl}
+                              alt="preview"
+                              className="w-full h-full object-cover"
+                            />
                             <button
                               type="button"
                               onClick={() => {
                                 URL.revokeObjectURL(previewUrl);
-                                setNewColorImages((prev) => prev.filter((_, i) => i !== idx));
+                                setNewColorImages((prev) =>
+                                  prev.filter((_, i) => i !== idx),
+                                );
                               }}
                               className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
                             >
@@ -1194,7 +1704,9 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                       })}
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
-                        <span className="text-[9px] font-['Montserrat']">Add</span>
+                        <span className="text-[9px] font-['Montserrat']">
+                          Add
+                        </span>
                         <input
                           type="file"
                           accept="image/*"
@@ -1223,15 +1735,24 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                 {/* Size list for New Color */}
                 {newColorName && (
                   <div className="space-y-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Size Variants for {newColorName} *</p>
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      {t("sizeVariantsFor", { color: newColorName })}
+                    </p>
                     {newColorVariants.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {newColorVariants.map((v, idx) => (
-                          <span key={idx} className="inline-flex items-center gap-1.5 bg-gray-100 border border-stroke px-2.5 py-1 rounded-lg font-['Montserrat'] text-xs">
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 bg-gray-100 border border-stroke px-2.5 py-1 rounded-lg font-['Montserrat'] text-xs"
+                          >
                             {v.size} ({v.quantity})
                             <button
                               type="button"
-                              onClick={() => setNewColorVariants((prev) => prev.filter((_, i) => i !== idx))}
+                              onClick={() =>
+                                setNewColorVariants((prev) =>
+                                  prev.filter((_, i) => i !== idx),
+                                )
+                              }
                               className="text-red-500 font-bold hover:text-red-700"
                             >
                               &times;
@@ -1240,7 +1761,7 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                         ))}
                       </div>
                     )}
-                    
+
                     <div className="flex gap-2 items-center">
                       <select
                         id="new-color-size-sel"
@@ -1248,7 +1769,9 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                       >
                         <option value="">Select Size</option>
                         {SIZE_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>{opt}</option>
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
                         ))}
                       </select>
                       <input
@@ -1262,8 +1785,12 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                       <button
                         type="button"
                         onClick={() => {
-                          const sizeSel = document.getElementById("new-color-size-sel") as HTMLSelectElement;
-                          const qtySel = document.getElementById("new-color-qty-input") as HTMLInputElement;
+                          const sizeSel = document.getElementById(
+                            "new-color-size-sel",
+                          ) as HTMLSelectElement;
+                          const qtySel = document.getElementById(
+                            "new-color-qty-input",
+                          ) as HTMLInputElement;
                           const sVal = sizeSel?.value;
                           const qVal = Number(qtySel?.value || 0);
 
@@ -1281,7 +1808,10 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                           }
 
                           setError("");
-                          setNewColorVariants((prev) => [...prev, { size: sVal, quantity: qVal }]);
+                          setNewColorVariants((prev) => [
+                            ...prev,
+                            { size: sVal, quantity: qVal },
+                          ]);
                           sizeSel.value = "";
                         }}
                         className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition bg-white"
@@ -1298,11 +1828,15 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                     disabled={addColorMutation.isPending}
                     onClick={async () => {
                       if (newColorImages.length === 0) {
-                        setError("Please upload at least one image for the new color.");
+                        setError(
+                          "Please upload at least one image for the new color.",
+                        );
                         return;
                       }
                       if (newColorVariants.length === 0) {
-                        setError("Please add at least one size variant for the new color.");
+                        setError(
+                          "Please add at least one size variant for the new color.",
+                        );
                         return;
                       }
 
@@ -1315,19 +1849,28 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                           fd.append("images", imgFile);
                         });
 
-                        await addColorMutation.mutateAsync({ productId: product!.id, formData: fd });
-                        
+                        await addColorMutation.mutateAsync({
+                          productId: product!.id,
+                          formData: fd,
+                        });
+
                         // Reset new color fields
                         setNewColorName("");
                         setNewColorImages([]);
                         setNewColorVariants([]);
                       } catch (err: any) {
-                        setError(err?.response?.data?.message ?? err?.message ?? "Failed to save new color option.");
+                        setError(
+                          err?.response?.data?.message ??
+                            err?.message ??
+                            "Failed to save new color option.",
+                        );
                       }
                     }}
                     className="w-full bg-foreground text-white rounded-xl py-2 font-['Montserrat'] text-xs font-bold hover:bg-foreground/90 transition disabled:opacity-50"
                   >
-                    {addColorMutation.isPending ? "Adding color option..." : "Save Color Option to Product"}
+                    {addColorMutation.isPending
+                      ? t("addingColorOption")
+                      : t("saveColorOption")}
                   </button>
                 )}
               </div>
@@ -1346,58 +1889,122 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
                     setWholesaleFile(croppedFile);
                     setWholesalePreview(URL.createObjectURL(croppedFile));
                   }}
-                  onCancel={() => { URL.revokeObjectURL(wholesaleCropSrc); setWholesaleCropSrc(null); }}
+                  onCancel={() => {
+                    URL.revokeObjectURL(wholesaleCropSrc);
+                    setWholesaleCropSrc(null);
+                  }}
                 />
               )}
               <div>
-                <input ref={wholesaleRef} type="file" accept="image/*" className="hidden"
+                <input
+                  ref={wholesaleRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
                   onChange={async (e) => {
                     const f = e.target.files?.[0];
                     e.target.value = "";
                     if (!f) return;
                     setWholesaleDimError("");
                     const err = await validateImageDimensions(f);
-                    if (err) { setWholesaleDimError(err); return; }
+                    if (err) {
+                      setWholesaleDimError(err);
+                      return;
+                    }
                     setWholesaleCropName(f.name);
                     setWholesaleCropSrc(URL.createObjectURL(f));
                   }}
                 />
-                <button type="button" onClick={() => wholesaleRef.current?.click()}
-                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white">
+                <button
+                  type="button"
+                  onClick={() => wholesaleRef.current?.click()}
+                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white"
+                >
                   {wholesalePreview ? (
-                    <img src={wholesalePreview} alt="preview" className="h-20 w-20 rounded-lg object-cover" />
+                    <img
+                      src={wholesalePreview}
+                      alt="preview"
+                      className="h-20 w-20 rounded-lg object-cover"
+                    />
                   ) : (
                     <>
-                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" strokeLinecap="round" strokeLinejoin="round" />
+                      <svg
+                        className="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      >
+                        <path
+                          d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
-                      <span>Click to change image</span>
-                      <span className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</span>
+                      <span>{t("clickChangeImage")}</span>
+                      <span className="font-['Montserrat'] text-xs text-gray-text">
+                        Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px
+                      </span>
                     </>
                   )}
                 </button>
-                {wholesaleDimError && <p className="mt-1 font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>}
+                {wholesaleDimError && (
+                  <p className="mt-1 font-['Montserrat'] text-xs text-red-600">
+                    {wholesaleDimError}
+                  </p>
+                )}
                 {wholesalePreview && !wholesaleDimError && (
-                  <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">Click image to replace</p>
+                  <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">
+                    {t("clickReplaceImage")}
+                  </p>
                 )}
               </div>
-              <input placeholder="Min order quantity" type="number" min="1" value={minOrder} onChange={(e) => setMinOrder(e.target.value)}
-                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary" />
+              <input
+                placeholder="Min order quantity"
+                type="number"
+                min="1"
+                value={minOrder}
+                onChange={(e) => setMinOrder(e.target.value)}
+                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              />
               <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3 bg-white">
-                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">Wholesale Attributes</p>
-                {([
-                  { label: "Best Deal", value: isBestDeal, set: setIsBestDeal },
-                  { label: "Most Popular", value: isMostPopular, set: setIsMostPopular },
-                  { label: "Premium Collection", value: isPremiumCollection, set: setIsPremiumCollection },
-                ] as const).map(({ label, value, set }) => (
-                  <div key={label} className="flex items-center justify-between">
-                    <span className="font-['Montserrat'] text-sm text-foreground">{label}</span>
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  {t("wholesaleAttributes")}
+                </p>
+                {(
+                  [
+                    {
+                      label: "Best Deal",
+                      value: isBestDeal,
+                      set: setIsBestDeal,
+                    },
+                    {
+                      label: "Most Popular",
+                      value: isMostPopular,
+                      set: setIsMostPopular,
+                    },
+                    {
+                      label: "Premium Collection",
+                      value: isPremiumCollection,
+                      set: setIsPremiumCollection,
+                    },
+                  ] as const
+                ).map(({ label, value, set }) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="font-['Montserrat'] text-sm text-foreground">
+                      {label}
+                    </span>
                     <button
                       type="button"
                       onClick={() => set((v) => !v)}
                       className={`relative h-6 w-11 rounded-full transition-colors ${value ? "bg-primary" : "bg-gray-200"}`}
                     >
-                      <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
+                      <div
+                        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`}
+                      />
                     </button>
                   </div>
                 ))}
@@ -1405,11 +2012,20 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
             </>
           )}
 
-          {error && <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>}
+          {error && (
+            <p className="font-['Montserrat'] text-xs text-red-600">{error}</p>
+          )}
 
-          <button type="submit" disabled={isSaving || uploading}
-            className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50">
-            {uploading ? "Uploading images..." : isSaving ? "Saving..." : "Save Changes"}
+          <button
+            type="submit"
+            disabled={isSaving || uploading}
+            className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
+          >
+            {uploading
+              ? t("uploadingImages")
+              : isSaving
+                ? t("saving")
+                : t("saveChanges")}
           </button>
         </form>
       </div>
@@ -1451,14 +2067,16 @@ export function InventoryTablePanel({
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("date-desc");
   const [openFilter, setOpenFilter] = useState<string | null>(null);
-
+  const { t } = useTranslation("traderProduct");
   useEffect(() => {
     const handleClickOutside = () => setOpenFilter(null);
     if (openFilter) document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [openFilter]);
 
-  const uniqueCategories = Array.from(new Set(items.map((i) => i.category).filter(Boolean)));
+  const uniqueCategories = Array.from(
+    new Set(items.map((i) => i.category).filter(Boolean)),
+  );
 
   const filtered = items
     .filter((i) => {
@@ -1467,28 +2085,42 @@ export function InventoryTablePanel({
         i.product.toLowerCase().includes(q) ||
         i.category.toLowerCase().includes(q) ||
         i.sku.toLowerCase().includes(q);
-      const matchesCategory = filterCategory === "all" || i.category === filterCategory;
+      const matchesCategory =
+        filterCategory === "all" || i.category === filterCategory;
       const matchesStatus = filterStatus === "all" || i.status === filterStatus;
-      const matchesType = !showTypeFilter || filterType === "all" || i.type === filterType;
+      const matchesType =
+        !showTypeFilter || filterType === "all" || i.type === filterType;
       return matchesSearch && matchesCategory && matchesStatus && matchesType;
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case "price-asc":  return a.priceNum - b.priceNum;
-        case "price-desc": return b.priceNum - a.priceNum;
-        case "name-asc":   return a.product.localeCompare(b.product);
-        case "name-desc":  return b.product.localeCompare(a.product);
-        case "stock-asc":  return a.stock - b.stock;
-        case "stock-desc": return b.stock - a.stock;
-        case "date-asc":   return a.createdAtRaw - b.createdAtRaw;
-        case "none":       return 0;
-        default:           return b.createdAtRaw - a.createdAtRaw;
+        case "price-asc":
+          return a.priceNum - b.priceNum;
+        case "price-desc":
+          return b.priceNum - a.priceNum;
+        case "name-asc":
+          return a.product.localeCompare(b.product);
+        case "name-desc":
+          return b.product.localeCompare(a.product);
+        case "stock-asc":
+          return a.stock - b.stock;
+        case "stock-desc":
+          return b.stock - a.stock;
+        case "date-asc":
+          return a.createdAtRaw - b.createdAtRaw;
+        case "none":
+          return 0;
+        default:
+          return b.createdAtRaw - a.createdAtRaw;
       }
     });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
+  const paginated = filtered.slice(
+    (safePage - 1) * itemsPerPage,
+    safePage * itemsPerPage,
+  );
 
   const handlePageSizeChange = (size: number) => {
     setItemsPerPage(size);
@@ -1499,29 +2131,61 @@ export function InventoryTablePanel({
   const toggleRow = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
   const toggleAll = () => {
     setSelected((prev) =>
-      prev.size === paginated.length ? new Set() : new Set(paginated.map((i) => i.id))
+      prev.size === paginated.length
+        ? new Set()
+        : new Set(paginated.map((i) => i.id)),
     );
   };
-  const allSelected = paginated.length > 0 && selected.size === paginated.length;
+  const allSelected =
+    paginated.length > 0 && selected.size === paginated.length;
 
   const tableColumns = showTypeFilter
-    ? ["Image", "Product", "Category", "Type", "Stock", "SKU", "Price", "Date", "Status", "Actions"]
-    : ["Image", "Product", "Category", "Stock", "SKU", "Price", "Date", "Status", "Actions"];
+    ? [
+        "image",
+        "product",
+        "category",
+        "type",
+        "stock",
+        "sku",
+        "price",
+        "date",
+        "status",
+        "actions",
+      ]
+    : [
+        "image",
+        "product",
+        "category",
+        "stock",
+        "sku",
+        "price",
+        "date",
+        "status",
+        "actions",
+      ];
 
   const filterBtn = (key: string, label: string, active: boolean) => (
     <button
       type="button"
-      onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === key ? null : key); }}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpenFilter(openFilter === key ? null : key);
+      }}
       className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 font-['Montserrat'] text-xs font-medium transition ${active ? "border-primary bg-primary text-foreground" : "border-stroke bg-white text-foreground hover:bg-background"}`}
     >
       {label}
-      <img className={`h-4 w-4 transition-transform ${openFilter === key ? "-rotate-90" : "rotate-90"}`} src={asset("weui_arrow-outlined.svg")} alt="" />
+      <img
+        className={`h-4 w-4 transition-transform ${openFilter === key ? "-rotate-90" : "rotate-90"}`}
+        src={asset("weui_arrow-outlined.svg")}
+        alt=""
+      />
     </button>
   );
 
@@ -1530,12 +2194,19 @@ export function InventoryTablePanel({
       {/* Search + Add */}
       <div className="flex flex-wrap items-center justify-start gap-3">
         <label className="relative flex min-w-70 items-center">
-          <img className="pointer-events-none absolute left-4 h-5 w-5" src={asset("mynaui_search.svg")} alt="" />
+          <img
+            className="pointer-events-none absolute left-4 h-5 w-5"
+            src={asset("mynaui_search.svg")}
+            alt=""
+          />
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("search")}
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
           />
         </label>
@@ -1545,7 +2216,7 @@ export function InventoryTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          {addLabel}
+          {t(addLabel)}
         </button>
       </div>
 
@@ -1554,16 +2225,30 @@ export function InventoryTablePanel({
         {/* Panel header */}
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{title}</h2>
+            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
+              {t(title)}
+            </h2>
 
             {/* Category */}
             <div className="relative">
-              {filterBtn("category", filterCategory === "all" ? "Category" : filterCategory, filterCategory !== "all")}
+              {filterBtn(
+                "category",
+                filterCategory === "all" ? t("category") : filterCategory,
+                filterCategory !== "all",
+              )}
               {openFilter === "category" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-32 rounded-xl border border-stroke bg-white shadow-lg py-1">
                   {["all", ...uniqueCategories].map((opt) => (
-                    <button key={opt} type="button" onClick={() => { setFilterCategory(opt); setOpenFilter(null); setPage(1); }}
-                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterCategory === opt ? "text-primary" : "text-foreground"}`}>
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        setFilterCategory(opt);
+                        setOpenFilter(null);
+                        setPage(1);
+                      }}
+                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterCategory === opt ? "text-primary" : "text-foreground"}`}
+                    >
                       {opt === "all" ? "All Categories" : opt}
                     </button>
                   ))}
@@ -1573,12 +2258,31 @@ export function InventoryTablePanel({
 
             {/* Status */}
             <div className="relative">
-              {filterBtn("status", filterStatus === "all" ? "Status" : filterStatus, filterStatus !== "all")}
+              {filterBtn(
+                "status",
+                filterStatus === "all" ? t("status") : filterStatus,
+                filterStatus !== "all",
+              )}
               {openFilter === "status" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-35 rounded-xl border border-stroke bg-white shadow-lg py-1">
-                  {(["all", "Active", "Low Stock", "Out of Stock"] as const).map((opt) => (
-                    <button key={opt} type="button" onClick={() => { setFilterStatus(opt); setOpenFilter(null); setPage(1); }}
-                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium transition hover:bg-background ${filterStatus === opt ? "text-primary" : "text-foreground"}`}>
+                  {(
+                    [
+                      t("all"),
+                      t("active"),
+                      t("lowStock"),
+                      t("outOfStock"),
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => {
+                        setFilterStatus(opt);
+                        setOpenFilter(null);
+                        setPage(1);
+                      }}
+                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium transition hover:bg-background ${filterStatus === opt ? "text-primary" : "text-foreground"}`}
+                    >
                       {opt === "all" ? "All Statuses" : opt}
                     </button>
                   ))}
@@ -1589,13 +2293,33 @@ export function InventoryTablePanel({
             {/* Type */}
             {showTypeFilter && (
               <div className="relative">
-                {filterBtn("type", filterType === "all" ? "Type" : filterType === "product" ? "Product" : "Wholesale", filterType !== "all")}
+                {filterBtn(
+                  "type",
+                  filterType === "all"
+                    ? t("type")
+                    : filterType === "product"
+                      ? t("product")
+                      : t("wholesale"),
+                  filterType !== "all",
+                )}
                 {openFilter === "type" && (
                   <div className="absolute left-0 top-full z-20 mt-1 min-w-30 rounded-xl border border-stroke bg-white shadow-lg py-1">
                     {(["all", "product", "wholesale"] as const).map((opt) => (
-                      <button key={opt} type="button" onClick={() => { setFilterType(opt); setOpenFilter(null); setPage(1); }}
-                        className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterType === opt ? "text-primary" : "text-foreground"}`}>
-                        {opt === "all" ? "All Types" : opt === "product" ? "Product" : "Wholesale"}
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => {
+                          setFilterType(opt);
+                          setOpenFilter(null);
+                          setPage(1);
+                        }}
+                        className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterType === opt ? "text-primary" : "text-foreground"}`}
+                      >
+                        {opt === "all"
+                          ? "All Types"
+                          : opt === "product"
+                            ? "Product"
+                            : "Wholesale"}
                       </button>
                     ))}
                   </div>
@@ -1605,22 +2329,34 @@ export function InventoryTablePanel({
 
             {/* Sort by */}
             <div className="relative">
-              {filterBtn("sort", "Sort by", sortBy !== "date-desc" && sortBy !== "none")}
+              {filterBtn(
+                "sort",
+                t("sortBy"),
+                sortBy !== "date-desc" && sortBy !== "none",
+              )}
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-white shadow-lg py-1">
                   {[
-                    { value: "none",       label: "No sort" },
-                    { value: "date-desc",  label: "Newest first" },
-                    { value: "date-asc",   label: "Oldest first" },
-                    { value: "price-asc",  label: "Price: Low → High" },
-                    { value: "price-desc", label: "Price: High → Low" },
-                    { value: "stock-asc",  label: "Stock: Low → High" },
-                    { value: "stock-desc", label: "Stock: High → Low" },
-                    { value: "name-asc",   label: "Name: A → Z" },
-                    { value: "name-desc",  label: "Name: Z → A" },
+                    { value: "none", label: t("none") },
+                    { value: "date-desc", label: t("dateDesc") },
+                    { value: "date-asc", label: t("dateAsc") },
+                    { value: "price-asc", label: t("priceAsc") },
+                    { value: "price-desc", label: t("priceDesc") },
+                    { value: "stock-asc", label: t("stockAsc") },
+                    { value: "stock-desc", label: t("stockDesc") },
+                    { value: "name-asc", label: t("nameAsc") },
+                    { value: "name-desc", label: t("nameDesc") },
                   ].map((opt) => (
-                    <button key={opt.value} type="button" onClick={() => { setSortBy(opt.value); setOpenFilter(null); setPage(1); }}
-                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium transition hover:bg-background ${sortBy === opt.value ? "text-primary" : "text-foreground"}`}>
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setSortBy(opt.value);
+                        setOpenFilter(null);
+                        setPage(1);
+                      }}
+                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium transition hover:bg-background ${sortBy === opt.value ? "text-primary" : "text-foreground"}`}
+                    >
                       {opt.label}
                     </button>
                   ))}
@@ -1631,32 +2367,94 @@ export function InventoryTablePanel({
 
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 rounded-2xl border border-stroke bg-white px-2 py-1">
-              <button type="button" onClick={() => setViewMode("table")}
-                className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "table" ? "bg-gray-light" : ""}`}>
-                <img className="h-6 w-6" src={asset("material-symbols_table-outline.svg")} alt="" />
-                <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}>Tables</span>
+              <button
+                type="button"
+                onClick={() => setViewMode("table")}
+                className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "table" ? "bg-gray-light" : ""}`}
+              >
+                <img
+                  className="h-6 w-6"
+                  src={asset("material-symbols_table-outline.svg")}
+                  alt=""
+                />
+                <span
+                  className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}
+                >
+                  {t("tables")}
+                </span>
               </button>
-              <button type="button" onClick={() => setViewMode("cards")}
-                className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "cards" ? "bg-gray-light" : ""}`}>
-                <img className="h-6 w-6" src={asset("clarity_view-cards-line.svg")} alt="" />
-                <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}>Cards</span>
+              <button
+                type="button"
+                onClick={() => setViewMode("cards")}
+                className={`flex items-center gap-1 rounded-2xl px-2 py-1 transition ${viewMode === "cards" ? "bg-gray-light" : ""}`}
+              >
+                <img
+                  className="h-6 w-6"
+                  src={asset("clarity_view-cards-line.svg")}
+                  alt=""
+                />
+                <span
+                  className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}
+                >
+                  {t("cards")}
+                </span>
               </button>
             </div>
             <button
               type="button"
               onClick={() => {
                 const headers = showTypeFilter
-                  ? ["Product", "Category", "Type", "Stock", "SKU", "Price", "Date", "Status"]
-                  : ["Product", "Category", "Stock", "SKU", "Price", "Date", "Status"];
+                  ? [
+                      "Product",
+                      "Category",
+                      "Type",
+                      "Stock",
+                      "SKU",
+                      "Price",
+                      "Date",
+                      "Status",
+                    ]
+                  : [
+                      "Product",
+                      "Category",
+                      "Stock",
+                      "SKU",
+                      "Price",
+                      "Date",
+                      "Status",
+                    ];
                 const rows = filtered.map((i) =>
                   showTypeFilter
-                    ? [i.product, i.category, i.type, i.stock, i.sku, i.priceNum, i.date, i.status]
-                    : [i.product, i.category, i.stock, i.sku, i.priceNum, i.date, i.status]
+                    ? [
+                        i.product,
+                        i.category,
+                        i.type,
+                        i.stock,
+                        i.sku,
+                        i.priceNum,
+                        i.date,
+                        i.status,
+                      ]
+                    : [
+                        i.product,
+                        i.category,
+                        i.stock,
+                        i.sku,
+                        i.priceNum,
+                        i.date,
+                        i.status,
+                      ],
                 );
                 const csv = [headers, ...rows]
-                  .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+                  .map((r) =>
+                    r
+                      .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+                      .join(","),
+                  )
                   .join("\n");
-                const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                const blob = new Blob([csv], {
+                  type: "text/csv;charset=utf-8;",
+                });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -1666,8 +2464,12 @@ export function InventoryTablePanel({
               }}
               className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              <img className="h-5 w-5" src={asset("download-cloud-02.svg")} alt="" />
-              Export
+              <img
+                className="h-5 w-5"
+                src={asset("download-cloud-02.svg")}
+                alt=""
+              />
+              {t("export")}
             </button>
           </div>
         </div>
@@ -1675,17 +2477,23 @@ export function InventoryTablePanel({
         {/* Content */}
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <p className="font-['Montserrat'] text-sm text-gray-text">Loading...</p>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              {t("loading")}{" "}
+            </p>
           </div>
         ) : errorMessages.length > 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12">
             {errorMessages.map((msg, i) => (
-              <p key={i} className="font-['Montserrat'] text-sm text-red-600">{msg}</p>
+              <p key={i} className="font-['Montserrat'] text-sm text-red-600">
+                {msg}
+              </p>
             ))}
           </div>
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
-            <p className="font-['Montserrat'] text-sm text-gray-text">No items found. Click "{addLabel}" to get started.</p>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              {t("noItemsFound", { addLabel })}
+            </p>
           </div>
         ) : viewMode === "cards" ? (
           <div className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -1693,40 +2501,87 @@ export function InventoryTablePanel({
               const pill = statusPill(item.status as InventoryStatus);
               const tp = typePill(item.type as ProductType);
               return (
-                <div key={item.id} className="relative flex flex-col overflow-hidden rounded-lg border border-stroke bg-white">
+                <div
+                  key={item.id}
+                  className="relative flex flex-col overflow-hidden rounded-lg border border-stroke bg-white"
+                >
                   <div className="relative mx-2 mt-2 h-48 overflow-hidden rounded-lg">
                     {item.image ? (
-                      <img className="h-full w-full rounded-lg object-cover" src={item.image} alt={item.product} />
+                      <img
+                        className="h-full w-full rounded-lg object-cover"
+                        src={item.image}
+                        alt={item.product}
+                      />
                     ) : (
                       <div className="h-full w-full rounded-lg bg-background" />
                     )}
-                    <span className={`absolute right-3 top-3 inline-flex rounded-2xl px-2 py-1 text-sm font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{item.status}</span>
+                    <span
+                      className={`absolute right-3 top-3 inline-flex rounded-2xl px-2 py-1 text-sm font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
+                    >
+                      {item.status}
+                    </span>
                     {showTypeFilter && (
-                      <span className={`absolute left-3 top-3 inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${tp.bg} ${tp.text}`}>{tp.label}</span>
+                      <span
+                        className={`absolute left-3 top-3 inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${tp.bg} ${tp.text}`}
+                      >
+                        {tp.label}
+                      </span>
                     )}
                   </div>
                   <div className="flex flex-col gap-2 px-2 pb-3 pt-2">
-                    <p className="truncate font-['Montserrat'] text-base font-semibold text-foreground">{item.product}</p>
+                    <p className="truncate font-['Montserrat'] text-base font-semibold text-foreground">
+                      {item.product}
+                    </p>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{item.category}</p>
-                      <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">SKU: <span className="font-semibold text-foreground">{item.sku}</span></p>
+                      <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
+                        {item.category}
+                      </p>
+                      <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                        SKU:{" "}
+                        <span className="font-semibold text-foreground">
+                          {item.sku}
+                        </span>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">{item.price}</p>
-                      <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">Stock: <span className="font-semibold text-foreground">{item.stock}</span></p>
+                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
+                        {item.price}
+                      </p>
+                      <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                        Stock:{" "}
+                        <span className="font-semibold text-foreground">
+                          {item.stock}
+                        </span>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between pt-1">
                       <div className="flex items-center gap-2">
-                        <button type="button" onClick={() => onEdit(item)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background">
-                          <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
+                        <button
+                          type="button"
+                          onClick={() => onEdit(item)}
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
+                        >
+                          <img
+                            className="h-4 w-4"
+                            src={asset("mynaui_edit.svg")}
+                            alt="Edit"
+                          />
                         </button>
-                        <button type="button" onClick={() => onDelete(item)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background">
-                          <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
+                        <button
+                          type="button"
+                          onClick={() => onDelete(item)}
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
+                        >
+                          <img
+                            className="h-4 w-4"
+                            src={asset("material-symbols_delete-outline.svg")}
+                            alt="Delete"
+                          />
                         </button>
                       </div>
-                      <p className="font-['Montserrat'] text-xs font-medium text-gray-text">{item.date}</p>
+                      <p className="font-['Montserrat'] text-xs font-medium text-gray-text">
+                        {item.date}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1739,16 +2594,34 @@ export function InventoryTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3">
-                    <div className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center" onClick={toggleAll}>
+                    <div
+                      className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
+                      onClick={toggleAll}
+                    >
                       {allSelected && (
-                        <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <svg
+                          className="h-3 w-3 text-primary"
+                          viewBox="0 0 12 12"
+                          fill="none"
+                        >
+                          <path
+                            d="M2 6l3 3 5-5"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                       )}
                     </div>
                   </th>
                   {tableColumns.map((col) => (
-                    <th key={col} className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">{col}</th>
+                    <th
+                      key={col}
+                      className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap"
+                    >
+                      {t(col)}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -1758,49 +2631,100 @@ export function InventoryTablePanel({
                   const pill = statusPill(item.status as InventoryStatus);
                   const tp = typePill(item.type as ProductType);
                   return (
-                    <tr key={item.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
+                    <tr
+                      key={item.id}
+                      className={idx % 2 === 0 ? "bg-white" : "bg-background"}
+                    >
                       <td className="px-4 py-3">
                         <div
                           className={`h-5 w-5 cursor-pointer rounded-md border flex items-center justify-center transition ${isChecked ? "border-secondary bg-secondary" : "border-gray-300 bg-white"}`}
                           onClick={() => toggleRow(item.id)}
                         >
                           {isChecked && (
-                            <svg className="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-                              <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <svg
+                              className="h-3 w-3 text-white"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                            >
+                              <path
+                                d="M2 6l3 3 5-5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
                             </svg>
                           )}
                         </div>
                       </td>
                       <td className="px-3 py-3 text-center">
                         {item.image ? (
-                          <img className="mx-auto h-7 w-7 rounded-lg object-cover" src={item.image} alt={item.product} />
+                          <img
+                            className="mx-auto h-7 w-7 rounded-lg object-cover"
+                            src={item.image}
+                            alt={item.product}
+                          />
                         ) : (
                           <div className="mx-auto h-7 w-7 rounded-lg bg-background" />
                         )}
                       </td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">{item.product}</td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">{item.category}</td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                        {item.product}
+                      </td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                        {item.category}
+                      </td>
                       {showTypeFilter && (
                         <td className="px-3 py-3 text-center">
-                          <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${tp.bg} ${tp.text}`}>{tp.label}</span>
+                          <span
+                            className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${tp.bg} ${tp.text}`}
+                          >
+                            {tp.label}
+                          </span>
                         </td>
                       )}
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">{item.stock}</td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">{item.sku}</td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">{item.price}</td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground whitespace-nowrap">{item.date}</td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                        {item.stock}
+                      </td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                        {item.sku}
+                      </td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                        {item.price}
+                      </td>
+                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground whitespace-nowrap">
+                        {item.date}
+                      </td>
                       <td className="px-3 py-3 text-center">
-                        <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{item.status}</span>
+                        <span
+                          className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
+                        >
+                          {item.status}
+                        </span>
                       </td>
                       <td className="px-3 py-3 text-center">
                         <div className="flex items-center justify-center gap-1">
-                          <button type="button" onClick={() => onEdit(item)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background">
-                            <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="Edit" />
+                          <button
+                            type="button"
+                            onClick={() => onEdit(item)}
+                            className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
+                          >
+                            <img
+                              className="h-4 w-4"
+                              src={asset("mynaui_edit.svg")}
+                              alt="Edit"
+                            />
                           </button>
-                          <button type="button" onClick={() => onDelete(item)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background">
-                            <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="Delete" />
+                          <button
+                            type="button"
+                            onClick={() => onDelete(item)}
+                            className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
+                          >
+                            <img
+                              className="h-4 w-4"
+                              src={asset("material-symbols_delete-outline.svg")}
+                              alt="Delete"
+                            />
                           </button>
                         </div>
                       </td>
@@ -1818,11 +2742,18 @@ export function InventoryTablePanel({
           <div className="relative">
             <button
               type="button"
-              onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === "pagesize" ? null : "pagesize"); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenFilter(openFilter === "pagesize" ? null : "pagesize");
+              }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
-              <img className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`} src={asset("weui_arrow-outlined.svg")} alt="" />
+              {t("perPage", { count: itemsPerPage })}
+              <img
+                className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
+                src={asset("weui_arrow-outlined.svg")}
+                alt=""
+              />
             </button>
             {openFilter === "pagesize" && (
               <div className="absolute bottom-full left-0 z-20 mb-1 min-w-30 rounded-xl border border-stroke bg-white shadow-lg py-1">
@@ -1843,17 +2774,38 @@ export function InventoryTablePanel({
           {/* Page info + prev/next */}
           <div className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5">
             <span className="font-['Inter'] text-sm font-medium text-foreground">
-              {filtered.length === 0 ? "0" : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}–{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              {filtered.length === 0
+                ? "0"
+                : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
+              –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
+              <span className="text-gray-text">
+                {t("of")} {filtered.length}
+              </span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
-            <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage === 1}
-              className="flex h-5 w-5 items-center justify-center disabled:opacity-40">
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Prev" />
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="flex h-5 w-5 items-center justify-center disabled:opacity-40"
+            >
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt={t("prev")}
+              />
             </button>
-            <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}
-              className="flex h-5 w-5 rotate-180 items-center justify-center disabled:opacity-40">
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Next" />
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="flex h-5 w-5 rotate-180 items-center justify-center disabled:opacity-40"
+            >
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt={t("next")}
+              />
             </button>
           </div>
         </div>

@@ -1,0 +1,23 @@
+{
+    "overview": "Overview",
+    "retail": "Retail",
+    "dropshipping": "Dropshipping",
+    "wholesale": "Wholesale",
+    "brandPartners": "Brand Partners",
+    "categories": "Categories",
+    "products": "Products",
+    "orders": "Orders",
+    "inventory": "Inventory",
+    "customers": "Customers",
+    "coupons": "Coupons",
+    "finance": "Finance",
+    "notifications": "Notifications",
+    "analytics": "Analytics",
+    "helpCenter": "Help Center",
+    "storeSettings": "Store Settings",
+    "dashboard": "Dashboard",
+    "logout": "Log out",
+    "loggedOut": "Logged out successfully",
+    "traderRole": "Trader",
+    "profile": "Profile"
+} 

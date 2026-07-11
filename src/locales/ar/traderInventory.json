@@ -1,0 +1,19 @@
+{
+  "inStock": "متوفر في المخزون",
+  "lowStock": "مخزون منخفض",
+  "outOfStock": "غير متوفر",
+  "totalProducts": "إجمالي المنتجات",
+  "inventoryTable": "جدول المخزون",
+  "recentAlerts": "التنبيهات الأخيرة",
+  "inventorySnapshot": "ملخص المخزون",
+  "activityLog": "سجل النشاط",
+  "viewAll": "عرض الكل",
+  "items": "عناصر",
+  "addedBy": "تمت الإضافة بواسطة",
+  "restockedFromSupplier": "تم إعادة التخزين من المورد",
+  "lowStockAlert": "تنبيه مخزون منخفض",
+  "onlyItemsLeft": "متبقي فقط {{count}} عناصر في المخزون.",
+  "outStock": "نفد المخزون",
+  "products": "المنتجات",
+  "wholesales": "الجملة"
+}

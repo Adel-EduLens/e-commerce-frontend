@@ -58,6 +58,19 @@ import reviewFormAr from "./locales/ar/reviewForm.json";
 
 import compareEn from "./locales/en/compare.json";
 import compareAr from "./locales/ar/compare.json";
+
+import traderLayoutEn from "./locales/en/traderLayout.json";
+import traderLayoutAr from "./locales/ar/traderLayout.json";
+
+import traderInventoryEn from "./locales/en/traderInventory.json";
+import traderInventoryAr from "./locales/ar/traderInventory.json";
+
+import traderWholesaleEn from "./locales/en/traderWholesale.json";
+import traderWholesaleAr from "./locales/ar/traderWholesale.json";
+
+import traderProductEn from "./locales/en/traderProduct.json";
+import traderProductAr from "./locales/ar/traderProduct.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -83,6 +96,10 @@ i18n
         productDetails: productDetailsEn,
         reviewForm: reviewFormEn,
         compare: compareEn,
+        traderLayout: traderLayoutEn,
+        traderInventory: traderInventoryEn,
+        traderWholesale: traderWholesaleEn,
+        traderProduct: traderProductEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -104,6 +121,10 @@ i18n
         productDetails: productDetailsAr,
         reviewForm: reviewFormAr,
         compare: compareAr,
+        traderLayout: traderLayoutAr,
+        traderInventory: traderInventoryAr,
+        traderWholesale: traderWholesaleAr,
+        traderProduct: traderProductAr,
       },
     },
 
