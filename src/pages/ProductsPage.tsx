@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { ProductCard, CatalogFilters } from "../components/shared";
+import { ProductCard, SidebarFilters } from "../components/shared";
+import ShopBanner from "../components/product/ShopBanner";
 import Pagination from "../components/shared/Pagination";
 import { useProducts } from "../hooks/queries/productsQuery";
 import { useCategories } from "../hooks/queries/categoriesQuery";
@@ -11,19 +12,7 @@ import { useHomeFilters } from "../hooks/utils/HomeFilters";
 import { useWholesales } from "../hooks/queries/wholesaleQuery";
 import { useTranslation } from "react-i18next";
 
-const FILTER_LABELS: Record<string, string> = {
-  "best-deal": "Best Deals",
-  "most-popular": "Most Popular",
-  premium: "Premium Collection",
-  new: "New Arrivals",
-  "must-have": "This Season's Must-Haves",
-  "flash-deals": "Flash Deals",
-};
-const CATEGORY_LABELS: Record<string, string> = {
-  kids: "Kids",
-  men: "Men",
-  women: "Women",
-};
+
 
 export default function ProductsPage() {
   const { t } = useTranslation("productSection");
@@ -83,17 +72,19 @@ export default function ProductsPage() {
     limit: 16,
   });
 
-  const { data: wholesales = [], isLoading: isWholesaleLoading } = useWholesales(
-    filters.search ? { search: filters.search } : undefined
-  );
-  
+  const { data: wholesales = [], isLoading: isWholesaleLoading } =
+    useWholesales(filters.search ? { search: filters.search } : undefined);
+
   const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
 
   useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      search: urlSearch,
-    }));
+    const func = async () => {
+      setFilters((prev) => ({
+        ...prev,
+        search: urlSearch,
+      }));
+    };
+    func();
   }, [urlSearch]);
 
   useEffect(() => {
@@ -116,29 +107,11 @@ export default function ProductsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
-  const pageTitle = useMemo(() => {
-    if (filter) return FILTER_LABELS[filter] ?? "Products";
 
-    if (effectiveCategoryName) {
-      return (
-        CATEGORY_LABELS[effectiveCategoryName.toLowerCase()] ?? "All Products"
-      );
-    }
-
-    return "All Products";
-  }, [filter, effectiveCategoryName]);
-
-  if (isError) {
-    return (
-      <div className="py-20 text-center text-gray-text">
-        {t("Something went wrong. Please try again later.")}
-      </div>
-    );
-  }
 
   const combinedProducts = useMemo(() => {
+    console.log(data?.products);
     const items: React.ReactNode[] = [];
-    
     if (data?.products) {
       data.products.forEach((product) => {
         items.push(
@@ -146,9 +119,21 @@ export default function ProductsPage() {
             key={`retail-${product.id}`}
             title={product.name}
             productId={product.id}
+            colors={product.colors?.map((c) => c.colorName)}
+            images={product.images}
             price={`$${product.price}`}
-            imageSrc={product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url || product.images?.[0]?.url}
-            sizeLabel={Array.from(new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).join(" - ")}
+            imageSrc={
+              product.colors?.[0]?.images?.[0]?.imageUrl ||
+              product.colors?.[0]?.images?.[0]?.url ||
+              product.images?.[0]?.url
+            }
+            sizeLabel={Array.from(
+              new Set(
+                product.colors?.flatMap(
+                  (c) => c.variants?.map((v) => v.size) ?? [],
+                ) ?? [],
+              ),
+            ).join(" - ")}
             featured={product.rating >= 4}
             isMustHave={product.isMustHave}
             isFlashDeals={product.isFlashDeals}
@@ -157,7 +142,8 @@ export default function ProductsPage() {
             productType="SHOP"
             showTypeBadge={!!filters.search}
             to={`/product-details/${product.id}`}
-          />
+            subtitle={product.description}
+          />,
         );
       });
     }
@@ -177,53 +163,68 @@ export default function ProductsPage() {
             productType="WHOLESALE"
             showTypeBadge={!!filters.search}
             to={`/wholesale/${wholesale.id}`}
-          />
+          />,
         );
       });
     }
     return items;
   }, [data, wholesales, filters.search]);
 
+  if (isError) {
+    return (
+      <div className="py-20 text-center text-gray-text">
+        {t("Something went wrong. Please try again later.")}
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full">
-      <div className="font-['Montserrat'] text-5xl font-bold text-foreground sm:text-8xl">
-        {t(pageTitle)}
+
+    <div className="w-full bg-background min-h-screen text-foreground transition-colors">
+      <ShopBanner />
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-8 lg:flex-row">
+          {/* Sidebar */}
+          <div className="w-full shrink-0 lg:w-64">
+            <SidebarFilters
+              filters={filter2}
+              initialValues={filters}
+              onFilterChange={setFilters}
+            />
+          </div>
+
+          {/* Main content */}
+          <div className="flex-1">
+            {isAnyLoading && (
+              <div className="w-full py-2 text-center text-gray-400">
+                {t("Loading")}
+              </div>
+            )}
+
+            {!isAnyLoading && (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+                {combinedProducts}
+              </div>
+            )}
+
+            {!isAnyLoading && combinedProducts.length === 0 && (
+              <div className="mt-20 text-center text-xl text-gray-500">
+                {t("No products found.")}
+              </div>
+            )}
+
+            {!isAnyLoading && data && data.pagination.totalPages > 1 && (
+              <Pagination
+                className="mt-12 mb-8"
+                currentPage={data.pagination.page}
+                totalPages={data.pagination.totalPages}
+                onPageChange={setPage}
+              />
+            )}
+          </div>
+        </div>
       </div>
-
-      <div className="mt-8">
-        <CatalogFilters
-          filters={filter2}
-          initialValues={filters}
-          onFilterChange={setFilters}
-        />
-      </div>
-
-      {isAnyLoading && (
-        <div className="mt-8 w-full py-2 text-center text-gray-text">
-          {t("Loading")}
-        </div>
-      )}
-
-      {!isAnyLoading && (
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {combinedProducts}
-        </div>
-      )}
-
-      {!isAnyLoading && combinedProducts.length === 0 && (
-        <div className="mt-20 text-center text-xl text-gray-500">
-          {t("No products found.")}
-        </div>
-      )}
-
-      {!isAnyLoading && data && data.pagination.totalPages > 1 && (
-        <Pagination
-          className="mt-12 mb-8"
-          currentPage={data.pagination.page}
-          totalPages={data.pagination.totalPages}
-          onPageChange={setPage}
-        />
-      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Star } from "../ui/star";
 import { asset } from "../../lib/utils";
 import { MdCompare } from "react-icons/md";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import {
   addCompareProduct,
@@ -17,9 +17,18 @@ import { useCartStore } from "../../store/useCartStore";
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
 );
+type ImageType = {
+  id: string;
+  url: string;
+  color?: string;
+  productId?: string;
+};
 
 export type ProductCardProps = {
   title?: string;
+  subtitle?: string;
+  colors?: string[];
+  images?: ImageType[];
   sizeLabel?: string;
   price?: string;
   to?: string;
@@ -32,9 +41,10 @@ export type ProductCardProps = {
   flashDealPrice?: number;
   flashDealEndsAt?: string;
   isMustHave?: boolean;
+  description?: string;
   isFlashDeals?: boolean;
   productId?: string;
-  productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
+  productType?: "SHOP" | "WHOLESALE" | "RETAIL";
   showTypeBadge?: boolean;
 };
 
@@ -74,30 +84,30 @@ function useCountdown(endsAt?: string) {
 }
 
 export default function ProductCard({
-  title = "Amber Blaze Classic Tee",
-  sizeLabel = "XS - XXL",
-  price = "$250",
+  title = "Linen shirt",
+  subtitle = "Minimalist design, maximum airflow",
+  colors = [],
+  images = [],
+  sizeLabel = "M-L-XL-XXL",
+  price = "120$",
   to = "/product-details",
-  featured = false,
-  accentClassName = "bg-[#BEA1DF]",
   imageSrc = defaultImage,
   imageAlt,
   className = "",
-  rating = 0,
+  rating = 4.5,
   flashDealPrice,
   flashDealEndsAt,
   isFlashDeals = false,
   productId = "",
   productType = "SHOP",
+  isMustHave = false,
   showTypeBadge = false,
 }: ProductCardProps) {
-  const rootTone = featured ? accentClassName : "bg-white";
-  const mediaTone = featured ? accentClassName : "bg-background";
-
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const { label: countdownLabel, expired } = useCountdown(
     showFlashDeal ? flashDealEndsAt : undefined,
   );
+  const [activeImage, setActiveImage] = useState(imageSrc);
   const [isCompared, setIsCompared] = useState(false);
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -107,7 +117,10 @@ export default function ProductCard({
     title ||
     "unknown-id";
 
-  const { data: wishlistStatus } = useWishlistStatus(productType, actualProductId);
+  const { data: wishlistStatus } = useWishlistStatus(
+    productType,
+    actualProductId,
+  );
   const toggleWishlist = useToggleWishlist();
   const isWishlisted = Boolean(wishlistStatus?.isWishlisted);
   const cartItems = useCartStore((s) => s.items);
@@ -117,10 +130,13 @@ export default function ProductCard({
   const existingCartItem = cartItems.find(
     (item) =>
       item.productId === actualProductId ||
-      item.id === `${actualProductId}-default-default`
+      item.id === `${actualProductId}-default-default`,
   );
   const isInCart = Boolean(existingCartItem);
 
+  useEffect(() => {
+    setActiveImage(imageSrc);
+  }, [imageSrc]);
   useEffect(() => {
     setIsCompared(isProductCompared(actualProductId));
   }, [actualProductId]);
@@ -181,36 +197,34 @@ export default function ProductCard({
       toast.success("Added to cart");
     }
   };
+  const handleColorClick = (color: string) => {
+    setActiveImage(images?.find((c) => c.color === color)?.url || "");
+  };
 
   return (
-    <Link
-      to={to}
-      aria-label={`Open details for ${title}`}
-      className={`group relative block w-full overflow-hidden rounded-2xl shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] transition-transform duration-200 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/60 ${rootTone} ${className}`}
+    <div
+      className={`group flex flex-col w-full overflow-hidden rounded-2xl bg-card border border-card-border shadow-sm transition-transform duration-200 hover:-translate-y-1 ${className}`}
     >
-      <div
-        className={`relative mx-2 mt-2 overflow-hidden rounded-lg ${mediaTone} aspect-[4/5]`}
+      {/* Image container */}
+      <Link
+        to={to}
+        className="relative block aspect-[4/5] w-full overflow-hidden bg-muted"
       >
         <img
-          className="absolute inset-0 h-full w-full object-contain"
-          src={imageSrc}
+          className="h-full w-full object-cover"
+          src={activeImage}
           alt={imageAlt ?? title}
           draggable={false}
         />
-        <button
-          onClick={handleCompare}
-          aria-label={isCompared ? "Remove from compare" : "Add to compare"}
-          className={`absolute bottom-2 left-2 z-30 flex h-10 w-10 items-center justify-center rounded-full outline outline-1 outline-gray-light transition-all ${
-            isCompared
-              ? "bg-primary text-primary-foreground"
-              : "bg-white text-foreground hover:bg-primary hover:text-primary-foreground"
-          }`}
-        >
-          <MdCompare  size={18} />
-        </button>
+
         {/* Badges Container */}
-        <div className="absolute left-2 top-2 flex flex-col gap-2 items-start z-30">
-          {showTypeBadge && productType === 'WHOLESALE' && (
+        <div className="absolute left-3 top-3 flex flex-col gap-2 items-start z-30">
+          {isMustHave && (
+            <div className="rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm bg-danger">
+              Must Have
+            </div>
+          )}
+          {showTypeBadge && productType === "WHOLESALE" && (
             <div className="rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm bg-primary text-primary-foreground">
               Wholesale
             </div>
@@ -248,73 +262,110 @@ export default function ProductCard({
           )}
         </div>
 
+        {/* Heart icon */}
         <button
           type="button"
           onClick={handleToggleWishlist}
           disabled={toggleWishlist.isPending}
-          aria-label={isWishlisted ? "Remove from favorites" : "Add to favorites"}
-          className="absolute right-2 top-2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 disabled:opacity-70"
+          className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 backdrop-blur-sm transition-all hover:scale-105 disabled:opacity-70"
         >
           <Heart
             size={20}
             strokeWidth={1.8}
-            className={`transition-colors ${isWishlisted ? "text-red-500" : "text-slate-400"}`}
+            className={`transition-colors ${isWishlisted ? "text-white" : "text-gray-300"}`}
             fill={isWishlisted ? "currentColor" : "none"}
           />
         </button>
 
+        {/* Compare button (optional, moved to top right below heart) */}
         <button
-          type="button"
-          onClick={handleToggleCart}
-          aria-label={isInCart ? "Remove from cart" : "Add to cart"}
-          className={`absolute bottom-2 right-2 z-20 flex h-10 w-10 items-center justify-center rounded-full outline outline-1 outline-offset-[-1px] outline-gray-light transition-all hover:scale-105 ${
-            isInCart
+          onClick={handleCompare}
+          aria-label={isCompared ? "Remove from compare" : "Add to compare"}
+          className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
+            isCompared
               ? "bg-primary text-primary-foreground"
-              : "bg-white text-foreground hover:bg-primary hover:text-primary-foreground"
+              : "bg-black/60 text-gray-300 hover:text-white"
           }`}
         >
-          <ShoppingCart size={18} />
+          <MdCompare size={18} />
         </button>
-      </div>
 
-      <div
-        className={`mx-2 mb-2 mt-1 rounded-lg bg-white p-2 ${
-          featured
-            ? "outline outline-1 outline-offset-[-1px] outline-secondary"
-            : ""
-        }`}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div className="font-['Montserrat'] text-sm sm:text-base lg:text-xl font-medium leading-tight text-foreground line-clamp-2 flex-1">
-            {title}
-          </div>
-          <div className="flex items-center shrink-0">
-            {Array.from({ length: 5 }).map((_, index) => {
-              const fill = Math.min(1, Math.max(0, rating - index));
-              return <Star key={index} fill={fill} />;
-            })}
-          </div>
+        {/* Carousel indicators (mock) */}
+        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 z-20">
+          {images.slice(0, 3).map((img, index) => (
+            <button
+              key={index}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setActiveImage(img.url);
+              }}
+              className={`h-2 w-2 rounded-full ${
+                activeImage === img.url ? "bg-danger" : "bg-black"
+              }`}
+            />
+          ))}
         </div>
-        <div className="mt-2 flex items-center justify-between">
-          <div className="font-['Montserrat'] text-xs sm:text-sm lg:text-base font-medium text-foreground">
+      </Link>
+
+      {/* Info container */}
+      <div className="flex flex-col p-5 font-['Montserrat']">
+        {/* Title */}
+        <Link
+          to={to}
+          className="text-xl sm:text-2xl font-medium text-card-text hover:underline line-clamp-1"
+        >
+          {title}
+        </Link>
+
+        {/* Subtitle */}
+        <p className="mt-1 text-sm text-gray-text line-clamp-1">{subtitle}</p>
+
+        {/* Colors and Sizes */}
+        <div className="mt-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {colors.map((c, i) => (
+              <div
+                key={i}
+                onClick={() => handleColorClick(c)}
+                className={`h-6 w-6 rounded-full ${
+                  i === 0
+                    ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card"
+                    : ""
+                }`}
+                style={{
+                  backgroundColor: c,
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="rounded-full border border-gray-500 px-3 py-1 text-xs text-gray-400">
             {sizeLabel}
           </div>
-          {showFlashDeal ? (
-            <div className="flex flex-col items-end">
-              <span className="font-['Montserrat'] text-xs font-medium text-gray-text line-through">
-                {price}
-              </span>
-              <span className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-urgent">
-                ${flashDealPrice!.toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <div className="font-['Montserrat'] text-base sm:text-lg lg:text-2xl font-semibold text-foreground">
-              {price}
-            </div>
-          )}
         </div>
+
+        {/* Rating and Price */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <Star fill={1} size={20} />
+            <span className="text-base font-medium text-foreground">{rating}</span>
+          </div>
+          <div className="text-2xl font-bold text-danger">
+            {showFlashDeal && flashDealPrice
+              ? `$${flashDealPrice.toFixed(2)}`
+              : price}
+          </div>
+        </div>
+
+        {/* Add to cart button */}
+        <button
+          onClick={handleToggleCart}
+          className="mt-5 w-full rounded-xl bg-danger py-3 text-center text-base font-medium text-white transition-colors hover:bg-red-800"
+        >
+          {isInCart ? "Remove from cart" : "Add to cart"}
+        </button>
       </div>
-    </Link>
+    </div>
   );
 }

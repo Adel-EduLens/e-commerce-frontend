@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap");
+@import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
 @theme {
@@ -17,6 +17,7 @@
   --color-ink: var(--ink);
   --color-info: var(--info);
   --color-urgent: var(--urgent);
+
 
   /* --- Brand & Theme additions --- */
   --color-text-primary: var(--color-text-primary);
@@ -39,6 +40,12 @@
   --color-gray-100: var(--color-gray-100);
   --color-off-white: var(--color-off-white);
   --color-pure-white: var(--color-pure-white);
+
+  --color-danger: var(--danger);
+  --color-muted: var(--muted);
+  --color-card-text: var(--card-text);
+  --color-card-border: var(--card-border);
+
 }
 
 :root {
@@ -126,6 +133,10 @@
   --ink: #0f1115;
   --info: var(--color-info);
   --urgent: var(--color-error);
+  --danger: #c1121f;
+  --muted: #e0e0e0;
+  --card-text: #0D0D0D;
+  --card-border: #F0F0F0;
 
   font-family: 'Inter', sans-serif;
 }
@@ -209,6 +220,10 @@
   --ink: #f9fafb;
   --info: var(--color-info);
   --urgent: var(--color-error);
+  --danger: #c1121f;
+  --muted: #2a2a2a;
+  --card-text: #ffffff;
+  --card-border: #1C1C1C;
 }
 
 /* Dark mode layout and structural color overrides */
