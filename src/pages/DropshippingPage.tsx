@@ -192,7 +192,7 @@ function HowWeStartSection() {
             </div>
             <img
               src={ds(step.icon)}
-              className="absolute end-[16px] top-[-16px] h-32 w-32 rtl:scale-x-[-1]"
+              className="absolute end-[16px] top-[-16px] h-32 w-32 rtl:scale-x-[-1] no-invert"
               alt=""
             />
           </div>
