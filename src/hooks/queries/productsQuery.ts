@@ -56,6 +56,7 @@ export interface Product {
     color?: string;
     productId: string;
   }[];
+  stock: number;
   colors: ProductColor[];
 }
 
@@ -98,6 +99,8 @@ function transformProduct(raw: any): Product {
     return raw;
   }
 
+  const hasColorSpecificSizes = flatSizes.some((s: any) => s.color !== null && s.color !== undefined && s.color !== "");
+
   const colors: ProductColor[] = flatColors.map((c: any) => {
     const colorName = c.colorName || c.color || '';
     return {
@@ -110,11 +113,13 @@ function transformProduct(raw: any): Product {
           imageUrl: img.url || img.imageUrl || '',
           url: img.url || img.imageUrl || '',
         })),
-      variants: flatSizes.map((s: any) => ({
-        id: s.id,
-        size: s.size,
-        quantity: s.quantity ?? productStock,
-      })),
+      variants: flatSizes
+        .filter((s: any) => hasColorSpecificSizes ? s.color === colorName : (!s.color || s.color === colorName))
+        .map((s: any) => ({
+          id: s.id,
+          size: s.size,
+          quantity: s.quantity ?? productStock,
+        })),
     };
   });
 

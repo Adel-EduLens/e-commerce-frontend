@@ -805,11 +805,10 @@ export function EditItemModal({ item, onClose }: { item: InventoryItem; onClose:
     try {
       setUploading(true);
       if (item.type === "product") {
-        const calculatedStock = product?.colors?.reduce((sum, c) => sum + (c.variants?.reduce((s, v) => s + v.quantity, 0) ?? 0), 0) ?? 0;
         await updateProduct.mutateAsync({
           id: item.id, name, description, price: Number(price), categoryId,
           brandId: brandId || undefined,
-          sku: sku || undefined, stock: calculatedStock,
+          sku: sku || undefined,
           isMustHave,
           isFlashDeals,
           flashDealPrice: isFlashDeals && flashDealPrice ? Number(flashDealPrice) : null,

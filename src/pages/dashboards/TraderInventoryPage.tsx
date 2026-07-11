@@ -34,10 +34,7 @@ export default function TraderInventoryPage() {
         }))
       ) ?? [];
 
-      const totalStock = p.colors?.reduce(
-        (sum, c) => sum + (c.variants?.reduce((s, v) => s + v.quantity, 0) ?? 0),
-        0
-      ) ?? 0;
+      const totalStock = p.stock ?? 0;
 
       const uniqueSizes = Array.from(new Set(p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []));
       const uniqueColors = Array.from(new Set(p.colors?.map((c) => c.colorName) ?? []));
