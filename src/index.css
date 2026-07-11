@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;700;800;900&display=swap");
+@import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
 @theme {
@@ -39,45 +39,50 @@
   --color-gray-100: var(--color-gray-100);
   --color-off-white: var(--color-off-white);
   --color-pure-white: var(--color-pure-white);
+
+  --color-danger: var(--danger);
+  --color-muted: var(--muted);
+  --color-card-text: var(--card-text);
+  --color-card-border: var(--card-border);
 }
 
 :root {
   /* --- Text ------------------------------------------------------------ */
-  --color-text-primary: #1A1A1A;
+  --color-text-primary: #1a1a1a;
   /* light Text */
-  --color-text-secondary: #6B7280;
+  --color-text-secondary: #6b7280;
   /* gray text-Secondary txt */
 
   /* --- Surfaces ---------------------------------------------------------- */
-  --color-background: #F9FAFB;
+  --color-background: #f9fafb;
   /* light Background */
-  --color-card: #FFFFFF;
+  --color-card: #ffffff;
   /* light card */
 
   /* --- Borders / Grays --------------------------------------------------- */
-  --color-stroke: #E0E0E0;
+  --color-stroke: #e0e0e0;
   /* Stroke light */
-  --color-gray: #EDEDED;
+  --color-gray: #ededed;
   /* gray light */
-  --color-gray-pressed: #D9D9D9;
+  --color-gray-pressed: #d9d9d9;
   /* Gray Pressed */
 
   /* --- Primary (Brand) ---------------------------------------------------- */
-  --color-primary: #A81324;
+  --color-primary: #a81324;
   /* primary_light mode */
-  --color-primary-pressed: #6E0C18;
+  --color-primary-pressed: #6e0c18;
   /* Primary Pressed */
-  --color-primary-tint: #FFF0F0;
+  --color-primary-tint: #fff0f0;
   /* Background Tint */
 
   /* --- Semantic / Functional ----------------------------------------------- */
-  --color-error: #E31B23;
+  --color-error: #e31b23;
   /* Error (source token was misspelled "Erorr") */
-  --color-warning: #F79009;
+  --color-warning: #f79009;
   /* Warning */
-  --color-success: #12B76A;
+  --color-success: #12b76a;
   /* Success */
-  --color-info: #0EA5E9;
+  --color-info: #0ea5e9;
   /* Info */
 
   /*
@@ -90,25 +95,25 @@
    * actually needs a lighter burgundy tint or a finer gray scale, that
    * should come from Figma directly rather than being estimated here.
    */
-  --color-burgundy-core: #A81324;
+  --color-burgundy-core: #a81324;
   /* = primary_light mode */
-  --color-burgundy-dark: #6E0C18;
+  --color-burgundy-dark: #6e0c18;
   /* = Primary Pressed */
-  --color-burgundy-tint: #FFF0F0;
+  --color-burgundy-tint: #fff0f0;
   /* = Background Tint */
-  --color-charcoal: #1A1A1A;
+  --color-charcoal: #1a1a1a;
   /* = light Text */
-  --color-slate: #6B7280;
+  --color-slate: #6b7280;
   /* = gray text-Secondary txt */
-  --color-mid-gray: #E0E0E0;
+  --color-mid-gray: #e0e0e0;
   /* = Stroke light */
-  --color-gray-200: #D9D9D9;
+  --color-gray-200: #d9d9d9;
   /* = Gray Pressed */
-  --color-gray-100: #EDEDED;
+  --color-gray-100: #ededed;
   /* = gray light */
-  --color-off-white: #F9FAFB;
+  --color-off-white: #f9fafb;
   /* = light Background */
-  --color-pure-white: #FFFFFF;
+  --color-pure-white: #ffffff;
   /* = light card */
 
   /* --- Compatibility Mappings for Existing System --- */
@@ -126,38 +131,42 @@
   --ink: #0f1115;
   --info: var(--color-info);
   --urgent: var(--color-error);
+  --danger: #c1121f;
+  --muted: #e0e0e0;
+  --card-text: #0d0d0d;
+  --card-border: #f0f0f0;
 
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .dark,
 [data-theme="dark"] {
   /* --- Text ------------------------------------------------------------ */
-  --color-text-primary: #FFFFFF;
+  --color-text-primary: #ffffff;
   /* dark text */
-  --color-text-secondary: #A0A0A0;
+  --color-text-secondary: #a0a0a0;
   /* gray text dark */
 
   /* --- Surfaces ---------------------------------------------------------- */
-  --color-background: #0F1115;
+  --color-background: #0f1115;
   /* dark background */
-  --color-card: #1C1F24;
+  --color-card: #1c1f24;
   /* dark card */
 
   /* --- Borders / Grays --------------------------------------------------- */
-  --color-stroke: #2E3238;
+  --color-stroke: #2e3238;
   /* dark stroke */
-  --color-gray: #2A2E35;
+  --color-gray: #2a2e35;
   /* gray dark */
-  --color-gray-pressed: #44464A;
+  --color-gray-pressed: #44464a;
   /* Dark Gray Pressed */
 
   /* --- Primary (Brand) ---------------------------------------------------- */
-  --color-primary: #BF1629;
+  --color-primary: #bf1629;
   /* primary_Dark mode */
-  --color-primary-pressed: #6E0C18;
+  --color-primary-pressed: #6e0c18;
   /* Primary Pressed (no distinct dark token in Figma) */
-  --color-primary-tint: #2A1215;
+  --color-primary-tint: #2a1215;
   /* NOTE: assumption — dark equivalent of Background Tint.
                                           Figma only defines one Background Tint (#FFF0F0), which
                                           is a light pink meant for light surfaces; reusing it
@@ -168,30 +177,30 @@
                                           matters here. */
 
   /* --- Semantic / Functional (unchanged across modes — Figma defines only one set) --- */
-  --color-error: #E31B23;
-  --color-warning: #F79009;
-  --color-success: #12B76A;
-  --color-info: #0EA5E9;
+  --color-error: #e31b23;
+  --color-warning: #f79009;
+  --color-success: #12b76a;
+  --color-info: #0ea5e9;
 
   /* --- Direct Color Palette Tokens (Dark) — same 1:1 mapping principle as light mode --- */
-  --color-burgundy-core: #BF1629;
+  --color-burgundy-core: #bf1629;
   /* = primary_Dark mode */
-  --color-burgundy-dark: #6E0C18;
+  --color-burgundy-dark: #6e0c18;
   /* = Primary Pressed */
   --color-burgundy-tint: var(--color-primary-tint);
-  --color-charcoal: #FFFFFF;
+  --color-charcoal: #ffffff;
   /* = dark text */
-  --color-slate: #A0A0A0;
+  --color-slate: #a0a0a0;
   /* = gray text dark */
-  --color-mid-gray: #2E3238;
+  --color-mid-gray: #2e3238;
   /* = dark stroke */
-  --color-gray-200: #44464A;
+  --color-gray-200: #44464a;
   /* = Dark Gray Pressed */
-  --color-gray-100: #2A2E35;
+  --color-gray-100: #2a2e35;
   /* = gray dark */
-  --color-off-white: #0F1115;
+  --color-off-white: #0f1115;
   /* = dark background */
-  --color-pure-white: #1C1F24;
+  --color-pure-white: #1c1f24;
   /* = dark card */
 
   /* --- Compatibility Mappings for Existing System --- */
@@ -209,6 +218,10 @@
   --ink: #f9fafb;
   --info: var(--color-info);
   --urgent: var(--color-error);
+  --danger: #c1121f;
+  --muted: #2a2a2a;
+  --card-text: #ffffff;
+  --card-border: #1c1c1c;
 }
 
 /* Dark mode layout and structural color overrides */
@@ -302,6 +315,7 @@ body {
 .dark .bg-secondary img[src$=".svg"],
 .dark .bg-black img[src$=".svg"],
 .dark img[src*="mdi_heart.svg"],
-.dark img[src*="star"] {
+.dark img[src*="star"],
+.dark img.no-invert {
   filter: none !important;
 }
