@@ -83,7 +83,15 @@ export default function ProductDetailsPage() {
     colors: (product.colors || []).map((c: any) => ({
       id: c.id,
       color: c.colorName || c.color || "",
+      colorHex: c.colorCode || null,
     })),
+    sizes: Array.from(
+      new Map(
+        (product.colors || [])
+          .flatMap((c: any) => c.variants || [])
+          .map((v: any) => [v.size, { id: v.id, size: v.size }])
+      ).values()
+    ),
   };
 
   return (

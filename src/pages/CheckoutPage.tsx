@@ -743,17 +743,6 @@ export default function CheckoutPage() {
     null,
   );
 
-  if (isCartLoading || isAddressesLoading) {
-    return (
-      <div className="flex h-[75vh] w-full flex-col items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
-        <p className="font-['Montserrat'] text-lg font-semibold text-foreground">
-          Preparing checkout...
-        </p>
-      </div>
-    );
-  }
-
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
   const [appliedCoupon, setAppliedCoupon] = useState<any>(initialCoupon);
   const [couponError, setCouponError] = useState("");
@@ -795,6 +784,17 @@ export default function CheckoutPage() {
 
     return (qualifyingSubtotal * appliedCoupon.discount) / 100;
   }, [appliedCoupon, items]);
+
+  if (isCartLoading || isAddressesLoading) {
+    return (
+      <div className="flex h-[75vh] w-full flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
+        <p className="font-['Montserrat'] text-lg font-semibold text-foreground">
+          Preparing checkout...
+        </p>
+      </div>
+    );
+  }
 
   const shipping = 50; // Flat shipping rate
   const total = Math.max(0, subtotal - discountAmount + shipping);

@@ -17,6 +17,9 @@ export default function WholesaleDetailsPage() {
   const { mutate: addSignal } = useAddSignalMutation();
 
   const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
@@ -53,11 +56,20 @@ export default function WholesaleDetailsPage() {
         </div>
 
         <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-          <ProductGallery selectedColor={selectedColor} item={item} />
+          <ProductGallery
+            selectedColor={selectedColor}
+            selectedImage={selectedImage}
+            setSelectedImage={setSelectedImage}
+            item={item}
+          />
 
           <ProductInfoPanel
             selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+            onColorChange={setSelectedColor}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+            quantity={quantity}
+            setQuantity={setQuantity}
             item={item}
             productType="WHOLESALE"
           />

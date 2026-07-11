@@ -32,5 +32,6 @@ export type DetailItem = {
   colors: {
     id: string;
     color: string;
+    colorHex?: string | null;
   }[];
 };

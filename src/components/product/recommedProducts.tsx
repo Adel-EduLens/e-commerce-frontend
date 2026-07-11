@@ -86,7 +86,7 @@ export function RecommedProducts({
           {products.map((product) => {
             const firstColor = product.colors?.[0];
             const imageSrc = firstColor?.images?.[0]?.url || firstColor?.images?.[0]?.imageUrl || product.images?.[0]?.url || "";
-            const sizesList = product.sizes || firstColor?.variants || [];
+            const sizesList = firstColor?.variants || [];
             const sizeLabel = sizesList.map((s: any) => s.size).filter(Boolean).join("-") || "Default";
             const isFavorite = false; // Add actual logic if needed
 

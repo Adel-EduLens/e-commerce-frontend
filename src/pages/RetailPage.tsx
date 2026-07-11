@@ -84,24 +84,10 @@ export default function RetailPage() {
   const categories = useMemo(() => normalizeCategoriesResponse(categoriesQuery.data), [categoriesQuery.data])
   console.log('Retail normalized categories:', categories)
 
-  const filterValue = {
-    category: categoryId ? String(categoryId) : 'all',
-    sort: sort || 'latest',
-    search,
-  }
-
-  const filterOptions = useMemo(() => {
-    return (categories || []).map((item: any) => ({
-      label: item.name,
-      value: String(item.id),
-    }))
-  }, [categories])
-
-  const handleFilterChange = (next: { category: string; sort: string; search: string }) => {
-    setSearch(next.search)
-    setCategoryId(next.category === 'all' ? '' : next.category)
-    setSort(next.sort)
-  }
+  const filterConfigs = useMemo(() => [
+    { key: 'category', label: 'Category', options: (categories || []).map((c: any) => c.name) },
+    { key: 'sort', label: 'Sort', options: ['latest', 'price_asc', 'price_desc'] },
+  ], [categories])
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 text-slate-900">
@@ -126,17 +112,25 @@ export default function RetailPage() {
       </section>
 
       <CatalogFilters
-        title="Refine retail catalog"
-        className="animate-[fadeIn_0.35s_ease-out]"
-        value={filterValue}
-        onChange={handleFilterChange}
-        categoryOptions={[{ label: 'All categories', value: 'all' }, ...filterOptions]}
-        sortOptions={[
-          { label: 'Latest', value: 'latest' },
-          { label: 'Price: low to high', value: 'price_asc' },
-          { label: 'Price: high to low', value: 'price_desc' },
-        ]}
-        searchPlaceholder="Search retail products"
+        filters={filterConfigs}
+        initialValues={{
+          search: search,
+          category: categoryId ? categories.find((c: any) => String(c.id) === String(categoryId))?.name || null : null,
+          sort: sort || 'latest',
+          priceMin: null,
+          priceMax: null,
+        }}
+        onFilterChange={(v) => {
+          setSearch(v.search)
+          const catName = v.category
+          if (catName) {
+            const matched = categories.find((c: any) => c.name === catName)
+            if (matched) setCategoryId(String(matched.id))
+          } else {
+            setCategoryId('')
+          }
+          if (v.sort) setSort(v.sort)
+        }}
       />
 
       <section className="flex flex-col gap-4">

@@ -198,7 +198,11 @@ function ViewAllButton({ to }: { to: string }) {
 }
 
 function ProductSection({ title, products, isLoading, viewAllLink }: { title: string; products: Wholesale[]; isLoading: boolean; viewAllLink?: string }) {
-  const [filterState, setFilterState] = useState<FilterValues>({ search: '' })
+  const [filterState, setFilterState] = useState<FilterValues>({
+    search: '',
+    priceMin: null,
+    priceMax: null,
+  })
 
   const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])

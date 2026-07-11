@@ -1,4 +1,4 @@
-export function Star({ fill }: { fill: number }) {
+export function Star({ fill, size }: { fill: number; size?: number }) {
   // fill: 0 -> 1 (0% -> 100% of the star is colored)
   const isFull = fill >= 0.75
   const isHalf = fill >= 0.25 && fill < 0.75
@@ -10,6 +10,12 @@ export function Star({ fill }: { fill: number }) {
       : 'material-symbols_star_empty.svg'
 
   return (
-    <img className="h-6 w-6" src={'/home-page/' + encodeURIComponent(src)} alt="" draggable={false} />
+    <img
+      className={size ? "" : "h-6 w-6"}
+      style={size ? { width: size, height: size } : undefined}
+      src={'/home-page/' + encodeURIComponent(src)}
+      alt=""
+      draggable={false}
+    />
   )
 }

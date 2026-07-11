@@ -59,15 +59,24 @@ export function ProductInfoPanel({
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = rawProduct?.colors?.find(
     (c: any) =>
-      c.colorName &&
+      (c.colorName || c.color) &&
       selectedColor &&
-      c.colorName.toLowerCase() === selectedColor.toLowerCase()
+      (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
   );
   const colorVariants = colorObj?.variants || [];
   
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
-  const availableStock = selectedVariant ? selectedVariant.quantity : 0;
+  
+  const hasColors = Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;
+  const hasSizes = Array.isArray(rawProduct?.sizes) && rawProduct.sizes.length > 0;
+
+  const availableStock = (() => {
+    if (hasColors && hasSizes) {
+      return selectedVariant ? selectedVariant.quantity : 0;
+    }
+    return rawProduct?.stock ?? 0;
+  })();
 
   // Guard quantity: cannot exceed availableStock
   useEffect(() => {

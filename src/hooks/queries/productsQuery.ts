@@ -5,6 +5,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 export interface ProductColor {
   id: string;
   colorName: string;
+  color?: string;
   colorCode?: string | null;
   images: {
     id: string;
