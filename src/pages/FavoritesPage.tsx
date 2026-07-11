@@ -1,16 +1,29 @@
 import { useWishlist } from '../hooks/useWishlist'
 import RetailProductCard from '../components/retail/RetailProductCard'
 import ProductCard from '../components/shared/ProductCard'
-import { Heart } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 function EmptyFavorites() {
   return (
     <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-      <Heart size={56} className="text-gray-300" strokeWidth={1.5} />
-      <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">No favorites yet</p>
-      <p className="text-gray-text font-['Montserrat'] text-base">
-        Start adding products you love by pressing the heart icon.
+      <img
+        src="/image 82.png"
+        alt="No favorites yet"
+        className="mb-2 w-48 h-auto object-contain"
+        draggable={false}
+      />
+      <h3 className="font-['Montserrat'] text-2xl font-semibold text-foreground">
+        No favorites yet
+      </h3>
+      <p className="font-['Montserrat'] text-base text-gray-text">
+        Start exploring and save what you love.
       </p>
+      <Link
+        to="/products"
+        className="mt-4 rounded-xl bg-danger px-8 py-3 font-['Montserrat'] text-base font-medium text-white transition-all "
+      >
+        Start Shopping
+      </Link>
     </div>
   )
 }
