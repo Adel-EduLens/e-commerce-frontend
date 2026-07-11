@@ -54,7 +54,7 @@ const formatDate = (dateStr: string) => {
 
 const getOrderSteps = (status: string, dateStr: string) => {
   const { date } = formatDate(dateStr);
-  
+
   const isPending = status === "PENDING";
   const isProcessing = status === "PROCESSING";
   const isShipped = status === "SHIPPED";
@@ -62,11 +62,11 @@ const getOrderSteps = (status: string, dateStr: string) => {
   const isCancelled = status === "CANCELLED";
 
   return [
-    { 
-      icon: FileText, 
-      label: "New Order", 
-      date: date, 
-      completed: !isCancelled 
+    {
+      icon: FileText,
+      label: "New Order",
+      date: date,
+      completed: !isCancelled
     },
     {
       icon: CheckCircle2,
@@ -74,10 +74,10 @@ const getOrderSteps = (status: string, dateStr: string) => {
       date: (!isPending && !isCancelled) ? date : "Pending Confirmation",
       completed: !isPending && !isCancelled,
     },
-    { 
-      icon: Package, 
-      label: "Shipped", 
-      date: (isShipped || isCompleted) ? date : "Pending Shipment", 
+    {
+      icon: Package,
+      label: "Shipped",
+      date: (isShipped || isCompleted) ? date : "Pending Shipment",
       completed: isShipped || isCompleted,
     },
     {
@@ -110,11 +110,10 @@ function OrderTabs({
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`pb-4 font-['Montserrat'] text-base font-bold cursor-pointer transition-all duration-200 ${
-              activeTab === tab.key
-                ? "text-foreground border-b-[3px] border-secondary"
-                : "text-gray-text hover:text-foreground"
-            }`}
+            className={`pb-4 font-['Montserrat'] text-base font-bold cursor-pointer transition-all duration-200 ${activeTab === tab.key
+              ? "text-foreground border-b-[3px] border-secondary"
+              : "text-gray-text hover:text-foreground"
+              }`}
           >
             {t(tab.label)}
           </button>
@@ -128,9 +127,9 @@ function OrderTabs({
 function OrderHeader({ order }: { order: Order }) {
   const { t } = useTranslation("orders");
   const { date, time } = formatDate(order.createdAt);
-  
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl bg-zinc-100 p-5 shadow-sm border border-stroke">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl bg-card p-5 shadow-sm border border-stroke">
       <div className="flex flex-col gap-1.5">
         <span className="font-['Montserrat'] text-lg font-bold text-secondary">
           {t("Order")} #{order.id.slice(-8).toUpperCase()}
@@ -175,12 +174,12 @@ function OrderItemCard({ item }: { item: OrderItem }) {
           </h4>
           <div className="flex flex-wrap gap-2.5">
             {item.size && (
-              <span className="inline-flex items-center rounded-md bg-gray-50 border border-stroke px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-foreground">
+              <span className="inline-flex items-center rounded-md  border border-stroke px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-foreground">
                 {t("Size")}: {item.size}
               </span>
             )}
             {item.color && (
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-gray-50 border border-stroke px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-foreground">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-stroke px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-foreground">
                 {t("Color")}:
                 {item.color.startsWith("#") ? (
                   <span className="h-3.5 w-3.5 rounded-full border border-stroke shrink-0" style={{ backgroundColor: item.color }} />
@@ -232,26 +231,23 @@ function OrderStatus({ order }: { order: Order }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300 ${
-                    step.completed 
-                      ? "bg-secondary text-secondary-foreground" 
-                      : "bg-zinc-100 text-zinc-400"
-                  }`}
+                  className={`flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300 ${step.completed
+                    ? "bg-secondary text-secondary-foreground"
+                    : "bg-zinc-100 text-zinc-400"
+                    }`}
                 >
                   <step.icon className="h-5 w-5" strokeWidth={2} />
                 </div>
                 <div className="flex flex-col gap-0.5">
                   <span
-                    className={`font-['Montserrat'] text-sm font-bold ${
-                      step.completed ? "text-foreground" : "text-gray-text/60"
-                    }`}
+                    className={`font-['Montserrat'] text-sm font-bold ${step.completed ? "text-foreground" : "text-gray-text/60"
+                      }`}
                   >
                     {t(step.label)}
                   </span>
                   <span
-                    className={`font-['Montserrat'] text-xs font-semibold ${
-                      step.completed ? "text-gray-text" : "text-gray-text/40"
-                    }`}
+                    className={`font-['Montserrat'] text-xs font-semibold ${step.completed ? "text-gray-text" : "text-gray-text/40"
+                      }`}
                   >
                     {step.date === "Pending Delivery" || step.date === "Pending Shipment" || step.date === "Pending Confirmation"
                       ? t(step.date)
@@ -271,11 +267,10 @@ function OrderStatus({ order }: { order: Order }) {
             </div>
             {index < steps.length - 1 && (
               <div
-                className={`ml-[23px] h-10 w-0.5 transition-all duration-300 ${
-                  step.completed && steps[index + 1]?.completed
-                    ? "bg-secondary"
-                    : "bg-stroke"
-                }`}
+                className={`ml-[23px] h-10 w-0.5 transition-all duration-300 ${step.completed && steps[index + 1]?.completed
+                  ? "bg-secondary"
+                  : "bg-stroke"
+                  }`}
               />
             )}
           </div>
@@ -292,7 +287,7 @@ function OrderDetailsCard({ order }: { order: Order }) {
         <MapPin className="h-5 w-5 text-secondary" />
         <span className="font-['Montserrat'] text-base font-bold text-foreground">Delivery & Payment Info</span>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-['Montserrat'] text-sm">
         <div className="space-y-2">
           <div className="text-gray-text font-medium">Recipient & Address</div>
@@ -314,7 +309,7 @@ function OrderDetailsCard({ order }: { order: Order }) {
               {order.paymentMethod === "COD" ? "Cash on Delivery" : "Card Payment"}
             </div>
           </div>
-          
+
           {order.mapAddress && (
             <div className="space-y-1">
               <div className="text-gray-text font-medium">Pined Map Address</div>
@@ -420,11 +415,10 @@ export default function MyOrdersPage() {
                 <button
                   key={order.id}
                   onClick={() => setSelectedOrderId(order.id)}
-                  className={`w-full flex items-center justify-between rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer ${
-                    isSelected
-                      ? "bg-secondary border-secondary text-secondary-foreground shadow-md font-semibold"
-                      : "bg-white border-stroke text-foreground hover:bg-gray-50"
-                  }`}
+                  className={`w-full flex items-center justify-between rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer ${isSelected
+                    ? "bg-secondary border-secondary text-secondary-foreground shadow-md font-semibold"
+                    : "bg-white border-stroke text-foreground hover:bg-gray-50"
+                    }`}
                 >
                   <div className="space-y-1 min-w-0">
                     <div className={`font-['Montserrat'] text-sm font-bold truncate ${isSelected ? "text-secondary-foreground" : "text-foreground"}`}>
@@ -446,7 +440,7 @@ export default function MyOrdersPage() {
               <div className="flex-1 flex flex-col gap-5 min-w-0">
                 <OrderHeader order={selectedOrder} />
                 <OrderDetailsCard order={selectedOrder} />
-                
+
                 <div className="flex flex-col gap-3.5">
                   <span className="font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider px-1">
                     Items List
@@ -456,7 +450,7 @@ export default function MyOrdersPage() {
                   ))}
                 </div>
               </div>
-              
+
               <OrderStatus order={selectedOrder} />
             </div>
           )}

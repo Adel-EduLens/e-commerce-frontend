@@ -246,7 +246,7 @@ function OrderSummary({
             <button
               onClick={handleApplyCoupon}
               disabled={isValidating || !couponCode.trim()}
-              className="flex h-14 sm:h-16 items-center justify-center bg-secondary px-4 sm:px-6 disabled:opacity-50"
+              className="flex h-14 sm:h-16 items-center justify-center bg-primary px-4 sm:px-6 disabled:opacity-50"
             >
               <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
                 {isValidating ? "Applying..." : "Apply"}
