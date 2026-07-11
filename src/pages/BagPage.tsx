@@ -239,9 +239,10 @@ function BagItemCard({
               {t("bagItem.color")}:
               <span
                 className="h-4 w-4 rounded-full border border-stroke"
-                style={{ backgroundColor: item.colorHex }}
+                style={{ backgroundColor: item.colorHex || item.color }}
                 aria-label={item.color}
               />
+              <strong className="font-bold">{item.color}</strong>
             </span>
           </div>
         </div>

@@ -93,7 +93,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               currency: "EGP",
               size: dbItem.size || "",
               color: dbItem.color || "",
-              colorHex: "",
+              colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
             }))
@@ -124,7 +124,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               currency: "EGP",
               size: dbItem.size || "",
               color: dbItem.color || "",
-              colorHex: "",
+              colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
             }))
@@ -159,7 +159,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               currency: "EGP",
               size: dbItem.size || "",
               color: dbItem.color || "",
-              colorHex: "",
+              colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
             }))

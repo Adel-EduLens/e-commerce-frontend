@@ -25,7 +25,7 @@ export function useCart() {
           currency: 'EGP',
           size: item.size || '',
           color: item.color || '',
-          colorHex: '',
+          colorHex: item.color || '',
           imageSrc: item.imageSrc,
           quantity: item.quantity
         })));
