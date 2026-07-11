@@ -334,7 +334,7 @@ export function RecommedProducts({
                   className="group flex flex-col overflow-hidden rounded-xl border border-stroke bg-card shadow-sm hover:shadow-md transition-all duration-300"
                 >
                   {/* Image Section */}
-                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-light cursor-pointer" onClick={() => navigate(`/product-details/${product.id}`)}>
+                  <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#f5f5f5] cursor-pointer" onClick={() => navigate(`/product-details/${product.id}`)}>
                     <img
                       src={imageSrc}
                       alt={product.name}

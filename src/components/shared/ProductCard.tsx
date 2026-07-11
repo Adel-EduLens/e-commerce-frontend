@@ -208,7 +208,7 @@ export default function ProductCard({
       {/* Image container */}
       <Link
         to={to}
-        className="relative block aspect-[4/5] w-full overflow-hidden bg-muted"
+        className="relative block aspect-[4/5] w-full overflow-hidden bg-[#f5f5f5]"
       >
         <img
           className="h-full w-full object-cover"

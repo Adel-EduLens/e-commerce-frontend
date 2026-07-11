@@ -27,7 +27,7 @@ export function ProductGallery({
   return (
     <div className="flex flex-row gap-3 w-full select-none">
       {/* Main selected image — left */}
-      <div className="relative flex-1 aspect-[3/4] w-full overflow-hidden rounded-lg bg-background border border-stroke">
+      <div className="relative flex-1 aspect-[3/4] w-full overflow-hidden rounded-lg bg-[#f5f5f5] border border-stroke">
         {selectedImage ? (
           <img
             src={selectedImage}
@@ -50,7 +50,7 @@ export function ProductGallery({
               type="button"
               key={image.id}
               onClick={() => setSelectedImage(image.url)}
-              className={`relative h-[88px] w-full shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition-all outline-none ${
+              className={`relative h-[88px] w-full shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition-all outline-none bg-[#f5f5f5] ${
                 isSelected
                   ? "border-primary"
                   : "border-stroke hover:border-gray-text"
