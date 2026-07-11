@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, PenLine, Plus, RotateCcwKey, X, Trash2  } from "lucide-react";
+import { Check, PenLine, Plus, RotateCcwKey, X, Trash2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useOutletContext } from "react-router-dom";
 import type { AccountLayoutContext } from "../layouts/AccountLayout";
 import { useAuthStore } from "../store/useAuthStore";
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
 import {
   useMyAddresses,
   useAddAddress,
@@ -182,9 +182,8 @@ function AddressCard({
 
   return (
     <div
-      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${
-        isAddressLoading ? "pointer-eve nts-none opacity-50" : ""
-      }`}
+      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${isAddressLoading ? "pointer-eve nts-none opacity-50" : ""
+        }`}
     >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -202,24 +201,24 @@ function AddressCard({
           </h3>
         </div>
 
-       <div className="flex items-center gap-1">
-  {!isEditing && (
-    <>
-      <IconButton
-      icon={PenLine}
-      label={t("Edit address")}
-      onClick={onEdit} 
-      />
-      <IconButton
-      icon={Trash2} 
-      tone="danger"
-      label={t("Edit address")}
-      onClick={onDelete} 
-      />
+        <div className="flex items-center gap-1">
+          {!isEditing && (
+            <>
+              <IconButton
+                icon={PenLine}
+                label={t("Edit address")}
+                onClick={onEdit}
+              />
+              <IconButton
+                icon={Trash2}
+                tone="danger"
+                label={t("Edit address")}
+                onClick={onDelete}
+              />
 
-      </>
-  )}
-</div>
+            </>
+          )}
+        </div>
       </div>
       {/* Details */}
       <div className="grid grid-cols-1 gap-x-5 gap-y-3 border-t border-stroke pt-4 sm:grid-cols-2">
@@ -272,23 +271,23 @@ function AddressCard({
         </div>
       </div>
       {isEditing && (
-  <div className="sm:col-span-2 mt-4 flex justify-end">
-    <button
-      type="button"
-      onClick={onSave}
-      disabled={isAddressLoading}
-      className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-['Montserrat'] text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {isAddressLoading ? (
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
-      ) : (
-        <Check className="h-5 w-5" />
-      )}
+        <div className="sm:col-span-2 mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={isAddressLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-['Montserrat'] text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isAddressLoading ? (
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              <Check className="h-5 w-5" />
+            )}
 
-      {isNew ? t("Add Address") : t("Save Address")}
-    </button>
-  </div>
-)} 
+            {isNew ? t("Add Address") : t("Save Address")}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -499,7 +498,7 @@ export default function ContactDetailsPage() {
   };
 
   return (
-    <div className="flex w-full max-w-2xl flex-col items-start justify-start gap-8">
+    <div className="flex w-full max-w-2xl flex-col items-center justify-center gap-8">
       <SectionHeader title={t("CONTACT DETAILS")} icon={PenLine} />
       <div className="flex self-stretch flex-col items-start justify-start gap-6">
         <DetailField
@@ -615,10 +614,10 @@ export default function ContactDetailsPage() {
           isEditing
           isNew={isAdding}
           isAddressLoading={isAddingAddress}
-          onEdit={() => {}}
+          onEdit={() => { }}
           onDraftChange={setAddressDraft}
           onCancel={handleCancelEditingAddress}
-          onDelete={() => {}}
+          onDelete={() => { }}
           onSave={
             isAdding
               ? handleCreateAddress

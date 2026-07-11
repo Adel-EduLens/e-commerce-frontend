@@ -144,7 +144,7 @@ function SummaryCard({
         type="button"
         onClick={onCheckout}
         disabled={checkoutDisabled}
-        className="w-full h-14 rounded-xl bg-foreground text-background font-['Montserrat'] text-base font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+        className="w-full h-14 rounded-xl bg-primary text-background font-['Montserrat'] text-base font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
       >
         {t("summary.checkout")}
       </button>
@@ -168,12 +168,15 @@ function BagItemCard({
   const { t } = useTranslation("bag");
   const hasDiscount = useMemo(() => {
     if (!appliedCoupon) return false;
+    const itemCategoryId = item.categoryId;
+    const itemProductId = item.productId;
+
     if (!appliedCoupon.categoryId && !appliedCoupon.productId) return true;
-    if (appliedCoupon.productId && item.productId === appliedCoupon.productId)
+    if (appliedCoupon.productId && String(itemProductId) === String(appliedCoupon.productId))
       return true;
     if (
       appliedCoupon.categoryId &&
-      item.categoryId === appliedCoupon.categoryId
+      String(itemCategoryId) === String(appliedCoupon.categoryId)
     )
       return true;
     return false;
@@ -319,19 +322,19 @@ function FavoritesSection({
   const { data: recentlyViewedData } = useRecentlyViewed();
   const apiRecentlyViewed = Array.isArray(recentlyViewedData?.data)
     ? recentlyViewedData.data.map((item: any) => {
-        const product = item.product;
-        if (!product) return null;
-        return { ...product, _productType: item.productType };
-      }).filter(Boolean)
+      const product = item.product;
+      if (!product) return null;
+      return { ...product, _productType: item.productType };
+    }).filter(Boolean)
     : [];
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
     ? wishlistData.data.map((item: any) => {
-        const product = item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct;
-        if (!product) return null;
-        return { ...product, _productType: item.productType };
-      }).filter(Boolean)
+      const product = item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct;
+      if (!product) return null;
+      return { ...product, _productType: item.productType };
+    }).filter(Boolean)
     : [];
 
   const allProducts = selectedTab === "favorites" ? apiFavorites : apiRecentlyViewed;
@@ -345,8 +348,8 @@ function FavoritesSection({
           type="button"
           onClick={() => onSelectTab("favorites")}
           className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "favorites"
-              ? "border-b-[3px] border-foreground text-foreground"
-              : "text-gray-text hover:text-foreground"
+            ? "border-b-[3px] border-foreground text-foreground"
+            : "text-gray-text hover:text-foreground"
             }`}
         >
           {t("favorites.favorites")}
@@ -355,8 +358,8 @@ function FavoritesSection({
           type="button"
           onClick={() => onSelectTab("recent")}
           className={`pb-4 font-['Montserrat'] text-xl sm:text-2xl lg:text-3xl font-bold transition-all ${selectedTab === "recent"
-              ? "border-b-[3px] border-foreground text-foreground"
-              : "text-gray-text hover:text-foreground"
+            ? "border-b-[3px] border-foreground text-foreground"
+            : "text-gray-text hover:text-foreground"
             }`}
         >
           {t("favorites.recentlyViewed")}
@@ -447,16 +450,19 @@ export default function BagPage() {
 
     return items.reduce((total, item) => {
       let applies = false;
+      const itemCategoryId = item.categoryId;
+      const itemProductId = item.productId;
+
       if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
         applies = true;
       } else if (
         appliedCoupon.productId &&
-        item.productId === appliedCoupon.productId
+        String(itemProductId) === String(appliedCoupon.productId)
       ) {
         applies = true;
       } else if (
         appliedCoupon.categoryId &&
-        item.categoryId === appliedCoupon.categoryId
+        String(itemCategoryId) === String(appliedCoupon.categoryId)
       ) {
         applies = true;
       }
@@ -488,10 +494,13 @@ export default function BagPage() {
       const coupon = data.data;
 
       const appliesToSomeItem = items.some((item) => {
+        const itemCategoryId = item.categoryId;
+        const itemProductId = item.productId;
+
         if (!coupon.categoryId && !coupon.productId) return true;
-        if (coupon.productId && item.productId === coupon.productId)
+        if (coupon.productId && String(itemProductId) === String(coupon.productId))
           return true;
-        if (coupon.categoryId && item.categoryId === coupon.categoryId)
+        if (coupon.categoryId && String(itemCategoryId) === String(coupon.categoryId))
           return true;
         return false;
       });

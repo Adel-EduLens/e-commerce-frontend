@@ -20,6 +20,7 @@ export function useCart() {
         setItems(data.data.items.map((item: any) => ({
           id: item.id,
           productId: item.productId,
+          categoryId: item.categoryId,
           title: item.title,
           unitPrice: item.price,
           currency: 'EGP',

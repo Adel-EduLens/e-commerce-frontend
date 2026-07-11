@@ -144,13 +144,21 @@ function OrderSummary({
         // Check if coupon actually applies to any item in cart
         let appliesToCart = false;
         items.forEach((item) => {
-          let isQualifying = true;
-          if (coupon.categoryId && item.categoryId !== coupon.categoryId) {
-            isQualifying = false;
+          const itemCategoryId = item.categoryId;
+          const itemProductId = item.productId;
+
+          let isQualifying = false;
+          if (!coupon.categoryId && !coupon.productId) {
+            isQualifying = true;
+          } else {
+            if (coupon.productId && String(itemProductId) === String(coupon.productId)) {
+              isQualifying = true;
+            }
+            if (coupon.categoryId && String(itemCategoryId) === String(coupon.categoryId)) {
+              isQualifying = true;
+            }
           }
-          if (coupon.productId && item.productId !== coupon.productId) {
-            isQualifying = false;
-          }
+
           if (isQualifying) {
             appliesToCart = true;
           }
@@ -759,19 +767,27 @@ export default function CheckoutPage() {
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
     items.forEach((item) => {
-      let isQualifying = true;
-      if (
-        appliedCoupon.categoryId &&
-        item.categoryId !== appliedCoupon.categoryId
-      ) {
-        isQualifying = false;
+      const itemCategoryId = item.categoryId;
+      const itemProductId = item.productId;
+
+      let isQualifying = false;
+      if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
+        isQualifying = true;
+      } else {
+        if (
+          appliedCoupon.productId &&
+          String(itemProductId) === String(appliedCoupon.productId)
+        ) {
+          isQualifying = true;
+        }
+        if (
+          appliedCoupon.categoryId &&
+          String(itemCategoryId) === String(appliedCoupon.categoryId)
+        ) {
+          isQualifying = true;
+        }
       }
-      if (
-        appliedCoupon.productId &&
-        item.productId !== appliedCoupon.productId
-      ) {
-        isQualifying = false;
-      }
+
       if (isQualifying) {
         qualifyingSubtotal += item.unitPrice * item.quantity;
         hasMatchingItem = true;
