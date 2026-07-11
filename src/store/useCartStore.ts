@@ -48,9 +48,9 @@ export const useCartStore = create<CartStore>()((set, get) => ({
           items: state.items.map((currentItem) =>
             currentItem.id === existingItem.id
               ? {
-                  ...currentItem,
-                  quantity: currentItem.quantity + item.quantity,
-                }
+                ...currentItem,
+                quantity: currentItem.quantity + item.quantity,
+              }
               : currentItem
           ),
         };

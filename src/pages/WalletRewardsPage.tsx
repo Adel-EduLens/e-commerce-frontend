@@ -43,7 +43,7 @@ function WalletPanel() {
   ];
 
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-6">
+    <div className="flex w-full  flex-col gap-6">
       <div className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
         {t("Wallet & Rewards")}
       </div>
@@ -54,7 +54,7 @@ function WalletPanel() {
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               {t("Balance")}
             </div>
-            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
+            <div className="font-['Montserrat'] text-primary text-lg sm:text-2xl font-semibold text-foreground">
               $120.00
             </div>
           </div>
@@ -62,27 +62,27 @@ function WalletPanel() {
             <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
               {t("Points")}
             </div>
-            <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
+            <div className="font-['Montserrat'] text-primary text-lg sm:text-2xl font-semibold text-foreground">
               250
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+        <div className="flex flex-col sm:flex-row lg:flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="flex flex-1 w-full sm:w-auto justify-center items-center gap-2 rounded-2xl bg-card hover:bg-gray-light transition-colors cursor-pointer p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <CreditCard className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
-            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground whitespace-nowrap">
               {t("Link Card")}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+          <div className="flex flex-1 w-full sm:w-auto justify-center items-center gap-2 rounded-2xl bg-card hover:bg-gray-light transition-colors cursor-pointer p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
-            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground whitespace-nowrap">
               {t("Redeem Points")}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+          <div className="flex flex-1 w-full sm:w-auto justify-center items-center gap-2 rounded-2xl bg-card hover:bg-gray-light transition-colors cursor-pointer p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <PlusCircle className="h-5 w-5 sm:h-6 sm:w-6 text-foreground" strokeWidth={1.5} />
-            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
+            <div className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground whitespace-nowrap">
               {t("Add Funds")}
             </div>
           </div>
@@ -99,11 +99,10 @@ function WalletPanel() {
             key={tab.key}
             type="button"
             onClick={() => setActiveTab(tab.key)}
-            className={`cursor-pointer py-3 sm:py-4 font-['Montserrat'] text-sm sm:text-base font-bold ${
-              activeTab === tab.key
-                ? "border-b-[3px] border-foreground text-foreground"
-                : "text-gray-text"
-            }`}
+            className={`cursor-pointer py-3 sm:py-4 font-['Montserrat'] text-sm sm:text-base font-bold ${activeTab === tab.key
+              ? "border-b-[3px] border-foreground text-foreground"
+              : "text-gray-text"
+              }`}
           >
             {t(tab.label)}
           </button>

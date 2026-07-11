@@ -159,12 +159,12 @@ function OrderItemCard({ item }: { item: OrderItem }) {
   const { t } = useTranslation("orders");
 
   return (
-    <div className="flex rounded-xl bg-white border border-stroke p-3 sm:p-4 gap-4 transition-all hover:shadow-md">
-      <div className="h-24 w-20 sm:h-28 sm:w-24 shrink-0 rounded-lg bg-gray-50 overflow-hidden flex items-center justify-center border border-stroke">
+    <div className="flex rounded-xl bg-card border border-stroke p-3 sm:p-4 gap-4 transition-all hover:shadow-md">
+      <div className="h-24 w-20 sm:h-28 sm:w-24 shrink-0 rounded-lg bg-gray-light overflow-hidden flex items-center justify-center border border-stroke">
         {item.imageSrc ? (
           <img src={item.imageSrc} alt={item.title} className="h-full w-full object-cover" />
         ) : (
-          <ShoppingBag className="h-8 w-8 text-gray-300" />
+          <ShoppingBag className="h-8 w-8 text-gray-text/40" />
         )}
       </div>
       <div className="flex-1 flex flex-col justify-between py-1 min-w-0">
@@ -209,11 +209,11 @@ function OrderStatus({ order }: { order: Order }) {
 
   if (order.status === "CANCELLED") {
     return (
-      <div className="w-full lg:w-80 shrink-0 rounded-xl bg-red-500/5 border border-red-500/20 p-5 self-start">
-        <span className="font-['Montserrat'] text-base font-bold text-red-600">
+      <div className="w-full lg:w-80 shrink-0 rounded-xl bg-urgent/5 border border-urgent/20 p-5 self-start">
+        <span className="font-['Montserrat'] text-base font-bold text-urgent">
           Order Cancelled
         </span>
-        <p className="mt-3 font-['Montserrat'] text-sm font-medium text-red-800 leading-relaxed">
+        <p className="mt-3 font-['Montserrat'] text-sm font-medium text-urgent leading-relaxed">
           This order has been cancelled and is no longer being processed. If you believe this is an error, please contact customer support.
         </p>
       </div>
@@ -221,7 +221,7 @@ function OrderStatus({ order }: { order: Order }) {
   }
 
   return (
-    <div className="w-full lg:w-80 shrink-0 rounded-xl bg-white border border-stroke p-5 self-start shadow-sm">
+    <div className="w-full lg:w-80 shrink-0 rounded-xl bg-card border border-stroke p-5 self-start shadow-sm">
       <span className="font-['Montserrat'] text-base font-bold text-foreground">
         {t("Order Status")}
       </span>
@@ -232,8 +232,8 @@ function OrderStatus({ order }: { order: Order }) {
               <div className="flex items-center gap-3">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300 ${step.completed
-                    ? "bg-secondary text-secondary-foreground"
-                    : "bg-zinc-100 text-zinc-400"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-gray-light text-gray-text/40"
                     }`}
                 >
                   <step.icon className="h-5 w-5" strokeWidth={2} />
@@ -257,7 +257,7 @@ function OrderStatus({ order }: { order: Order }) {
               </div>
               <div className="h-6 w-6 flex items-center justify-center">
                 {step.completed ? (
-                  <div className="h-5 w-5 rounded-full bg-secondary flex items-center justify-center text-secondary-foreground font-bold text-[10px]">
+                  <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-[10px]">
                     ✓
                   </div>
                 ) : (
@@ -268,7 +268,7 @@ function OrderStatus({ order }: { order: Order }) {
             {index < steps.length - 1 && (
               <div
                 className={`ml-[23px] h-10 w-0.5 transition-all duration-300 ${step.completed && steps[index + 1]?.completed
-                  ? "bg-secondary"
+                  ? "bg-primary"
                   : "bg-stroke"
                   }`}
               />
@@ -282,7 +282,7 @@ function OrderStatus({ order }: { order: Order }) {
 
 function OrderDetailsCard({ order }: { order: Order }) {
   return (
-    <div className="rounded-xl border border-stroke bg-white p-5 space-y-4 shadow-sm">
+    <div className="rounded-xl border border-stroke bg-card p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 border-b border-stroke pb-3">
         <MapPin className="h-5 w-5 text-secondary" />
         <span className="font-['Montserrat'] text-base font-bold text-foreground">Delivery & Payment Info</span>
@@ -313,7 +313,7 @@ function OrderDetailsCard({ order }: { order: Order }) {
           {order.mapAddress && (
             <div className="space-y-1">
               <div className="text-gray-text font-medium">Pined Map Address</div>
-              <div className="text-xs font-semibold text-green-600 break-words leading-relaxed">
+              <div className="text-xs font-semibold text-success break-words leading-relaxed">
                 {order.mapAddress}
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function MyOrdersPage() {
           <Loader2 className="h-8 w-8 animate-spin text-secondary" />
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stroke p-12 text-center bg-gray-50/50 transition-all duration-300">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stroke p-12 text-center bg-gray-light/50 transition-all duration-300">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10 text-secondary mb-4">
             <ShoppingBag className="h-8 w-8" />
           </div>
@@ -417,7 +417,7 @@ export default function MyOrdersPage() {
                   onClick={() => setSelectedOrderId(order.id)}
                   className={`w-full flex items-center justify-between rounded-xl border p-4 text-left transition-all duration-200 cursor-pointer ${isSelected
                     ? "bg-secondary border-secondary text-secondary-foreground shadow-md font-semibold"
-                    : "bg-white border-stroke text-foreground hover:bg-gray-50"
+                    : "bg-card border-stroke text-foreground hover:bg-gray-light"
                     }`}
                 >
                   <div className="space-y-1 min-w-0">
