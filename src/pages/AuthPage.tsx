@@ -12,8 +12,6 @@ import { loginSchema, signupSchema } from '../schemas'
 import type { LoginFormValues, SignupFormValues } from '../schemas'
 import { useTranslation } from 'react-i18next'
 import { Globe, ChevronDown } from 'lucide-react'
-import { AxiosError } from 'axios'
-import type { ApiErrorResponse } from '../types/api'
 import { handleApiError } from '../lib/utils';
 
 interface AuthPageProps {
@@ -297,7 +295,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       {t('login.signupLink')}
                     </Link>
                   </div>
-                  <div className="flex flex-wrap items-end justify-center gap-[8px] font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px]">
+                   <div className="flex flex-wrap items-end justify-center gap-[8px] font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px]">
                     <span className="text-foreground">Are you a seller?</span>
                     <Link
                       to="/trader/login"

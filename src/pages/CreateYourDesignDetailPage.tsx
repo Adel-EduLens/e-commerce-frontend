@@ -21,7 +21,7 @@ const CreateYourDesignDetailPage = () => {
   });
 
   useEffect(() => {
-    const func=async ()=>{
+    const func=()=>{
 
         if (blankProduct) {
             if (blankProduct.images?.length > 0) {
@@ -76,7 +76,7 @@ const CreateYourDesignDetailPage = () => {
       <div className="mx-auto flex max-w-[1440px] flex-col gap-6 lg:flex-row">
         
         {/* Left Column: Viewer */}
-        <div className="relative flex min-h-[500px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-[#111111] lg:min-h-[700px]">
+        <div className="relative flex min-h-[500px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-background lg:min-h-[700px]">
           
           {/* Header Info inside Viewer */}
           <div className="absolute left-6 top-6 z-10 md:left-10 md:top-10">
@@ -132,7 +132,7 @@ const CreateYourDesignDetailPage = () => {
         </div>
 
         {/* Right Column: Controls */}
-        <div className="flex w-full flex-col gap-8 rounded-[24px] bg-[#111111] p-6 lg:w-[420px] xl:w-[480px]">
+        <div className="flex w-full flex-col gap-8 rounded-[24px] bg-background p-6 lg:w-[420px] xl:w-[480px]">
           
           {/* Sub Navigation */}
           <div className="flex items-center justify-between border-b border-white/10 pb-6">
@@ -177,7 +177,7 @@ const CreateYourDesignDetailPage = () => {
                   key={mat}
                   className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
                     mat === blankProduct.material
-                      ? 'bg-[#BF1629] text-white'
+                      ? 'bg-danger text-white'
                       : 'border border-white/10 text-gray-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
@@ -196,7 +196,7 @@ const CreateYourDesignDetailPage = () => {
                   key={pat}
                   className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
                     pat === blankProduct.pattern
-                      ? 'bg-[#BF1629] text-white'
+                      ? 'bg-danger text-white'
                       : 'border border-white/10 text-gray-400 hover:bg-white/5 hover:text-white'
                   }`}
                 >
@@ -229,7 +229,7 @@ const CreateYourDesignDetailPage = () => {
 
           {/* Bottom Actions */}
           <div className="mt-auto flex gap-4 pt-6">
-            <button className="flex-1 rounded-xl bg-[#BF1629] py-4 font-['Montserrat'] text-base font-semibold text-white transition-all hover:bg-red-800 hover:scale-[1.02]">
+            <button className="flex-1 rounded-xl bg-danger py-4 font-['Montserrat'] text-base font-semibold text-white transition-all hover:bg-red-800 hover:scale-[1.02]">
               Done
             </button>
             <button className="flex items-center justify-center rounded-xl border border-white/10 px-5 text-gray-300 transition-colors hover:bg-white/5 hover:text-white">

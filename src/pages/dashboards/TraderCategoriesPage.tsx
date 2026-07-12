@@ -8,7 +8,8 @@ import {
   useCreateCategory,
   useUpdateCategory,
   useDeleteCategory,
-} from "../../hooks/queries/categoriesQuery.js";
+} from "../../hooks/queries/categoriesQuery";
+import { toast } from "sonner";
 
 interface CategoryTablePanelProps {
   categories: Category[];
@@ -48,17 +49,24 @@ export function CategoryTablePanel({
         case "name-desc":
           return b.name.localeCompare(a.name);
         case "date-asc":
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
         case "none":
           return 0;
         default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
       }
     });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * itemsPerPage, safePage * itemsPerPage);
+  const paginated = filtered.slice(
+    (safePage - 1) * itemsPerPage,
+    safePage * itemsPerPage,
+  );
 
   return (
     <div className="space-y-4">
@@ -152,7 +160,9 @@ export function CategoryTablePanel({
                   src={asset("material-symbols_table-outline.svg")}
                   alt=""
                 />
-                <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}>
+                <span
+                  className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}
+                >
                   Tables
                 </span>
               </button>
@@ -166,7 +176,9 @@ export function CategoryTablePanel({
                   src={asset("clarity_view-cards-line.svg")}
                   alt=""
                 />
-                <span className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}>
+                <span
+                  className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}
+                >
                   Cards
                 </span>
               </button>
@@ -191,7 +203,11 @@ export function CategoryTablePanel({
               >
                 <div className="relative mx-2 mt-2 h-48 overflow-hidden rounded-lg bg-background">
                   {c.image ? (
-                    <img className="h-full w-full object-cover" src={c.image} alt="" />
+                    <img
+                      className="h-full w-full object-cover"
+                      src={c.image}
+                      alt=""
+                    />
                   ) : (
                     <div className="h-full w-full bg-background" />
                   )}
@@ -207,7 +223,11 @@ export function CategoryTablePanel({
                         onClick={() => onEdit(c)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                       >
-                        <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="" />
+                        <img
+                          className="h-4 w-4"
+                          src={asset("mynaui_edit.svg")}
+                          alt=""
+                        />
                       </button>
                       <button
                         type="button"
@@ -257,10 +277,17 @@ export function CategoryTablePanel({
               </thead>
               <tbody>
                 {paginated.map((c, idx) => (
-                  <tr key={c.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
+                  <tr
+                    key={c.id}
+                    className={idx % 2 === 0 ? "bg-white" : "bg-background"}
+                  >
                     <td className="px-4 py-3 text-center">
                       {c.image ? (
-                        <img className="mx-auto h-8 w-8 rounded-lg object-cover" src={c.image} alt="" />
+                        <img
+                          className="mx-auto h-8 w-8 rounded-lg object-cover"
+                          src={c.image}
+                          alt=""
+                        />
                       ) : (
                         <div className="mx-auto h-8 w-8 rounded-lg bg-background" />
                       )}
@@ -285,7 +312,11 @@ export function CategoryTablePanel({
                           onClick={() => onEdit(c)}
                           className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-background"
                         >
-                          <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="" />
+                          <img
+                            className="h-4 w-4"
+                            src={asset("mynaui_edit.svg")}
+                            alt=""
+                          />
                         </button>
                         <button
                           type="button"
@@ -359,7 +390,11 @@ export function CategoryTablePanel({
               disabled={safePage === 1}
               className="flex h-5 w-5 items-center justify-center disabled:opacity-40"
             >
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="" />
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt=""
+              />
             </button>
             <button
               type="button"
@@ -367,7 +402,11 @@ export function CategoryTablePanel({
               disabled={safePage === totalPages}
               className="flex h-5 w-5 rotate-180 items-center justify-center disabled:opacity-40"
             >
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Next" />
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt="Next"
+              />
             </button>
           </div>
         </div>
@@ -376,8 +415,13 @@ export function CategoryTablePanel({
       {deleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 space-y-4 shadow-xl">
-            <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Delete Category</h3>
-            <p className="font-['Montserrat'] text-sm text-gray-text">Are you sure you want to delete this category? This action cannot be undone.</p>
+            <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+              Delete Category
+            </h3>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              Are you sure you want to delete this category? This action cannot
+              be undone.
+            </p>
             <div className="flex gap-2 pt-2">
               <button
                 type="button"
@@ -419,8 +463,17 @@ export default function TraderCategoriesPage() {
         <CategoryFormModal
           onClose={() => setShowAddModal(false)}
           onSave={async (data) => {
-            await createCategory.mutateAsync(data);
-            setShowAddModal(false);
+            try {
+              await createCategory.mutateAsync(data);
+              setShowAddModal(false);
+              toast.success("Category created successfully");
+            } catch (error) {
+              toast.error(
+                error instanceof Error
+                  ? error.message
+                  : "Failed to create category",
+              );
+            }
           }}
         />
       )}
@@ -431,7 +484,11 @@ export default function TraderCategoriesPage() {
           onSave={async (formData) => {
             await updateCategory.mutateAsync({
               id: editCategory.id,
-              data: { name: formData.name, image: formData.image , appearOnHome: formData.appearOnHome },
+              data: {
+                name: formData.name,
+                image: formData.image,
+                appearOnHome: formData.appearOnHome,
+              },
             });
             setEditCategory(null);
           }}

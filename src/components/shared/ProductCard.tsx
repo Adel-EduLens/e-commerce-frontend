@@ -261,14 +261,12 @@ export default function ProductCard({
       {/* Image container */}
       <Link
         to={to}
-          className={`relative block aspect-[4/5] w-full overflow-hidden ${
-            useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
+        className={`relative block aspect-[4/5] w-full overflow-hidden ${useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
           }`}
       >
         <img
-          className={`h-full w-full object-cover ${
-            useWholesaleCard ? "transition-transform duration-300 group-hover:scale-105" : ""
-          }`}
+          className={`h-full w-full object-cover ${useWholesaleCard ? "transition-transform duration-300 group-hover:scale-105" : ""
+            }`}
           src={activeImage}
           alt={imageAlt ?? title}
           draggable={false}
@@ -289,9 +287,8 @@ export default function ProductCard({
           {/* Flash deal countdown badge */}
           {showFlashDeal && countdownLabel && (
             <div
-              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${
-                expired ? "bg-gray-text" : "bg-urgent"
-              }`}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${expired ? "bg-gray-text" : "bg-urgent"
+                }`}
             >
               <svg
                 className="h-3 w-3 shrink-0"
@@ -324,20 +321,18 @@ export default function ProductCard({
           type="button"
           onClick={handleToggleWishlist}
           disabled={toggleWishlist.isPending}
-          className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${
-            useWholesaleCard ? "bg-white shadow-md" : "bg-black/60 backdrop-blur-sm"
-          }`}
+          className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${useWholesaleCard ? "bg-white shadow-md" : "bg-black/60 backdrop-blur-sm"
+            }`}
         >
           <Heart
             size={useWholesaleCard ? 18 : 20}
             strokeWidth={useWholesaleCard ? 2 : 1.8}
-            className={`transition-colors ${
-              useWholesaleCard
+            className={`transition-colors ${useWholesaleCard
                 ? ""
                 : isWishlisted
                   ? "text-white"
                   : "text-gray-300"
-            }`}
+              }`}
             fill={isWishlisted ? (useWholesaleCard ? "#e53e3e" : "currentColor") : "none"}
             color={useWholesaleCard ? (isWishlisted ? "#e53e3e" : "#555") : undefined}
           />
@@ -348,11 +343,10 @@ export default function ProductCard({
           <button
             onClick={handleCompare}
             aria-label={isCompared ? "Remove from compare" : "Add to compare"}
-            className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
-              isCompared
+            className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${isCompared
                 ? "bg-primary text-primary-foreground"
                 : "bg-black/60 text-gray-300 hover:text-white"
-            }`}
+              }`}
           >
             <MdCompare size={18} />
           </button>
@@ -362,21 +356,20 @@ export default function ProductCard({
         <div className={`${useWholesaleCard ? "bottom-3" : "bottom-4"} absolute left-1/2 flex -translate-x-1/2 gap-1.5 z-20`}>
           {images.slice(0, useWholesaleCard ? 5 : 3).map((img, index) => (
             <button
-              key={index}
+              key={`${img.id}-${index}`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setActiveImage(img.url);
               }}
-              className={`rounded-full ${
-                useWholesaleCard
+              className={`rounded-full ${useWholesaleCard
                   ? activeImage === img.url
                     ? "h-1.5 w-4 bg-danger transition-all"
                     : "h-1.5 w-1.5 bg-black/40 transition-all"
                   : activeImage === img.url
                     ? "h-2 w-2 bg-danger"
                     : "h-2 w-2 bg-black"
-              }`}
+                }`}
             />
           ))}
         </div>
@@ -443,15 +436,14 @@ export default function ProductCard({
                     }
                   }}
                   title={c}
-                  className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${
-                    useWholesaleCard
+                  className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${useWholesaleCard
                       ? isSelected
                         ? "border-foreground scale-110"
                         : "border-transparent hover:border-gray-400"
                       : isSelected
                         ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
                         : "hover:scale-105"
-                  }`}
+                    }`}
                   style={{
                     backgroundColor: colorToHex(c),
                   }}
@@ -465,11 +457,10 @@ export default function ProductCard({
 
           {sizeLabel && (
             <div
-              className={`rounded-full border ${
-                useWholesaleCard
+              className={`rounded-full border ${useWholesaleCard
                   ? "ml-auto shrink-0 whitespace-nowrap border-gray-400 px-2.5 py-0.5 text-[10px] text-gray-500"
                   : "border-gray-500 px-3 py-1 text-xs text-gray-400"
-              }`}
+                }`}
             >
               {sizeLabel}
             </div>

@@ -25,8 +25,9 @@ function CategoriesSection() {
                 className="relative w-full overflow-hidden rounded-2xl bg-white no-underline aspect-[448/547]"
               >
                 <img
+                  alt={category.name}
                   src={category.image}
-                  className="absolut e inset-0 h-full h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
 
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-6 py-2 sm:px-8 sm:py-3">
