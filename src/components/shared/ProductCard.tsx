@@ -279,6 +279,7 @@ export default function ProductCard({
 
         {/* Compare button (optional, moved to top right below heart) */}
         <button
+          type="button"
           onClick={handleCompare}
           aria-label={isCompared ? "Remove from compare" : "Add to compare"}
           className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
@@ -294,7 +295,7 @@ export default function ProductCard({
         <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5 z-20">
           {images.slice(0, 3).map((img, index) => (
             <button
-              key={index}
+              key={`${img.id}-${index}`}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -325,7 +326,8 @@ export default function ProductCard({
         <div className="mt-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {colors.map((c, i) => (
-              <div
+              <button
+                type="button"
                 key={i}
                 onClick={() => handleColorClick(c)}
                 className={`h-6 w-6 rounded-full ${
@@ -349,7 +351,9 @@ export default function ProductCard({
         <div className="mt-6 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Star fill={1} size={20} />
-            <span className="text-base font-medium text-foreground">{rating}</span>
+            <span className="text-base font-medium text-foreground">
+              {rating}
+            </span>
           </div>
           <div className="text-2xl font-bold text-danger">
             {showFlashDeal && flashDealPrice
