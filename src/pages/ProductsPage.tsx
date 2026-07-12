@@ -153,16 +153,22 @@ export default function ProductsPage() {
         items.push(
           <ProductCard
             key={`wholesale-${wholesale.id}`}
-            title={wholesale.name}
             productId={wholesale.id}
+            productType="WHOLESALE"
+            title={wholesale.name}
+            subtitle={wholesale.description || undefined}
             price={`$${wholesale.price}`}
             imageSrc={wholesale.images[0]?.url}
-            sizeLabel={`Min. Order: ${wholesale.minOrder}`}
-            featured={wholesale.rating >= 4}
+            images={wholesale.images}
             rating={wholesale.rating}
-            productType="WHOLESALE"
-            showTypeBadge={!!filters.search}
             to={`/wholesale/${wholesale.id}`}
+            brand={wholesale.brand}
+            category={wholesale.category?.name}
+            colors={wholesale.wholesaleColors?.map(wc => wc.color) || []}
+            wholesaleSizes={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || []))}
+            sizeLabel={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+            minOrder={wholesale.minOrder}
+            wholesaleCard
           />,
         );
       });

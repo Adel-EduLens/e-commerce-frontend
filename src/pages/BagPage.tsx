@@ -230,11 +230,13 @@ function BagItemCard({
             </span>
             <span className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-3 py-1 font-['Montserrat'] text-sm text-foreground">
               {t("bagItem.color")}:
-              <span
-                className="h-4 w-4 rounded-full border border-stroke"
-                style={{ backgroundColor: item.colorHex || item.color }}
-                aria-label={item.color}
-              />
+              {!item.color.includes(",") && (
+                <span
+                  className="h-4 w-4 rounded-full border border-stroke"
+                  style={{ backgroundColor: item.colorHex || item.color }}
+                  aria-label={item.color}
+                />
+              )}
               <strong className="font-bold">{item.color}</strong>
             </span>
           </div>
@@ -284,6 +286,9 @@ function EmptyBagState({ onAddItems }: { onAddItems: () => void }) {
   const { t } = useTranslation("bag");
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-card border border-stroke p-12 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+      <div className="w-60 h-60">
+        <img className="w-full h-full object-contain" src="/empty_cart.png" alt="Empty Bag" />
+      </div>
       <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
         {t("empty.title")}
       </div>
@@ -560,19 +565,21 @@ export default function BagPage() {
         </div>
 
         {/* Right Side: Summary Card */}
-        <div className="w-full lg:w-[424px] shrink-0">
-          <SummaryCard
-            subtotal={subtotal}
-            discount={discount}
-            couponCode={couponCode}
-            isCouponApplied={Boolean(appliedCoupon)}
-            appliedCouponDetails={appliedCoupon}
-            onCouponChange={setCouponCode}
-            onApplyCoupon={handleApplyCoupon}
-            onCheckout={handleCheckout}
-            checkoutDisabled={!items.length}
-          />
-        </div>
+        {items.length > 0 && (
+          <div className="w-full lg:w-[424px] shrink-0">
+            <SummaryCard
+              subtotal={subtotal}
+              discount={discount}
+              couponCode={couponCode}
+              isCouponApplied={Boolean(appliedCoupon)}
+              appliedCouponDetails={appliedCoupon}
+              onCouponChange={setCouponCode}
+              onApplyCoupon={handleApplyCoupon}
+              onCheckout={handleCheckout}
+              checkoutDisabled={!items.length}
+            />
+          </div>
+        )}
       </div>
 
       {/* Favorites tab */}

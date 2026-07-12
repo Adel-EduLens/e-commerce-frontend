@@ -2,6 +2,34 @@ import { useWishlist } from '../hooks/useWishlist'
 import RetailProductCard from '../components/retail/RetailProductCard'
 import ProductCard from '../components/shared/ProductCard'
 import { Link } from 'react-router-dom'
+import type { RetailProduct } from '../types/retail'
+
+type WholesaleColor = {
+  color: string
+  sizes: { size: string }[]
+}
+
+type FavoriteProduct = {
+  id: string
+  name: string
+  price: number
+  images?: { id: string; url: string; color?: string }[]
+  rating?: number
+  description?: string
+  flashDealPrice?: number | null
+  flashDealEndsAt?: string | null
+  isFlashDeals?: boolean | null
+  brand?: string
+  category?: { name?: string }
+  wholesaleColors?: WholesaleColor[]
+  minOrder?: number
+} & Record<string, unknown>
+
+type FavoriteItem = {
+  id: string
+  productType: 'RETAIL' | 'SHOP' | 'WHOLESALE'
+  product?: FavoriteProduct
+}
 
 function EmptyFavorites() {
   return (
@@ -32,7 +60,7 @@ function EmptyFavorites() {
 export default function FavoritesPage() {
   const { data, isLoading } = useWishlist()
 
-  const items: any[] = data?.data ?? []
+  const items = (data?.data ?? []) as FavoriteItem[]
 
   if (isLoading) {
     return (
@@ -69,7 +97,7 @@ export default function FavoritesPage() {
               return (
                 <RetailProductCard
                   key={item.id}
-                  product={{ ...item.product, isWishlisted: true }}
+                  product={{ ...item.product, isWishlisted: true } as unknown as RetailProduct}
                 />
               )
             }
@@ -95,16 +123,28 @@ export default function FavoritesPage() {
 
             if (item.productType === 'WHOLESALE') {
               const p = item.product
+              const wholesaleColors = (p.wholesaleColors ?? []) as WholesaleColor[]
+              const wholesaleSizes = Array.from(new Set(wholesaleColors.flatMap((wc) => wc.sizes.map((s) => s.size))))
+
               return (
                 <ProductCard
                   key={item.id}
                   productId={p.id}
                   productType="WHOLESALE"
                   title={p.name}
+                  subtitle={p.description || undefined}
                   price={`${p.price} EGP`}
                   to={`/wholesale/${p.id}`}
                   imageSrc={p.images?.[0]?.url}
+                  images={p.images}
                   rating={p.rating ?? 0}
+                  brand={p.brand}
+                  category={p.category?.name}
+                  colors={wholesaleColors.map((wc) => wc.color)}
+                  wholesaleSizes={wholesaleSizes}
+                  sizeLabel={wholesaleSizes.slice(0, 4).join("-") || "All Sizes"}
+                  minOrder={p.minOrder}
+                  wholesaleCard
                 />
               )
             }

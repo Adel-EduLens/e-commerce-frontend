@@ -32,6 +32,13 @@ export interface Wholesale {
     color?: string;
     wholesaleId: string;
   }[];
+  
+  wholesaleColors?: {
+    id: string;
+    color: string;
+    wholesaleId: string;
+    sizes: { id: string; size: string; wholesaleColorId: string }[];
+  }[];
 
 }
 
@@ -92,6 +99,8 @@ export interface WholesaleFormData {
   images: { url: string; color?: string }[];
   sku?: string;
   stock?: number;
+  colors?: string[];
+  sizes?: string[];
 }
 
 const createWholesale = async (body: WholesaleFormData) => {

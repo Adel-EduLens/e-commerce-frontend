@@ -56,36 +56,65 @@ export function ProductInfoPanel({
     setIsCompared(isProductCompared(item.id));
   }, [item.id]);
 
+  const isWholesale = productType === 'WHOLESALE';
+
   // Retrieve sizes & stock quantity for the currently selected color
-  const colorObj = rawProduct?.colors?.find(
-    (c: any) =>
-      (c.colorName || c.color) &&
-      selectedColor &&
-      (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
-  );
-  const colorVariants = colorObj?.variants || [];
+  const colorObj = isWholesale
+    ? rawProduct?.wholesaleColors?.find(
+        (c: any) =>
+          c.color &&
+          selectedColor &&
+          c.color.toLowerCase() === selectedColor.toLowerCase()
+      )
+    : rawProduct?.colors?.find(
+        (c: any) =>
+          (c.colorName || c.color) &&
+          selectedColor &&
+          (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
+      );
+
+  const colorVariants = isWholesale
+    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: rawProduct?.stock ?? 0 }))
+    : colorObj?.variants || [];
   
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
   
-  const hasColors = Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;
-  const hasSizes = Array.isArray(rawProduct?.sizes) && rawProduct.sizes.length > 0;
+  const hasColors = isWholesale
+    ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.length > 0
+    : Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;
+
+  const hasSizes = isWholesale
+    ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.some((c: any) => c.sizes && c.sizes.length > 0)
+    : Array.isArray(rawProduct?.sizes) && rawProduct.sizes.length > 0;
 
   const availableStock = (() => {
-    if (hasColors && hasSizes) {
-      return selectedVariant ? selectedVariant.quantity : 0;
+    const stockVal = (() => {
+      if (hasColors && hasSizes) {
+        return selectedVariant ? selectedVariant.quantity : 0;
+      }
+      return rawProduct?.stock ?? 0;
+    })();
+    // For wholesale, if stock is less than minOrder, it's effectively 0 (insufficient stock)
+    if (isWholesale && item.minOrder && stockVal < item.minOrder) {
+      return 0;
     }
-    return rawProduct?.stock ?? 0;
+    return stockVal;
   })();
 
-  // Guard quantity: cannot exceed availableStock
+  // Guard quantity: cannot exceed availableStock or fall below minOrder
   useEffect(() => {
-    if (availableStock > 0 && quantity > availableStock) {
-      setQuantity(availableStock);
-    } else if (availableStock === 0) {
+    const minQty = item.minOrder || 1;
+    if (availableStock > 0) {
+      if (quantity > availableStock) {
+        setQuantity(availableStock);
+      } else if (quantity < minQty) {
+        setQuantity(minQty);
+      }
+    } else {
       setQuantity(1);
     }
-  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity]);
+  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder]);
 
   // Flash deal price calculation
   const hasFlashDeal =
@@ -140,33 +169,60 @@ export function ProductInfoPanel({
       return;
     }
 
-    const matchingImage = item.images.find(
-      (image) =>
-        image.color &&
-        image.color.toLowerCase() === selectedColor.toLowerCase()
-    );
+    if (isWholesale) {
+      const allColorsStr = item.colors.map((c) => c.color).join(", ") || "All Colors";
+      const allSizesStr = item.sizes.map((s) => s.size).join(", ") || "All Sizes";
 
-    addItem({
-      id: `${item.id}-${selectedSize}-${selectedColor}`,
-      productId: item.id,
-      categoryId: item.category.id,
-      title: item.name,
-      unitPrice: activePrice,
-      currency: "EGP",
-      size: selectedSize,
-      color: selectedColor,
-      colorHex: selectedColor,
-      imageSrc: matchingImage?.url || item.images[0]?.url || "",
-      quantity,
-    });
+      addItem({
+        id: `${item.id}-wholesale`,
+        productId: item.id,
+        categoryId: item.category.id,
+        title: item.name,
+        unitPrice: activePrice,
+        currency: "EGP",
+        size: allSizesStr,
+        color: allColorsStr,
+        colorHex: "",
+        imageSrc: item.images[0]?.url || "",
+        quantity,
+      });
 
-    toast.success(
-      t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
-        count: quantity,
+      toast.success(
+        t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
+          count: quantity,
+          size: allSizesStr,
+          color: allColorsStr,
+        })
+      );
+    } else {
+      const matchingImage = item.images.find(
+        (image) =>
+          image.color &&
+          image.color.toLowerCase() === selectedColor.toLowerCase()
+      );
+
+      addItem({
+        id: `${item.id}-${selectedSize}-${selectedColor}`,
+        productId: item.id,
+        categoryId: item.category.id,
+        title: item.name,
+        unitPrice: activePrice,
+        currency: "EGP",
         size: selectedSize,
         color: selectedColor,
-      })
-    );
+        colorHex: selectedColor,
+        imageSrc: matchingImage?.url || item.images[0]?.url || "",
+        quantity,
+      });
+
+      toast.success(
+        t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
+          count: quantity,
+          size: selectedSize,
+          color: selectedColor,
+        })
+      );
+    }
   };
 
   const handleBuyNow = () => {
@@ -331,8 +387,8 @@ export function ProductInfoPanel({
         <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
-            disabled={availableStock <= 0}
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            disabled={availableStock <= 0 || quantity <= (item.minOrder || 1)}
+            onClick={() => setQuantity(Math.max(item.minOrder || 1, quantity - 1))}
             className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-l-md"
           >
             −
@@ -353,6 +409,11 @@ export function ProductInfoPanel({
         <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded ${stockBadgeClass}`}>
           {stockLabel}
         </span>
+        {productType === "WHOLESALE" && item.minOrder && (
+          <span className="text-xs font-semibold text-danger bg-red-50 border border-red-200 px-2 py-0.5 rounded ml-2">
+            Min. Order: {item.minOrder}
+          </span>
+        )}
       </div>
 
       {/* Favorite */}

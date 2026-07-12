@@ -4,7 +4,7 @@ import { ProductCard } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
-import { useWholesales, type Wholesale } from '../hooks/queries/wholesaleQuery'
+import { useWholesales } from '../hooks/queries/wholesaleQuery'
 import { asset } from '../lib/utils';
 
 function AssetImage({
@@ -197,12 +197,20 @@ function ViewAllButton({ to }: { to: string }) {
   )
 }
 
-function ProductSection({ title, products, isLoading, viewAllLink }: { title: string; products: Wholesale[]; isLoading: boolean; viewAllLink?: string }) {
+function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: Parameters<typeof useWholesales>[0]; viewAllLink?: string }) {
   const [filterState, setFilterState] = useState<FilterValues>({
     search: '',
     priceMin: null,
     priceMax: null,
   })
+
+  const queryFilters = useMemo(() => ({
+    ...baseFilters,
+    search: filterState.search || undefined,
+    category: filterState.category || baseFilters?.category,
+  }), [baseFilters, filterState])
+
+  const { data: products = [], isLoading } = useWholesales(queryFilters)
 
   const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
@@ -242,10 +250,19 @@ function ProductSection({ title, products, isLoading, viewAllLink }: { title: st
                     productId={item.id}
                     productType="WHOLESALE"
                     title={item.name}
+                    subtitle={item.description || undefined}
                     price={`$${item.price}`}
                     imageSrc={item.images[0]?.url}
+                    images={item.images}
                     rating={item.rating}
                     to={`/wholesale/${item.id}`}
+                    brand={item.brand}
+                    category={item.category?.name}
+                    colors={item.wholesaleColors?.map(wc => wc.color) || []}
+                    wholesaleSizes={Array.from(new Set(item.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || []))}
+                    sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+                    minOrder={item.minOrder}
+                    wholesaleCard
                   />
                 ))
               ) : (
@@ -279,13 +296,6 @@ export default function WholesalePage() {
   }
   const activeFilter = filterParam ? filterMap[filterParam] : null
 
-  const { data: filteredProducts = [], isLoading: filteredLoading } = useWholesales(
-    categoryName ? { category: categoryName } : activeFilter ? activeFilter.filters : undefined
-  )
-  const { data: bestDeals = [], isLoading: bestDealsLoading } = useWholesales({ isBestDeal: true })
-  const { data: mostPopular = [], isLoading: popularLoading } = useWholesales({ isMostPopular: true })
-  const { data: premium = [], isLoading: premiumLoading } = useWholesales({ isPremiumCollection: true })
-
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [categoryFilter, filterParam])
@@ -297,8 +307,7 @@ export default function WholesalePage() {
         <HeroBanner />
         <ProductSection
           title={categoryName || activeFilter!.label}
-          products={filteredProducts}
-          isLoading={filteredLoading}
+          baseFilters={categoryName ? { category: categoryName } : activeFilter ? activeFilter.filters : undefined}
         />
         <FaqSection />
       </div>
@@ -308,10 +317,10 @@ export default function WholesalePage() {
   return (
     <div className="w-full pt-8 overflow-hidden">
       <HeroBanner />
-      <ProductSection title="Best Deals" products={bestDeals} isLoading={bestDealsLoading} viewAllLink="/wholesale?filter=best-deals" />
+      <ProductSection title="Best Deals" baseFilters={{ isBestDeal: true }} viewAllLink="/wholesale?filter=best-deals" />
       <CategoriesSection />
-      <ProductSection title="Most Popular" products={mostPopular} isLoading={popularLoading} viewAllLink="/wholesale?filter=most-popular" />
-      <ProductSection title="Premium Collections" products={premium} isLoading={premiumLoading} viewAllLink="/wholesale?filter=premium-collections" />
+      <ProductSection title="Most Popular" baseFilters={{ isMostPopular: true }} viewAllLink="/wholesale?filter=most-popular" />
+      <ProductSection title="Premium Collections" baseFilters={{ isPremiumCollection: true }} viewAllLink="/wholesale?filter=premium-collections" />
       <FaqSection />
     </div>
   )

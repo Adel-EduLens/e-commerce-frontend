@@ -240,12 +240,12 @@ export function AddItemModal({
     name: string;
   } | null>(null);
 
-  const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
-  const [wholesalePreview, setWholesalePreview] = useState("");
-  const [wholesaleCropSrc, setWholesaleCropSrc] = useState<string | null>(null);
-  const [wholesaleCropName, setWholesaleCropName] = useState("");
+  const [wholesaleFiles, setWholesaleFiles] = useState<File[]>([]);
+  const [wholesalePreviews, setWholesalePreviews] = useState<string[]>([]);
   const [wholesaleDimError, setWholesaleDimError] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
+  const [wholesaleColors, setWholesaleColors] = useState<string[]>([]);
+  const [wholesaleSizes, setWholesaleSizes] = useState<string[]>([]);
 
   const [isMustHave, setIsMustHave] = useState(false);
   const [isFlashDeals, setIsFlashDeals] = useState(false);
@@ -313,8 +313,8 @@ export function AddItemModal({
         }
       }
     } else {
-      if (!wholesaleFile) {
-        setError("Please upload an image.");
+      if (wholesaleFiles.length === 0) {
+        setError("Please upload at least one image.");
         return;
       }
     }
@@ -366,7 +366,7 @@ export function AddItemModal({
         setUploading(false);
         await createProduct.mutateAsync(formData);
       } else {
-        const wholesaleUrl = await uploadImageFile(wholesaleFile!);
+        const uploadedUrls = await Promise.all(wholesaleFiles.map(uploadImageFile));
         setUploading(false);
         await createWholesale.mutateAsync({
           name,
@@ -378,9 +378,11 @@ export function AddItemModal({
           isBestDeal,
           isMostPopular,
           isPremiumCollection,
-          images: [{ url: wholesaleUrl }],
+          images: uploadedUrls.map((url) => ({ url })),
           sku: sku || undefined,
           stock: stock ? Number(stock) : 0,
+          colors: wholesaleColors.length > 0 ? wholesaleColors : undefined,
+          sizes: wholesaleSizes.length > 0 ? wholesaleSizes : undefined,
         });
       }
       onClose();
@@ -875,80 +877,81 @@ export function AddItemModal({
 
           {type === "wholesale" && (
             <>
-              {wholesaleCropSrc && (
-                <ImageCropModal
-                  imageSrc={wholesaleCropSrc}
-                  fileName={wholesaleCropName}
-                  onConfirm={(croppedFile) => {
-                    URL.revokeObjectURL(wholesaleCropSrc);
-                    setWholesaleCropSrc(null);
-                    setWholesaleFile(croppedFile);
-                    setWholesalePreview(URL.createObjectURL(croppedFile));
-                  }}
-                  onCancel={() => {
-                    URL.revokeObjectURL(wholesaleCropSrc);
-                    setWholesaleCropSrc(null);
-                  }}
-                />
-              )}
-              <div>
+              <MultiSelect
+                label="Select wholesale colors"
+                options={COLOR_OPTIONS}
+                selected={wholesaleColors}
+                onChange={(vals) => setWholesaleColors(vals)}
+              />
+
+              <MultiSelect
+                label="Select wholesale sizes"
+                options={SIZE_OPTIONS}
+                selected={wholesaleSizes}
+                onChange={(vals) => setWholesaleSizes(vals)}
+              />
+
+              <div className="flex flex-col gap-2">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Images *
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {wholesalePreviews.map((src, idx) => (
+                    <div key={idx} className="relative">
+                      <img
+                        src={src}
+                        alt={`preview-${idx}`}
+                        className="h-20 w-20 rounded-lg object-cover border border-stroke"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          URL.revokeObjectURL(src);
+                          setWholesalePreviews((prev) => prev.filter((_, i) => i !== idx));
+                          setWholesaleFiles((prev) => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => wholesaleRef.current?.click()}
+                    className="h-20 w-20 rounded-lg border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-gray-text hover:border-primary hover:text-primary transition bg-white"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-xs font-['Montserrat']">Add</span>
+                  </button>
+                </div>
                 <input
                   ref={wholesaleRef}
                   type="file"
                   accept="image/*"
+                  multiple
                   className="hidden"
                   onChange={async (e) => {
-                    const f = e.target.files?.[0];
+                    const files = Array.from(e.target.files || []);
                     e.target.value = "";
-                    if (!f) return;
+                    if (files.length === 0) return;
                     setWholesaleDimError("");
-                    const err = await validateImageDimensions(f);
-                    if (err) {
-                      setWholesaleDimError(err);
-                      return;
+                    const validFiles: File[] = [];
+                    for (const f of files) {
+                      const err = await validateImageDimensions(f);
+                      if (err) { setWholesaleDimError(err); return; }
+                      validFiles.push(f);
                     }
-                    setWholesaleCropName(f.name);
-                    setWholesaleCropSrc(URL.createObjectURL(f));
+                    setWholesaleFiles((prev) => [...prev, ...validFiles]);
+                    setWholesalePreviews((prev) => [...prev, ...validFiles.map((f) => URL.createObjectURL(f))]);
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => wholesaleRef.current?.click()}
-                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white"
-                >
-                  {wholesalePreview ? (
-                    <img
-                      src={wholesalePreview}
-                      alt="preview"
-                      className="h-20 w-20 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <>
-                      <svg
-                        className="h-6 w-6"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span>Click to upload image *</span>
-                      <span className="font-['Montserrat'] text-xs text-gray-text">
-                        Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px
-                      </span>
-                    </>
-                  )}
-                </button>
                 {wholesaleDimError && (
-                  <p className="mt-1 font-['Montserrat'] text-xs text-red-600">
-                    {wholesaleDimError}
-                  </p>
+                  <p className="font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>
                 )}
+                <p className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
               </div>
               <input
                 placeholder="Min order quantity"
@@ -1068,12 +1071,14 @@ export function EditItemModal({
     name: string;
   } | null>(null);
 
-  const [wholesaleFile, setWholesaleFile] = useState<File | null>(null);
-  const [wholesalePreview, setWholesalePreview] = useState(item.image);
-  const [wholesaleCropSrc, setWholesaleCropSrc] = useState<string | null>(null);
-  const [wholesaleCropName, setWholesaleCropName] = useState("");
+  const [wholesaleFiles, setWholesaleFiles] = useState<File[]>([]);
+  const [wholesaleExistingUrls, setWholesaleExistingUrls] = useState<string[]>(
+    item.imagesByColor.map((img) => img.url)
+  );
   const [wholesaleDimError, setWholesaleDimError] = useState("");
   const wholesaleRef = useRef<HTMLInputElement>(null);
+  const [wholesaleColors, setWholesaleColors] = useState<string[]>(item.colors || []);
+  const [wholesaleSizes, setWholesaleSizes] = useState<string[]>(item.sizes || []);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -1121,16 +1126,23 @@ export function EditItemModal({
             isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
         });
       } else {
-        const wholesaleUrl = wholesaleFile
-          ? await uploadImageFile(wholesaleFile)
-          : item.image;
+        const newUrls = await Promise.all(wholesaleFiles.map(uploadImageFile));
+        const allImages = [
+          ...wholesaleExistingUrls.map((url) => ({ url })),
+          ...newUrls.map((url) => ({ url })),
+        ];
+        if (allImages.length === 0) {
+          setError("Please keep or upload at least one image.");
+          setUploading(false);
+          return;
+        }
         await updateWholesale.mutateAsync({
           id: item.id,
           name,
           description,
           price: Number(price),
           categoryId,
-          images: [{ url: wholesaleUrl }],
+          images: allImages,
           minOrder: Number(minOrder) || 1,
           sku: sku || undefined,
           stock: Number(stock),
@@ -1138,6 +1150,8 @@ export function EditItemModal({
           isBestDeal,
           isMostPopular,
           isPremiumCollection,
+          colors: wholesaleColors.length > 0 ? wholesaleColors : undefined,
+          sizes: wholesaleSizes.length > 0 ? wholesaleSizes : undefined,
         });
       }
       setUploading(false);
@@ -1880,85 +1894,99 @@ export function EditItemModal({
 
           {item.type === "wholesale" && (
             <>
-              {wholesaleCropSrc && (
-                <ImageCropModal
-                  imageSrc={wholesaleCropSrc}
-                  fileName={wholesaleCropName}
-                  onConfirm={(croppedFile) => {
-                    URL.revokeObjectURL(wholesaleCropSrc);
-                    setWholesaleCropSrc(null);
-                    setWholesaleFile(croppedFile);
-                    setWholesalePreview(URL.createObjectURL(croppedFile));
-                  }}
-                  onCancel={() => {
-                    URL.revokeObjectURL(wholesaleCropSrc);
-                    setWholesaleCropSrc(null);
-                  }}
-                />
-              )}
-              <div>
+              <MultiSelect
+                label="Select wholesale colors"
+                options={COLOR_OPTIONS}
+                selected={wholesaleColors}
+                onChange={(vals) => setWholesaleColors(vals)}
+              />
+
+              <MultiSelect
+                label="Select wholesale sizes"
+                options={SIZE_OPTIONS}
+                selected={wholesaleSizes}
+                onChange={(vals) => setWholesaleSizes(vals)}
+              />
+
+              <div className="flex flex-col gap-2">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Images
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {/* Existing saved images */}
+                  {wholesaleExistingUrls.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative">
+                      <img
+                        src={url}
+                        alt={`existing-${idx}`}
+                        className="h-20 w-20 rounded-lg object-cover border border-stroke"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWholesaleExistingUrls((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {/* New pending images */}
+                  {wholesaleFiles.map((file, idx) => (
+                    <div key={`new-${idx}`} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`new-${idx}`}
+                        className="h-20 w-20 rounded-lg object-cover border-2 border-primary border-dashed"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setWholesaleFiles((prev) => prev.filter((_, i) => i !== idx))
+                        }
+                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {/* Add button */}
+                  <button
+                    type="button"
+                    onClick={() => wholesaleRef.current?.click()}
+                    className="h-20 w-20 rounded-lg border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-gray-text hover:border-primary hover:text-primary transition bg-white"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="text-xs font-['Montserrat']">Add</span>
+                  </button>
+                </div>
                 <input
                   ref={wholesaleRef}
                   type="file"
                   accept="image/*"
+                  multiple
                   className="hidden"
                   onChange={async (e) => {
-                    const f = e.target.files?.[0];
+                    const files = Array.from(e.target.files || []);
                     e.target.value = "";
-                    if (!f) return;
+                    if (files.length === 0) return;
                     setWholesaleDimError("");
-                    const err = await validateImageDimensions(f);
-                    if (err) {
-                      setWholesaleDimError(err);
-                      return;
+                    const validFiles: File[] = [];
+                    for (const f of files) {
+                      const err = await validateImageDimensions(f);
+                      if (err) { setWholesaleDimError(err); return; }
+                      validFiles.push(f);
                     }
-                    setWholesaleCropName(f.name);
-                    setWholesaleCropSrc(URL.createObjectURL(f));
+                    setWholesaleFiles((prev) => [...prev, ...validFiles]);
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => wholesaleRef.current?.click()}
-                  className="w-full rounded-xl border-2 border-dashed border-stroke py-4 font-['Montserrat'] text-sm text-gray-text hover:border-primary hover:text-primary transition flex flex-col items-center gap-1 bg-white"
-                >
-                  {wholesalePreview ? (
-                    <img
-                      src={wholesalePreview}
-                      alt="preview"
-                      className="h-20 w-20 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <>
-                      <svg
-                        className="h-6 w-6"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      >
-                        <path
-                          d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span>{t("clickChangeImage")}</span>
-                      <span className="font-['Montserrat'] text-xs text-gray-text">
-                        Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px
-                      </span>
-                    </>
-                  )}
-                </button>
                 {wholesaleDimError && (
-                  <p className="mt-1 font-['Montserrat'] text-xs text-red-600">
-                    {wholesaleDimError}
-                  </p>
+                  <p className="font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>
                 )}
-                {wholesalePreview && !wholesaleDimError && (
-                  <p className="mt-1 text-center font-['Montserrat'] text-xs text-gray-text">
-                    {t("clickReplaceImage")}
-                  </p>
-                )}
+                <p className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
               </div>
               <input
                 placeholder="Min order quantity"

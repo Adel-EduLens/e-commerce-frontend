@@ -27,11 +27,31 @@ export default function WholesaleDetailsPage() {
     }
   }, [isAuthenticated, user, navigate]);
 
+  // Initialize selected values on wholesale product load
   useEffect(() => {
-    if (wholesale) {
-      addSignal({ productId: wholesale.id, categoryId: wholesale.categoryId, type: "view" });
+    if (wholesale && wholesale.wholesaleColors && wholesale.wholesaleColors.length > 0) {
+      const firstColor = wholesale.wholesaleColors[0];
+      setSelectedColor(firstColor.color);
+
+      const firstAvailableSize = firstColor.sizes?.[0]?.size || "";
+      setSelectedSize(firstAvailableSize);
+
+      const firstImage = wholesale.images?.[0]?.url || "";
+      setSelectedImage(firstImage);
+
+      setQuantity(wholesale.minOrder || 1);
     }
-  }, [wholesale, addSignal]);
+  }, [wholesale]);
+
+  const handleColorChange = (colorName: string) => {
+    setSelectedColor(colorName);
+    const colorObj = wholesale?.wholesaleColors?.find((c) => c.color === colorName);
+    if (colorObj) {
+      const firstAvailableSize = colorObj.sizes?.[0]?.size || "";
+      setSelectedSize(firstAvailableSize);
+      setQuantity(wholesale?.minOrder || 1);
+    }
+  };
 
   if (!isAuthenticated || !user) {
     return null;
@@ -44,8 +64,14 @@ export default function WholesaleDetailsPage() {
     ...wholesale,
     brandName: wholesale.brand ?? null,
     minOrder: wholesale.minOrder,
-    colors: [],
-    sizes: [],
+    colors: wholesale.wholesaleColors?.map((wc) => ({ id: wc.id, color: wc.color })) || [],
+    sizes: Array.from(
+      new Map(
+        wholesale.wholesaleColors
+          ?.flatMap((wc) => wc.sizes)
+          .map((s) => [s.size, { id: s.id, size: s.size }]) || []
+      ).values()
+    ),
   };
 
   return (
@@ -65,16 +91,17 @@ export default function WholesaleDetailsPage() {
 
           <ProductInfoPanel
             selectedColor={selectedColor}
-            onColorChange={setSelectedColor}
+            onColorChange={handleColorChange}
             selectedSize={selectedSize}
             setSelectedSize={setSelectedSize}
             quantity={quantity}
             setQuantity={setQuantity}
             item={item}
             productType="WHOLESALE"
+            rawProduct={wholesale}
           />
         </div>
-        <RecommedProducts currentProductId={wholesale.id} currentCategoryId={wholesale.categoryId} />
+        <RecommedProducts currentProductId={wholesale.id} />
       </div>
     </div>
   );
