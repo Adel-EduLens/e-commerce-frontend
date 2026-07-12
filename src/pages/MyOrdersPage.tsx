@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, Package, Truck, CheckCircle2, ShoppingBag, Loader2, Calendar, MapPin, CreditCard, ChevronRight } from "lucide-react";
+import { LoadingSpinner } from "../components/shared";
 import { useTranslation } from "react-i18next";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
@@ -380,9 +381,7 @@ export default function MyOrdersPage() {
       <OrderTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
       {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-secondary" />
-        </div>
+        <LoadingSpinner containerClassName="h-64" className="h-8 w-8" />
       ) : filteredOrders.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-stroke p-12 text-center bg-gray-light/50 transition-all duration-300">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10 text-secondary mb-4">

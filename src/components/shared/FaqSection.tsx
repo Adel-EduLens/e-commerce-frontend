@@ -1,6 +1,7 @@
 import CollapsibleFAQ from './CollapsibleFAQ'
 import { asset } from '../../lib/utils';
 import { usePublicFAQs } from '../../hooks/queries/faqQuery';
+import LoadingSpinner from './LoadingSpinner';
 
 function AssetImage({
   file,
@@ -51,14 +52,7 @@ function FaqSection() {
         />
         <div className="flex w-full flex-col items-start justify-start gap-8 lg:flex-1">
           {isLoading ? (
-            <div className="flex flex-col gap-8 w-full">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="rounded-2xl p-4 sm:rounded-3xl sm:p-8 bg-gray-light animate-pulse flex w-full items-center justify-between h-[88px] sm:h-[120px]">
-                  <div className="h-6 sm:h-8 w-2/3 rounded-md bg-gray-300 dark:bg-gray-600" />
-                  <div className="h-12 w-12 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
-                </div>
-              ))}
-            </div>
+            <LoadingSpinner containerClassName="py-12" />
           ) : (
             <CollapsibleFAQ faqs={faqs} />
           )}

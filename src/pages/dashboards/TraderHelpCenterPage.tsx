@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { LoadingSpinner } from '../../components/shared'
 import {
   FaChevronDown,
   FaPen,
@@ -357,14 +358,7 @@ export default function TraderHelpCenterPage() {
   const editingVideo = videos.find((v) => v.id === editingId) ?? null
 
   if (isLoadingVideos || isLoadingCategories) {
-    return (
-      <div className="flex h-[50vh] w-full flex-col items-center justify-center gap-3">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-stroke border-t-primary" />
-        <span className="font-['Montserrat'] text-base font-semibold text-gray-text">
-          Loading Help Center...
-        </span>
-      </div>
-    )
+    return <LoadingSpinner text="Loading Help Center..." containerClassName="h-[50vh]" />
   }
 
   return (

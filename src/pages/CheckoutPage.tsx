@@ -15,6 +15,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMyAddresses } from "../hooks/queries/addressQuery";
 import type { Address } from "../hooks/queries/addressQuery";
+import { LoadingSpinner } from "../components/shared";
 import { couponAppliesToItem, type Coupon } from "../lib/couponUtils";
 type SavedAddressesSectionProps = {
   addresses: Address[];
@@ -762,14 +763,7 @@ export default function CheckoutPage() {
   }, [appliedCoupon, items]);
 
   if (isCartLoading || isAddressesLoading) {
-    return (
-      <div className="flex h-[75vh] w-full flex-col items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" strokeWidth={1.5} />
-        <p className="font-['Montserrat'] text-lg font-semibold text-foreground">
-          Preparing checkout...
-        </p>
-      </div>
-    );
+    return <LoadingSpinner text="Preparing checkout..." containerClassName="h-[75vh]" className="h-12 w-12" />;
   }
 
   const shipping = 50; // Flat shipping rate

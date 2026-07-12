@@ -37,6 +37,7 @@ import {
   uploadImageFile,
 } from "./inventoryUtils";
 import { useTranslation } from "react-i18next";
+import { LoadingSpinner } from "../shared";
 
 // ─── MultiSelect ───────────────────────────────────────────────────────────────
 export function MultiSelect({
@@ -2476,11 +2477,7 @@ export function InventoryTablePanel({
 
         {/* Content */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="font-['Montserrat'] text-sm text-gray-text">
-              {t("loading")}{" "}
-            </p>
-          </div>
+          <LoadingSpinner text={t("loading")} containerClassName="py-12" />
         ) : errorMessages.length > 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12">
             {errorMessages.map((msg, i) => (

@@ -7,6 +7,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { LoadingSpinner } from "../components/shared";
 import {
   useUserNotifications,
   useMarkNotificationRead,
@@ -165,11 +166,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n: any) => !n.isRead).length;
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-20" />;
   }
 
   if (isError) {
@@ -202,9 +199,7 @@ export default function NotificationsPage() {
 
       {/* Category subscription cards */}
       {isCategoriesLoading && (
-        <div className="flex items-center justify-center py-20 gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
+        <LoadingSpinner containerClassName="py-20" className="h-8 w-8" />
       )}
       {!isCategoriesLoading && categories.length > 0 && (
         <div className="flex gap-3">

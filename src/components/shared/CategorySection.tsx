@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
-
-
+import LoadingSpinner from "./LoadingSpinner";
 
 function CategoriesSection() {
   const { data: categories = [], isLoading: isCategoriesLoading } =
@@ -14,9 +13,7 @@ function CategoriesSection() {
       </div>
       <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {isCategoriesLoading && (
-          <div className="flex items-center justify-center py-20 gap-3">
-            loading...
-          </div>
+          <LoadingSpinner containerClassName="py-20 col-span-1 sm:col-span-2 lg:col-span-3" />
         )}
         {!isCategoriesLoading &&
           categories

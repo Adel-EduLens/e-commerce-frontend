@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { asset } from "../../components/trader/inventoryUtils";
 import { CategoryFormModal } from "../../components/trader/CategoryFormModal";
+import { LoadingSpinner } from "../../components/shared";
 import {
   type Category,
   useCategories,
@@ -174,10 +175,7 @@ export function CategoryTablePanel({
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-stroke border-t-primary" />
-            <p className="font-['Montserrat'] text-sm text-gray-text">Loading categories...</p>
-          </div>
+          <LoadingSpinner text="Loading categories..." containerClassName="py-20" className="h-8 w-8" />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">

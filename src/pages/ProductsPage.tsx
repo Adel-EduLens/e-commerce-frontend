@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { ProductCard, SidebarFilters } from "../components/shared";
+import { ProductCard, SidebarFilters, LoadingSpinner } from "../components/shared";
 import ShopBanner from "../components/product/ShopBanner";
 import Pagination from "../components/shared/Pagination";
 import { useProducts } from "../hooks/queries/productsQuery";
@@ -197,9 +197,7 @@ export default function ProductsPage() {
           {/* Main content */}
           <div className="flex-1">
             {isAnyLoading && (
-              <div className="w-full py-2 text-center text-gray-400">
-                {t("Loading")}
-              </div>
+              <LoadingSpinner containerClassName="py-12" text={t("Loading")} />
             )}
 
             {!isAnyLoading && (

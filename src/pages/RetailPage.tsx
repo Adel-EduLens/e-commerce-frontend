@@ -5,6 +5,7 @@ import useRetailCategories from '../hooks/useRetailCategories'
 import { useSearchParams } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import CatalogFilters from '../components/shared/CatalogFilters'
+import { LoadingSpinner } from '../components/shared'
 
 function normalizeProductsResponse(response: any) {
   if (!response) return []
@@ -164,9 +165,11 @@ export default function RetailPage() {
 
         <main className="w-full rounded-[24px] border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:p-6">
           {isLoading ? (
-            <div className="flex items-center gap-2 rounded-[24px] border border-slate-200 bg-white p-6 text-slate-500 shadow-sm">
-              <Loader2 className="h-4 w-4 animate-spin" /> Loading products...
-            </div>
+            <LoadingSpinner
+              text="Loading products..."
+              containerClassName="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm"
+              className="h-6 w-6"
+            />
           ) : error ? (
             <div className="rounded-[24px] border border-red-200 bg-red-50 p-6 text-red-600 shadow-sm">
               Failed to load products: {(error as any)?.message ?? 'Unknown error'}
