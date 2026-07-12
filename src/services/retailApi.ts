@@ -39,9 +39,6 @@ export const retailApi = {
   },
 
   async createRetailNotifyMe(payload: { retailProductId: string | number; userId?: string | number }) {
-    console.log('Wishlist payload', payload)
-    console.log('Stored token', localStorage.getItem('token'))
-    console.log('Axios Authorization', api.defaults.headers.common.Authorization)
 
     const response = await api.post(`${API_PREFIX}/notify-me`, {
       retailProductId: payload.retailProductId,

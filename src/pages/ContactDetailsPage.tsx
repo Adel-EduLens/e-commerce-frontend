@@ -182,7 +182,7 @@ function AddressCard({
 
   return (
     <div
-      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${isAddressLoading ? "pointer-eve nts-none opacity-50" : ""
+      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${isAddressLoading ? "pointer-events-none opacity-50" : ""
         }`}
     >
       {/* Header */}

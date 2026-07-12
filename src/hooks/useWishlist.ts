@@ -30,8 +30,7 @@ export function useToggleWishlist() {
   return useMutation({
     mutationFn: async ({ productType, productId }: { productType: WishlistProductType; productId: number | string }) => {
       const { user, token } = useAuthStore.getState()
-      console.log('[Wishlist] user:', user)
-      console.log('[Wishlist] token:', token || localStorage.getItem('token'))
+
       return wishlistApi.toggleWishlist({ productType, productId })
     },
     onSuccess: async (_data, variables) => {

@@ -407,6 +407,39 @@ export const useProductDetails = (id?: string) => {
   return useProduct(id);
 };
 
-export const useRecommendedProducts = (query: ProductsQuery) => {
-  return useProducts(query);
+export type RecommendedProductsQuery = {
+  categories?: string | string[];
+  limit?: number;
+  excludeId?: string;
+  categoryId?: string;
+  size?: string;
+  color?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+};
+
+const getRecommendedProducts = async (
+  params: RecommendedProductsQuery
+): Promise<ProductsResponse> => {
+  const queryParams: Record<string, any> = { ...params };
+  if (Array.isArray(queryParams.categories)) {
+    queryParams.categories = queryParams.categories.join(",");
+  }
+
+  const { data } = await api.get("/products/recommendations", {
+    params: queryParams,
+  });
+
+  const result = data.data;
+  if (result?.products) {
+    result.products = result.products.map(transformProduct);
+  }
+  return result;
+};
+
+export const useRecommendedProducts = (params: RecommendedProductsQuery) => {
+  return useQuery({
+    queryKey: ["products", "recommendations", params],
+    queryFn: () => getRecommendedProducts(params),
+  });
 };

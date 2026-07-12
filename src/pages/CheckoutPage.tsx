@@ -15,6 +15,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMyAddresses } from "../hooks/queries/addressQuery";
 import type { Address } from "../hooks/queries/addressQuery";
+import { couponAppliesToItem, type Coupon } from "../lib/couponUtils";
 type SavedAddressesSectionProps = {
   addresses: Address[];
   selectedAddressId: string | null;
@@ -142,27 +143,7 @@ function OrderSummary({
       const coupon = data?.data;
       if (coupon) {
         // Check if coupon actually applies to any item in cart
-        let appliesToCart = false;
-        items.forEach((item) => {
-          const itemCategoryId = item.categoryId;
-          const itemProductId = item.productId;
-
-          let isQualifying = false;
-          if (!coupon.categoryId && !coupon.productId) {
-            isQualifying = true;
-          } else {
-            if (coupon.productId && String(itemProductId) === String(coupon.productId)) {
-              isQualifying = true;
-            }
-            if (coupon.categoryId && String(itemCategoryId) === String(coupon.categoryId)) {
-              isQualifying = true;
-            }
-          }
-
-          if (isQualifying) {
-            appliesToCart = true;
-          }
-        });
+        const appliesToCart = items.some(item => couponAppliesToItem(coupon, item));
 
         if (!appliesToCart) {
           setCouponError(
@@ -752,7 +733,7 @@ export default function CheckoutPage() {
   );
 
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(initialCoupon);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(initialCoupon);
   const [couponError, setCouponError] = useState("");
 
   const subtotal = useMemo(
@@ -767,28 +748,7 @@ export default function CheckoutPage() {
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
     items.forEach((item) => {
-      const itemCategoryId = item.categoryId;
-      const itemProductId = item.productId;
-
-      let isQualifying = false;
-      if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
-        isQualifying = true;
-      } else {
-        if (
-          appliedCoupon.productId &&
-          String(itemProductId) === String(appliedCoupon.productId)
-        ) {
-          isQualifying = true;
-        }
-        if (
-          appliedCoupon.categoryId &&
-          String(itemCategoryId) === String(appliedCoupon.categoryId)
-        ) {
-          isQualifying = true;
-        }
-      }
-
-      if (isQualifying) {
+      if (couponAppliesToItem(appliedCoupon, item)) {
         qualifyingSubtotal += item.unitPrice * item.quantity;
         hasMatchingItem = true;
       }
@@ -867,7 +827,6 @@ export default function CheckoutPage() {
         })),
       };
 
-      console.log("Sending order payload to backend:", orderPayload);
       await api.post("/orders", orderPayload);
 
       await clearCart();

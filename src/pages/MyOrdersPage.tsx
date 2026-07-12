@@ -312,7 +312,7 @@ function OrderDetailsCard({ order }: { order: Order }) {
 
           {order.mapAddress && (
             <div className="space-y-1">
-              <div className="text-gray-text font-medium">Pined Map Address</div>
+              <div className="text-gray-text font-medium">Pinned Map Address</div>
               <div className="text-xs font-semibold text-success break-words leading-relaxed">
                 {order.mapAddress}
               </div>

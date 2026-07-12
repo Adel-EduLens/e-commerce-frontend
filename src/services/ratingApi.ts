@@ -30,9 +30,7 @@ async function postFallbackRating(payload: RateProductPayload) {
   const { productType, productId, rating } = payload
 
   if (productType === 'RETAIL') {
-    console.log('Rating payload', payload)
-    console.log('Stored token', localStorage.getItem('token'))
-    console.log('Axios Authorization', api.defaults.headers.common.Authorization)
+
     const response = await api.post(`/retail/products/${productId}/rating`, { rating })
     return normalizeRatingResponse(response.data)
   }
@@ -47,14 +45,10 @@ async function postFallbackRating(payload: RateProductPayload) {
 }
 
 export async function rateProduct(payload: RateProductPayload) {
-  console.log('Rating payload', payload)
-  console.log('Stored token', localStorage.getItem('token'))
-  console.log('Axios Authorization', api.defaults.headers.common.Authorization)
+
 
   try {
     const state = (await import('../store/useAuthStore')).useAuthStore.getState()
-    console.log('[ratingApi] user:', state.user)
-    console.log('[ratingApi] token:', state.token || (typeof window !== 'undefined' ? localStorage.getItem('token') : null))
 
     if (payload.productType === 'RETAIL') {
       const response = await api.post(`/retail/products/${payload.productId}/rating`, { rating: payload.rating })
@@ -69,12 +63,7 @@ export async function rateProduct(payload: RateProductPayload) {
     return normalizeRatingResponse(response.data)
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      console.log(error.response?.status)
-      console.log(error.response?.data)
-      console.log(error.config?.url)
-      console.log(error.config?.method)
-      console.log(error.config?.headers)
-      console.log(error.config?.data)
+
     }
 
     if (

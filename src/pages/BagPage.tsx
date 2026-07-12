@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ProductCard } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 import { api } from "../lib/axios";
+import { couponAppliesToItem } from "../lib/couponUtils";
 import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/useAuthStore";
@@ -168,18 +169,7 @@ function BagItemCard({
   const { t } = useTranslation("bag");
   const hasDiscount = useMemo(() => {
     if (!appliedCoupon) return false;
-    const itemCategoryId = item.categoryId;
-    const itemProductId = item.productId;
-
-    if (!appliedCoupon.categoryId && !appliedCoupon.productId) return true;
-    if (appliedCoupon.productId && String(itemProductId) === String(appliedCoupon.productId))
-      return true;
-    if (
-      appliedCoupon.categoryId &&
-      String(itemCategoryId) === String(appliedCoupon.categoryId)
-    )
-      return true;
-    return false;
+    return couponAppliesToItem(appliedCoupon, item);
   }, [appliedCoupon, item]);
 
   const discountedPrice = hasDiscount
@@ -449,23 +439,7 @@ export default function BagPage() {
     if (!appliedCoupon) return 0;
 
     return items.reduce((total, item) => {
-      let applies = false;
-      const itemCategoryId = item.categoryId;
-      const itemProductId = item.productId;
-
-      if (!appliedCoupon.categoryId && !appliedCoupon.productId) {
-        applies = true;
-      } else if (
-        appliedCoupon.productId &&
-        String(itemProductId) === String(appliedCoupon.productId)
-      ) {
-        applies = true;
-      } else if (
-        appliedCoupon.categoryId &&
-        String(itemCategoryId) === String(appliedCoupon.categoryId)
-      ) {
-        applies = true;
-      }
+      const applies = couponAppliesToItem(appliedCoupon, item);
 
       if (applies) {
         return (
@@ -493,17 +467,7 @@ export default function BagPage() {
       const { data } = await api.get(`/coupons/validate/${normalizedCode}`);
       const coupon = data.data;
 
-      const appliesToSomeItem = items.some((item) => {
-        const itemCategoryId = item.categoryId;
-        const itemProductId = item.productId;
-
-        if (!coupon.categoryId && !coupon.productId) return true;
-        if (coupon.productId && String(itemProductId) === String(coupon.productId))
-          return true;
-        if (coupon.categoryId && String(itemCategoryId) === String(coupon.categoryId))
-          return true;
-        return false;
-      });
+      const appliesToSomeItem = items.some((item) => couponAppliesToItem(coupon, item));
 
       if (!appliesToSomeItem) {
         toast.error(t("toast.couponNotApplicable"));

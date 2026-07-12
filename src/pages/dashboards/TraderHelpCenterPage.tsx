@@ -333,6 +333,7 @@ export default function TraderHelpCenterPage() {
 
   const handleDeleteCategory = async (id: string) => {
     if (deleteCategoryMutation.isPending) return
+    if (!window.confirm('Are you sure you want to delete this category?')) return
     try {
       await deleteCategoryMutation.mutateAsync(id)
       toast.success('Category deleted successfully')
@@ -343,6 +344,7 @@ export default function TraderHelpCenterPage() {
 
   const handleDeleteVideo = async (id: string) => {
     if (deleteVideoMutation.isPending) return
+    if (!window.confirm('Are you sure you want to delete this video?')) return
     try {
       await deleteVideoMutation.mutateAsync(id)
       toast.success('Video deleted successfully')
