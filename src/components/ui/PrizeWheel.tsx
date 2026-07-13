@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Wheel } from "react-custom-roulette";
 import { usePrizes, useSpinPrize } from "../../hooks/queries/prizequery";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 const colors = ["#e0343f", "#f2994a", "#2f80ed"];
 const PrizeWheel = () => {
@@ -18,7 +18,6 @@ const PrizeWheel = () => {
     },
   }));
 
-
   const handleSpin = async () => {
     if (mustSpin) return;
     try {
@@ -29,7 +28,7 @@ const PrizeWheel = () => {
       setMustSpin(true);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to spin the wheel. Please try again.")
+      toast.error("Failed to spin the wheel. Please try again.");
     }
   };
   if (isLoading) return <p>Loading...</p>;
@@ -72,8 +71,6 @@ const PrizeWheel = () => {
 
 export default PrizeWheel;
 
-
-
 // Each prize has a "weight".
 // Higher weight = higher chance of being selected.
 // const prizes = [
@@ -111,14 +108,13 @@ export default PrizeWheel;
 //   return 0;
 // }
 
+// const handleSpin = () => {
+//   if (mustSpin) return;
 
-  // const handleSpin = () => {
-  //   if (mustSpin) return;
+//   const winner = weightedRandom();
+//   console.log("Winner Index:", winner);
+//   console.log("Winner Prize:", prizes[winner]);
 
-  //   const winner = weightedRandom();
-  //   console.log("Winner Index:", winner);
-  //   console.log("Winner Prize:", prizes[winner]);
-
-  //   setPrizeNumber(winner);
-  //   setMustSpin(true);
-  // };
+//   setPrizeNumber(winner);
+//   setMustSpin(true);
+// };

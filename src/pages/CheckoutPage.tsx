@@ -177,12 +177,12 @@ function OrderSummary({
   const formatCurrency = (v: number) => `EGP ${v.toFixed(2)}`;
 
   return (
-    <div className="w-full flex flex-col gap-8 rounded-2xl bg-white px-4 py-6 outline outline-1 outline-offset-[-1px] outline-stroke">
+    <div className="w-full flex flex-col gap-8 rounded-2xl bg-card px-4 py-6 outline outline-1 outline-offset-[-1px] outline-stroke">
       <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
         {items.map((item) => (
           <div
             key={`${item.productId}-${item.size || 'none'}-${item.color || 'none'}`}
-            className="relative flex items-start gap-4 rounded-lg bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
+            className="relative flex items-start gap-4 rounded-lg bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
           >
             <div className="relative shrink-0">
               <img
@@ -217,7 +217,7 @@ function OrderSummary({
             value={couponCode}
             onChange={(e) => setCouponCode(e.target.value)}
             disabled={isValidating || !!appliedCoupon}
-            className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-white disabled:bg-gray-50"
+            className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-card disabled:bg-gray-50"
           />
           {appliedCoupon ? (
             <button
@@ -328,7 +328,7 @@ function FormInput({
 }) {
   return (
     <div
-      className={`flex h-14 sm:h-16 items-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+      className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
     >
       <input
         type="text"
@@ -356,7 +356,7 @@ function FormSelect({
 }) {
   return (
     <div
-      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
     >
       <select
         value={value}
@@ -594,7 +594,7 @@ function PaymentMethodSection() {
               className="h-6 w-8 sm:h-8 sm:w-10"
               alt="Mastercard"
             />
-            <div className="flex h-6 w-8 sm:h-8 sm:w-10 items-center justify-center rounded-lg bg-white outline outline-1 outline-offset-[-1px] outline-stroke">
+            <div className="flex h-6 w-8 sm:h-8 sm:w-10 items-center justify-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke">
               <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
                 +3
               </span>
@@ -609,7 +609,7 @@ function PaymentMethodSection() {
           </div>
           <FormInput placeholder="Name on card" />
         </div>
-        <div className="flex items-center justify-between rounded-b-lg bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+        <div className="flex items-center justify-between rounded-b-lg bg-card p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
           <div className="flex items-center gap-2.5">
             <img
               src="/checkout/ri_radio-button-line.svg"
@@ -639,7 +639,7 @@ function RememberMeSection({
         REMEMBER ME
       </h2>
       <div className="flex flex-col gap-4">
-        <div className="flex items-center rounded-lg bg-white p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+        <div className="flex items-center rounded-lg bg-card p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
           <div className="flex items-center gap-2.5">
             <img
               src="/checkout/ri_radio-button-line.svg"

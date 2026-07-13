@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AxiosError } from "axios";
 import {
   type InventoryItem,
   getStatus,
@@ -57,6 +58,9 @@ const activityLogs = [
   },
 ];
 
+type ErrorResponse = {
+  message?: string;
+};
 export default function TraderInventoryPage() {
   const { t } = useTranslation("traderInventory");
   const [showModal, setShowModal] = useState(false);
@@ -87,9 +91,7 @@ export default function TraderInventoryPage() {
           })),
         ) ?? [];
 
-
       const totalStock = p.stock ?? 0;
-
 
       const uniqueSizes = Array.from(
         new Set(
@@ -176,14 +178,25 @@ export default function TraderInventoryPage() {
   };
 
   const errorMessages: string[] = [];
-  if (productsError)
+  if (productsError) {
+    const error = productsErrorMsg as AxiosError<ErrorResponse>;
+
     errorMessages.push(
-      `Products: ${(productsErrorMsg as any)?.response?.data?.message ?? (productsErrorMsg as any)?.message ?? "Unknown error"}`,
+      `Products: ${
+        error.response?.data?.message ?? error.message ?? "Unknown error"
+      }`,
     );
-  if (wholesalesError)
+  }
+
+  if (wholesalesError) {
+    const error = wholesalesErrorMsg as AxiosError<ErrorResponse>;
+
     errorMessages.push(
-      `Wholesales: ${(wholesalesErrorMsg as any)?.response?.data?.message ?? (wholesalesErrorMsg as any)?.message ?? "Unknown error"}`,
+      `Wholesales: ${
+        error.response?.data?.message ?? error.message ?? "Unknown error"
+      }`,
     );
+  }
 
   const inStock = inventoryItems.filter((i) => i.status === "Active").length;
   const lowStock = inventoryItems.filter(
@@ -219,7 +232,7 @@ export default function TraderInventoryPage() {
           {summaryCards.map((card) => (
             <div
               key={card.label}
-              className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+              className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex flex-col gap-1">
@@ -258,7 +271,7 @@ export default function TraderInventoryPage() {
         {/* Bottom panels */}
         <div className="grid gap-4 lg:grid-cols-3">
           {/* Recent Alerts */}
-          <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">
                 {t("recentAlerts")}
@@ -302,14 +315,22 @@ export default function TraderInventoryPage() {
           </div>
 
           {/* Inventory Snapshot */}
-          <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
               {t("inventorySnapshot")}
             </h3>
             <div className="flex flex-col gap-3 mb-5">
               {[
-                { label: t("inStock"), count: `${inStock} ${t("items")}`, dot: "text-emerald-700" },
-                { label: t("lowStock"), count: `${lowStock} ${t("items")}`, dot: "text-yellow-500" },
+                {
+                  label: t("inStock"),
+                  count: `${inStock} ${t("items")}`,
+                  dot: "text-emerald-700",
+                },
+                {
+                  label: t("lowStock"),
+                  count: `${lowStock} ${t("items")}`,
+                  dot: "text-yellow-500",
+                },
                 {
                   label: t("outOfStock"),
                   count: `${outOfStock} ${t("items")}`,
@@ -377,7 +398,7 @@ export default function TraderInventoryPage() {
           </div>
 
           {/* Activity Log */}
-          <div className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">
                 {t("activityLog")}
