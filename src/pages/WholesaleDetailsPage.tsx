@@ -64,12 +64,12 @@ export default function WholesaleDetailsPage() {
     ...wholesale,
     brandName: wholesale.brand ?? null,
     minOrder: wholesale.minOrder,
-    colors: wholesale.wholesaleColors?.map((wc) => ({ id: wc.id, color: wc.color })) || [],
+    colors: (wholesale.wholesaleColors || []).map((wc) => ({ id: wc.id, color: wc.color })),
     sizes: Array.from(
       new Map(
-        wholesale.wholesaleColors
-          ?.flatMap((wc) => wc.sizes)
-          .map((s) => [s.size, { id: s.id, size: s.size }]) || []
+        (wholesale.wholesaleColors || [])
+          .flatMap((wc) => wc.sizes || [])
+          .map((s) => [s.size, { id: s.id, size: s.size }])
       ).values()
     ),
   };

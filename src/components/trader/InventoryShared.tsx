@@ -234,6 +234,39 @@ export function AddItemModal({
   const [productColors, setProductColors] = useState<ProductColor[]>([]);
   const [minOrder, setMinOrder] = useState("1");
   const [description, setDescription] = useState("");
+  const [sharedSizes, setSharedSizes] = useState<string[]>([]);
+
+  const handleAddPackage = () => {
+    setProductColors((prev) => [
+      ...prev,
+      {
+        color: "",
+        images: [],
+        variants: sharedSizes.map((size) => ({ size, quantity: 0 })),
+        stock: 0,
+      },
+    ]);
+  };
+
+  const handleRemovePackage = (index: number) => {
+    setProductColors((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSharedSizesChange = (newSizes: string[]) => {
+    setSharedSizes(newSizes);
+    setProductColors((prev) =>
+      prev.map((pc) => {
+        const updatedVariants = newSizes.map((size) => {
+          const existing = pc.variants.find((v) => v.size === size);
+          return existing ? existing : { size, quantity: 0 };
+        });
+        return {
+          ...pc,
+          variants: updatedVariants,
+        };
+      })
+    );
+  };
 
   const [cropState, setCropState] = useState<{
     color: string;
@@ -283,12 +316,44 @@ export function AddItemModal({
       setError("Name, category and price are required.");
       return;
     }
-    if (type === "product" || type === "wholesale") {
+    if (type === "wholesale") {
+      if (productColors.length === 0) {
+        setError("Please add at least one package.");
+        return;
+      }
+      for (let i = 0; i < productColors.length; i++) {
+        const pc = productColors[i];
+        if (!pc.color) {
+          setError(`Please select a color for Package #${i + 1}.`);
+          return;
+        }
+        const isDuplicate = productColors.some((p, idx) => p.color === pc.color && idx !== i);
+        if (isDuplicate) {
+          setError(`Duplicate color selected: ${pc.color} is used in multiple packages.`);
+          return;
+        }
+        if (pc.images.length === 0) {
+          setError(`Please upload at least one image for Package #${i + 1} (${pc.color}).`);
+          return;
+        }
+        if ((pc.stock ?? 0) < 0) {
+          setError(`Stock for Package #${i + 1} (${pc.color}) cannot be negative.`);
+          return;
+        }
+      }
+      if (sharedSizes.length === 0) {
+        setError("Please select at least one shared size.");
+        return;
+      }
+      if ((Number(minOrder) || 0) < 1) {
+        setError("Min order quantity must be at least 1.");
+        return;
+      }
+    } else if (type === "product") {
       if (productColors.length === 0) {
         setError("Please select at least one color.");
         return;
       }
-      // Validation checks for variants
       for (const pc of productColors) {
         if (pc.images.length === 0) {
           setError(`Please upload at least one image for: ${pc.color}`);
@@ -298,24 +363,11 @@ export function AddItemModal({
           setError(`Please add at least one size variant for: ${pc.color}`);
           return;
         }
-        if (type !== "wholesale") {
-          for (const v of pc.variants) {
-            if (v.quantity < 0) {
-              setError(
-                `Quantity for ${pc.color} size ${v.size} cannot be negative.`,
-              );
-              return;
-            }
-          }
-        } else {
-          if ((pc.stock ?? 0) < 0) {
-            setError(`Stock for ${pc.color} cannot be negative.`);
-            return;
-          }
-        }
-        if (type === "wholesale") {
-          if ((Number(minOrder) || 0) < 1) {
-            setError("Min order quantity must be at least 1.");
+        for (const v of pc.variants) {
+          if (v.quantity < 0) {
+            setError(
+              `Quantity for ${pc.color} size ${v.size} cannot be negative.`,
+            );
             return;
           }
         }
@@ -432,11 +484,11 @@ export function AddItemModal({
             const col = cropState.color;
             setCropState(null);
             setProductColors((prev) =>
-              prev.map((pc) =>
-                pc.color === col
+              prev.map((pc, idx) =>
+                pc.color === col || String(idx) === col
                   ? { ...pc, images: [...pc.images, croppedFile] }
-                  : pc,
-              ),
+                  : pc
+              )
             );
           }}
           onCancel={() => {
@@ -610,7 +662,7 @@ export function AddItemModal({
               )}
             </div>
           )}
-          {(type === "product" || type === "wholesale") && (
+          {type === "product" && (
             <>
               <MultiSelect
                 label="Select colors *"
@@ -644,28 +696,6 @@ export function AddItemModal({
                       Remove Color
                     </button>
                   </div>
-
-                  {type === "wholesale" && (
-                    <div className="flex gap-2 items-center pt-1 pb-2 border-b border-stroke">
-                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        Stock:
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={pc.stock ?? 0}
-                        onChange={(e) => {
-                          const val = Number(e.target.value) || 0;
-                          setProductColors((prev) =>
-                            prev.map((item) =>
-                              item.color === pc.color ? { ...item, stock: val } : item
-                            )
-                          );
-                        }}
-                        className="w-20 border border-stroke rounded-xl px-3 py-1 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
-                      />
-                    </div>
-                  )}
 
                   {/* Multiple Image Upload */}
                   <div className="space-y-2">
@@ -758,11 +788,9 @@ export function AddItemModal({
                             <th className="p-2 border-b border-stroke">
                               {t("size")}
                             </th>
-                            {type !== "wholesale" && (
-                              <th className="p-2 border-b border-stroke">
-                                {t("quantity")}
-                              </th>
-                            )}
+                            <th className="p-2 border-b border-stroke">
+                              {t("quantity")}
+                            </th>
                             <th className="p-2 border-b border-stroke text-right">
                               {t("action")}
                             </th>
@@ -775,37 +803,35 @@ export function AddItemModal({
                               className="bg-white border-b border-stroke last:border-none"
                             >
                               <td className="p-2 font-semibold">{v.size}</td>
-                              {type !== "wholesale" && (
-                                <td className="p-2">
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    value={v.quantity}
-                                    onChange={(e) => {
-                                      const qty = Number(e.target.value);
-                                      setProductColors((prev) =>
-                                        prev.map((item) =>
-                                          item.color === pc.color
-                                            ? {
-                                              ...item,
-                                              variants: item.variants.map(
-                                                (variant, idx) =>
-                                                  idx === vIdx
-                                                    ? {
-                                                      ...variant,
-                                                      quantity: qty,
-                                                    }
-                                                    : variant,
-                                              ),
-                                            }
-                                            : item,
-                                        ),
-                                      );
-                                    }}
-                                    className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
-                                  />
-                                </td>
-                              )}
+                              <td className="p-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={v.quantity}
+                                  onChange={(e) => {
+                                    const qty = Number(e.target.value);
+                                    setProductColors((prev) =>
+                                      prev.map((item) =>
+                                        item.color === pc.color
+                                          ? {
+                                            ...item,
+                                            variants: item.variants.map(
+                                              (variant, idx) =>
+                                                idx === vIdx
+                                                  ? {
+                                                    ...variant,
+                                                    quantity: qty,
+                                                  }
+                                                  : variant,
+                                            ),
+                                          }
+                                          : item,
+                                      ),
+                                    );
+                                  }}
+                                  className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
+                                />
+                              </td>
                               <td className="p-2 text-right">
                                 <button
                                   type="button"
@@ -852,27 +878,25 @@ export function AddItemModal({
                           </option>
                         ))}
                       </select>
-                      {type !== "wholesale" && (
-                        <input
-                          type="number"
-                          min="0"
-                          id={`add-size-qty-${pc.color}`}
-                          placeholder={t("qty")}
-                          defaultValue="10"
-                          className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
-                        />
-                      )}
+                      <input
+                        type="number"
+                        min="0"
+                        id={`add-size-qty-${pc.color}`}
+                        placeholder={t("qty")}
+                        defaultValue="10"
+                        className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
+                      />
                       <button
                         type="button"
                         onClick={() => {
                           const sizeSel = document.getElementById(
                             `add-size-select-${pc.color}`,
                           ) as HTMLSelectElement;
-                          const qtySel = type !== "wholesale" ? (document.getElementById(
+                          const qtySel = document.getElementById(
                             `add-size-qty-${pc.color}`,
-                          ) as HTMLInputElement) : null;
+                          ) as HTMLInputElement;
                           const sizeVal = sizeSel?.value;
-                          const qtyVal = qtySel ? Number(qtySel.value || 0) : 0;
+                          const qtyVal = Number(qtySel?.value || 0);
 
                           if (!sizeVal) {
                             setError("Please select a size first.");
@@ -915,17 +939,216 @@ export function AddItemModal({
               ))}
             </>
           )}
+
+          {type === "wholesale" && (
+            <>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Shared Sizes for All Packages *
+                </label>
+                <MultiSelect
+                  label="Select shared sizes"
+                  options={SIZE_OPTIONS}
+                  selected={sharedSizes}
+                  onChange={handleSharedSizesChange}
+                />
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
+                  Packages
+                </p>
+                <button
+                  type="button"
+                  onClick={handleAddPackage}
+                  className="rounded-xl bg-primary px-3 py-1.5 font-['Montserrat'] text-xs font-bold text-foreground transition hover:opacity-90"
+                >
+                  + Add Package
+                </button>
+              </div>
+
+              {productColors.map((pc, colorIdx) => (
+                <div
+                  key={colorIdx}
+                  className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+                >
+                  <div className="flex items-center justify-between border-b border-stroke pb-2">
+                    <h4 className="font-['Montserrat'] text-sm font-bold text-foreground">
+                      Package #{colorIdx + 1} {pc.color ? `(${pc.color})` : ""}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePackage(colorIdx)}
+                      className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
+                    >
+                      Remove Package
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div className="flex flex-col gap-1">
+                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Color *
+                      </label>
+                      {(() => {
+                        const chosenColors = productColors
+                          .map((p, idx) => (idx !== colorIdx ? p.color : ""))
+                          .filter(Boolean);
+                        const availableColorOptions = COLOR_OPTIONS.filter((c) => !chosenColors.includes(c));
+                        return (
+                          <select
+                            value={pc.color}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setProductColors((prev) =>
+                                prev.map((item, idx) =>
+                                  idx === colorIdx ? { ...item, color: val } : item
+                                )
+                              );
+                            }}
+                            className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                          >
+                            <option value="">Select Color</option>
+                            {availableColorOptions.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </select>
+                        );
+                      })()}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Stock *
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={pc.stock ?? 0}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 0;
+                          setProductColors((prev) =>
+                            prev.map((item, idx) =>
+                              idx === colorIdx ? { ...item, stock: val } : item
+                            )
+                          );
+                        }}
+                        className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Multiple Image Upload */}
+                  <div className="space-y-2">
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Upload Images *
+                    </p>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {pc.images.map((imgFile, imgIdx) => {
+                        const previewUrl = URL.createObjectURL(imgFile);
+                        return (
+                          <div
+                            key={imgIdx}
+                            className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                          >
+                            <img
+                              src={previewUrl}
+                              alt="preview"
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                URL.revokeObjectURL(previewUrl);
+                                setProductColors((prev) =>
+                                  prev.map((item, idx) =>
+                                    idx === colorIdx
+                                      ? {
+                                        ...item,
+                                        images: item.images.filter(
+                                          (_, i) => i !== imgIdx,
+                                        ),
+                                      }
+                                      : item,
+                                  ),
+                                );
+                              }}
+                              className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        );
+                      })}
+                      {/* Upload Button */}
+                      <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
+                        <span className="text-xl font-bold">+</span>
+                        <span className="text-[9px] font-['Montserrat']">
+                          Add
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const err = await validateImageDimensions(file);
+                              if (err) {
+                                toast.error(`Image dimensions error: ${err}`);
+                                e.target.value = "";
+                                return;
+                              }
+                              setCropState({
+                                color: String(colorIdx),
+                                src: URL.createObjectURL(file),
+                                name: file.name,
+                              });
+                            }
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    </div>
+                    {pc.images.length === 0 && (
+                      <p className="text-red-500 font-['Montserrat'] text-[10px]">
+                        * At least one image is required
+                      </p>
+                    )}
+                  </div>
+
+                  {sharedSizes.length > 0 && (
+                    <div className="pt-1.5 flex items-center gap-1.5">
+                      <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
+                        Sizes:
+                      </span>
+                      <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
+                        {sharedSizes.join(", ")}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
           {type === "wholesale" && (
             <>
 
-              <input
-                placeholder="Min order quantity"
-                type="number"
-                min="1"
-                value={minOrder}
-                onChange={(e) => setMinOrder(e.target.value)}
-                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-              />
+              <div className="flex flex-col gap-1">
+                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Min Order Quantity *
+                </label>
+                <input
+                  placeholder="Min order quantity"
+                  type="number"
+                  min="1"
+                  value={minOrder}
+                  onChange={(e) => setMinOrder(e.target.value)}
+                  className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                />
+              </div>
               <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3 bg-white">
                 <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
                   Wholesale Attributes
@@ -1047,6 +1270,36 @@ export function EditItemModal({
   const [wholesaleColorsState, setWholesaleColorsState] = useState<WholesaleColorEditState[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [sharedSizes, setSharedSizes] = useState<string[]>([]);
+
+  const handleAddPackageEdit = () => {
+    setWholesaleColorsState((prev) => [
+      ...prev,
+      {
+        color: "",
+        minOrder: 1,
+        stock: 0,
+        images: [],
+        variants: sharedSizes.map((size) => ({ size })),
+      },
+    ]);
+  };
+
+  const handleSharedSizesChangeEdit = (newSizes: string[]) => {
+    setSharedSizes(newSizes);
+    setWholesaleColorsState((prev) =>
+      prev.map((wc) => {
+        const updatedVariants = newSizes.map((size) => {
+          const existing = wc.variants.find((v) => v.size === size);
+          return existing ? existing : { size };
+        });
+        return {
+          ...wc,
+          variants: updatedVariants,
+        };
+      })
+    );
+  };
 
   const { data: categories = [] } = useCategories();
   const { data: brands = [] } = useBrands();
@@ -1082,6 +1335,13 @@ export function EditItemModal({
         };
       });
       setWholesaleColorsState(mapped);
+
+      const initialSizes = Array.from(
+        new Set(
+          (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
+        )
+      );
+      setSharedSizes(initialSizes);
     }
   }, [wholesale]);
 
@@ -1124,26 +1384,38 @@ export function EditItemModal({
           return;
         }
         if (wholesaleColorsState.length === 0) {
-          setError("Please add at least one color.");
+          setError("Please add at least one package.");
           setUploading(false);
           return;
         }
-        for (const wc of wholesaleColorsState) {
-          if (wc.images.length === 0) {
-            setError(`Please upload at least one image for color: ${wc.color}`);
+        for (let i = 0; i < wholesaleColorsState.length; i++) {
+          const wc = wholesaleColorsState[i];
+          if (!wc.color) {
+            setError(`Please select a color for Package #${i + 1}.`);
             setUploading(false);
             return;
           }
-          if (wc.variants.length === 0) {
-            setError(`Please add at least one size variant for color: ${wc.color}`);
+          const isDuplicate = wholesaleColorsState.some((p, idx) => p.color === wc.color && idx !== i);
+          if (isDuplicate) {
+            setError(`Duplicate color selected: ${wc.color} is used in multiple packages.`);
+            setUploading(false);
+            return;
+          }
+          if (wc.images.length === 0) {
+            setError(`Please upload at least one image for Package #${i + 1} (${wc.color}).`);
             setUploading(false);
             return;
           }
           if (wc.stock < 0) {
-            setError(`Stock for color ${wc.color} cannot be negative.`);
+            setError(`Stock for Package #${i + 1} (${wc.color}) cannot be negative.`);
             setUploading(false);
             return;
           }
+        }
+        if (sharedSizes.length === 0) {
+          setError("Please select at least one shared size.");
+          setUploading(false);
+          return;
         }
 
         // Upload new images and construct final images array with color associations
@@ -1927,73 +2199,106 @@ export function EditItemModal({
 
           {item.type === "wholesale" && (
             <>
-              <MultiSelect
-                label="Select wholesale colors"
-                options={COLOR_OPTIONS}
-                selected={wholesaleColorsState.map((wc) => wc.color)}
-                onChange={(colors) => {
-                  setWholesaleColorsState((prev) => {
-                    const next = prev.filter((pc) => colors.includes(pc.color));
-                    colors.forEach((c) => {
-                      if (!next.some((pc) => pc.color === c)) {
-                        next.push({
-                          color: c,
-                          minOrder: 1,
-                          stock: 0,
-                          images: [],
-                          variants: [],
-                        });
-                      }
-                    });
-                    return next;
-                  });
-                }}
-              />
+              <div className="flex flex-col gap-1.5">
+                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Shared Sizes for All Packages *
+                </label>
+                <MultiSelect
+                  label="Select shared sizes"
+                  options={SIZE_OPTIONS}
+                  selected={sharedSizes}
+                  onChange={handleSharedSizesChangeEdit}
+                />
+              </div>
+
+              <div className="flex justify-between items-center pt-2">
+                <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
+                  Packages
+                </p>
+                <button
+                  type="button"
+                  onClick={handleAddPackageEdit}
+                  className="rounded-xl bg-primary px-3 py-1.5 font-['Montserrat'] text-xs font-bold text-foreground transition hover:opacity-90"
+                >
+                  + Add Package
+                </button>
+              </div>
 
               {wholesaleColorsState.map((wc, colorIdx) => (
                 <div
-                  key={wc.color}
+                  key={colorIdx}
                   className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50 animate-fadeIn"
                 >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
-                    <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
-                      <span
-                        className="inline-block w-3 h-3 rounded-full border border-stroke"
-                        style={{ backgroundColor: wc.color.toLowerCase() }}
-                      />
-                      {wc.color}
+                    <h4 className="font-['Montserrat'] text-sm font-bold text-foreground">
+                      Package #{colorIdx + 1} {wc.color ? `(${wc.color})` : ""}
                     </h4>
                     <button
                       type="button"
                       onClick={() => {
                         setWholesaleColorsState((prev) =>
-                          prev.filter((c) => c.color !== wc.color)
+                          prev.filter((_, idx) => idx !== colorIdx)
                         );
                       }}
                       className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
                     >
-                      Remove Color
+                      Remove Package
                     </button>
                   </div>
 
-                  <div className="flex gap-2 items-center pt-1 pb-2 border-b border-stroke">
-                    <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Stock:
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={wc.stock ?? 0}
-                      onChange={(e) => {
-                        const val = Number(e.target.value) || 0;
-                        setWholesaleColorsState((prev) =>
-                          prev.map((item) =>
-                            item.color === wc.color ? { ...item, stock: val } : item
-                          )
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div className="flex flex-col gap-1">
+                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Color *
+                      </label>
+                      {(() => {
+                        const chosenColors = wholesaleColorsState
+                          .map((p, idx) => (idx !== colorIdx ? p.color : ""))
+                          .filter(Boolean);
+                        const availableColorOptions = COLOR_OPTIONS.filter((c) => !chosenColors.includes(c));
+                        return (
+                          <select
+                            value={wc.color}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setWholesaleColorsState((prev) =>
+                                prev.map((item, idx) =>
+                                  idx === colorIdx ? { ...item, color: val } : item
+                                )
+                              );
+                            }}
+                            className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                          >
+                            <option value="">Select Color</option>
+                            {availableColorOptions.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </select>
                         );
-                      }}
-                      className="w-20 border border-stroke rounded-xl px-3 py-1 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
-                    />
+                      })()}
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Stock *
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={wc.stock ?? 0}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 0;
+                          setWholesaleColorsState((prev) =>
+                            prev.map((item, idx) =>
+                              idx === colorIdx ? { ...item, stock: val } : item
+                            )
+                          );
+                        }}
+                        className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2 pt-2">
@@ -2020,11 +2325,11 @@ export function EditItemModal({
                                   URL.revokeObjectURL(previewUrl!);
                                 }
                                 setWholesaleColorsState((prev) =>
-                                  prev.map((item) =>
-                                    item.color === wc.color
+                                  prev.map((item, idx) =>
+                                    idx === colorIdx
                                       ? {
                                         ...item,
-                                        images: item.images.filter((_, idx) => idx !== imgIdx),
+                                        images: item.images.filter((_, i) => i !== imgIdx),
                                       }
                                       : item
                                   )
@@ -2049,13 +2354,13 @@ export function EditItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`${wc.color} Image: ${err}`);
+                                toast.error(`Image dimensions error: ${err}`);
                                 e.target.value = "";
                                 return;
                               }
                               setWholesaleColorsState((prev) =>
-                                prev.map((item) =>
-                                  item.color === wc.color
+                                prev.map((item, idx) =>
+                                  idx === colorIdx
                                     ? {
                                       ...item,
                                       images: [...item.images, { file }],
@@ -2070,111 +2375,32 @@ export function EditItemModal({
                     </div>
                   </div>
 
-                  {/* Color-specific Sizes */}
-                  <div className="space-y-2 pt-2">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Sizes & Quantities *
-                    </p>
-                    {wc.variants.length > 0 && (
-                      <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
-                        <thead>
-                          <tr className="bg-secondary text-primary font-bold">
-                            <th className="p-2 border-b border-stroke">Size</th>
-                            <th className="p-2 border-b border-stroke text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {wc.variants.map((v, vIdx) => (
-                            <tr
-                              key={vIdx}
-                              className="bg-white border-b border-stroke last:border-none"
-                            >
-                              <td className="p-2 font-semibold">{v.size}</td>
-                              <td className="p-2 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setWholesaleColorsState((prev) =>
-                                      prev.map((item) =>
-                                        item.color === wc.color
-                                          ? {
-                                            ...item,
-                                            variants: item.variants.filter((_, idx) => idx !== vIdx),
-                                          }
-                                          : item
-                                      )
-                                    );
-                                  }}
-                                  className="text-red-500 hover:text-red-700"
-                                >
-                                  Delete
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                    <div className="flex gap-2 items-center pt-2">
-                      <select
-                        id={`edit-wholesale-size-select-${wc.color}`}
-                        className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
-                      >
-                        <option value="">Size</option>
-                        {SIZE_OPTIONS.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const sizeSel = document.getElementById(
-                            `edit-wholesale-size-select-${wc.color}`
-                          ) as HTMLSelectElement;
-                          const sizeVal = sizeSel?.value;
-                          const qtyVal = 0;
-
-                          if (!sizeVal) {
-                            toast.error("Please select a size first.");
-                            return;
-                          }
-                          if (wc.variants.some((v) => v.size === sizeVal)) {
-                            toast.error(`Size ${sizeVal} already exists for ${wc.color}.`);
-                            return;
-                          }
-
-                          setWholesaleColorsState((prev) =>
-                            prev.map((item) =>
-                              item.color === wc.color
-                                ? {
-                                  ...item,
-                                  variants: [...item.variants, { size: sizeVal, quantity: qtyVal }],
-                                }
-                                : item
-                            )
-                          );
-                          sizeSel.value = "";
-                        }}
-                        className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-white"
-                      >
-                        Add Size
-                      </button>
+                  {sharedSizes.length > 0 && (
+                    <div className="pt-1.5 flex items-center gap-1.5">
+                      <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
+                        Sizes:
+                      </span>
+                      <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
+                        {sharedSizes.join(", ")}
+                      </span>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
 
-              <input
-                placeholder="Min order quantity"
-                type="number"
-                min="1"
-                value={minOrder}
-                onChange={(e) => setMinOrder(e.target.value)}
-                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-              />
+              <div className="flex flex-col gap-1">
+                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Min Order Quantity *
+                </label>
+                <input
+                  placeholder="Min order quantity"
+                  type="number"
+                  min="1"
+                  value={minOrder}
+                  onChange={(e) => setMinOrder(e.target.value)}
+                  className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+                />
+              </div>
               <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3 bg-white">
                 <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
                   {t("wholesaleAttributes")}

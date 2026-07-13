@@ -101,7 +101,8 @@ export function ProductInfoPanel({
       return rawProduct?.stock ?? 0;
     })();
     // For wholesale, if stock is less than minOrder, it's effectively 0 (insufficient stock)
-    if (isWholesale && item.minOrder && stockVal < item.minOrder) {
+    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
+    if (isWholesale && minQty && stockVal < minQty) {
       return 0;
     }
     return stockVal;
@@ -109,7 +110,7 @@ export function ProductInfoPanel({
 
   // Guard quantity: cannot exceed availableStock or fall below minOrder
   useEffect(() => {
-    const minQty = item.minOrder || 1;
+    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
     if (availableStock > 0) {
       if (quantity > availableStock) {
         setQuantity(availableStock);
@@ -117,9 +118,9 @@ export function ProductInfoPanel({
         setQuantity(minQty);
       }
     } else {
-      setQuantity(1);
+      setQuantity(minQty);
     }
-  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder]);
+  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale]);
 
   // Flash deal price calculation
   const hasFlashDeal =
@@ -325,7 +326,7 @@ export function ProductInfoPanel({
       {item.colors.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-            COLOR: <span className="text-foreground normal-case font-bold">{selectedColor}</span>
+            {isWholesale ? "PACKAGE COLOR:" : "COLOR:"} <span className="text-foreground normal-case font-bold">{selectedColor}</span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {item.colors.map((color) => {
@@ -401,8 +402,8 @@ export function ProductInfoPanel({
         <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
-            disabled={availableStock <= 0 || quantity <= (item.minOrder || 1)}
-            onClick={() => setQuantity(Math.max(item.minOrder || 1, quantity - 1))}
+            disabled={availableStock <= 0 || quantity <= (isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1))}
+            onClick={() => setQuantity(Math.max(isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1), quantity - 1))}
             className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-l-md"
           >
             −
@@ -423,9 +424,9 @@ export function ProductInfoPanel({
         <span className={`ml-2 text-xs font-semibold px-2 py-0.5 rounded ${stockBadgeClass}`}>
           {stockLabel}
         </span>
-        {productType === "WHOLESALE" && item.minOrder && (
+        {productType === "WHOLESALE" && (colorObj?.minOrder ?? item.minOrder) && (
           <span className="text-xs font-semibold text-danger bg-red-50 border border-red-200 px-2 py-0.5 rounded ml-2">
-            Min. Order: {item.minOrder}
+            Min. Order: {colorObj?.minOrder ?? item.minOrder}
           </span>
         )}
       </div>

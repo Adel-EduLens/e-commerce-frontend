@@ -111,7 +111,7 @@ export default function TraderLayout() {
   const currentItem = sidebarItems.find((item) =>
     item.path === "/dashboard/trader"
       ? location.pathname === "/dashboard/trader" ||
-        location.pathname === "/dashboard/trader/"
+      location.pathname === "/dashboard/trader/"
       : location.pathname.startsWith(item.path),
   );
 
@@ -126,7 +126,7 @@ export default function TraderLayout() {
             <div className="mb-8">
               <img
                 className="h-12 w-auto"
-                src={traderAsset("logo gen-z .white 1.png")}
+                src="/home-page/Logo.png"
                 alt="Gen-Z"
               />
             </div>
@@ -139,11 +139,10 @@ export default function TraderLayout() {
                     key={item.label}
                     type="button"
                     onClick={() => item.path && navigate(item.path)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive
-                        ? "bg-primary text-foreground"
-                        : "text-gray-text hover:bg-white/5 hover:text-white"
-                    }`}
+                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${isActive
+                      ? "bg-primary text-foreground"
+                      : "text-gray-text hover:bg-white/5 hover:text-white"
+                      }`}
                   >
                     <div
                       className="h-6 w-6 shrink-0"
