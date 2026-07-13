@@ -36,6 +36,8 @@ export interface Wholesale {
   wholesaleColors?: {
     id: string;
     color: string;
+    minOrder: number;
+    stock: number;
     wholesaleId: string;
     sizes: { id: string; size: string; wholesaleColorId: string }[];
   }[];
@@ -86,6 +88,13 @@ export const useTraderWholesales = () => {
   });
 };
 
+export interface WholesaleColorInput {
+  color: string;
+  minOrder: number;
+  stock: number;
+  sizes: { size: string }[];
+}
+
 export interface WholesaleFormData {
   name: string;
   description: string;
@@ -99,7 +108,7 @@ export interface WholesaleFormData {
   images: { url: string; color?: string }[];
   sku?: string;
   stock?: number;
-  colors?: string[];
+  colors?: WholesaleColorInput[];
   sizes?: string[];
 }
 

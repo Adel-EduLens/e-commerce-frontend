@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Star } from "../ui/star";
 import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +44,7 @@ export function ProductInfoPanel({
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
+  const queryClient = useQueryClient();
 
   const { data: wishlistStatus } = useWishlistStatus(productType, item.id);
   const toggleWishlist = useToggleWishlist();
@@ -61,25 +63,25 @@ export function ProductInfoPanel({
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = isWholesale
     ? rawProduct?.wholesaleColors?.find(
-        (c: any) =>
-          c.color &&
-          selectedColor &&
-          c.color.toLowerCase() === selectedColor.toLowerCase()
-      )
+      (c: any) =>
+        c.color &&
+        selectedColor &&
+        c.color.toLowerCase() === selectedColor.toLowerCase()
+    )
     : rawProduct?.colors?.find(
-        (c: any) =>
-          (c.colorName || c.color) &&
-          selectedColor &&
-          (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
-      );
+      (c: any) =>
+        (c.colorName || c.color) &&
+        selectedColor &&
+        (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
+    );
 
   const colorVariants = isWholesale
-    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: rawProduct?.stock ?? 0 }))
+    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: colorObj?.stock ?? 0 }))
     : colorObj?.variants || [];
-  
+
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
-  
+
   const hasColors = isWholesale
     ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.length > 0
     : Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;
@@ -90,6 +92,9 @@ export function ProductInfoPanel({
 
   const availableStock = (() => {
     const stockVal = (() => {
+      if (isWholesale) {
+        return colorObj?.stock ?? 0;
+      }
       if (hasColors && hasSizes) {
         return selectedVariant ? selectedVariant.quantity : 0;
       }
@@ -133,15 +138,15 @@ export function ProductInfoPanel({
     availableStock === 0
       ? "Out of Stock"
       : availableStock <= 5
-      ? "Low Stock"
-      : "In Stock";
-      
+        ? "Low Stock"
+        : "In Stock";
+
   const stockBadgeClass =
     availableStock === 0
       ? "text-red-600 bg-red-50 border-red-200"
       : availableStock <= 5
-      ? "text-amber-600 bg-amber-50 border-amber-200"
-      : "text-green-600 bg-green-50 border-green-200";
+        ? "text-amber-600 bg-amber-50 border-amber-200"
+        : "text-green-600 bg-green-50 border-green-200";
 
   const handleShare = async () => {
     try {
@@ -162,7 +167,6 @@ export function ProductInfoPanel({
       }
     );
   };
-
   const handleAddToCart = () => {
     if (availableStock <= 0) {
       toast.error("This option is currently out of stock.");
@@ -170,28 +174,37 @@ export function ProductInfoPanel({
     }
 
     if (isWholesale) {
-      const allColorsStr = item.colors.map((c) => c.color).join(", ") || "All Colors";
-      const allSizesStr = item.sizes.map((s) => s.size).join(", ") || "All Sizes";
+      const sizesForSelectedColor = colorObj
+        ? (colorObj.sizes || []).map((s: any) => s.size).join(", ")
+        : "";
+
+      const cartItemId = `${item.id}-${selectedColor.toLowerCase()}-wholesale`;
 
       addItem({
-        id: `${item.id}-wholesale`,
+        id: cartItemId,
         productId: item.id,
         categoryId: item.category.id,
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
-        size: allSizesStr,
-        color: allColorsStr,
+        size: sizesForSelectedColor,
+        color: selectedColor,
         colorHex: "",
-        imageSrc: item.images[0]?.url || "",
+        imageSrc:
+          item.images.find(
+            (img) => img.color?.toLowerCase() === selectedColor.toLowerCase()
+          )?.url || item.images[0]?.url || "",
         quantity,
+      }).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["wholesale"] });
+        queryClient.invalidateQueries({ queryKey: ["wholesales"] });
       });
 
       toast.success(
         t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
           count: quantity,
-          size: allSizesStr,
-          color: allColorsStr,
+          size: sizesForSelectedColor,
+          color: selectedColor,
         })
       );
     } else {
@@ -326,9 +339,8 @@ export function ProductInfoPanel({
                   type="button"
                   onClick={() => onColorChange(color.color)}
                   title={color.color}
-                  className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
-                    isSelected ? "border-primary" : "border-stroke hover:border-gray-text"
-                  }`}
+                  className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${isSelected ? "border-primary" : "border-stroke hover:border-gray-text"
+                    }`}
                 >
                   <span
                     className="w-full h-full rounded-full inline-block border border-black/10"
@@ -353,20 +365,22 @@ export function ProductInfoPanel({
       {colorVariants.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-            SIZE: <span className="text-foreground normal-case font-bold">{selectedSize}</span>
+            {isWholesale ? "AVAILABLE SIZES:" : `SIZE: ${selectedSize}`}
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
-              const isSelected = variant.size === selectedSize;
+              const isSelected = !isWholesale && variant.size === selectedSize;
               const isOutOfStock = variant.quantity <= 0;
               return (
                 <button
                   key={variant.size}
                   type="button"
-                  disabled={isOutOfStock}
-                  onClick={() => setSelectedSize(variant.size)}
+                  disabled={!isWholesale && isOutOfStock}
+                  onClick={() => !isWholesale && setSelectedSize(variant.size)}
                   className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
-                    isSelected
+                    isWholesale
+                      ? "bg-white text-black border-stroke cursor-default"
+                      : isSelected
                       ? "bg-foreground text-background border-foreground"
                       : isOutOfStock
                       ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
@@ -420,9 +434,8 @@ export function ProductInfoPanel({
       <button
         type="button"
         onClick={handleToggleFavorite}
-        className={`flex items-center gap-2 text-sm font-semibold w-fit transition ${
-          isFavorite ? "text-primary" : "text-gray-text hover:text-primary"
-        }`}
+        className={`flex items-center gap-2 text-sm font-semibold w-fit transition ${isFavorite ? "text-primary" : "text-gray-text hover:text-primary"
+          }`}
       >
         <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
         {isFavorite ? "Wishlisted" : t("addToFavorite")}

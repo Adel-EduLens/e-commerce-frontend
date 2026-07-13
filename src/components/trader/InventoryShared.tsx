@@ -18,7 +18,9 @@ import {
 import {
   useCreateWholesale,
   useUpdateWholesale,
+  useWholesale,
 } from "../../hooks/queries/wholesaleQuery";
+
 import ImageCropModal, {
   validateImageDimensions,
   MIN_IMG_WIDTH,
@@ -89,11 +91,10 @@ export function MultiSelect({
                 key={opt}
                 type="button"
                 onClick={() => toggle(opt)}
-                className={`rounded-lg border px-3 py-1 font-['Montserrat'] text-xs font-medium transition ${
-                  selected.includes(opt)
+                className={`rounded-lg border px-3 py-1 font-['Montserrat'] text-xs font-medium transition ${selected.includes(opt)
                     ? "border-primary bg-primary text-foreground"
                     : "border-stroke bg-white text-foreground hover:bg-background"
-                }`}
+                  }`}
               >
                 {opt}
               </button>
@@ -204,7 +205,6 @@ export function ColorImageUpload({
   );
 }
 
-// ─── ProductColor Interface ───────────────────────────────────────────────────
 interface ProductColor {
   color: string;
   images: File[];
@@ -212,6 +212,7 @@ interface ProductColor {
     size: string;
     quantity: number;
   }[];
+  stock?: number;
 }
 
 // ─── Add Item Modal ────────────────────────────────────────────────────────────
@@ -240,12 +241,7 @@ export function AddItemModal({
     name: string;
   } | null>(null);
 
-  const [wholesaleFiles, setWholesaleFiles] = useState<File[]>([]);
-  const [wholesalePreviews, setWholesalePreviews] = useState<string[]>([]);
-  const [wholesaleDimError, setWholesaleDimError] = useState("");
-  const wholesaleRef = useRef<HTMLInputElement>(null);
-  const [wholesaleColors, setWholesaleColors] = useState<string[]>([]);
-  const [wholesaleSizes, setWholesaleSizes] = useState<string[]>([]);
+
 
   const [isMustHave, setIsMustHave] = useState(false);
   const [isFlashDeals, setIsFlashDeals] = useState(false);
@@ -287,8 +283,7 @@ export function AddItemModal({
       setError("Name, category and price are required.");
       return;
     }
-
-    if (type === "product") {
+    if (type === "product" || type === "wholesale") {
       if (productColors.length === 0) {
         setError("Please select at least one color.");
         return;
@@ -303,19 +298,27 @@ export function AddItemModal({
           setError(`Please add at least one size variant for: ${pc.color}`);
           return;
         }
-        for (const v of pc.variants) {
-          if (v.quantity < 0) {
-            setError(
-              `Quantity for ${pc.color} size ${v.size} cannot be negative.`,
-            );
+        if (type !== "wholesale") {
+          for (const v of pc.variants) {
+            if (v.quantity < 0) {
+              setError(
+                `Quantity for ${pc.color} size ${v.size} cannot be negative.`,
+              );
+              return;
+            }
+          }
+        } else {
+          if ((pc.stock ?? 0) < 0) {
+            setError(`Stock for ${pc.color} cannot be negative.`);
             return;
           }
         }
-      }
-    } else {
-      if (wholesaleFiles.length === 0) {
-        setError("Please upload at least one image.");
-        return;
+        if (type === "wholesale") {
+          if ((Number(minOrder) || 0) < 1) {
+            setError("Min order quantity must be at least 1.");
+            return;
+          }
+        }
       }
     }
 
@@ -366,7 +369,23 @@ export function AddItemModal({
         setUploading(false);
         await createProduct.mutateAsync(formData);
       } else {
-        const uploadedUrls = await Promise.all(wholesaleFiles.map(uploadImageFile));
+        const colorsData = await Promise.all(
+          productColors.map(async (pc) => {
+            const urls = await Promise.all(pc.images.map(uploadImageFile));
+            const colorStock = pc.stock ?? 0;
+            return {
+              color: pc.color,
+              minOrder: Number(minOrder) || 1,
+              stock: colorStock,
+              images: urls.map((url) => ({ url, color: pc.color })),
+              sizes: pc.variants.map((v) => ({ size: v.size })),
+            };
+          })
+        );
+
+        const allImages = colorsData.flatMap((c) => c.images);
+        const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
+
         setUploading(false);
         await createWholesale.mutateAsync({
           name,
@@ -378,11 +397,15 @@ export function AddItemModal({
           isBestDeal,
           isMostPopular,
           isPremiumCollection,
-          images: uploadedUrls.map((url) => ({ url })),
+          images: allImages,
           sku: sku || undefined,
-          stock: stock ? Number(stock) : 0,
-          colors: wholesaleColors.length > 0 ? wholesaleColors : undefined,
-          sizes: wholesaleSizes.length > 0 ? wholesaleSizes : undefined,
+          stock: calculatedStock,
+          colors: colorsData.map((c) => ({
+            color: c.color,
+            minOrder: c.minOrder,
+            stock: c.stock,
+            sizes: c.sizes,
+          })),
         });
       }
       onClose();
@@ -506,31 +529,22 @@ export function AddItemModal({
               onChange={(e) => setPrice(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
             />
-            {type === "wholesale" ? (
-              <input
-                placeholder="Stock"
-                type="number"
-                min="0"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-              />
-            ) : (
-              <input
-                placeholder="Stock (Calculated)"
-                type="text"
-                readOnly
-                disabled
-                value={
-                  productColors.reduce(
+            <input
+              placeholder="Stock (Calculated)"
+              type="text"
+              readOnly
+              disabled
+              value={
+                type === "wholesale"
+                  ? productColors.reduce((sum, c) => sum + (c.stock ?? 0), 0) || ""
+                  : productColors.reduce(
                     (sum, c) =>
                       sum + c.variants.reduce((s, v) => s + v.quantity, 0),
                     0,
                   ) || ""
-                }
-                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
-              />
-            )}
+              }
+              className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+            />
           </div>
 
           <input
@@ -596,8 +610,7 @@ export function AddItemModal({
               )}
             </div>
           )}
-
-          {type === "product" && (
+          {(type === "product" || type === "wholesale") && (
             <>
               <MultiSelect
                 label="Select colors *"
@@ -632,6 +645,28 @@ export function AddItemModal({
                     </button>
                   </div>
 
+                  {type === "wholesale" && (
+                    <div className="flex gap-2 items-center pt-1 pb-2 border-b border-stroke">
+                      <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Stock:
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={pc.stock ?? 0}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 0;
+                          setProductColors((prev) =>
+                            prev.map((item) =>
+                              item.color === pc.color ? { ...item, stock: val } : item
+                            )
+                          );
+                        }}
+                        className="w-20 border border-stroke rounded-xl px-3 py-1 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                      />
+                    </div>
+                  )}
+
                   {/* Multiple Image Upload */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
@@ -658,11 +693,11 @@ export function AddItemModal({
                                   prev.map((item) =>
                                     item.color === pc.color
                                       ? {
-                                          ...item,
-                                          images: item.images.filter(
-                                            (_, idx) => idx !== imgIdx,
-                                          ),
-                                        }
+                                        ...item,
+                                        images: item.images.filter(
+                                          (_, idx) => idx !== imgIdx,
+                                        ),
+                                      }
                                       : item,
                                   ),
                                 );
@@ -723,9 +758,11 @@ export function AddItemModal({
                             <th className="p-2 border-b border-stroke">
                               {t("size")}
                             </th>
-                            <th className="p-2 border-b border-stroke">
-                              {t("quantity")}
-                            </th>
+                            {type !== "wholesale" && (
+                              <th className="p-2 border-b border-stroke">
+                                {t("quantity")}
+                              </th>
+                            )}
                             <th className="p-2 border-b border-stroke text-right">
                               {t("action")}
                             </th>
@@ -738,35 +775,37 @@ export function AddItemModal({
                               className="bg-white border-b border-stroke last:border-none"
                             >
                               <td className="p-2 font-semibold">{v.size}</td>
-                              <td className="p-2">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  value={v.quantity}
-                                  onChange={(e) => {
-                                    const qty = Number(e.target.value);
-                                    setProductColors((prev) =>
-                                      prev.map((item) =>
-                                        item.color === pc.color
-                                          ? {
+                              {type !== "wholesale" && (
+                                <td className="p-2">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={v.quantity}
+                                    onChange={(e) => {
+                                      const qty = Number(e.target.value);
+                                      setProductColors((prev) =>
+                                        prev.map((item) =>
+                                          item.color === pc.color
+                                            ? {
                                               ...item,
                                               variants: item.variants.map(
                                                 (variant, idx) =>
                                                   idx === vIdx
                                                     ? {
-                                                        ...variant,
-                                                        quantity: qty,
-                                                      }
+                                                      ...variant,
+                                                      quantity: qty,
+                                                    }
                                                     : variant,
                                               ),
                                             }
-                                          : item,
-                                      ),
-                                    );
-                                  }}
-                                  className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
-                                />
-                              </td>
+                                            : item,
+                                        ),
+                                      );
+                                    }}
+                                    className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
+                                  />
+                                </td>
+                              )}
                               <td className="p-2 text-right">
                                 <button
                                   type="button"
@@ -775,11 +814,11 @@ export function AddItemModal({
                                       prev.map((item) =>
                                         item.color === pc.color
                                           ? {
-                                              ...item,
-                                              variants: item.variants.filter(
-                                                (_, idx) => idx !== vIdx,
-                                              ),
-                                            }
+                                            ...item,
+                                            variants: item.variants.filter(
+                                              (_, idx) => idx !== vIdx,
+                                            ),
+                                          }
                                           : item,
                                       ),
                                     );
@@ -813,25 +852,27 @@ export function AddItemModal({
                           </option>
                         ))}
                       </select>
-                      <input
-                        type="number"
-                        min="0"
-                        id={`add-size-qty-${pc.color}`}
-                        placeholder={t("qty")}
-                        defaultValue="10"
-                        className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
-                      />
+                      {type !== "wholesale" && (
+                        <input
+                          type="number"
+                          min="0"
+                          id={`add-size-qty-${pc.color}`}
+                          placeholder={t("qty")}
+                          defaultValue="10"
+                          className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
+                        />
+                      )}
                       <button
                         type="button"
                         onClick={() => {
                           const sizeSel = document.getElementById(
                             `add-size-select-${pc.color}`,
                           ) as HTMLSelectElement;
-                          const qtySel = document.getElementById(
+                          const qtySel = type !== "wholesale" ? (document.getElementById(
                             `add-size-qty-${pc.color}`,
-                          ) as HTMLInputElement;
+                          ) as HTMLInputElement) : null;
                           const sizeVal = sizeSel?.value;
-                          const qtyVal = Number(qtySel?.value || 0);
+                          const qtyVal = qtySel ? Number(qtySel.value || 0) : 0;
 
                           if (!sizeVal) {
                             setError("Please select a size first.");
@@ -853,12 +894,12 @@ export function AddItemModal({
                             prev.map((item) =>
                               item.color === pc.color
                                 ? {
-                                    ...item,
-                                    variants: [
-                                      ...item.variants,
-                                      { size: sizeVal, quantity: qtyVal },
-                                    ],
-                                  }
+                                  ...item,
+                                  variants: [
+                                    ...item.variants,
+                                    { size: sizeVal, quantity: qtyVal },
+                                  ],
+                                }
                                 : item,
                             ),
                           );
@@ -874,85 +915,9 @@ export function AddItemModal({
               ))}
             </>
           )}
-
           {type === "wholesale" && (
             <>
-              <MultiSelect
-                label="Select wholesale colors"
-                options={COLOR_OPTIONS}
-                selected={wholesaleColors}
-                onChange={(vals) => setWholesaleColors(vals)}
-              />
 
-              <MultiSelect
-                label="Select wholesale sizes"
-                options={SIZE_OPTIONS}
-                selected={wholesaleSizes}
-                onChange={(vals) => setWholesaleSizes(vals)}
-              />
-
-              <div className="flex flex-col gap-2">
-                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Images *
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {wholesalePreviews.map((src, idx) => (
-                    <div key={idx} className="relative">
-                      <img
-                        src={src}
-                        alt={`preview-${idx}`}
-                        className="h-20 w-20 rounded-lg object-cover border border-stroke"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          URL.revokeObjectURL(src);
-                          setWholesalePreviews((prev) => prev.filter((_, i) => i !== idx));
-                          setWholesaleFiles((prev) => prev.filter((_, i) => i !== idx));
-                        }}
-                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => wholesaleRef.current?.click()}
-                    className="h-20 w-20 rounded-lg border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-gray-text hover:border-primary hover:text-primary transition bg-white"
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-xs font-['Montserrat']">Add</span>
-                  </button>
-                </div>
-                <input
-                  ref={wholesaleRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={async (e) => {
-                    const files = Array.from(e.target.files || []);
-                    e.target.value = "";
-                    if (files.length === 0) return;
-                    setWholesaleDimError("");
-                    const validFiles: File[] = [];
-                    for (const f of files) {
-                      const err = await validateImageDimensions(f);
-                      if (err) { setWholesaleDimError(err); return; }
-                      validFiles.push(f);
-                    }
-                    setWholesaleFiles((prev) => [...prev, ...validFiles]);
-                    setWholesalePreviews((prev) => [...prev, ...validFiles.map((f) => URL.createObjectURL(f))]);
-                  }}
-                />
-                {wholesaleDimError && (
-                  <p className="font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>
-                )}
-                <p className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
-              </div>
               <input
                 placeholder="Min order quantity"
                 type="number"
@@ -1027,6 +992,14 @@ export function AddItemModal({
   );
 }
 
+interface WholesaleColorEditState {
+  color: string;
+  minOrder: number;
+  stock: number;
+  images: { id?: string; url?: string; file?: File }[];
+  variants: { id?: string; size: string }[];
+}
+
 // ─── Edit Item Modal ───────────────────────────────────────────────────────────
 export function EditItemModal({
   item,
@@ -1071,14 +1044,7 @@ export function EditItemModal({
     name: string;
   } | null>(null);
 
-  const [wholesaleFiles, setWholesaleFiles] = useState<File[]>([]);
-  const [wholesaleExistingUrls, setWholesaleExistingUrls] = useState<string[]>(
-    item.imagesByColor.map((img) => img.url)
-  );
-  const [wholesaleDimError, setWholesaleDimError] = useState("");
-  const wholesaleRef = useRef<HTMLInputElement>(null);
-  const [wholesaleColors, setWholesaleColors] = useState<string[]>(item.colors || []);
-  const [wholesaleSizes, setWholesaleSizes] = useState<string[]>(item.sizes || []);
+  const [wholesaleColorsState, setWholesaleColorsState] = useState<WholesaleColorEditState[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -1092,6 +1058,32 @@ export function EditItemModal({
   const { data: product, isLoading: productLoading } = useProduct(
     isProductType ? item.id : undefined,
   );
+
+  const { data: wholesale, isLoading: wholesaleLoading } = useWholesale(
+    !isProductType ? item.id : undefined,
+  );
+
+  useEffect(() => {
+    if (wholesale) {
+      const mapped = (wholesale.wholesaleColors || []).map((wc) => {
+        const colorImages = (wholesale.images || [])
+          .filter((img) => img.color === wc.color)
+          .map((img) => ({ id: img.id, url: img.url }));
+        const colorSizes = (wc.sizes || []).map((s) => ({
+          id: s.id,
+          size: s.size,
+        }));
+        return {
+          color: wc.color,
+          minOrder: wc.minOrder ?? 1,
+          stock: wc.stock ?? 0,
+          images: colorImages,
+          variants: colorSizes,
+        };
+      });
+      setWholesaleColorsState(mapped);
+    }
+  }, [wholesale]);
 
   // Granular mutation hooks
   const addColorMutation = useAddProductColor();
@@ -1126,16 +1118,59 @@ export function EditItemModal({
             isFlashDeals && flashDealEndsAt ? flashDealEndsAt : null,
         });
       } else {
-        const newUrls = await Promise.all(wholesaleFiles.map(uploadImageFile));
-        const allImages = [
-          ...wholesaleExistingUrls.map((url) => ({ url })),
-          ...newUrls.map((url) => ({ url })),
-        ];
-        if (allImages.length === 0) {
-          setError("Please keep or upload at least one image.");
+        if ((Number(minOrder) || 0) < 1) {
+          setError("Min order quantity must be at least 1.");
           setUploading(false);
           return;
         }
+        if (wholesaleColorsState.length === 0) {
+          setError("Please add at least one color.");
+          setUploading(false);
+          return;
+        }
+        for (const wc of wholesaleColorsState) {
+          if (wc.images.length === 0) {
+            setError(`Please upload at least one image for color: ${wc.color}`);
+            setUploading(false);
+            return;
+          }
+          if (wc.variants.length === 0) {
+            setError(`Please add at least one size variant for color: ${wc.color}`);
+            setUploading(false);
+            return;
+          }
+          if (wc.stock < 0) {
+            setError(`Stock for color ${wc.color} cannot be negative.`);
+            setUploading(false);
+            return;
+          }
+        }
+
+        // Upload new images and construct final images array with color associations
+        const colorsData = await Promise.all(
+          wholesaleColorsState.map(async (wc) => {
+            const updatedImages = await Promise.all(
+              wc.images.map(async (img) => {
+                if (img.file) {
+                  const url = await uploadImageFile(img.file);
+                  return { url, color: wc.color };
+                }
+                return { url: img.url!, color: wc.color };
+              })
+            );
+            return {
+              color: wc.color,
+              minOrder: Number(minOrder) || 1,
+              stock: wc.stock ?? 0,
+              images: updatedImages,
+              sizes: wc.variants.map((v) => ({ size: v.size })),
+            };
+          })
+        );
+
+        const allImages = colorsData.flatMap((c) => c.images);
+        const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
+
         await updateWholesale.mutateAsync({
           id: item.id,
           name,
@@ -1145,15 +1180,20 @@ export function EditItemModal({
           images: allImages,
           minOrder: Number(minOrder) || 1,
           sku: sku || undefined,
-          stock: Number(stock),
+          stock: calculatedStock,
           brand: "",
           isBestDeal,
           isMostPopular,
           isPremiumCollection,
-          colors: wholesaleColors.length > 0 ? wholesaleColors : undefined,
-          sizes: wholesaleSizes.length > 0 ? wholesaleSizes : undefined,
+          colors: colorsData.map((c) => ({
+            color: c.color,
+            minOrder: c.minOrder,
+            stock: c.stock,
+            sizes: c.sizes,
+          })),
         });
       }
+
       setUploading(false);
       onClose();
     } catch (err: unknown) {
@@ -1256,35 +1296,28 @@ export function EditItemModal({
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
             />
 
-            {item.type === "wholesale" ? (
-              <input
-                placeholder={t("stock")}
-                type="number"
-                min="0"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-              />
-            ) : (
-              <input
-                placeholder={t("stockCalculated")}
-                type="text"
-                readOnly
-                disabled
-                value={
-                  productLoading
+            <input
+              placeholder={t("stockCalculated")}
+              type="text"
+              readOnly
+              disabled
+              value={
+                item.type === "wholesale"
+                  ? wholesaleLoading
+                    ? "Loading..."
+                    : (wholesaleColorsState || []).reduce((sum, c) => sum + (c.stock ?? 0), 0) || ""
+                  : productLoading
                     ? "Loading..."
                     : product?.colors?.reduce(
-                        (sum, c) =>
-                          sum +
-                          (c.variants?.reduce((s, v) => s + v.quantity, 0) ??
-                            0),
-                        0,
-                      ) || ""
-                }
-                className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
-              />
-            )}
+                      (sum, c) =>
+                        sum +
+                        (c.variants?.reduce((s, v) => s + v.quantity, 0) ??
+                          0),
+                      0,
+                    ) || ""
+              }
+              className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+            />
           </div>
 
           <input
@@ -1397,8 +1430,8 @@ export function EditItemModal({
                           } catch (err: any) {
                             setError(
                               err?.response?.data?.message ??
-                                err?.message ??
-                                t("failedDeleteColor"),
+                              err?.message ??
+                              t("failedDeleteColor"),
                             );
                           }
                         }
@@ -1445,8 +1478,8 @@ export function EditItemModal({
                               } catch (err: any) {
                                 setError(
                                   err?.response?.data?.message ??
-                                    err?.message ??
-                                    t("failedDeleteImage"),
+                                  err?.message ??
+                                  t("failedDeleteImage"),
                                 );
                               }
                             }}
@@ -1486,8 +1519,8 @@ export function EditItemModal({
                               } catch (err: any) {
                                 setError(
                                   err?.response?.data?.message ??
-                                    err?.message ??
-                                    "Failed to add image.",
+                                  err?.message ??
+                                  "Failed to add image.",
                                 );
                               }
                             }
@@ -1546,8 +1579,8 @@ export function EditItemModal({
                                     } catch (err: any) {
                                       setError(
                                         err?.response?.data?.message ??
-                                          err?.message ??
-                                          t("failedUpdateQuantity"),
+                                        err?.message ??
+                                        t("failedUpdateQuantity"),
                                       );
                                     }
                                   }}
@@ -1573,8 +1606,8 @@ export function EditItemModal({
                                     } catch (err: any) {
                                       setError(
                                         err?.response?.data?.message ??
-                                          err?.message ??
-                                          "Failed to delete size.",
+                                        err?.message ??
+                                        "Failed to delete size.",
                                       );
                                     }
                                   }}
@@ -1648,8 +1681,8 @@ export function EditItemModal({
                           } catch (err: any) {
                             setError(
                               err?.response?.data?.message ??
-                                err?.message ??
-                                "Failed to add size.",
+                              err?.message ??
+                              "Failed to add size.",
                             );
                           }
                         }}
@@ -1876,8 +1909,8 @@ export function EditItemModal({
                       } catch (err: any) {
                         setError(
                           err?.response?.data?.message ??
-                            err?.message ??
-                            "Failed to save new color option.",
+                          err?.message ??
+                          "Failed to save new color option.",
                         );
                       }
                     }}
@@ -1897,97 +1930,243 @@ export function EditItemModal({
               <MultiSelect
                 label="Select wholesale colors"
                 options={COLOR_OPTIONS}
-                selected={wholesaleColors}
-                onChange={(vals) => setWholesaleColors(vals)}
+                selected={wholesaleColorsState.map((wc) => wc.color)}
+                onChange={(colors) => {
+                  setWholesaleColorsState((prev) => {
+                    const next = prev.filter((pc) => colors.includes(pc.color));
+                    colors.forEach((c) => {
+                      if (!next.some((pc) => pc.color === c)) {
+                        next.push({
+                          color: c,
+                          minOrder: 1,
+                          stock: 0,
+                          images: [],
+                          variants: [],
+                        });
+                      }
+                    });
+                    return next;
+                  });
+                }}
               />
 
-              <MultiSelect
-                label="Select wholesale sizes"
-                options={SIZE_OPTIONS}
-                selected={wholesaleSizes}
-                onChange={(vals) => setWholesaleSizes(vals)}
-              />
+              {wholesaleColorsState.map((wc, colorIdx) => (
+                <div
+                  key={wc.color}
+                  className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50 animate-fadeIn"
+                >
+                  <div className="flex items-center justify-between border-b border-stroke pb-2">
+                    <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
+                      <span
+                        className="inline-block w-3 h-3 rounded-full border border-stroke"
+                        style={{ backgroundColor: wc.color.toLowerCase() }}
+                      />
+                      {wc.color}
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWholesaleColorsState((prev) =>
+                          prev.filter((c) => c.color !== wc.color)
+                        );
+                      }}
+                      className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
+                    >
+                      Remove Color
+                    </button>
+                  </div>
 
-              <div className="flex flex-col gap-2">
-                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Images
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {/* Existing saved images */}
-                  {wholesaleExistingUrls.map((url, idx) => (
-                    <div key={`existing-${idx}`} className="relative">
-                      <img
-                        src={url}
-                        alt={`existing-${idx}`}
-                        className="h-20 w-20 rounded-lg object-cover border border-stroke"
-                      />
+                  <div className="flex gap-2 items-center pt-1 pb-2 border-b border-stroke">
+                    <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Stock:
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={wc.stock ?? 0}
+                      onChange={(e) => {
+                        const val = Number(e.target.value) || 0;
+                        setWholesaleColorsState((prev) =>
+                          prev.map((item) =>
+                            item.color === wc.color ? { ...item, stock: val } : item
+                          )
+                        );
+                      }}
+                      className="w-20 border border-stroke rounded-xl px-3 py-1 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Upload Images *
+                    </p>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {wc.images.map((img, imgIdx) => {
+                        const previewUrl = img.file ? URL.createObjectURL(img.file) : img.url;
+                        return (
+                          <div
+                            key={imgIdx}
+                            className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                          >
+                            <img
+                              src={previewUrl}
+                              alt="preview"
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (img.file) {
+                                  URL.revokeObjectURL(previewUrl!);
+                                }
+                                setWholesaleColorsState((prev) =>
+                                  prev.map((item) =>
+                                    item.color === wc.color
+                                      ? {
+                                        ...item,
+                                        images: item.images.filter((_, idx) => idx !== imgIdx),
+                                      }
+                                      : item
+                                  )
+                                );
+                              }}
+                              className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        );
+                      })}
+                      <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
+                        <span className="text-xl font-bold">+</span>
+                        <span className="text-[9px] font-['Montserrat']">Add</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const err = await validateImageDimensions(file);
+                              if (err) {
+                                toast.error(`${wc.color} Image: ${err}`);
+                                e.target.value = "";
+                                return;
+                              }
+                              setWholesaleColorsState((prev) =>
+                                prev.map((item) =>
+                                  item.color === wc.color
+                                    ? {
+                                      ...item,
+                                      images: [...item.images, { file }],
+                                    }
+                                    : item
+                                )
+                              );
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Color-specific Sizes */}
+                  <div className="space-y-2 pt-2">
+                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                      Sizes & Quantities *
+                    </p>
+                    {wc.variants.length > 0 && (
+                      <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
+                        <thead>
+                          <tr className="bg-secondary text-primary font-bold">
+                            <th className="p-2 border-b border-stroke">Size</th>
+                            <th className="p-2 border-b border-stroke text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {wc.variants.map((v, vIdx) => (
+                            <tr
+                              key={vIdx}
+                              className="bg-white border-b border-stroke last:border-none"
+                            >
+                              <td className="p-2 font-semibold">{v.size}</td>
+                              <td className="p-2 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setWholesaleColorsState((prev) =>
+                                      prev.map((item) =>
+                                        item.color === wc.color
+                                          ? {
+                                            ...item,
+                                            variants: item.variants.filter((_, idx) => idx !== vIdx),
+                                          }
+                                          : item
+                                      )
+                                    );
+                                  }}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                    <div className="flex gap-2 items-center pt-2">
+                      <select
+                        id={`edit-wholesale-size-select-${wc.color}`}
+                        className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
+                      >
+                        <option value="">Size</option>
+                        {SIZE_OPTIONS.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+
                       <button
                         type="button"
-                        onClick={() =>
-                          setWholesaleExistingUrls((prev) => prev.filter((_, i) => i !== idx))
-                        }
-                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
+                        onClick={() => {
+                          const sizeSel = document.getElementById(
+                            `edit-wholesale-size-select-${wc.color}`
+                          ) as HTMLSelectElement;
+                          const sizeVal = sizeSel?.value;
+                          const qtyVal = 0;
+
+                          if (!sizeVal) {
+                            toast.error("Please select a size first.");
+                            return;
+                          }
+                          if (wc.variants.some((v) => v.size === sizeVal)) {
+                            toast.error(`Size ${sizeVal} already exists for ${wc.color}.`);
+                            return;
+                          }
+
+                          setWholesaleColorsState((prev) =>
+                            prev.map((item) =>
+                              item.color === wc.color
+                                ? {
+                                  ...item,
+                                  variants: [...item.variants, { size: sizeVal, quantity: qtyVal }],
+                                }
+                                : item
+                            )
+                          );
+                          sizeSel.value = "";
+                        }}
+                        className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-white"
                       >
-                        ×
+                        Add Size
                       </button>
                     </div>
-                  ))}
-                  {/* New pending images */}
-                  {wholesaleFiles.map((file, idx) => (
-                    <div key={`new-${idx}`} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`new-${idx}`}
-                        className="h-20 w-20 rounded-lg object-cover border-2 border-primary border-dashed"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setWholesaleFiles((prev) => prev.filter((_, i) => i !== idx))
-                        }
-                        className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                  {/* Add button */}
-                  <button
-                    type="button"
-                    onClick={() => wholesaleRef.current?.click()}
-                    className="h-20 w-20 rounded-lg border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-gray-text hover:border-primary hover:text-primary transition bg-white"
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-xs font-['Montserrat']">Add</span>
-                  </button>
+                  </div>
                 </div>
-                <input
-                  ref={wholesaleRef}
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="hidden"
-                  onChange={async (e) => {
-                    const files = Array.from(e.target.files || []);
-                    e.target.value = "";
-                    if (files.length === 0) return;
-                    setWholesaleDimError("");
-                    const validFiles: File[] = [];
-                    for (const f of files) {
-                      const err = await validateImageDimensions(f);
-                      if (err) { setWholesaleDimError(err); return; }
-                      validFiles.push(f);
-                    }
-                    setWholesaleFiles((prev) => [...prev, ...validFiles]);
-                  }}
-                />
-                {wholesaleDimError && (
-                  <p className="font-['Montserrat'] text-xs text-red-600">{wholesaleDimError}</p>
-                )}
-                <p className="font-['Montserrat'] text-xs text-gray-text">Min {MIN_IMG_WIDTH}×{MIN_IMG_HEIGHT}px</p>
-              </div>
+              ))}
+
               <input
                 placeholder="Min order quantity"
                 type="number"
@@ -2177,28 +2356,28 @@ export function InventoryTablePanel({
 
   const tableColumns = showTypeFilter
     ? [
-        "image",
-        "product",
-        "category",
-        "type",
-        "stock",
-        "sku",
-        "price",
-        "date",
-        "status",
-        "actions",
-      ]
+      "image",
+      "product",
+      "category",
+      "type",
+      "stock",
+      "sku",
+      "price",
+      "date",
+      "status",
+      "actions",
+    ]
     : [
-        "image",
-        "product",
-        "category",
-        "stock",
-        "sku",
-        "price",
-        "date",
-        "status",
-        "actions",
-      ];
+      "image",
+      "product",
+      "category",
+      "stock",
+      "sku",
+      "price",
+      "date",
+      "status",
+      "actions",
+    ];
 
   const filterBtn = (key: string, label: string, active: boolean) => (
     <button
@@ -2434,45 +2613,45 @@ export function InventoryTablePanel({
               onClick={() => {
                 const headers = showTypeFilter
                   ? [
-                      "Product",
-                      "Category",
-                      "Type",
-                      "Stock",
-                      "SKU",
-                      "Price",
-                      "Date",
-                      "Status",
-                    ]
+                    "Product",
+                    "Category",
+                    "Type",
+                    "Stock",
+                    "SKU",
+                    "Price",
+                    "Date",
+                    "Status",
+                  ]
                   : [
-                      "Product",
-                      "Category",
-                      "Stock",
-                      "SKU",
-                      "Price",
-                      "Date",
-                      "Status",
-                    ];
+                    "Product",
+                    "Category",
+                    "Stock",
+                    "SKU",
+                    "Price",
+                    "Date",
+                    "Status",
+                  ];
                 const rows = filtered.map((i) =>
                   showTypeFilter
                     ? [
-                        i.product,
-                        i.category,
-                        i.type,
-                        i.stock,
-                        i.sku,
-                        i.priceNum,
-                        i.date,
-                        i.status,
-                      ]
+                      i.product,
+                      i.category,
+                      i.type,
+                      i.stock,
+                      i.sku,
+                      i.priceNum,
+                      i.date,
+                      i.status,
+                    ]
                     : [
-                        i.product,
-                        i.category,
-                        i.stock,
-                        i.sku,
-                        i.priceNum,
-                        i.date,
-                        i.status,
-                      ],
+                      i.product,
+                      i.category,
+                      i.stock,
+                      i.sku,
+                      i.priceNum,
+                      i.date,
+                      i.status,
+                    ],
                 );
                 const csv = [headers, ...rows]
                   .map((r) =>
