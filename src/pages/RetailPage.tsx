@@ -135,9 +135,9 @@ export default function RetailPage() {
       />
 
       <section className="flex flex-col gap-4">
-        <aside className="w-full rounded-[24px] border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:p-6">
+        <aside className="w-full rounded-[24px] border border-stroke bg-card/95 p-4 shadow-sm backdrop-blur sm:p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Quick filters</h3>
+            <h3 className="text-lg font-semibold text-foreground">Quick filters</h3>
             <button
               type="button"
               onClick={() => {
@@ -145,37 +145,37 @@ export default function RetailPage() {
                 setCategoryId('')
                 setSort('latest')
               }}
-              className="text-sm font-medium text-slate-500 transition hover:text-slate-800"
+              className="text-sm font-medium text-gray-text transition hover:text-foreground"
             >
               Clear
             </button>
           </div>
 
-          <div className="space-y-3 text-sm text-slate-600">
-            <div className="rounded-2xl bg-slate-50 p-3">
-              <div className="font-medium text-slate-900">Active search</div>
+          <div className="space-y-3 text-sm text-gray-text">
+            <div className="rounded-2xl bg-background p-3">
+              <div className="font-medium text-foreground">Active search</div>
               <div className="mt-1">{search || 'All products'}</div>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-3">
-              <div className="font-medium text-slate-900">Current category</div>
+            <div className="rounded-2xl bg-background p-3">
+              <div className="font-medium text-foreground">Current category</div>
               <div className="mt-1">{categoryId ? categories.find((item: any) => String(item.id) === String(categoryId))?.name || 'Selected' : 'All categories'}</div>
             </div>
           </div>
         </aside>
 
-        <main className="w-full rounded-[24px] border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur sm:p-6">
+        <main className="w-full rounded-[24px] border border-stroke bg-card/95 p-4 shadow-sm backdrop-blur sm:p-6">
           {isLoading ? (
             <LoadingSpinner
               text="Loading products..."
-              containerClassName="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm"
+              containerClassName="rounded-[24px] border border-stroke bg-card p-6 shadow-sm"
               className="h-6 w-6"
             />
           ) : error ? (
-            <div className="rounded-[24px] border border-red-200 bg-red-50 p-6 text-red-600 shadow-sm">
+            <div className="rounded-[24px] border border-error/20 bg-error/10 p-6 text-error shadow-sm">
               Failed to load products: {(error as any)?.message ?? 'Unknown error'}
             </div>
           ) : products.length === 0 ? (
-            <div className="rounded-[24px] border border-slate-200 bg-white p-8 text-center text-slate-600 shadow-sm">
+            <div className="rounded-[24px] border border-stroke bg-card p-8 text-center text-gray-text shadow-sm">
               No products found. Check console normalized response.
             </div>
           ) : (

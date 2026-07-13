@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 export type FAQItem = {
   question: string;
@@ -43,15 +44,14 @@ export default function CollapsibleFAQ({
               </h3>
 
               <div
-                className={`rounded-full bg-white p-3 transition-transform duration-300 ${
+                className={`rounded-full bg-card p-3 transition-transform duration-300 ${
                   isOpen ? "rotate-90" : ""
                 }`}
               >
-                <img
-                  src={asset("weui_arrow-filled.svg")}
-                  className="h-6 w-3"
-                  alt=""
-                  draggable={false}
+                <ChevronRight
+                  className={`h-6 w-6 transition-colors ${
+                    isOpen ? "text-primary" : "text-foreground"
+                  }`}
                 />
               </div>
             </button>
@@ -61,7 +61,7 @@ export default function CollapsibleFAQ({
                 isOpen ? "mt-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-white" : "text-foreground"}`}>
+              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-secondary-foreground" : "text-foreground"}`}>
                 {faq.answer}
               </p>
             </div>

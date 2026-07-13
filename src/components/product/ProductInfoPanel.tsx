@@ -379,7 +379,7 @@ export function ProductInfoPanel({
                   onClick={() => !isWholesale && setSelectedSize(variant.size)}
                   className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
                     isWholesale
-                      ? "bg-white text-black border-stroke cursor-default"
+                      ? "bg-card text-foreground border-stroke cursor-default"
                       : isSelected
                       ? "bg-foreground text-background border-foreground"
                       : isOutOfStock

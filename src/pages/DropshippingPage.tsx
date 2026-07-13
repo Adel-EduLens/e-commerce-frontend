@@ -39,7 +39,7 @@ function HeroSection() {
         </p>
 
         <div className="mt-8 inline-flex w-fit items-center justify-start gap-2 rounded-2xl bg-secondary p-4 lg:absolute lg:start-[24px] lg:top-[682px] lg:mt-0">
-          <span className="font-['Montserrat'] text-lg font-semibold text-white sm:text-xl">
+          <span className="font-['Montserrat'] text-lg font-semibold text-secondary-foreground sm:text-xl">
             {t("hero.cta")}
           </span>
         </div>
@@ -164,7 +164,7 @@ function HowWeStartSection() {
             {t("howWeStart.subtitle")}
           </p>
           <div className="inline-flex h-12 items-center justify-center gap-2.5 overflow-hidden rounded-[40px] bg-primary px-6 py-3">
-            <span className="font-['Montserrat'] text-lg font-medium text-foreground">
+            <span className="font-['Montserrat'] text-lg font-medium text-primary-foreground">
               {t("howWeStart.cta")}
             </span>
           </div>
@@ -178,7 +178,7 @@ function HowWeStartSection() {
             className="relative h-56 w-full overflow-hidden rounded-3xl bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
             <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-primary px-2 py-0.5">
-              <div className="text-center font-['Outfit'] text-base font-medium text-foreground">
+              <div className="text-center font-['Outfit'] text-base font-medium text-primary-foreground">
                 {i + 1}
               </div>
             </div>
@@ -226,7 +226,7 @@ function EverythingYouNeedSection() {
             className="relative h-auto w-full overflow-hidden rounded-3xl bg-card pb-6 shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] outline outline-1 outline-offset-[-1px] outline-stroke"
           >
             <div className="absolute start-[16px] top-[16px] inline-flex h-10 w-10 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-primary px-2 py-0.5">
-              <div className="text-center font-['Outfit'] text-base font-medium text-foreground">
+              <div className="text-center font-['Outfit'] text-base font-medium text-primary-foreground">
                 {cards.indexOf(card) + 1}
               </div>
             </div>

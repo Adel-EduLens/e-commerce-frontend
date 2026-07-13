@@ -32,16 +32,16 @@ function HeroSection() {
     <div className="relative w-full overflow-hidden rounded-3xl bg-primary">
       {/* Mobile/Tablet layout */}
       <div className="relative z-10 flex flex-col px-6 py-10 lg:hidden">
-        <div className="font-['Montserrat'] text-5xl sm:text-7xl font-bold text-foreground">
+        <div className="font-['Montserrat'] text-5xl sm:text-7xl font-bold text-primary-foreground">
           Discover
         </div>
         <div className="relative my-2">
           <div className="h-12 sm:h-16 w-3/4 rounded-2xl bg-secondary" />
-          <div className="absolute left-2 -top-2 font-['Montserrat'] text-5xl sm:text-7xl font-bold text-white">
+          <div className="absolute left-2 -top-2 font-['Montserrat'] text-5xl sm:text-7xl font-bold text-secondary-foreground">
             fashion
           </div>
         </div>
-        <div className="font-['Montserrat'] text-3xl sm:text-5xl font-bold text-foreground">
+        <div className="font-['Montserrat'] text-3xl sm:text-5xl font-bold text-primary-foreground">
           Fits Your Story
         </div>
         <div className="mt-6 rounded-xl bg-background p-4">
@@ -56,16 +56,16 @@ function HeroSection() {
       <div className="relative hidden lg:block h-[978px]">
         <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-secondary" />
         <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
-          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-foreground">
+          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-primary-foreground">
             Discover
           </div>
           <div className="relative h-56 w-[517.21px]">
             <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-secondary" />
-            <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-white">
+            <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-secondary-foreground">
               fashion
             </div>
           </div>
-          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-foreground">
+          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-primary-foreground">
             Fits Your Story
           </div>
         </div>
@@ -129,7 +129,7 @@ function CollectionSection() {
             </div>
           </div>
           <div className="inline-flex h-10 sm:h-12 w-56 sm:w-72 items-center justify-center rounded-[200px] bg-secondary outline outline-1 outline-offset-[-1px]">
-            <div className="text-center font-['Inter'] text-xs sm:text-sm font-medium leading-6 tracking-wide text-white">
+            <div className="text-center font-['Inter'] text-xs sm:text-sm font-medium leading-6 tracking-wide text-secondary-foreground">
               VIEW COLLECTIONS
             </div>
           </div>
@@ -208,7 +208,7 @@ function VoteRings() {
       {rings.map(([size, position]) => (
         <div
           key={`${size}-${position}`}
-          className={`absolute ${position} ${size} rounded-full outline outline-2 outline-offset-[-1px] outline-slate-400/50`}
+          className={`absolute ${position} ${size} rounded-full outline outline-2 outline-offset-[-1px] outline-stroke/50`}
         />
       ))}
     </>
@@ -292,24 +292,24 @@ function VoteSection() {
         )}
         <div className="rounded-3xl bg-primary p-6 flex flex-col gap-4">
           {!current ? (
-            <div className="font-['Montserrat'] text-xl font-medium text-foreground">
+            <div className="font-['Montserrat'] text-xl font-medium text-primary-foreground">
               No designs to vote on yet.
             </div>
           ) : (
             <>
-              <div className="font-['Montserrat'] text-2xl sm:text-3xl font-semibold text-foreground break-words">
+              <div className="font-['Montserrat'] text-2xl sm:text-3xl font-semibold text-primary-foreground break-words">
                 {current.title?.trim() || 'Untitled design'}
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-['Montserrat'] text-xl font-semibold text-foreground">Votes</div>
-                  <div className="font-['Montserrat'] text-xl font-normal text-foreground">{(current.votes ?? 0).toLocaleString()}</div>
+                  <div className="font-['Montserrat'] text-xl font-semibold text-primary-foreground">Votes</div>
+                  <div className="font-['Montserrat'] text-xl font-normal text-primary-foreground">{(current.votes ?? 0).toLocaleString()}</div>
                 </div>
                 <button
                   type="button"
                   onClick={handleVote}
                   disabled={voting}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-card px-6 py-3 disabled:opacity-60 text-foreground"
                 >
                   {voting ? (
                     <span className="h-6 w-6 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
@@ -336,7 +336,7 @@ function VoteSection() {
                       key={design.id}
                       type="button"
                       onClick={() => setCurrentIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-white hover:bg-white/80'}`}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-gray-pressed'}`}
                     />
                   ))}
                 </div>
@@ -359,19 +359,19 @@ function VoteSection() {
         <div className="absolute left-0 top-[266px] h-[772px] w-full overflow-hidden rounded-3xl bg-primary">
           <VoteRings />
           {!current ? (
-            <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-foreground">
+            <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-primary-foreground">
               No designs to vote on yet.
             </div>
           ) : (
             <>
-              <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-foreground">
+              <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-primary-foreground">
                 {current.title?.trim() || 'Untitled design'}
               </div>
               <div className="absolute left-[714px] top-[350px] inline-flex flex-col items-start justify-start gap-4">
-                <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-foreground">
+                <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-primary-foreground">
                   Votes
                 </div>
-                <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-foreground">
+                <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-primary-foreground">
                   {(current.votes ?? 0).toLocaleString()}
                 </div>
               </div>
@@ -379,7 +379,7 @@ function VoteSection() {
                 type="button"
                 onClick={handleVote}
                 disabled={voting}
-                className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-white p-4 disabled:opacity-60"
+                className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-card p-4 disabled:opacity-60 text-foreground"
               >
                 {voting ? (
                   <span className="h-8 w-8 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
@@ -393,7 +393,7 @@ function VoteSection() {
             </>
           )}
           {current && (
-            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-white flex items-center justify-center shadow-md">
+            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-card flex items-center justify-center shadow-md">
               <div className="flex items-center justify-start gap-4">
                 <button
                   type="button"
