@@ -78,7 +78,7 @@ export default function ProductsPage() {
   const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
 
   useEffect(() => {
-    const func = async () => {
+    const func = () => {
       setFilters((prev) => ({
         ...prev,
         search: urlSearch,
@@ -88,7 +88,7 @@ export default function ProductsPage() {
   }, [urlSearch]);
 
   useEffect(() => {
-    const func = async () => {
+    const func = () => {
       setPage(1);
     };
     func();
