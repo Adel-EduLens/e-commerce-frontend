@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore } from "../store/useCartStore";
 import { useCart } from "../hooks/useCart";
@@ -710,6 +710,7 @@ export default function CheckoutPage() {
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
@@ -728,6 +729,30 @@ export default function CheckoutPage() {
   const { isLoading: isCartLoading } = useCart();
   const { data: addresses = [], isLoading: isAddressesLoading } =
     useMyAddresses();
+
+  // Redirect back to bag if any wholesale item doesn't meet its minimum order
+  useEffect(() => {
+    if (isCartLoading) return;
+    if (items.length === 0) return;
+
+    const wholesaleItems = items.filter((item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale"));
+    const groupedWholesale = wholesaleItems.reduce((acc, item) => {
+      if (!acc[item.productId]) {
+        acc[item.productId] = { sum: 0, minOrder: item.minOrder || 1, title: item.title };
+      }
+      acc[item.productId].sum += item.quantity;
+      return acc;
+    }, {} as Record<string, { sum: number; minOrder: number; title: string }>);
+
+    for (const productId in groupedWholesale) {
+      const { sum, minOrder, title } = groupedWholesale[productId];
+      if (sum < minOrder) {
+        toast.error(`Cannot access checkout. The total packages for wholesale product "${title}" in your cart (${sum}) is less than the minimum order requirement (${minOrder}).`);
+        navigate("/bag");
+        return;
+      }
+    }
+  }, [items, isCartLoading, navigate]);
 
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     null,

@@ -39,7 +39,7 @@ export default function WholesaleDetailsPage() {
       const firstImage = wholesale.images?.[0]?.url || "";
       setSelectedImage(firstImage);
 
-      setQuantity(wholesale.minOrder || 1);
+      setQuantity(1);
     }
   }, [wholesale]);
 
@@ -49,7 +49,7 @@ export default function WholesaleDetailsPage() {
     if (colorObj) {
       const firstAvailableSize = colorObj.sizes?.[0]?.size || "";
       setSelectedSize(firstAvailableSize);
-      setQuantity(wholesale?.minOrder || 1);
+      setQuantity(1);
     }
   };
 

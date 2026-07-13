@@ -37,6 +37,11 @@ const sidebarItems = [
     path: "/dashboard/trader/categories",
   },
   {
+    label: "wholesaleCategories",
+    icon: "carbon_category-2.svg",
+    path: "/dashboard/trader/wholesale-categories",
+  },
+  {
     label: "products",
     icon: "streamline-ultimate_products-gifts.svg",
     path: "/dashboard/trader/products",
@@ -108,12 +113,14 @@ export default function TraderLayout() {
     navigate("/login");
   };
 
-  const currentItem = sidebarItems.find((item) =>
-    item.path === "/dashboard/trader"
-      ? location.pathname === "/dashboard/trader" ||
-      location.pathname === "/dashboard/trader/"
-      : location.pathname.startsWith(item.path),
-  );
+  const currentItem = [...sidebarItems]
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((item) =>
+      item.path === "/dashboard/trader"
+        ? location.pathname === "/dashboard/trader" ||
+          location.pathname === "/dashboard/trader/"
+        : location.pathname.startsWith(item.path),
+    );
 
   const title = currentItem ? t(currentItem.label) : t("dashboard");
 

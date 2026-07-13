@@ -100,17 +100,17 @@ export function ProductInfoPanel({
       }
       return rawProduct?.stock ?? 0;
     })();
-    // For wholesale, if stock is less than minOrder, it's effectively 0 (insufficient stock)
-    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
+    // For wholesale, if stock is less than 1, it's effectively 0 (insufficient stock)
+    const minQty = isWholesale ? 1 : (item.minOrder || 1);
     if (isWholesale && minQty && stockVal < minQty) {
       return 0;
     }
     return stockVal;
   })();
 
-  // Guard quantity: cannot exceed availableStock or fall below minOrder
+  // Guard quantity: cannot exceed availableStock or fall below minOrder (for retail) / 1 (for wholesale)
   useEffect(() => {
-    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
+    const minQty = isWholesale ? 1 : (item.minOrder || 1);
     if (availableStock > 0) {
       if (quantity > availableStock) {
         setQuantity(availableStock);
@@ -244,6 +244,20 @@ export function ProductInfoPanel({
       toast.error("This option is currently out of stock.");
       return;
     }
+    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
+    
+    // Calculate total quantity of this product in the cart after adding this item
+    const currentCartQty = useCartStore.getState().items
+      .filter((cartItem) => cartItem.productId === item.id)
+      .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+    const newTotalQty = currentCartQty + quantity;
+
+    if (isWholesale && newTotalQty < minQty) {
+      toast.error(`Cannot proceed to checkout. The total quantity of packages for this wholesale product in your cart (${newTotalQty}) must be at least the minimum order quantity (${minQty}).`);
+      handleAddToCart();
+      return;
+    }
+
     handleAddToCart();
     navigate("/checkout");
   };
@@ -402,8 +416,8 @@ export function ProductInfoPanel({
         <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
-            disabled={availableStock <= 0 || quantity <= (isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1))}
-            onClick={() => setQuantity(Math.max(isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1), quantity - 1))}
+            disabled={availableStock <= 0 || quantity <= (isWholesale ? 1 : (item.minOrder || 1))}
+            onClick={() => setQuantity(Math.max(isWholesale ? 1 : (item.minOrder || 1), quantity - 1))}
             className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-l-md"
           >
             −

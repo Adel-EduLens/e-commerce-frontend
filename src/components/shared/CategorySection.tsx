@@ -2,9 +2,13 @@ import { Link } from "react-router-dom";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import LoadingSpinner from "./LoadingSpinner";
 
-function CategoriesSection() {
+interface CategoriesSectionProps {
+  isWholesale?: boolean;
+}
+
+function CategoriesSection({ isWholesale = false }: CategoriesSectionProps) {
   const { data: categories = [], isLoading: isCategoriesLoading } =
-    useCategories();
+    useCategories(isWholesale);
 
   return (
     <div className="mt-16 flex w-full flex-col items-center justify-start gap-10">
@@ -17,11 +21,11 @@ function CategoriesSection() {
         )}
         {!isCategoriesLoading &&
           categories
-            .filter((category) => category.appearOnHome)
+            .filter((category) => category.appearOnHome || isWholesale)
             .map((category) => (
               <Link
                 key={category.id}
-                to={`/products?category=${category.name}`}
+                to={isWholesale ? `/wholesale?category=${category.name}` : `/products?category=${category.name}`}
                 className="relative w-full overflow-hidden rounded-2xl bg-white no-underline aspect-[448/547]"
               >
                 <img

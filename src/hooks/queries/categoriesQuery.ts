@@ -6,28 +6,32 @@ import { toast } from "sonner";
 export interface Category {
   id: string;
   name: string;
-  image: string;
+  image?: string;
   appearOnHome: boolean;
+  isWholesale?: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-const getCategories = async (): Promise<Category[]> => {
-  const { data } = await api.get("/categories");
+const getCategories = async (isWholesale?: boolean): Promise<Category[]> => {
+  const { data } = await api.get("/categories", {
+    params: isWholesale !== undefined ? { isWholesale } : undefined,
+  });
   return data.data;
 };
 
-export const useCategories = () => {
+export const useCategories = (isWholesale?: boolean) => {
   return useQuery({
-    queryKey: ["categories"],
-    queryFn: getCategories,
+    queryKey: ["categories", isWholesale],
+    queryFn: () => getCategories(isWholesale),
   });
 };
 
 const createCategory = async (data: {
   name: string;
-  image: string;
+  image?: string;
   appearOnHome: boolean;
+  isWholesale?: boolean;
 }) => {
   const res = await api.post("/categories", data);
   return res.data.data;
@@ -63,6 +67,7 @@ const updateCategory = async ({
     name?: string;
     image?: string;
     appearOnHome?: boolean;
+    isWholesale?: boolean;
   };
 }) => {
   const res = await api.patch(`/categories/${id}`, data);

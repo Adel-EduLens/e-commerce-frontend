@@ -286,7 +286,7 @@ export function AddItemModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [] } = useCategories(type === "wholesale");
   const { data: brands = [] } = useBrands();
   const createProduct = useCreateProduct();
   const createWholesale = useCreateWholesale();
@@ -1301,7 +1301,7 @@ export function EditItemModal({
     );
   };
 
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [] } = useCategories(!isProductType);
   const { data: brands = [] } = useBrands();
   const updateProduct = useUpdateProduct();
   const updateWholesale = useUpdateWholesale();

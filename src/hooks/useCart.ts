@@ -28,7 +28,9 @@ export function useCart() {
           color: item.color || '',
           colorHex: item.color || '',
           imageSrc: item.imageSrc,
-          quantity: item.quantity
+          quantity: item.quantity,
+          minOrder: item.minOrder,
+          productType: item.productType
         })));
       }
       return data;

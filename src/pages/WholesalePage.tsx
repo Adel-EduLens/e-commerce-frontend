@@ -318,7 +318,7 @@ export default function WholesalePage() {
     <div className="w-full pt-8 overflow-hidden">
       <HeroBanner />
       <ProductSection title="Best Deals" baseFilters={{ isBestDeal: true }} viewAllLink="/wholesale?filter=best-deals" />
-      <CategoriesSection />
+      <CategoriesSection isWholesale={true} />
       <ProductSection title="Most Popular" baseFilters={{ isMostPopular: true }} viewAllLink="/wholesale?filter=most-popular" />
       <ProductSection title="Premium Collections" baseFilters={{ isPremiumCollection: true }} viewAllLink="/wholesale?filter=premium-collections" />
       <FaqSection />

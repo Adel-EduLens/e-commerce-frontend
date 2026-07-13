@@ -14,6 +14,8 @@ export type CartItem = {
   colorHex: string;
   imageSrc: string;
   quantity: number;
+  minOrder?: number;
+  productType?: string;
 };
 
 type CartStore = {
@@ -96,6 +98,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
+              minOrder: dbItem.minOrder,
+              productType: dbItem.productType,
             }))
           );
         }
@@ -127,6 +131,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
+              minOrder: dbItem.minOrder,
+              productType: dbItem.productType,
             }))
           );
         }
@@ -162,6 +168,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
               colorHex: dbItem.color || "",
               imageSrc: dbItem.imageSrc || "",
               quantity: dbItem.quantity,
+              minOrder: dbItem.minOrder,
+              productType: dbItem.productType,
             }))
           );
         }

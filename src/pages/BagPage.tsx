@@ -501,6 +501,24 @@ export default function BagPage() {
       return;
     }
 
+    // Validate wholesale minimum orders
+    const wholesaleItems = items.filter((item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale"));
+    const groupedWholesale = wholesaleItems.reduce((acc, item) => {
+      if (!acc[item.productId]) {
+        acc[item.productId] = { sum: 0, minOrder: item.minOrder || 1, title: item.title };
+      }
+      acc[item.productId].sum += item.quantity;
+      return acc;
+    }, {} as Record<string, { sum: number; minOrder: number; title: string }>);
+
+    for (const productId in groupedWholesale) {
+      const { sum, minOrder, title } = groupedWholesale[productId];
+      if (sum < minOrder) {
+        toast.error(`Cannot proceed to checkout. The total packages for wholesale product "${title}" in your cart (${sum}) is less than the minimum order requirement (${minOrder}).`);
+        return;
+      }
+    }
+
     toast.success(t("toast.checkout"));
     navigate("/checkout", {
       state: {
