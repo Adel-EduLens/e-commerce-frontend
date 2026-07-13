@@ -16,7 +16,7 @@ const navLinks = [
   { label: "shop", path: "/products" },
   { label: "wholesale", path: "/wholesale" },
   { label: "retail", path: "/retail" },
-  { label: "designLab", path: "/design-lab" },
+  { label: "designLab", path: "/createYourDesign" },
   { label: "dropshipping", path: "/dropshipping" },
 ];
 
