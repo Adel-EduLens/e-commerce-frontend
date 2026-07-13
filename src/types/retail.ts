@@ -44,4 +44,8 @@ export interface RetailProduct {
   images: RetailProductImage[]
   colors: RetailProductColor[]
   sizes: RetailProductSize[]
+  depositAmount: number
+  securityDeposit: number
+  termsAndConditions?: string
+  privacyPolicy?: string
 }
