@@ -77,6 +77,11 @@ const sidebarItems = [
     path: "/dashboard/trader/analytics",
   },
   {
+    label: "Shop Banner",
+    icon: "banner.svg",
+    path: "/dashboard/trader/shop-banner",
+  },
+  {
     label: "helpCenter",
     icon: "help-circle.svg",
     path: "/dashboard/trader/help-center",
