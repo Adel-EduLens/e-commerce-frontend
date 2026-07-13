@@ -220,7 +220,7 @@ export default function Navbar() {
         <Link to="/" className="shrink-0">
           <img
             className="h-8 w-auto max-w-[64px] sm:h-9 sm:max-w-[75px] lg:h-11 lg:max-w-[90px] logo-theme object-contain"
-            src={asset("logo gen-z 2 copy 1.png")}
+            src={asset("Logo.png")}
             alt="Gen Z"
             draggable={false}
           />
@@ -234,8 +234,8 @@ export default function Navbar() {
                 key={item.label}
                 to={item.path}
                 className={`shrink-0 font-['Montserrat'] text-sm xl:text-lg font-semibold whitespace-nowrap transition-colors ${isActive
-                    ? "flex items-center justify-center gap-2.5 rounded-lg bg-primary px-3 py-2 text-foreground"
-                    : "text-foreground hover:text-primary"
+                  ? "flex items-center justify-center gap-2.5 rounded-lg bg-primary px-3 py-2 text-primary-foreground"
+                  : "text-foreground hover:text-primary"
                   }`}
               >
                 {t(item.label)}
@@ -348,8 +348,8 @@ export default function Navbar() {
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`rounded-lg px-4 py-3 font-['Montserrat'] text-base font-semibold transition-colors ${isActive
-                    ? "bg-primary text-foreground"
-                    : "text-foreground hover:bg-background"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-foreground hover:bg-background"
                   }`}
               >
                 {t(item.label)}
