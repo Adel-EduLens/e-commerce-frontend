@@ -44,6 +44,7 @@
   --color-muted: var(--muted);
   --color-card-text: var(--card-text);
   --color-card-border: var(--card-border);
+  --color-social-bg: var(--social-bg);
 }
 
 :root {
@@ -133,6 +134,7 @@
   --urgent: var(--color-error);
   --danger: #c1121f;
   --muted: #e0e0e0;
+  --social-bg: #ededed;
   --card-text: #0d0d0d;
   --card-border: #f0f0f0;
 
@@ -220,6 +222,7 @@
   --urgent: var(--color-error);
   --danger: #c1121f;
   --muted: #2a2a2a;
+  --social-bg: #1f1f1f;
   --card-text: #ffffff;
   --card-border: #1c1c1c;
 }
