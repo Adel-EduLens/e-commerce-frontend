@@ -342,13 +342,12 @@ export default function ProductCard({
             size={useWholesaleCard ? 18 : 20}
             strokeWidth={useWholesaleCard ? 2 : 1.8}
             className={`transition-colors ${useWholesaleCard
-                ? ""
+                ? isWishlisted ? "text-primary" : "text-[#555]"
                 : isWishlisted
-                  ? "text-white"
+                  ? "text-primary"
                   : "text-gray-300"
               }`}
-            fill={isWishlisted ? (useWholesaleCard ? "#e53e3e" : "currentColor") : "none"}
-            color={useWholesaleCard ? (isWishlisted ? "#e53e3e" : "#555") : undefined}
+            fill={isWishlisted ? "currentColor" : "none"}
           />
         </button>
 

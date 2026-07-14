@@ -69,7 +69,7 @@ export function ShopBannerFormModal({
       const url = await uploadImageFile(file);
       setImage(url);
     } catch (err) {
-      console.log(err);
+
       alert("Failed to upload image");
     } finally {
       setUploading(false);

@@ -4,7 +4,7 @@ import { Star } from "../ui/star";
 import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
-import { Heart, Tag, Truck, RotateCcw, Scale } from "lucide-react";
+import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/useCartStore";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
@@ -16,6 +16,8 @@ import {
   isProductCompared,
 } from "../../utils/compareStorage";
 import { useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useNotifyMeCheck, useNotifyMeSubscribe, useNotifyMeUnsubscribe } from "../../hooks/useNotifyMe";
 
 type ProductInfoPanelProps = {
   selectedColor: string;
@@ -49,6 +51,30 @@ export function ProductInfoPanel({
   const { data: wishlistStatus } = useWishlistStatus(productType, item.id);
   const toggleWishlist = useToggleWishlist();
   const isFavorite = Boolean(wishlistStatus?.isWishlisted);
+
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : "SHOP_RESTOCK";
+  const targetId = item.id;
+
+  const { data: checkData } = useNotifyMeCheck(targetType, targetId);
+  const isSubscribed = checkData?.isSubscribed ?? false;
+
+  const subscribeMutation = useNotifyMeSubscribe();
+  const unsubscribeMutation = useNotifyMeUnsubscribe();
+
+  const handleNotifyMeToggle = () => {
+    if (!isAuthenticated) {
+      toast.error("Please log in first to subscribe to notifications.");
+      navigate("/login");
+      return;
+    }
+
+    if (isSubscribed) {
+      unsubscribeMutation.mutate({ targetType, targetId });
+    } else {
+      subscribeMutation.mutate({ targetType, targetId });
+    }
+  };
 
   const { t } = useTranslation("productDetails");
 
@@ -481,23 +507,48 @@ export function ProductInfoPanel({
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <button
-          type="button"
-          disabled={availableStock <= 0}
-          onClick={handleAddToCart}
-          className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed disabled:opacity-50 transition"
-        >
-          <BsBag className="h-4 w-4" />
-          {t("addToCart")}
-        </button>
-        <button
-          type="button"
-          disabled={availableStock <= 0}
-          onClick={handleBuyNow}
-          className="flex-1 h-11 bg-foreground text-background rounded-md font-bold text-sm flex items-center justify-center hover:opacity-90 disabled:opacity-50 transition"
-        >
-          {t("buyNow")}
-        </button>
+        {availableStock > 0 ? (
+          <>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed transition"
+            >
+              <BsBag className="h-4 w-4" />
+              {t("addToCart")}
+            </button>
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              className="flex-1 h-11 bg-foreground text-background rounded-md font-bold text-sm flex items-center justify-center hover:opacity-90 transition"
+            >
+              {t("buyNow")}
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={handleNotifyMeToggle}
+            disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
+            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${
+              isSubscribed
+                ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+                : "border-primary text-primary bg-transparent hover:bg-primary/5"
+            }`}
+          >
+            {isSubscribed ? (
+              <>
+                <Check className="h-4 w-4" />
+                Subscribed for restock
+              </>
+            ) : (
+              <>
+                <Bell className="h-4 w-4 animate-bounce" />
+                Notify me when in stock
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Shipping Info */}

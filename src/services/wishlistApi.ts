@@ -4,7 +4,7 @@ import type { WishlistItem, WishlistProductType, WishlistStatusResponse, Wishlis
 export const wishlistApi = {
   async getWishlist() {
     const response = await api.get('/wishlist')
-    console.log('wishlistApi raw response:', response.data)
+
     return response.data
   },
 

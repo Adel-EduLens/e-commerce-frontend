@@ -40,7 +40,7 @@ function FilterDropdown({
   const [open, setOpen] = useState(false);
   const { t } = useTranslation("filters");
   return (
-    <div className="relative w-full sm:w-44">
+    <div className={`relative w-full sm:w-44 ${open ? "z-50" : "z-10"}`}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -59,8 +59,8 @@ function FilterDropdown({
       {
         open && (
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-            <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex max-h-64 min-w-full flex-col overflow-y-auto overflow-x-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
+            <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+            <div className="absolute left-0 top-[calc(100%+8px)] z-50 flex max-h-64 min-w-full flex-col overflow-y-auto overflow-x-hidden rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)]">
               {value !== null && (
                 <button
                   type="button"

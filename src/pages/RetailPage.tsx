@@ -77,13 +77,9 @@ export default function RetailPage() {
   const { data, isLoading, error } = useRetailProducts(filters)
   const categoriesQuery = useRetailCategories()
 
-  console.log('Retail raw products response:', data)
   const products = useMemo(() => normalizeProductsResponse(data), [data])
-  console.log('Retail normalized products:', products)
 
-  console.log('Retail raw categories response:', categoriesQuery.data)
   const categories = useMemo(() => normalizeCategoriesResponse(categoriesQuery.data), [categoriesQuery.data])
-  console.log('Retail normalized categories:', categories)
 
   const filterConfigs = useMemo(() => [
     { key: 'category', label: 'Category', options: (categories || []).map((c: any) => c.name) },

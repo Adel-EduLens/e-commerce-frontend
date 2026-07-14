@@ -62,7 +62,7 @@ export default function WishlistHeartButton({
       <Heart
         size={18}
         strokeWidth={1.8}
-        className={`transition-colors ${isActive ? 'text-red-500' : 'text-slate-400 hover:text-red-500'}`}
+        className={`transition-colors ${isActive ? 'text-primary' : 'text-slate-400 hover:text-primary'}`}
         fill={isActive ? 'currentColor' : 'none'}
       />
     </button>
