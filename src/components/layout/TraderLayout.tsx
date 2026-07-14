@@ -47,6 +47,16 @@ const sidebarItems = [
     path: "/dashboard/trader/products",
   },
   {
+    label: "Retail Categories",
+    icon: "carbon_category-2.svg",
+    path: "/dashboard/trader/retailCategories",
+  },
+  {
+    label: "Retail Products",
+    icon: "streamline-ultimate_products-gifts.svg",
+    path: "/dashboard/trader/retailProducts",
+  },
+  {
     label: "orders",
     icon: "carbon_follow-up-work-order.svg",
     path: "/dashboard/trader/orders",
@@ -119,7 +129,8 @@ export default function TraderLayout() {
       item.path === "/dashboard/trader"
         ? location.pathname === "/dashboard/trader" ||
           location.pathname === "/dashboard/trader/"
-        : location.pathname.startsWith(item.path),
+        : location.pathname === item.path ||
+          location.pathname.startsWith(item.path + "/"),
     );
 
   const title = currentItem ? t(currentItem.label) : t("dashboard");
@@ -128,12 +139,12 @@ export default function TraderLayout() {
     <div className="min-h-screen bg-background p-4 text-foreground sm:p-6">
       <div className="mx-auto flex w-full max-w-[1440px] gap-4 lg:flex-row">
         {/* ── Sidebar ── */}
-        <aside className="w-full rounded-[32px] bg-secondary p-4 text-white shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
+        <aside className="w-full rounded-[32px] bg-card p-4 text-foreground shadow-[0_18px_50px_-24px_rgba(17,24,39,0.7)] lg:sticky lg:top-6 lg:h-[calc(100vh-3rem)] lg:max-w-[280px] lg:p-5">
           <div className="flex h-full flex-col">
             <div className="mb-8">
               <img
-                className="h-12 w-auto"
-                src="/home-page/Logo.png"
+                className="h-12 w-auto invert dark:invert-0"
+                src={traderAsset("logo gen-z .white 1.png")}
                 alt="Gen-Z"
               />
             </div>
@@ -146,10 +157,11 @@ export default function TraderLayout() {
                     key={item.label}
                     type="button"
                     onClick={() => item.path && navigate(item.path)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${isActive
-                      ? "bg-primary text-foreground"
-                      : "text-gray-text hover:bg-white/5 hover:text-white"
-                      }`}
+                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-gray-text hover:bg-gray-100 dark:hover:bg-white/5 hover:text-foreground"
+                    }`}
                   >
                     <div
                       className="h-6 w-6 shrink-0"
@@ -167,18 +179,18 @@ export default function TraderLayout() {
               })}
             </nav>
             <div className="mt-4 space-y-4 shrink-0">
-              <div className="rounded-[24px] bg-white/6 p-3">
+              <div className="rounded-[24px] bg-gray-50 dark:bg-white/5 p-3">
                 <div className="flex items-center gap-3">
                   {avatar ? (
                     <img
-                      className="h-12 w-12 rounded-full object-cover ring-2 ring-white/10"
+                      className="h-12 w-12 rounded-full object-cover ring-2 ring-stroke dark:ring-white/10"
                       src={avatar}
                       alt={user?.name || "Trader"}
                     />
                   ) : (
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/10 ring-2 ring-white/10">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 ring-2 ring-stroke dark:ring-white/10">
                       <svg
-                        className="h-7 w-7 text-white/50"
+                        className="h-7 w-7 text-gray-text"
                         viewBox="0 0 24 24"
                         fill="currentColor"
                       >
@@ -187,7 +199,7 @@ export default function TraderLayout() {
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="truncate font-['Montserrat'] text-sm font-semibold text-white">
+                    <p className="truncate font-['Montserrat'] text-sm font-semibold text-foreground">
                       {user?.name || "Maan Hassan"}
                     </p>
                     <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-primary">
@@ -199,7 +211,7 @@ export default function TraderLayout() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full rounded-2xl border border-white/10 px-4 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:border-primary/40 hover:bg-primary/10"
+                className="w-full rounded-2xl border border-stroke px-4 py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:border-primary/40 hover:bg-primary/10"
               >
                 {t("logout")}
               </button>
@@ -210,12 +222,12 @@ export default function TraderLayout() {
         {/* ── Main ── */}
         <main className="min-w-0 flex-1 space-y-5 pb-6">
           {/* Top Header */}
-          <div className="flex h-20 items-center justify-between rounded-3xl border border-stroke bg-white px-6">
+          <div className="flex h-20 items-center justify-between rounded-3xl border border-stroke bg-card px-6">
             <h1 className="font-['Montserrat'] text-xl font-semibold text-foreground">
               {title}
             </h1>
             <div className="flex items-center gap-4">
-              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-stroke bg-white transition hover:bg-gray-50">
+              <button className="flex h-11 w-11 items-center justify-center rounded-full border border-stroke bg-card transition hover:bg-gray-100 dark:hover:bg-white/5">
                 <svg
                   className="h-5 w-5 text-foreground"
                   viewBox="0 0 24 24"

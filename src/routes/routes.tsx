@@ -64,6 +64,8 @@ import CreateYourDesignPage from "../pages/CreateYourDesignPage";
 import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
 
 import TraderShopBannerPage from "../pages/dashboards/TraderShopBannerPage";
+import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
+import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
 
 export const router = createBrowserRouter([
   {
@@ -316,6 +318,14 @@ export const router = createBrowserRouter([
           {
             path: "wholesale-categories",
             element: <TraderWholesaleCategoriesPage />,
+          },
+          {
+            path: "retailCategories",
+            element: <TraderRetailCategoriesPage />,
+          },
+          {
+            path: "retailProducts",
+            element: <TraderRetailProductsPage />,
           },
           {
             path: "products",
