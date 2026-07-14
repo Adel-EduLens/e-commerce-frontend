@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Trash2, Plus, Calendar, Tag, Percent, ShoppingBag, Eye, ChevronDown, X } from "lucide-react";
 import { api } from "../../lib/axios";
+import { Toggle } from "../../components/ui";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useCoupons } from "../../hooks/queries/couponsQuery";
 import type { Coupon } from "../../hooks/queries/couponsQuery";
@@ -376,20 +377,13 @@ export default function TraderCouponsPage() {
                       <td className="py-4 pl-4 text-right">
                         <div className="flex items-center justify-end gap-3">
                           {/* Toggle switch for active status */}
-                          <button
-                            type="button"
-                            onClick={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
-                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${coupon.isActive ? "bg-green-500" : "bg-gray-300"
-                              }`}
-                            role="switch"
-                            aria-checked={coupon.isActive}
+                          <Toggle
+                            checked={coupon.isActive}
+                            onChange={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
+                            size="md"
+                            variant="success"
                             title={coupon.isActive ? "Deactivate Coupon" : "Activate Coupon"}
-                          >
-                            <span
-                              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${coupon.isActive ? "translate-x-5" : "translate-x-0"
-                                }`}
-                            />
-                          </button>
+                          />
                         </div>
                       </td>
                     </tr>

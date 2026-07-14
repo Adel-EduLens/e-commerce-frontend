@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "../components/shared";
+import { Toggle } from "../components/ui";
 import {
   useUserNotifications,
   useMarkNotificationRead,
@@ -228,26 +229,18 @@ export default function NotificationsPage() {
                 <span className="flex-1 font-['Montserrat'] text-sm font-medium text-foreground truncate">
                   {t(cat.name)}
                 </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    enabled ? unsubscribe(cat.id) : subscribe(cat.id)
+                <Toggle
+                  checked={enabled}
+                  onChange={(checked) =>
+                    checked ? subscribe(cat.id) : unsubscribe(cat.id)
                   }
+                  size="sm"
                   aria-label={
                     enabled
                       ? `Unsubscribe from ${cat.name}`
                       : `Subscribe to ${cat.name}`
                   }
-                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                    enabled ? "bg-primary" : "bg-stroke"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                      enabled ? "translate-x-4" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
+                />
               </div>
             );
           })}

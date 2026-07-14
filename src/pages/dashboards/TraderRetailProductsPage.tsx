@@ -4,6 +4,7 @@ import {
   getStatus,
 } from "../../components/trader/inventoryUtils";
 import { InventoryTablePanel } from "../../components/trader/InventoryShared";
+import { Toggle } from "../../components/ui";
 import { toast } from "sonner";
 import {
   useRetailProducts,
@@ -338,29 +339,21 @@ export function RetailProductFormModal({
               <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
                 Is Active
               </span>
-              <button
-                type="button"
-                onClick={() => setIsActive(!isActive)}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-300 ${isActive ? "bg-primary" : "bg-stroke"}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-300 ${isActive ? "translate-x-6" : "translate-x-1"}`}
-                />
-              </button>
+              <Toggle
+                checked={isActive}
+                onChange={setIsActive}
+                size="md"
+              />
             </div>
             <div className="flex items-center justify-between rounded-xl border border-stroke p-3">
               <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
                 Is Featured
               </span>
-              <button
-                type="button"
-                onClick={() => setIsFeatured(!isFeatured)}
-                className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-300 ${isFeatured ? "bg-primary" : "bg-stroke"}`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-300 ${isFeatured ? "translate-x-6" : "translate-x-1"}`}
-                />
-              </button>
+              <Toggle
+                checked={isFeatured}
+                onChange={setIsFeatured}
+                size="md"
+              />
             </div>
           </div>
 

@@ -40,6 +40,7 @@ import {
 } from "./inventoryUtils";
 import { useTranslation } from "react-i18next";
 import { LoadingSpinner } from "../shared";
+import { Toggle } from "../ui";
 
 // ─── MultiSelect ───────────────────────────────────────────────────────────────
 export function MultiSelect({
@@ -616,30 +617,22 @@ export function AddItemModal({
                 <span className="font-['Montserrat'] text-sm text-foreground">
                   Must Have
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setIsMustHave((v) => !v)}
-                  className={`relative h-6 w-11 rounded-full transition-colors ${isMustHave ? "bg-primary" : "bg-gray-200"}`}
-                >
-                  <div
-                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isMustHave ? "translate-x-5" : "translate-x-0.5"}`}
-                  />
-                </button>
+                <Toggle
+                  checked={isMustHave}
+                  onChange={setIsMustHave}
+                  size="md"
+                />
               </div>
               {/* Flash Deal toggle */}
               <div className="flex items-center justify-between">
                 <span className="font-['Montserrat'] text-sm text-foreground">
                   Flash Deal
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setIsFlashDeals((v) => !v)}
-                  className={`relative h-6 w-11 rounded-full transition-colors ${isFlashDeals ? "bg-primary" : "bg-gray-200"}`}
-                >
-                  <div
-                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${isFlashDeals ? "translate-x-5" : "translate-x-0.5"}`}
-                  />
-                </button>
+                <Toggle
+                  checked={isFlashDeals}
+                  onChange={setIsFlashDeals}
+                  size="md"
+                />
               </div>
               {/* Flash deal extra fields */}
               {isFlashDeals && (

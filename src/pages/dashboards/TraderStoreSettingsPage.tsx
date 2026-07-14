@@ -3,6 +3,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { useUpdateTraderMe } from "../../hooks/queries/traderQuery";
 import { uploadImageFile } from "../../components/trader/inventoryUtils";
 import GoogleMapPicker, { type PickedLocation } from "../../components/GoogleMap";
+import { Toggle } from "../../components/ui";
 
 function GeneralInfoTab() {
   const user = useAuthStore((s) => s.user);
@@ -247,18 +248,11 @@ function TaxSettingsTab() {
       <div className="flex max-w-2xl flex-col gap-8">
         <div className="flex items-center justify-between">
           <span className="font-['Montserrat'] text-base font-semibold text-foreground">Apply VAT</span>
-          <button
-            onClick={() => setApplyVat(!applyVat)}
-            className={`relative h-9 w-14 rounded-full transition-colors ${
-              applyVat ? "bg-primary" : "bg-gray-300"
-            }`}
-          >
-            <div
-              className={`absolute top-1 h-7 w-7 rounded-full bg-white transition-transform ${
-                applyVat ? "left-6" : "left-1"
-              }`}
-            />
-          </button>
+          <Toggle
+            checked={applyVat}
+            onChange={setApplyVat}
+            size="md"
+          />
         </div>
 
         <div className="flex flex-col gap-4">
