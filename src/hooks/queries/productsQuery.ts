@@ -166,15 +166,38 @@ export interface ProductFilters {
   colors: string[];
 }
 
-const getProductFilters = async (): Promise<ProductFilters> => {
-  const { data } = await api.get("/products/filters");
-  return data.data;
+const getProductFilters = async (params?: ProductsQuery): Promise<ProductFilters> => {
+  const { data } = await api.get("/products", {
+    params: { ...params, limit: 1000 },
+  });
+  const products = data.data?.products ?? [];
+
+  const categories = Array.from(
+    new Set(products.map((p: any) => p.category?.name).filter(Boolean))
+  ) as string[];
+  const brands = Array.from(
+    new Set(products.map((p: any) => p.brand?.name).filter(Boolean))
+  ) as string[];
+  const sizes = Array.from(
+    new Set(
+      products.flatMap((p: any) => (p.sizes || []).map((s: any) => s.size)).filter(Boolean)
+    )
+  ) as string[];
+  const colors = Array.from(
+    new Set(
+      products
+        .flatMap((p: any) => (p.colors || []).map((c: any) => c.colorName || c.color))
+        .filter(Boolean)
+    )
+  ) as string[];
+
+  return { categories, brands, sizes, colors };
 };
 
-export const useProductFilters = () => {
+export const useProductFilters = (params?: ProductsQuery) => {
   return useQuery({
-    queryKey: ["products", "filters"],
-    queryFn: getProductFilters,
+    queryKey: ["products", "filters", params],
+    queryFn: () => getProductFilters(params),
   });
 };
 

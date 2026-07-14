@@ -238,19 +238,29 @@ export default function ProductCard({
           productType: "WHOLESALE",
         });
       } else {
+        const firstSize = sizeLabel
+          ? (sizeLabel.includes("-") 
+              ? sizeLabel.split("-")[0].trim() 
+              : sizeLabel.includes(",") 
+                ? sizeLabel.split(",")[0].trim() 
+                : sizeLabel.trim())
+          : "Default";
+        const firstColor = colors && colors.length > 0 ? colors[0] : "Default";
+        const firstColorHex = colors && colors.length > 0 ? colorToHex(colors[0]) : "#000";
+
         addItem({
-          id: `${actualProductId}-default-default`,
+          id: `${actualProductId}-${firstSize}-${firstColor}`,
           productId: actualProductId,
           title,
           unitPrice: numPrice,
           currency: "EGP",
-          size: sizeLabel || "Default",
-          color: "Default",
-          colorHex: "#000",
+          size: firstSize,
+          color: firstColor,
+          colorHex: firstColorHex,
           imageSrc,
           quantity: 1,
           minOrder: 1,
-          productType: "RETAIL",
+          productType: productType === "SHOP" ? "STANDARD" : productType,
         });
       }
 

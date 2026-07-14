@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { toast } from "sonner";
-import { ProductCard } from "../components/shared";
+import { ProductCard, LoadingSpinner } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 import { api } from "../lib/axios";
 import { couponAppliesToItem } from "../lib/couponUtils";
@@ -663,12 +663,10 @@ export default function BagPage() {
         {/* Left Side: Bag Items */}
         <div className="flex-1 w-full flex flex-col gap-6">
           {isLoading && items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-4 font-['Montserrat'] text-base font-semibold text-gray-text">
-                Loading bag items...
-              </p>
-            </div>
+            <LoadingSpinner
+              containerClassName="py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+              text="Loading bag items..."
+            />
           ) : items.length ? (
             items.map((item) => (
               <BagItemCard

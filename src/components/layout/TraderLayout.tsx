@@ -128,9 +128,9 @@ export default function TraderLayout() {
     .find((item) =>
       item.path === "/dashboard/trader"
         ? location.pathname === "/dashboard/trader" ||
-          location.pathname === "/dashboard/trader/"
+        location.pathname === "/dashboard/trader/"
         : location.pathname === item.path ||
-          location.pathname.startsWith(item.path + "/"),
+        location.pathname.startsWith(item.path + "/"),
     );
 
   const title = currentItem ? t(currentItem.label) : t("dashboard");
@@ -143,12 +143,12 @@ export default function TraderLayout() {
           <div className="flex h-full flex-col">
             <div className="mb-8">
               <img
-                className="h-12 w-auto invert dark:invert-0"
-                src={traderAsset("logo gen-z .white 1.png")}
+                className="h-12 w-auto"
+                src={'/home-page/Logo.png'}
                 alt="Gen-Z"
               />
             </div>
-            <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 overflow-y-auto pr-2 custom-scrollbar flex-1 pb-4">
+            <nav className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 overflow-y-auto pr-2 no-scrollbar flex-1 pb-4">
               {sidebarItems.map((item) => {
                 const isActive = item.label === currentItem?.label;
 
@@ -157,11 +157,10 @@ export default function TraderLayout() {
                     key={item.label}
                     type="button"
                     onClick={() => item.path && navigate(item.path)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-gray-text hover:bg-gray-100 dark:hover:bg-white/5 hover:text-foreground"
-                    }`}
+                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-text hover:bg-gray-100 dark:hover:bg-white/5 hover:text-foreground"
+                      }`}
                   >
                     <div
                       className="h-6 w-6 shrink-0"
