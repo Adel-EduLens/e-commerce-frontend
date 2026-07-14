@@ -32,9 +32,8 @@ function LanguageField() {
           <span className="font-['Poppins'] text-base">{currentLanguage}</span>
 
           <ChevronDown
-            className={`h-5 w-5 text-gray-text transition-transform ${
-              open ? "rotate-180" : ""
-            }`}
+            className={`h-5 w-5 text-gray-text transition-transform ${open ? "rotate-180" : ""
+              }`}
           />
         </button>
 
@@ -42,22 +41,20 @@ function LanguageField() {
           <div className="absolute left-0 right-0 top-16 z-20 overflow-hidden rounded-xl border border-stroke bg-card shadow-lg">
             <button
               onClick={() => changeLanguage("en")}
-              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${
-                i18n.language.startsWith("en")
+              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${i18n.language.startsWith("en")
                   ? "bg-primary text-primary-foreground"
                   : "text-foreground hover:bg-primary/60"
-              }`}
+                }`}
             >
               English
             </button>
 
             <button
               onClick={() => changeLanguage("ar")}
-              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${
-                i18n.language.startsWith("ar")
+              className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${i18n.language.startsWith("ar")
                   ? "bg-primary text-primary-foreground"
                   : "text-foreground hover:bg-primary/60"
-              }`}
+                }`}
             >
               العربية
             </button>
@@ -70,10 +67,10 @@ function LanguageField() {
 function ThemeMockup({ isDark = false }: { isDark?: boolean }) {
   return (
     <div
-      className={`h-36 w-full overflow-hidden ${isDark ? "bg-background" : "bg-white"}`}
+      className={`h-36 w-full overflow-hidden ${isDark ? "bg-black" : "bg-white"}`}
     >
       <div
-        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-card" : "bg-background"}`}
+        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-zinc-900" : "bg-background"}`}
       >
         <div className="grid grid-cols-2 gap-2 p-2">
           <div className="h-10 bg-primary" />
@@ -100,9 +97,8 @@ function ThemeCard({
   return (
     <div
       onClick={onClick}
-      className={`relative w-full sm:w-60 overflow-hidden rounded-lg bg-gray-light cursor-pointer transition-all hover:opacity-90 outline outline-2 outline-offset-[-2px] ${
-        selected ? "outline-primary" : "outline-stroke"
-      }`}
+      className={`relative w-full sm:w-60 overflow-hidden rounded-lg bg-gray-light cursor-pointer transition-all hover:opacity-90 outline outline-2 outline-offset-[-2px] ${selected ? "outline-primary" : "outline-stroke"
+        }`}
     >
       <ThemeMockup isDark={isDark} />
       <div className="flex items-center justify-between border-t border-stroke bg-card px-3 py-3">

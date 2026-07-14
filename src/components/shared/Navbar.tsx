@@ -137,7 +137,7 @@ function NotificationBell() {
         <button
           type="button"
           onClick={handleSeeAll}
-          className="flex-1 rounded-xl bg-primary py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:opacity-90 transition-opacity"
+          className="flex-1 rounded-xl text-white bg-primary py-2 font-['Montserrat'] text-sm font-bold hover:opacity-90 transition-opacity"
         >
           See All
         </button>

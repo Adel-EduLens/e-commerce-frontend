@@ -1,6 +1,6 @@
 
 import { useTranslation } from "react-i18next";
-import { CollapsibleFAQ } from "../components/shared";
+import FaqSection from "../components/shared/FaqSection";
 
 const ds = (file: string) =>
   `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
@@ -250,56 +250,15 @@ function EverythingYouNeedSection() {
   );
 }
 
-/* ------------------------------- FAQ Section -------------------------------- */
-
-function FAQSection() {
-  const { t } = useTranslation("dropshipping");
-
-  const faqKeys = [
-    "cancel",
-    "trackOrder",
-    "internationalShipping",
-    "contactSupport",
-  ] as const;
-
-  const faqs = faqKeys.map((key) => ({
-    question: t(`faq.items.${key}.question`),
-    answer: t(`faq.items.${key}.answer`),
-  }));
-
-  return (
-    <div className="mb-16 mt-16 flex w-full flex-col items-start justify-start gap-10">
-      <h2 className="w-full text-center font-['Montserrat'] text-4xl font-bold text-foreground sm:text-6xl lg:text-8xl">
-        {t("faq.title")}
-      </h2>
-      <div className="flex w-full flex-col items-center justify-between gap-10 lg:flex-row lg:items-start">
-        <img
-          className="h-[360px] w-full max-w-[566px] rounded-3xl object-cover lg:h-[721px]"
-          src={ds("image 17(1).png")}
-          alt=""
-        />
-        <div className="flex w-full flex-col items-stretch justify-start gap-8 lg:w-[802px] ">
-          <CollapsibleFAQ faqs={faqs} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* --------------------------------- Page ------------------------------------- */
 
 export default function DropshippingPage() {
-
- 
-
-
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <HeroSection />
       <WhyDropshipSection />
       <HowWeStartSection />
       <EverythingYouNeedSection />
-      <FAQSection />
+      <FaqSection />
     </div>
   );
 }

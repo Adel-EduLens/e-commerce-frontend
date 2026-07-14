@@ -182,7 +182,7 @@ function BagItemCard({
       <button
         type="button"
         onClick={onRemove}
-        className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-background-hover transition text-foreground"
+        className="absolute hover:bg-primary hover:text-white cursor-pointer top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-background-hover transition text-foreground"
         aria-label={t("bagItem.remove", { title: item.title })}
       >
         <Trash2 className="h-5 w-5" strokeWidth={1.5} />
