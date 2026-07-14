@@ -234,6 +234,8 @@ export default function ProductCard({
           colorHex: useWholesaleCard ? colorToHex(selectedColor) : "",
           imageSrc: useWholesaleCard ? activeImage : imageSrc,
           quantity: minOrder || 1,
+          minOrder: minOrder || 1,
+          productType: "WHOLESALE",
         });
       } else {
         addItem({
@@ -247,6 +249,8 @@ export default function ProductCard({
           colorHex: "#000",
           imageSrc,
           quantity: 1,
+          minOrder: 1,
+          productType: "RETAIL",
         });
       }
 
