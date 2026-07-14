@@ -10,6 +10,7 @@ type SidebarFiltersProps = {
   filters?: FilterConfig[];
   initialValues?: Partial<FilterValues>;
   onFilterChange?: (values: FilterValues) => void;
+  availableSizes?: string[];
 };
 
 const MAX_PRICE = 20000;
@@ -18,6 +19,7 @@ export default function SidebarFilters({
   className = "",
   initialValues,
   onFilterChange,
+  availableSizes,
 }: SidebarFiltersProps) {
   const { t } = useTranslation("filters");
   const { data: categories = [] } = useCategories();
@@ -77,7 +79,11 @@ export default function SidebarFilters({
 
   const toggleFilter = (key: string, value: string) => {
     setValues((prev) => {
-      const isSelected = prev[key] === value;
+      const prevVal = prev[key];
+      const isSelected =
+        typeof prevVal === "string"
+          ? prevVal.toLowerCase() === value.toLowerCase()
+          : prevVal === value;
       return { ...prev, [key]: isSelected ? null : value };
     });
   };
@@ -109,7 +115,8 @@ export default function SidebarFilters({
     updateFilter("priceMax", value.toString());
   };
 
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const defaultSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const sizesToDisplay = availableSizes ?? defaultSizes;
   const colors = [
     { name: "Black", hex: "#1a1a1a" },
     { name: "White", hex: "#ffffff" },
@@ -157,7 +164,7 @@ export default function SidebarFilters({
                 key={cat.id}
                 onClick={() => toggleFilter("category", cat.name)}
                 className={`flex items-center justify-between text-sm font-medium transition-colors hover:text-foreground ${
-                  values.category === cat.name
+                  values.category?.toLowerCase() === cat.name.toLowerCase()
                     ? "text-danger"
                     : "text-gray-text"
                 }`}
@@ -185,7 +192,7 @@ export default function SidebarFilters({
                 key={brand.id}
                 onClick={() => toggleFilter("brand", brand.name)}
                 className={`flex items-center justify-between text-sm font-medium transition-colors hover:text-foreground ${
-                  values.brand === brand.name ? "text-danger" : "text-gray-text"
+                  values.brand?.toLowerCase() === brand.name.toLowerCase() ? "text-danger" : "text-gray-text"
                 }`}
               >
                 {brand.name}
@@ -237,12 +244,12 @@ export default function SidebarFilters({
           {t("Size")}
         </div>
         <div className="flex flex-wrap gap-2">
-          {sizes.map((s) => (
+          {sizesToDisplay.map((s) => (
             <button
               key={s}
               onClick={() => toggleFilter("size", s)}
               className={`flex h-8 min-w-[2rem] items-center justify-center rounded border px-2 text-xs font-medium transition-colors ${
-                values.size === s
+                values.size?.toLowerCase() === s.toLowerCase()
                   ? "border-danger bg-danger text-white"
                   : "border-stroke text-gray-text hover:border-foreground hover:text-foreground"
               }`}
@@ -264,7 +271,7 @@ export default function SidebarFilters({
               key={c.name}
               onClick={() => toggleFilter("color", c.name)}
               className={`flex h-6 w-6 items-center justify-center rounded-full transition-all border border-stroke ${
-                values.color === c.name
+                values.color?.toLowerCase() === c.name.toLowerCase()
                   ? "ring-1 ring-foreground ring-offset-2 ring-offset-background"
                   : "hover:scale-110"
               }`}

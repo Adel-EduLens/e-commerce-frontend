@@ -1,24 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-import { ProductCard, SidebarFilters, LoadingSpinner } from "../components/shared";
-import ShopBanner from "../components/product/ShopBanner";
+import {
+  ProductCard,
+  SidebarFilters,
+  LoadingSpinner,
+} from "../components/shared";
 import Pagination from "../components/shared/Pagination";
 import { useProducts } from "../hooks/queries/productsQuery";
 import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
 import { useHomeFilters } from "../hooks/utils/HomeFilters";
-import { useWholesales } from "../hooks/queries/wholesaleQuery";
-import { useTranslation } from "react-i18next";
 
-
-
-export default function ProductsPage() {
+export default function RetailShopPage() {
   const { t } = useTranslation("productSection");
-
   const { filters: filter2 } = useHomeFilters();
-
   const [searchParams] = useSearchParams();
 
   const urlSearch = searchParams.get("search") ?? "";
@@ -35,8 +33,8 @@ export default function ProductsPage() {
     priceMin: null,
     priceMax: null,
   });
-  const effectiveCategoryName = filters.category;
 
+  const effectiveCategoryName = filters.category;
   const [page, setPage] = useState(1);
 
   const { data: categories = [] } = useCategories();
@@ -73,11 +71,6 @@ export default function ProductsPage() {
     collectionId,
   });
 
-  const { data: wholesales = [], isLoading: isWholesaleLoading } =
-    useWholesales(filters.search ? { search: filters.search } : undefined);
-
-  const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
-
   useEffect(() => {
     const func = () => {
       setFilters((prev) => ({
@@ -110,102 +103,58 @@ export default function ProductsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
-
-
   const availableSizes = useMemo(() => {
+    if (!data?.products) return undefined;
     const sizes = new Set<string>();
-    
-    // Add sizes from retail products
-    if (data?.products) {
-      data.products.forEach((product) => {
-        product.colors?.forEach((color) => {
-          color.variants?.forEach((variant) => {
-            if (variant.size) sizes.add(variant.size);
-          });
+    data.products.forEach((product) => {
+      product.colors?.forEach((color) => {
+        color.variants?.forEach((variant) => {
+          if (variant.size) sizes.add(variant.size);
         });
       });
-    }
-
-    // Add sizes from wholesale products
-    if (wholesales) {
-      wholesales.forEach((wholesale) => {
-        wholesale.wholesaleColors?.forEach((wc) => {
-          wc.sizes?.forEach((s) => {
-            if (s.size) sizes.add(s.size);
-          });
-        });
-      });
-    }
-
+    });
     return Array.from(sizes);
-  }, [data, wholesales]);
+  }, [data]);
 
-  const combinedProducts = useMemo(() => {
+  const productsList = useMemo(() => {
+    if (!data?.products) return [];
 
-    const items: React.ReactNode[] = [];
-    if (data?.products) {
-      data.products.forEach((product) => {
-        items.push(
-          <ProductCard
-            key={`retail-${product.id}`}
-            title={product.name}
-            productId={product.id}
-            colors={product.colors?.map((c) => c.colorName || c.color).filter(Boolean) as string[]}
-            images={product.images}
-            price={`$${product.price}`}
-            imageSrc={
-              product.colors?.[0]?.images?.[0]?.imageUrl ||
-              product.colors?.[0]?.images?.[0]?.url ||
-              product.images?.[0]?.url
-            }
-            sizeLabel={Array.from(
-              new Set(
-                product.colors?.flatMap(
-                  (c) => c.variants?.map((v) => v.size) ?? [],
-                ) ?? [],
-              ),
-            ).join(" - ")}
-            featured={product.rating >= 4}
-            isMustHave={product.isMustHave}
-            isFlashDeals={product.isFlashDeals}
-            flashDealPrice={product.flashDealPrice}
-            rating={product.rating}
-            productType="SHOP"
-            showTypeBadge={!!filters.search}
-            to={`/product-details/${product.id}`}
-            subtitle={product.description}
-          />,
-        );
-      });
-    }
-
-    if (filters.search && wholesales) {
-      wholesales.forEach((wholesale) => {
-        items.push(
-          <ProductCard
-            key={`wholesale-${wholesale.id}`}
-            productId={wholesale.id}
-            productType="WHOLESALE"
-            title={wholesale.name}
-            subtitle={wholesale.description || undefined}
-            price={`$${wholesale.price}`}
-            imageSrc={wholesale.images[0]?.url}
-            images={wholesale.images}
-            rating={wholesale.rating}
-            to={`/wholesale/${wholesale.id}`}
-            brand={wholesale.brand}
-            category={wholesale.category?.name}
-            colors={wholesale.wholesaleColors?.map(wc => wc.color) || []}
-            wholesaleSizes={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || []))}
-            sizeLabel={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
-            minOrder={wholesale.minOrder}
-            wholesaleCard
-          />,
-        );
-      });
-    }
-    return items;
-  }, [data, wholesales, filters.search]);
+    return data.products.map((product) => (
+      <ProductCard
+        key={`retail-${product.id}`}
+        title={product.name}
+        productId={product.id}
+        colors={
+          product.colors
+            ?.map((c) => c.colorName || c.color)
+            .filter(Boolean) as string[]
+        }
+        images={product.images}
+        price={`$${product.price}`}
+        imageSrc={
+          product.colors?.[0]?.images?.[0]?.imageUrl ||
+          product.colors?.[0]?.images?.[0]?.url ||
+          product.images?.[0]?.url
+        }
+        sizeLabel={Array.from(
+          new Set(
+            product.colors?.flatMap(
+              (c) => c.variants?.map((v) => v.size) ?? [],
+            ) ?? [],
+          ),
+        ).join(" - ")}
+        featured={product.rating >= 4}
+        isMustHave={product.isMustHave}
+        isFlashDeals={product.isFlashDeals}
+        flashDealPrice={product.flashDealPrice}
+        rating={product.rating}
+        productType="SHOP"
+        showTypeBadge={!!filters.search}
+        to={`/product-details/${product.id}`}
+        subtitle={product.description}
+      />
+    ));
+  }, [data, filters.search]);
 
   if (isError) {
     return (
@@ -216,10 +165,7 @@ export default function ProductsPage() {
   }
 
   return (
-
     <div className="w-full bg-background min-h-screen text-foreground transition-colors">
-      <ShopBanner />
-
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar */}
@@ -228,29 +174,29 @@ export default function ProductsPage() {
               filters={filter2}
               initialValues={filters}
               onFilterChange={setFilters}
-              availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
+              availableSizes={availableSizes}
             />
           </div>
 
           {/* Main content */}
           <div className="flex-1">
-            {isAnyLoading && (
+            {isLoading && (
               <LoadingSpinner containerClassName="py-12" text={t("Loading")} />
             )}
 
-            {!isAnyLoading && (
+            {!isLoading && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {combinedProducts}
+                {productsList}
               </div>
             )}
 
-            {!isAnyLoading && combinedProducts.length === 0 && (
+            {!isLoading && productsList.length === 0 && (
               <div className="mt-20 text-center text-xl text-gray-500">
                 {t("No products found.")}
               </div>
             )}
 
-            {!isAnyLoading && data && data.pagination.totalPages > 1 && (
+            {!isLoading && data && data.pagination.totalPages > 1 && (
               <Pagination
                 className="mt-12 mb-8"
                 currentPage={data.pagination.page}

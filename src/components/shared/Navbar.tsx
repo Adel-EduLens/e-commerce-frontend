@@ -220,9 +220,9 @@ export default function Navbar() {
     item.label === "home"
       ? location.pathname === "/"
       : item.label === "shop"
-        ? location.pathname === item.path ||
-        location.pathname.startsWith("/collections/")
-        : location.pathname === item.path;
+        ? location.pathname.startsWith(item.path) ||
+          location.pathname.startsWith("/collections/")
+        : location.pathname.startsWith(item.path);
 
   return (
     <div className="relative w-full max-w-full">

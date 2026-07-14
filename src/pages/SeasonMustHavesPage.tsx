@@ -53,7 +53,7 @@ export default function SeasonMustHavesPage() {
   const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category.name))], [allProducts]);
   const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
   const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []))], [allProducts]);
-  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.map((c) => c.colorName) ?? []))], [allProducts]);
+  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.map((c) => c.colorName || c.color) ?? []))], [allProducts]);
   const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
 
   const filterConfigs = useMemo(
@@ -123,6 +123,7 @@ export default function SeasonMustHavesPage() {
               title={product.name}
               price={`$${product.price}`}
               imageSrc={product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url || product.images?.[0]?.url}
+              colors={product.colors?.map((c) => c.colorName || c.color).filter(Boolean) as string[]}
               sizeLabel={Array.from(new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).join(" - ")}
               featured={product.rating >= 4}
               rating={product.rating}
