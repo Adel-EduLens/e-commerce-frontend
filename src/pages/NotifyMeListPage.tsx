@@ -182,10 +182,16 @@ export default function NotifyMeListPage() {
             <ProductRequestCard
               key={notification.id}
               notification={notification}
-              onRemove={() => unsubscribeMutation.mutate(notification.id)}
+              onRemove={() =>
+                unsubscribeMutation.mutate({
+                  targetType: notification.targetType,
+                  targetId: notification.targetId,
+                })
+              }
               isRemoving={
                 unsubscribeMutation.isPending &&
-                unsubscribeMutation.variables === notification.id
+                unsubscribeMutation.variables?.targetType === notification.targetType &&
+                unsubscribeMutation.variables?.targetId === notification.targetId
               }
             />
           ))}
