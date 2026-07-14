@@ -173,8 +173,13 @@ export function ProductInfoPanel({
       toast.error("This option is currently out of stock.");
       return;
     }
+    if (quantity > availableStock) {
+      toast.error(`Cannot add to cart. Only ${availableStock} available in stock.`);
+      return;
+    }
 
     if (isWholesale) {
+      const minQty = colorObj?.minOrder ?? item.minOrder ?? 1;
       const sizesForSelectedColor = colorObj
         ? (colorObj.sizes || []).map((s: any) => s.size).join(", ")
         : "";
@@ -196,6 +201,8 @@ export function ProductInfoPanel({
             (img) => img.color?.toLowerCase() === selectedColor.toLowerCase()
           )?.url || item.images[0]?.url || "",
         quantity,
+        minOrder: minQty,
+        productType: "WHOLESALE",
       }).then(() => {
         queryClient.invalidateQueries({ queryKey: ["wholesale"] });
         queryClient.invalidateQueries({ queryKey: ["wholesales"] });
@@ -227,6 +234,8 @@ export function ProductInfoPanel({
         colorHex: selectedColor,
         imageSrc: matchingImage?.url || item.images[0]?.url || "",
         quantity,
+        minOrder: item.minOrder || 1,
+        productType: "STANDARD",
       });
 
       toast.success(
@@ -244,8 +253,17 @@ export function ProductInfoPanel({
       toast.error("This option is currently out of stock.");
       return;
     }
+    if (quantity > availableStock) {
+      toast.error(`Cannot proceed to checkout. Only ${availableStock} available in stock.`);
+      return;
+    }
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
     
+    if (isWholesale && quantity < minQty) {
+      toast.error(`The quantity (${quantity}) is less than the minimum order quantity (${minQty}).`);
+      return;
+    }
+
     // Calculate total quantity of this product in the cart after adding this item
     const currentCartQty = useCartStore.getState().items
       .filter((cartItem) => cartItem.productId === item.id)
@@ -407,6 +425,11 @@ export function ProductInfoPanel({
               );
             })}
           </div>
+          {isWholesale && (
+            <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-md font-medium mt-1">
+              Note: You are purchasing a wholesale package that contains all the sizes listed above.
+            </p>
+          )}
         </div>
       )}
 

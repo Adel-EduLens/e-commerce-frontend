@@ -220,7 +220,7 @@ export default function Navbar() {
         <Link to="/" className="shrink-0">
           <img
             className="h-8 w-auto max-w-[64px] sm:h-9 sm:max-w-[75px] lg:h-11 lg:max-w-[90px] logo-theme object-contain"
-            src={asset("Logo.png")}
+            src={`${asset("Logo.png")}?v=2`}
             alt="Gen Z"
             draggable={false}
           />

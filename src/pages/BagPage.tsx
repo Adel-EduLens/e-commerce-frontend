@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../hooks/useCart";
 import { toast } from "sonner";
-import { ProductCard } from "../components/shared";
+import { ProductCard, LoadingSpinner } from "../components/shared";
 import { type CartItem, useCartStore } from "../store/useCartStore";
 import { api } from "../lib/axios";
 import { couponAppliesToItem } from "../lib/couponUtils";
@@ -420,6 +420,7 @@ export default function BagPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCouponType | null>(
     null,
   );
+  const [isValidatingStock, setIsValidatingStock] = useState(false);
   const [selectedTab, setSelectedTab] = useState<BagTab>("favorites");
   const itemCount = useMemo(() => items.length, [items]);
   const subtotal = useMemo(
@@ -489,7 +490,7 @@ export default function BagPage() {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!items.length) {
       toast.error(t("toast.emptyBag"));
       return;
@@ -500,6 +501,108 @@ export default function BagPage() {
       navigate("/login");
       return;
     }
+
+    setIsValidatingStock(true);
+    const toastId = toast.loading("Checking stock availability...");
+
+    try {
+      // 1. Gather all unique products to check to avoid double-fetching
+      const uniqueProductIds = Array.from(new Set(items.map((item) => item.productId)));
+
+      // 2. Fetch all products in parallel
+      const productDetailsMap: Record<string, { type: string; data: any }> = {};
+      await Promise.all(
+        uniqueProductIds.map(async (productId) => {
+          const item = items.find((i) => i.productId === productId);
+          if (!item) return;
+
+          const isWholesale = item.productType === "WHOLESALE" || item.id.includes("-wholesale");
+          const isRetail = item.productType === "RETAIL" || item.id.includes("retail-") || !isNaN(Number(productId));
+
+          if (isWholesale) {
+            const { data } = await api.get(`/wholesales/${productId}`);
+            productDetailsMap[productId] = { type: "WHOLESALE", data: data.data };
+          } else if (isRetail) {
+            const { data } = await api.get(`/retail/products/${productId}`);
+            productDetailsMap[productId] = { type: "RETAIL", data: data.data };
+          } else {
+            const { data } = await api.get(`/products/${productId}`);
+            productDetailsMap[productId] = { type: "SHOP", data: data.data };
+          }
+        })
+      );
+
+      // 3. Validate stock for each item in the cart
+      const errors: string[] = [];
+
+      for (const item of items) {
+        const productInfo = productDetailsMap[item.productId];
+        if (!productInfo || !productInfo.data) {
+          errors.push(`Could not verify stock for "${item.title}".`);
+          continue;
+        }
+
+        const productData = productInfo.data;
+        let availableStock = 0;
+
+        if (productInfo.type === "WHOLESALE") {
+          const colorObj = productData.wholesaleColors?.find(
+            (c: any) => c.color && item.color && c.color.toLowerCase() === item.color.toLowerCase()
+          );
+          availableStock = colorObj ? colorObj.stock : 0;
+
+          if (item.quantity > availableStock) {
+            errors.push(
+              `Quantity out of stock for "${item.title}" (${item.color}). Only ${availableStock} package(s) available in stock.`
+            );
+          }
+        } else if (productInfo.type === "RETAIL") {
+          const matchingSize = productData.sizes?.find(
+            (s: any) => s.name && item.size && s.name.toLowerCase() === item.size.toLowerCase()
+          );
+          availableStock = matchingSize ? matchingSize.stock : (productData.stock ?? 0);
+
+          if (item.quantity > availableStock) {
+            errors.push(
+              `Quantity out of stock for "${item.title}" (${item.size || "default size"}). Only ${availableStock} item(s) available in stock.`
+            );
+          }
+        } else {
+          // Standard / SHOP product
+          const matchingSize = productData.sizes?.find(
+            (s: any) =>
+              s.size &&
+              item.size &&
+              s.size.toLowerCase() === item.size.toLowerCase() &&
+              (!s.color || (item.color && s.color.toLowerCase() === item.color.toLowerCase()))
+          );
+          availableStock = matchingSize ? (matchingSize.quantity ?? matchingSize.stock ?? 0) : (productData.stock ?? 0);
+
+          if (item.quantity > availableStock) {
+            const variantDesc = item.color || item.size ? ` (${[item.color, item.size].filter(Boolean).join(" / ")})` : "";
+            errors.push(
+              `Quantity out of stock for "${item.title}"${variantDesc}. Only ${availableStock} item(s) available in stock.`
+            );
+          }
+        }
+      }
+
+      toast.dismiss(toastId);
+
+      if (errors.length > 0) {
+        errors.forEach((err) => toast.error(err));
+        setIsValidatingStock(false);
+        return;
+      }
+    } catch (err: any) {
+      toast.dismiss(toastId);
+      console.error("Stock validation error:", err);
+      toast.error("Failed to verify product stock. Please try again.");
+      setIsValidatingStock(false);
+      return;
+    }
+
+    setIsValidatingStock(false);
 
     // Validate wholesale minimum orders
     const wholesaleItems = items.filter((item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale"));
@@ -560,12 +663,10 @@ export default function BagPage() {
         {/* Left Side: Bag Items */}
         <div className="flex-1 w-full flex flex-col gap-6">
           {isLoading && items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="mt-4 font-['Montserrat'] text-base font-semibold text-gray-text">
-                Loading bag items...
-              </p>
-            </div>
+            <LoadingSpinner
+              containerClassName="py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+              text="Loading bag items..."
+            />
           ) : items.length ? (
             items.map((item) => (
               <BagItemCard
@@ -594,7 +695,7 @@ export default function BagPage() {
               onCouponChange={setCouponCode}
               onApplyCoupon={handleApplyCoupon}
               onCheckout={handleCheckout}
-              checkoutDisabled={!items.length}
+              checkoutDisabled={!items.length || isValidatingStock}
             />
           </div>
         )}

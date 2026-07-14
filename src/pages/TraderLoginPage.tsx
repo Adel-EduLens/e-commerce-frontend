@@ -85,7 +85,7 @@ const TraderLoginPage = () => {
           <div className="flex w-full max-w-[480px] flex-col">
             <div className="flex justify-between mb-5 items-center">
               <img
-                src="/images/auth/logo.png"
+                src="/images/auth/logo.png?v=2"
                 alt="Gen Z"
                 className="h-[40px] w-[75px] object-contain sm:h-[48px] sm:w-[90px]"
               />

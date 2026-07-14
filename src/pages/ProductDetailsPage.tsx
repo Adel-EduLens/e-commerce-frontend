@@ -122,7 +122,7 @@ export default function ProductDetailsPage() {
           />
         </div>
         <ReviewsSection />
-        <RecommedProducts currentProductId={product.id} currentCategoryId={product.categoryId} />
+        <RecommedProducts currentProductId={product.id} />
       </div>
     </div>
   );
