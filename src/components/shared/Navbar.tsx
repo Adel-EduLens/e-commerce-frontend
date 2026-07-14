@@ -98,7 +98,17 @@ function NotificationBell() {
               type="button"
               onClick={() => {
                 setOpen(false);
-                if (n.productId) navigate(`/products/${n.productId}`);
+                if (n.productId) {
+                  const titleLower = (n.title || "").toLowerCase();
+                  const msgLower = ((n.message ?? n.body) || "").toLowerCase();
+                  if (titleLower.includes("wholesale") || msgLower.includes("wholesale")) {
+                    navigate(`/wholesale/${n.productId}`);
+                  } else if (titleLower.includes("retail") || msgLower.includes("retail")) {
+                    navigate(`/retail/${n.productId}`);
+                  } else {
+                    navigate(`/product-details/${n.productId}`);
+                  }
+                }
               }}
               className="w-full flex items-start gap-3 px-4 py-3 text-start hover:bg-background transition-colors"
             >
