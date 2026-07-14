@@ -24,6 +24,7 @@ export default function ProductsPage() {
   const urlSearch = searchParams.get("search") ?? "";
   const urlCategoryName = searchParams.get("category") ?? "";
   const filter = searchParams.get("filter") ?? "";
+  const collectionId = searchParams.get("collectionId") ?? "";
 
   const [filters, setFilters] = useState<FilterValues>({
     search: urlSearch,
@@ -70,6 +71,7 @@ export default function ProductsPage() {
     filter,
     page,
     limit: 16,
+    collectionId,
   });
 
   const { data: wholesales = [], isLoading: isWholesaleLoading } =
@@ -101,6 +103,7 @@ export default function ProductsPage() {
     filters.priceMin,
     filters.priceMax,
     filter,
+    collectionId,
   ]);
 
   useEffect(() => {

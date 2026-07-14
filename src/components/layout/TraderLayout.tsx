@@ -102,6 +102,11 @@ const sidebarItems = [
     path: "/dashboard/trader/home-banner",
   },
   {
+    label: "Collections",
+    icon: "carbon_category-2.svg",
+    path: "/dashboard/trader/collections",
+  },
+  {
     label: "helpCenter",
     icon: "help-circle.svg",
     path: "/dashboard/trader/help-center",

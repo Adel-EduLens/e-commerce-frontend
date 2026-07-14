@@ -74,6 +74,7 @@ export type ProductsQuery = {
 
   page?: number;
   limit?: number;
+  collectionId?: string;
 };
 
 type ProductsResponse = {

@@ -1,6 +1,6 @@
 
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { Link } from 'react-router-dom'
@@ -15,6 +15,8 @@ import { toast } from 'sonner'
 import { asset } from '../lib/utils';
 
 
+import { useCollections } from '../hooks/queries/collectionsQuery'
+
 type AssetImageProps = {
   file: string
 
@@ -24,33 +26,38 @@ type AssetImageProps = {
 
 function AssetImage({ file, className, alt = '' }: AssetImageProps) {
   return (
-    <img className={className} src={asset(file)} alt={alt} draggable={false} />
+    <img className={className} src={file.startsWith('http') || file.startsWith('/uploads') || file.startsWith('/home-page') ? file : asset(file)} alt={alt} draggable={false} />
   )
 }
 
-function CollectionSection() {
-  return (
-    <div className="mt-10 sm:mt-16 flex flex-col lg:flex-row gap-2.5 w-full">
+
+
+function CollectionCard({ c, big }: { c: any; big?: boolean }) {
+  const to = c.id?.startsWith?.('fallback') ? "/products" : `/products?collectionId=${c.id}`;
+  if (big) {
+    return (
       <Link
-        to="/collections/men"
+        to={to}
         className="relative block h-[400px] sm:h-[500px] lg:h-[770px] lg:flex-1 overflow-hidden rounded-3xl no-underline"
       >
         <AssetImage
-          file="image 2.png"
-          className="absolute inset-0 h-full w-full object-cover"
+          key={c.id + '-' + c.image}
+          file={c.image}
+          className="absolute inset-0 h-full w-full object-cover animate-swap-fade"
         />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/25 to-transparent pointer-events-none" />
         <div className="absolute left-6 sm:left-8 top-6 sm:top-8 inline-flex w-64 sm:w-80 flex-col items-start justify-start gap-5 sm:gap-7">
           <div className="flex flex-col items-start justify-start gap-3 sm:gap-5">
             <div className="font-['Inter'] text-4xl sm:text-6xl lg:text-8xl font-normal leading-tight text-white">
-              Color of
-              <br />
-              Summer
-              <br />
-              Outfit
+              {c.name.split(' ').map((word: string, i: number) => (
+                <span key={i}>{word}<br /></span>
+              ))}
             </div>
-            <div className="font-['Inter'] text-sm sm:text-lg font-normal leading-6 text-white opacity-80">
-              100+ Collections for your outfit inspirations in this summer
-            </div>
+            {c.description && (
+              <div className="font-['Inter'] text-sm sm:text-lg font-normal leading-6 text-white opacity-80 line-clamp-3">
+                {c.description}
+              </div>
+            )}
           </div>
           <div className="inline-flex h-10 sm:h-12 w-56 sm:w-72 items-center justify-center rounded-[200px] bg-secondary outline outline-1 outline-offset-[-1px]">
             <div className="text-center font-['Inter'] text-xs sm:text-sm font-medium leading-6 tracking-wide text-secondary-foreground">
@@ -59,36 +66,58 @@ function CollectionSection() {
           </div>
         </div>
       </Link>
-      <div className="flex flex-row lg:flex-col gap-2.5 lg:w-[352px]">
-        <Link
-          to="/collections/men"
-          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
-        >
-          <AssetImage
-            file="image 4.png"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-foreground">
-            Outdoor
-            <br />
-            Active
-          </div>
-        </Link>
-        <Link
-          to="/collections/men"
-          className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
-        >
-          <AssetImage
-            file="image 5.png"
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-          <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-foreground">
-            Casual
-            <br />
-            Comfort
-          </div>
-        </Link>
+    );
+  }
+  return (
+    <Link
+      to={to}
+      className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
+    >
+      <AssetImage
+        key={c.id + '-' + c.image}
+        file={c.image}
+        className="absolute inset-0 h-full w-full object-cover animate-swap-fade"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/10 to-transparent pointer-events-none" />
+      <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-white drop-shadow-md">
+        {c.name.split(' ').map((word: string, i: number) => (
+          <span key={i}>{word}<br /></span>
+        ))}
       </div>
+    </Link>
+  );
+}
+
+function CollectionSection() {
+  const { data: serverCollections = [], isLoading } = useCollections(true);
+  const [rotated, setRotated] = useState<any[]>([]);
+
+  useEffect(() => {
+    setRotated(serverCollections);
+  }, [serverCollections]);
+
+  // Rotate only when there are 2+ collections
+  useEffect(() => {
+    if (rotated.length < 2) return;
+    const timer = setInterval(() => {
+      setRotated(([first, ...rest]) => [...rest, first]);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [rotated]);
+
+  if (isLoading || rotated.length === 0) return null;
+
+  const [c1, c2, c3] = rotated;
+
+  return (
+    <div className="mt-10 sm:mt-16 flex flex-col lg:flex-row gap-2.5 w-full">
+      <CollectionCard c={c1} big />
+      {(c2 || c3) && (
+        <div className="flex flex-row lg:flex-col gap-2.5 lg:w-[352px]">
+          {c2 && <CollectionCard c={c2} />}
+          {c3 && <CollectionCard c={c3} />}
+        </div>
+      )}
     </div>
   )
 }

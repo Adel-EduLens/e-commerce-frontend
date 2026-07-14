@@ -67,6 +67,7 @@ import TraderShopBannerPage from "../pages/dashboards/TraderShopBannerPage";
 import TraderHomeBannerPage from "../pages/dashboards/TraderHomeBannerPage";
 import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
 import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
+import TraderCollectionsPage from "../pages/dashboards/TraderCollectionsPage";
 
 export const router = createBrowserRouter([
   {
@@ -352,6 +353,10 @@ export const router = createBrowserRouter([
           {
             path: "orders",
             element: <TraderOrdersPage />,
+          },
+          {
+            path: "collections",
+            element: <TraderCollectionsPage />,
           },
           {
             path: "inventory",
