@@ -11,6 +11,7 @@ type SidebarFiltersProps = {
   initialValues?: Partial<FilterValues>;
   onFilterChange?: (values: FilterValues) => void;
   availableSizes?: string[];
+  isWholesale?: boolean;
 };
 
 const MAX_PRICE = 20000;
@@ -20,9 +21,10 @@ export default function SidebarFilters({
   initialValues,
   onFilterChange,
   availableSizes,
+  isWholesale,
 }: SidebarFiltersProps) {
   const { t } = useTranslation("filters");
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [] } = useCategories(isWholesale);
   const { data: brands = [] } = useBrands();
 
   const [categoriesOpen, setCategoriesOpen] = useState(true);

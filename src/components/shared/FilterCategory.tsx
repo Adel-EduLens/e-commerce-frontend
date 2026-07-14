@@ -16,6 +16,7 @@ interface FilterCategoryProps {
   noProductsText?: string;
   loadingText?: string;
   availableSizes?: string[];
+  isWholesale?: boolean;
 }
 
 const FilterCategory: React.FC<FilterCategoryProps> = ({
@@ -27,6 +28,7 @@ const FilterCategory: React.FC<FilterCategoryProps> = ({
   combinedProducts,
   totalPages = 1,
   availableSizes,
+  isWholesale,
   currentPage = 1,
   onPageChange,
   noProductsText = "No products found.",
@@ -42,7 +44,7 @@ const FilterCategory: React.FC<FilterCategoryProps> = ({
             initialValues={initialValues}
             onFilterChange={onFilterChange}
             availableSizes={availableSizes}
-
+            isWholesale={isWholesale}
           />
         </div>
 

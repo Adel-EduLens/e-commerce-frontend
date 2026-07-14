@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ProductCard } from '../components/shared'
+import { ProductCard, FilterCategory } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
@@ -307,9 +307,113 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
   )
 }
 
+function WholesaleFilterSection({
+  baseFilters,
+}: {
+  baseFilters?: Parameters<typeof useWholesales>[0]
+}) {
+  const [filters, setFilters] = useState<FilterValues>({
+    search: '',
+    category: baseFilters?.category ?? null,
+    brand: null,
+    size: null,
+    color: null,
+    priceMin: null,
+    priceMax: null,
+  })
+
+  useEffect(() => {
+    setFilters({
+      search: '',
+      category: baseFilters?.category ?? null,
+      brand: null,
+      size: null,
+      color: null,
+      priceMin: null,
+      priceMax: null,
+    })
+  }, [
+    baseFilters?.category,
+    baseFilters?.isBestDeal,
+    baseFilters?.isMostPopular,
+    baseFilters?.isPremiumCollection,
+  ])
+
+  const queryParams = useMemo(() => {
+    const q: Parameters<typeof useWholesales>[0] = {}
+    if (filters.category) {
+      q.category = filters.category
+    }
+    if (baseFilters?.isBestDeal) q.isBestDeal = true
+    if (baseFilters?.isMostPopular) q.isMostPopular = true
+    if (baseFilters?.isPremiumCollection) q.isPremiumCollection = true
+    return q
+  }, [filters.category, baseFilters])
+
+  const { data: products = [], isLoading } = useWholesales(queryParams)
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((item) => {
+      if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
+      if (filters.priceMin !== null && item.price < Number(filters.priceMin)) return false
+      if (filters.priceMax !== null && item.price > Number(filters.priceMax)) return false
+      if (filters.brand && item.brand?.toLowerCase() !== filters.brand.toLowerCase()) return false
+      if (filters.color && !item.wholesaleColors?.some(wc => wc.color.toLowerCase() === filters.color?.toLowerCase())) return false
+      if (filters.size && !item.wholesaleColors?.some(wc => wc.sizes?.some(s => s.size.toLowerCase() === filters.size?.toLowerCase()))) return false
+      return true
+    })
+  }, [products, filters])
+
+  const availableSizes = useMemo(() => {
+    const sizes = new Set<string>()
+    products.forEach((item) => {
+      item.wholesaleColors?.forEach((wc) => {
+        wc.sizes?.forEach((s) => {
+          if (s.size) sizes.add(s.size)
+        })
+      })
+    })
+    return Array.from(sizes)
+  }, [products])
+
+  const combinedProducts = useMemo(() => {
+    return filteredProducts.map((item) => (
+      <ProductCard
+        key={item.id}
+        productId={item.id}
+        productType="WHOLESALE"
+        title={item.name}
+        subtitle={item.description || undefined}
+        price={`$${item.price}`}
+        imageSrc={item.images[0]?.url}
+        images={item.images}
+        rating={item.rating}
+        to={`/wholesale/${item.id}`}
+        brand={item.brand}
+        category={item.category?.name}
+        colors={item.wholesaleColors?.map((wc) => wc.color) || []}
+        wholesaleSizes={Array.from(new Set(item.wholesaleColors?.flatMap((wc) => wc.sizes.map((s) => s.size)) || []))}
+        sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap((wc) => wc.sizes.map((s) => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+        minOrder={item.minOrder}
+        wholesaleCard
+      />
+    ))
+  }, [filteredProducts])
+
+  return (
+    <FilterCategory
+      initialValues={filters}
+      onFilterChange={setFilters}
+      isAnyLoading={isLoading}
+      combinedProducts={combinedProducts}
+      availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
+      isWholesale={true}
+    />
+  )
+}
+
 export default function WholesalePage() {
   const [searchParams] = useSearchParams()
-
 
   const categoryFilter = searchParams.get('category')
   const filterParam = searchParams.get('filter')
@@ -326,13 +430,16 @@ export default function WholesalePage() {
     window.scrollTo(0, 0)
   }, [categoryFilter, filterParam])
 
-
   if (categoryName || activeFilter) {
     return (
       <div className="w-full pt-8 overflow-hidden">
         <HeroBanner />
-        <ProductSection
-          title={categoryName || activeFilter!.label}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-12">
+          <h1 className="font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
+            {categoryName || activeFilter!.label}
+          </h1>
+        </div>
+        <WholesaleFilterSection
           baseFilters={categoryName ? { category: categoryName } : activeFilter ? activeFilter.filters : undefined}
         />
         <FaqSection />
