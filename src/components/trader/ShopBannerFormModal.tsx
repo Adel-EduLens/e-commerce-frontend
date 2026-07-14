@@ -25,14 +25,17 @@ interface ShopBannerFormModalProps {
     backgroundColor: string;
     isActive: boolean;
     order: number;
+    type?: string;
   }) => void;
   onClose: () => void;
+  defaultType?: string;
 }
 
 export function ShopBannerFormModal({
   banner,
   onSave,
   onClose,
+  defaultType = "shop",
 }: ShopBannerFormModalProps) {
   const [title, setTitle] = useState(banner?.title ?? "");
   const [description, setDescription] = useState(banner?.description ?? "");
@@ -42,6 +45,7 @@ export function ShopBannerFormModal({
   const [image, setImage] = useState(banner?.image ?? "");
   const [isActive, setIsActive] = useState(banner?.isActive ?? true);
   const [order, setOrder] = useState(banner?.order ?? 0);
+  const [type] = useState(banner?.type ?? defaultType);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -78,7 +82,9 @@ export function ShopBannerFormModal({
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {banner ? "Edit Shop Banner" : "Add Shop Banner"}
+            {banner
+              ? (type === "home" ? "Edit Home Page Banner" : "Edit Shop Banner")
+              : (type === "home" ? "Add Home Page Banner" : "Add Shop Banner")}
           </h2>
           <button
             type="button"
@@ -205,7 +211,7 @@ export function ShopBannerFormModal({
             <button
               type="button"
               disabled={uploading || !title || !description || !image}
-              onClick={() => onSave({ title, description, buttonText, buttonLink, image, backgroundColor, isActive, order })}
+              onClick={() => onSave({ title, description, buttonText, buttonLink, image, backgroundColor, isActive, order, type })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
               {uploading ? "Uploading..." : "Save"}
@@ -218,6 +224,7 @@ export function ShopBannerFormModal({
         <ImageCropModal
           imageSrc={cropSrc}
           fileName="banner.jpg"
+          aspect={1440 / 900}
           onCancel={() => setCropSrc(null)}
           onConfirm={handleCrop}
 

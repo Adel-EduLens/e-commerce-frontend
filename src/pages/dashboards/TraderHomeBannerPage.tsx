@@ -11,7 +11,7 @@ import {
 } from "../../hooks/queries/shopBannerQuery";
 import { toast } from "sonner";
 
-interface ShopBannerTablePanelProps {
+interface HomeBannerTablePanelProps {
   banners: ShopBanner[];
   loading: boolean;
   onAdd: () => void;
@@ -19,13 +19,13 @@ interface ShopBannerTablePanelProps {
   onDelete: (id: string) => void;
 }
 
-export function ShopBannerTablePanel({
+export function HomeBannerTablePanel({
   banners,
   loading,
   onAdd,
   onEdit,
   onDelete,
-}: ShopBannerTablePanelProps) {
+}: HomeBannerTablePanelProps) {
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [page, setPage] = useState(1);
@@ -96,7 +96,7 @@ export function ShopBannerTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Shop Banner
+          Add Home Page Banner
         </button>
       </div>
 
@@ -104,7 +104,7 @@ export function ShopBannerTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Shop Banners
+              Home Page Banners
             </h2>
 
             <div className="relative">
@@ -420,7 +420,7 @@ export function ShopBannerTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Shop Banner
+              Delete Home Page Banner
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
               Are you sure you want to delete this banner? This action cannot
@@ -452,11 +452,11 @@ export function ShopBannerTablePanel({
   );
 }
 
-export default function TraderShopBannerPage() {
+export default function TraderHomeBannerPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editBanner, setEditBanner] = useState<ShopBanner | null>(null);
 
-  const { data: banners = [], isLoading } = useShopBanners("shop");
+  const { data: banners = [], isLoading } = useShopBanners("home");
   const createBanner = useCreateShopBanner();
   const updateBanner = useUpdateShopBanner();
   const deleteBanner = useDeleteShopBanner();
@@ -465,12 +465,13 @@ export default function TraderShopBannerPage() {
     <>
       {showAddModal && (
         <ShopBannerFormModal
+          defaultType="home"
           onClose={() => setShowAddModal(false)}
           onSave={async (data) => {
             try {
               await createBanner.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Banner created successfully");
+              toast.success("Home page banner created successfully");
             } catch (error) {
               toast.error(
                 error instanceof Error
@@ -484,6 +485,7 @@ export default function TraderShopBannerPage() {
       {editBanner && (
         <ShopBannerFormModal
           banner={editBanner}
+          defaultType="home"
           onClose={() => setEditBanner(null)}
           onSave={async (formData) => {
             try {
@@ -492,7 +494,7 @@ export default function TraderShopBannerPage() {
                 data: formData,
               });
               setEditBanner(null);
-              toast.success("Banner updated successfully");
+              toast.success("Home page banner updated successfully");
             } catch (error) {
               toast.error(
                 error instanceof Error
@@ -504,7 +506,7 @@ export default function TraderShopBannerPage() {
         />
       )}
 
-      <ShopBannerTablePanel
+      <HomeBannerTablePanel
         banners={banners}
         loading={isLoading}
         onAdd={() => setShowAddModal(true)}

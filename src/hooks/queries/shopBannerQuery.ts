@@ -11,6 +11,7 @@ export interface ShopBanner {
   backgroundColor: string;
   isActive: boolean;
   order: number;
+  type: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,6 +25,7 @@ export interface CreateShopBannerData {
   backgroundColor: string;
   isActive?: boolean;
   order?: number;
+  type?: string;
 }
 
 export interface UpdateShopBannerData {
@@ -35,37 +37,42 @@ export interface UpdateShopBannerData {
   backgroundColor?: string;
   isActive?: boolean;
   order?: number;
+  type?: string;
 }
 
 
 // ================= GET ALL =================
 
-const getShopBanners = async (): Promise<ShopBanner[]> => {
-  const { data } = await api.get("/shop-banners");
+const getShopBanners = async (type?: string): Promise<ShopBanner[]> => {
+  const { data } = await api.get("/shop-banners", {
+    params: type ? { type } : undefined,
+  });
 
   return data.data;
 };
 
-export const useShopBanners = () => {
+export const useShopBanners = (type?: string) => {
   return useQuery({
-    queryKey: ["shop-banners"],
-    queryFn: getShopBanners,
+    queryKey: ["shop-banners", type],
+    queryFn: () => getShopBanners(type),
   });
 };
 
 
 // ================= GET ACTIVE =================
 
-const getActiveShopBanners = async (): Promise<ShopBanner[]> => {
-  const { data } = await api.get("/shop-banners/active");
+const getActiveShopBanners = async (type?: string): Promise<ShopBanner[]> => {
+  const { data } = await api.get("/shop-banners/active", {
+    params: type ? { type } : undefined,
+  });
 
   return data.data;
 };
 
-export const useActiveShopBanners = () => {
+export const useActiveShopBanners = (type?: string) => {
   return useQuery({
-    queryKey: ["shop-banners", "active"],
-    queryFn: getActiveShopBanners,
+    queryKey: ["shop-banners", "active", type],
+    queryFn: () => getActiveShopBanners(type),
   });
 };
 

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const ShopBanner = () => {
   const navigate = useNavigate();
-  const { data: banners, isPending } = useActiveShopBanners();
+  const { data: banners, isPending } = useActiveShopBanners("shop");
 
   const [activeIndex, setActiveIndex] = useState(0);
 

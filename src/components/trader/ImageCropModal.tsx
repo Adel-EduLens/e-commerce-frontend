@@ -46,11 +46,30 @@ export async function getCroppedFile(imageSrc: string, pixelCrop: Area, fileName
     0, 0, pixelCrop.width, pixelCrop.height
   );
 
+  let mimeType = "image/jpeg";
+  let fileExt = ".jpg";
+
+  try {
+    if (imageSrc.startsWith("blob:")) {
+      const res = await fetch(imageSrc);
+      const blob = await res.blob();
+      if (blob.type === "image/png") {
+        mimeType = "image/png";
+        fileExt = ".png";
+      }
+    } else if (fileName.toLowerCase().endsWith(".png")) {
+      mimeType = "image/png";
+      fileExt = ".png";
+    }
+  } catch (e) {
+    console.error("Failed to detect image mime type:", e);
+  }
+
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (!blob) { reject(new Error("Canvas is empty")); return; }
-      resolve(new File([blob], fileName.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
-    }, "image/jpeg", 0.92);
+      resolve(new File([blob], fileName.replace(/\.[^.]+$/, fileExt), { type: mimeType }));
+    }, mimeType, mimeType === "image/png" ? undefined : 0.92);
   });
 }
 

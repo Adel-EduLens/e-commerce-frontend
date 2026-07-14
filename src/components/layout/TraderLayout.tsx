@@ -97,6 +97,11 @@ const sidebarItems = [
     path: "/dashboard/trader/shop-banner",
   },
   {
+    label: "Home Page Banner",
+    icon: "banner.svg",
+    path: "/dashboard/trader/home-banner",
+  },
+  {
     label: "helpCenter",
     icon: "help-circle.svg",
     path: "/dashboard/trader/help-center",

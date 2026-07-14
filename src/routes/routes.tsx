@@ -64,6 +64,7 @@ import CreateYourDesignPage from "../pages/CreateYourDesignPage";
 import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
 
 import TraderShopBannerPage from "../pages/dashboards/TraderShopBannerPage";
+import TraderHomeBannerPage from "../pages/dashboards/TraderHomeBannerPage";
 import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
 import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
 
@@ -343,6 +344,10 @@ export const router = createBrowserRouter([
           {
             path: "shop-banner",
             element: <TraderShopBannerPage />,
+          },
+          {
+            path: "home-banner",
+            element: <TraderHomeBannerPage />,
           },
           {
             path: "orders",

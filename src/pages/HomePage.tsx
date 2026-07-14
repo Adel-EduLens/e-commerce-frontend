@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
+import HomeBanner from '../components/product/HomeBanner'
 
 import { api } from '../lib/axios'
 import { toast } from 'sonner'
@@ -24,83 +25,6 @@ type AssetImageProps = {
 function AssetImage({ file, className, alt = '' }: AssetImageProps) {
   return (
     <img className={className} src={asset(file)} alt={alt} draggable={false} />
-  )
-}
-
-function HeroSection() {
-  return (
-    <div className="relative w-full overflow-hidden rounded-3xl bg-primary">
-      {/* Mobile/Tablet layout */}
-      <div className="relative z-10 flex flex-col px-6 py-10 lg:hidden">
-        <div className="font-['Montserrat'] text-5xl sm:text-7xl font-bold text-primary-foreground">
-          Discover
-        </div>
-        <div className="relative my-2">
-          <div className="h-12 sm:h-16 w-3/4 rounded-2xl bg-secondary" />
-          <div className="absolute left-2 -top-2 font-['Montserrat'] text-5xl sm:text-7xl font-bold text-secondary-foreground">
-            fashion
-          </div>
-        </div>
-        <div className="font-['Montserrat'] text-3xl sm:text-5xl font-bold text-primary-foreground">
-          Fits Your Story
-        </div>
-        <div className="mt-6 rounded-xl bg-background p-4">
-          <p className="font-['Inter'] text-base sm:text-lg font-medium text-foreground">
-            step into the spotlight with our latest drop. each piece is made to
-            turn heads while keeping you comfortable from day to night.
-          </p>
-        </div>
-      </div>
-
-      {/* Desktop layout */}
-      <div className="relative hidden lg:block h-[978px]">
-        <div className="absolute left-[625px] top-[162px] h-[480px] w-[480px] rounded-full border-2 border-secondary" />
-        <div className="absolute left-[24px] top-[121px] inline-flex w-[649px] flex-col items-start justify-start">
-          <div className="self-stretch font-['Montserrat'] text-9xl font-bold text-primary-foreground">
-            Discover
-          </div>
-          <div className="relative h-56 w-[517.21px]">
-            <div className="absolute left-0 top-[84.19px] h-32 w-[504px] origin-top-left rotate-[-7.42deg] rounded-3xl bg-secondary" />
-            <div className="absolute left-[8px] top-0 font-['Montserrat'] text-9xl font-bold text-secondary-foreground">
-              fashion
-            </div>
-          </div>
-          <div className="self-stretch font-['Montserrat'] text-7xl font-bold text-primary-foreground">
-            Fits Your Story
-          </div>
-        </div>
-        <div className="absolute left-[24px] top-[649px] h-72 w-[597px]">
-          <div className="absolute left-0 top-[28px] h-64 w-[597px] overflow-hidden bg-background rounded-3xl border border-stroke shadow-sm">
-            <div className="absolute left-[24px] top-[50px] h-36 w-80 font-['Montserrat'] text-2xl font-medium text-foreground">
-              step into the spotlight with our latest drop. each piece is made to
-              turn heads while keeping you comfortable from day to night.
-              <br />
-            </div>
-            <div className="absolute left-[354px] top-[11px] h-60 w-56 overflow-hidden rounded-2xl">
-              <AssetImage
-                file="medium-shot-man-posing-with-blue-background 1.png"
-                className="absolute left-[1px] top-0 h-60 w-[222px]"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="absolute left-[675px] top-[7px] h-[971px] w-[788px] overflow-hidden">
-          <AssetImage
-            file="image 1.png"
-            className="absolute left-0 top-0 h-[971px] w-[741px]"
-          />
-        </div>
-        <div className="absolute left-[1001px] top-[772px] h-40 w-96 overflow-hidden bg-background">
-          <div className="absolute left-[24px] top-[24px] h-28 w-80 font-['Montserrat'] text-2xl font-medium text-foreground">
-            Unlock fresh styles, exclusive drops, and a whole new vibe that&apos;s
-            set to dominate 2025
-            <br />
-            <br />
-          </div>
-        </div>
-        <div className="absolute left-[579px] top-[513px] h-0 w-[554.16px] origin-top-left rotate-[-47.41deg] border-t-2 border-secondary" />
-      </div>
-    </div>
   )
 }
 
@@ -451,11 +375,9 @@ function VoteSection() {
 
 
 export function HomePage() {
-
-
   return (
-    <div className="w-full overflow-hidden">
-      <HeroSection />
+    <div className="w-full overflow-hidden flex flex-col gap-10">
+      <HomeBanner />
       <CollectionSection />
       <ProductsSection
         title="This Season's Must-Haves"
