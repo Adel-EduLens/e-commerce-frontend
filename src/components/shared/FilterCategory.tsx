@@ -19,13 +19,14 @@ interface FilterCategoryProps {
 }
 
 const FilterCategory: React.FC<FilterCategoryProps> = ({
-  availableSizes,
+
   filtersConfig,
   initialValues,
   onFilterChange,
   isAnyLoading,
   combinedProducts,
   totalPages = 1,
+  availableSizes,
   currentPage = 1,
   onPageChange,
   noProductsText = "No products found.",
@@ -41,6 +42,7 @@ const FilterCategory: React.FC<FilterCategoryProps> = ({
             initialValues={initialValues}
             onFilterChange={onFilterChange}
             availableSizes={availableSizes}
+
           />
         </div>
 

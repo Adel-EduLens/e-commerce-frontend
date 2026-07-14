@@ -27,14 +27,15 @@ export default function ProductsPage() {
 
   const [filters, setFilters] = useState<FilterValues>({
     search: urlSearch,
-    category: urlCategoryName || null,
+    category: null,
     brand: null,
     size: null,
     color: null,
     priceMin: null,
     priceMax: null,
   });
-  const effectiveCategoryName = filters.category;
+
+  const effectiveCategoryName = filters.category ?? urlCategoryName;
 
   const [page, setPage] = useState(1);
 
@@ -82,11 +83,10 @@ export default function ProductsPage() {
       setFilters((prev) => ({
         ...prev,
         search: urlSearch,
-        category: urlCategoryName || null,
       }));
     };
     func();
-  }, [urlSearch, urlCategoryName]);
+  }, [urlSearch]);
 
   useEffect(() => {
     const func = () => {
@@ -149,7 +149,7 @@ export default function ProductsPage() {
             key={`retail-${product.id}`}
             title={product.name}
             productId={product.id}
-            colors={product.colors?.map((c) => c.colorName || c.color).filter(Boolean) as string[]}
+            colors={product.colors?.map((c) => c.colorName)}
             images={product.images}
             price={`$${product.price}`}
             imageSrc={
@@ -230,7 +230,6 @@ export default function ProductsPage() {
         noProductsText={t("No products found.")}
         loadingText={t("Loading")}
         availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
-
       />
     </div>
   );
