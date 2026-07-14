@@ -1,7 +1,7 @@
 import { api } from "../lib/axios";
 import type { RetailProduct, RetailCategory } from "../types/retail";
 
-const API_PREFIX = "/retail";
+const API_PREFIX = "/retail-products";
 
 function normalizeProductResponse(response: unknown): RetailProduct | null {
   if (!response) return null;
@@ -17,51 +17,46 @@ function normalizeProductResponse(response: unknown): RetailProduct | null {
 
 export const retailApi = {
   async getRetailProducts(params: Record<string, string | number | boolean | undefined> = {}) {
-    const response = await api.get(`${API_PREFIX}/products`, { params });
+    const response = await api.get(`${API_PREFIX}/`, { params });
     return response.data;
   },
 
   async getRetailProductById(id: string | number) {
-    const response = await api.get(`${API_PREFIX}/products/${id}`);
+    const response = await api.get(`${API_PREFIX}//${id}`);
     return normalizeProductResponse(response.data);
   },
 
-  async getRetailProductBySlug(slug: string) {
-    const response = await api.get(
-      `${API_PREFIX}/products/slug/${encodeURIComponent(slug)}`,
-    );
-    return normalizeProductResponse(response.data);
-  },
+
 
   async getRetailCategories() {
-    const response = await api.get(`${API_PREFIX}/categories`);
+    const response = await api.get(`/retail-category/categories`);
     return response.data;
   },
 
   async getRetailCategoryById(id: string | number) {
-    const response = await api.get(`${API_PREFIX}/categories/${id}`);
+    const response = await api.get(`/retail-category/categories/${id}`);
     return response.data;
   },
 
   async getRetailCategoryBySlug(slug: string) {
     const response = await api.get(
-      `${API_PREFIX}/categories/slug/${encodeURIComponent(slug)}`,
+      `/retail-category/categories/slug/${encodeURIComponent(slug)}`,
     );
     return response.data;
   },
 
   async createRetailCategory(data: Partial<RetailCategory> | FormData | Record<string, unknown>) {
-    const response = await api.post(`${API_PREFIX}/categories`, data);
+    const response = await api.post(`/retail-category/categories`, data);
     return response.data;
   },
 
   async updateRetailCategory({ id, data }: { id: string | number; data: Partial<RetailCategory> | FormData | Record<string, unknown> }) {
-    const response = await api.put(`${API_PREFIX}/categories/${id}`, data);
+    const response = await api.put(`/retail-category/categories/${id}`, data);
     return response.data;
   },
 
   async deleteRetailCategory(id: string | number) {
-    const response = await api.delete(`${API_PREFIX}/categories/${id}`);
+    const response = await api.delete(`/retail-category/categories/${id}`);
     return response.data;
   },
 
@@ -83,17 +78,22 @@ export const retailApi = {
   },
 
   async createRetailProduct(data: Partial<RetailProduct> | FormData | Record<string, unknown>) {
-    const response = await api.post(`${API_PREFIX}/products`, data);
+    const response = await api.post(`${API_PREFIX}/`, data);
     return response.data;
   },
 
   async updateRetailProduct({ id, data }: { id: string | number; data: Partial<RetailProduct> | FormData | Record<string, unknown> }) {
-    const response = await api.put(`${API_PREFIX}/products/${id}`, data);
+    const response = await api.put(`${API_PREFIX}/${id}`, data);
     return response.data;
   },
 
   async deleteRetailProduct(id: string | number) {
-    const response = await api.delete(`${API_PREFIX}/products/${id}`);
+    const response = await api.delete(`${API_PREFIX}/${id}`);
+    return response.data;
+  },
+
+  async getRetailBrands() {
+    const response = await api.get(`/retail-brand`);
     return response.data;
   },
 };

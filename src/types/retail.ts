@@ -1,10 +1,8 @@
 export interface RetailCategory {
   id: number | string
   name: string
-  slug: string
-  description?: string
-  imageUrl?: string
-  isActive: boolean
+  image?: string
+  appearOnHome: boolean
 }
 
 export interface RetailProductImage {
@@ -29,16 +27,13 @@ export interface RetailProductSize {
 export interface RetailProduct {
   id: number | string
   name: string
-  slug: string
   description?: string
-  shortDescription?: string
   price: number
-  discountPrice?: number
   stock: number
   sku?: string
-  brand?: string
+  brandId?: string
+  brand?: { id: string, name: string }
   isFeatured: boolean
-  isActive: boolean
   categoryId: number | string
   category?: RetailCategory
   images: RetailProductImage[]

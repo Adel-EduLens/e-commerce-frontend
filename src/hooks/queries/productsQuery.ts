@@ -1,4 +1,11 @@
-import { useMutation, useQuery, useQueries, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueries,
+  useQueryClient,
+  type UseQueryResult,
+  type UseQueryOptions,
+} from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 
@@ -87,48 +94,58 @@ type ProductsResponse = {
   };
 };
 
+type RawImage = { id?: string; url?: string; imageUrl?: string; color?: string };
+type RawSize = { id?: string; size?: string; quantity?: number; color?: string };
+type RawColor = { id?: string; colorName?: string; color?: string; images?: RawImage[] };
+
 /** Transform flat API response into the nested colors structure the frontend expects */
-function transformProduct(raw: any): Product {
-  if (!raw) return raw;
-  const flatImages = raw.images || [];
-  const flatSizes = raw.sizes || [];
-  const flatColors = raw.colors || [];
-  const productStock = raw.stock ?? 0;
+export function transformProduct(raw: Record<string, unknown>): Product {
+  if (!raw || typeof raw !== 'object') return raw as unknown as Product;
+  const flatImages = (raw.images as RawImage[]) || [];
+  const flatSizes = (raw.sizes as RawSize[]) || [];
+  const flatColors = (raw.colors as RawColor[]) || [];
+  const productStock = (raw.stock as number) ?? 0;
 
   // If colors already have nested images/variants, return as-is
   if (flatColors.length > 0 && flatColors[0].images) {
-    return raw;
+    return raw as unknown as Product;
   }
 
-  const hasColorSpecificSizes = flatSizes.some((s: any) => s.color !== null && s.color !== undefined && s.color !== "");
+  const hasColorSpecificSizes = flatSizes.some(
+    (s) => s.color !== null && s.color !== undefined && s.color !== "",
+  );
 
-  const colors: ProductColor[] = flatColors.map((c: any) => {
-    const colorName = c.colorName || c.color || '';
+  const colors: ProductColor[] = flatColors.map((c) => {
+    const colorName = c.colorName || c.color || "";
     return {
       ...c,
-      colorName,
+      id: c.id || "",
       images: flatImages
-        .filter((img: any) => img.color === colorName)
-        .map((img: any) => ({
-          id: img.id,
-          imageUrl: img.url || img.imageUrl || '',
-          url: img.url || img.imageUrl || '',
+        .filter((img) => img.color === colorName)
+        .map((img) => ({
+          id: img.id || "",
+          imageUrl: img.url || img.imageUrl || "",
+          url: img.url || img.imageUrl || "",
         })),
       variants: flatSizes
-        .filter((s: any) => hasColorSpecificSizes ? s.color === colorName : (!s.color || s.color === colorName))
-        .map((s: any) => ({
-          id: s.id,
-          size: s.size,
+        .filter((s) =>
+          hasColorSpecificSizes
+            ? s.color === colorName
+            : !s.color || s.color === colorName,
+        )
+        .map((s) => ({
+          id: s.id || "",
+          size: s.size || "",
           quantity: s.quantity ?? productStock,
         })),
-    };
+    } as ProductColor;
   });
 
-  return { ...raw, colors };
+  return { ...raw, colors } as unknown as Product;
 }
 
 const getProducts = async (
-  params: ProductsQuery
+  params: ProductsQuery,
 ): Promise<ProductsResponse> => {
   const { data } = await api.get("/products", {
     params,
@@ -141,10 +158,14 @@ const getProducts = async (
   return result;
 };
 
-export const useProducts = (params: ProductsQuery) => {
+export const useProducts = (
+  params: ProductsQuery,
+  options?: Omit<UseQueryOptions<ProductsResponse, Error, ProductsResponse, unknown[]>, "queryKey" | "queryFn">
+): UseQueryResult<ProductsResponse, Error> => {
   return useQuery({
     queryKey: ["products", params],
     queryFn: () => getProducts(params),
+    ...options,
   });
 };
 const getProduct = async (id: string): Promise<Product> => {
@@ -167,29 +188,42 @@ export interface ProductFilters {
   colors: string[];
 }
 
-const getProductFilters = async (params?: ProductsQuery): Promise<ProductFilters> => {
+type RawProductItem = {
+  category?: { name?: string };
+  brand?: { name?: string };
+  sizes?: { size?: string }[];
+  colors?: { colorName?: string; color?: string }[];
+};
+
+const getProductFilters = async (
+  params?: ProductsQuery,
+): Promise<ProductFilters> => {
   const { data } = await api.get("/products", {
     params: { ...params, limit: 1000 },
   });
-  const products = data.data?.products ?? [];
+  const products: RawProductItem[] = data.data?.products ?? [];
 
   const categories = Array.from(
-    new Set(products.map((p: any) => p.category?.name).filter(Boolean))
+    new Set(products.map((p) => p.category?.name).filter(Boolean)),
   ) as string[];
   const brands = Array.from(
-    new Set(products.map((p: any) => p.brand?.name).filter(Boolean))
+    new Set(products.map((p) => p.brand?.name).filter(Boolean)),
   ) as string[];
   const sizes = Array.from(
     new Set(
-      products.flatMap((p: any) => (p.sizes || []).map((s: any) => s.size)).filter(Boolean)
-    )
+      products
+        .flatMap((p) => (p.sizes || []).map((s) => s.size))
+        .filter(Boolean),
+    ),
   ) as string[];
   const colors = Array.from(
     new Set(
       products
-        .flatMap((p: any) => (p.colors || []).map((c: any) => c.colorName || c.color))
-        .filter(Boolean)
-    )
+        .flatMap((p) =>
+          (p.colors || []).map((c) => c.colorName || c.color),
+        )
+        .filter(Boolean),
+    ),
   ) as string[];
 
   return { categories, brands, sizes, colors };
@@ -212,8 +246,12 @@ export const useCompareProducts = (ids: string[]) => {
   });
 };
 
-const getTraderProducts = async (traderId: string | number): Promise<Product[]> => {
-  const { data } = await api.get("/products", { params: { traderId, limit: 1000 } });
+const getTraderProducts = async (
+  traderId: string | number,
+): Promise<Product[]> => {
+  const { data } = await api.get("/products", {
+    params: { traderId, limit: 1000 },
+  });
   return (data.data?.products ?? []).map(transformProduct);
 };
 
@@ -245,7 +283,10 @@ export interface ProductFormData {
 
 const createProduct = async (body: ProductFormData | FormData) => {
   const isFormData = body instanceof FormData;
-  const { data } = await api.post(isFormData ? "/trader/products" : "/products", body);
+  const { data } = await api.post(
+    isFormData ? "/trader/products" : "/products",
+    body,
+  );
   return data.data;
 };
 
@@ -260,8 +301,12 @@ export const useCreateProduct = () => {
   });
 };
 
-const updateProduct = async ({ id, ...body }: Partial<ProductFormData> & { id: string } | FormData & { id: string }) => {
-  const isFormData = body instanceof FormData;
+const updateProduct = async ({
+  id,
+  ...body
+}:
+  | (Partial<ProductFormData> & { id: string })
+  | (FormData & { id: string })) => {
   const { data } = await api.patch(`/products/${id}`, body);
   return data.data;
 };
@@ -296,13 +341,24 @@ export const useDeleteProduct = () => {
 export const useAddProductColor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ productId, formData }: { productId: string; formData: FormData }) => {
-      const { data } = await api.post(`/trader/products/${productId}/colors`, formData);
+    mutationFn: async ({
+      productId,
+      formData,
+    }: {
+      productId: string;
+      formData: FormData;
+    }) => {
+      const { data } = await api.post(
+        `/trader/products/${productId}/colors`,
+        formData,
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
-      queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+      queryClient.invalidateQueries({
+        queryKey: ["product", variables.productId],
+      });
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
@@ -311,14 +367,21 @@ export const useAddProductColor = () => {
 export const useDeleteProductColor = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ colorId }: { colorId: string; productId?: string }) => {
+    mutationFn: async ({
+      colorId,
+    }: {
+      colorId: string;
+      productId?: string;
+    }) => {
       const { data } = await api.delete(`/trader/products/colors/${colorId}`);
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -328,14 +391,26 @@ export const useDeleteProductColor = () => {
 export const useReplaceProductColorImages = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
-      const { data } = await api.put(`/trader/products/colors/${colorId}/images`, formData);
+    mutationFn: async ({
+      colorId,
+      formData,
+    }: {
+      colorId: string;
+      formData: FormData;
+      productId?: string;
+    }) => {
+      const { data } = await api.put(
+        `/trader/products/colors/${colorId}/images`,
+        formData,
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -345,14 +420,26 @@ export const useReplaceProductColorImages = () => {
 export const useAddProductColorImages = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ colorId, formData }: { colorId: string; formData: FormData; productId?: string }) => {
-      const { data } = await api.post(`/trader/products/colors/${colorId}/images`, formData);
+    mutationFn: async ({
+      colorId,
+      formData,
+    }: {
+      colorId: string;
+      formData: FormData;
+      productId?: string;
+    }) => {
+      const { data } = await api.post(
+        `/trader/products/colors/${colorId}/images`,
+        formData,
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -362,14 +449,21 @@ export const useAddProductColorImages = () => {
 export const useDeleteProductImage = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ imageId }: { imageId: string; productId?: string }) => {
+    mutationFn: async ({
+      imageId,
+    }: {
+      imageId: string;
+      productId?: string;
+    }) => {
       const { data } = await api.delete(`/trader/products/images/${imageId}`);
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -379,14 +473,26 @@ export const useDeleteProductImage = () => {
 export const useUpdateProductSizeQuantity = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ variantId, quantity }: { variantId: string; quantity: number; productId?: string }) => {
-      const { data } = await api.patch(`/trader/products/variants/${variantId}`, { quantity });
+    mutationFn: async ({
+      variantId,
+      quantity,
+    }: {
+      variantId: string;
+      quantity: number;
+      productId?: string;
+    }) => {
+      const { data } = await api.patch(
+        `/trader/products/variants/${variantId}`,
+        { quantity },
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -396,14 +502,30 @@ export const useUpdateProductSizeQuantity = () => {
 export const useAddProductSize = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ colorId, size, quantity, sku }: { colorId: string; size: string; quantity: number; sku?: string; productId?: string }) => {
-      const { data } = await api.post(`/trader/products/colors/${colorId}/sizes`, { size, quantity, sku });
+    mutationFn: async ({
+      colorId,
+      size,
+      quantity,
+      sku,
+    }: {
+      colorId: string;
+      size: string;
+      quantity: number;
+      sku?: string;
+      productId?: string;
+    }) => {
+      const { data } = await api.post(
+        `/trader/products/colors/${colorId}/sizes`,
+        { size, quantity, sku },
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -413,14 +535,23 @@ export const useAddProductSize = () => {
 export const useDeleteProductSize = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ variantId }: { variantId: string; productId?: string }) => {
-      const { data } = await api.delete(`/trader/products/variants/${variantId}`);
+    mutationFn: async ({
+      variantId,
+    }: {
+      variantId: string;
+      productId?: string;
+    }) => {
+      const { data } = await api.delete(
+        `/trader/products/variants/${variantId}`,
+      );
       return data.data;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       if (variables.productId) {
-        queryClient.invalidateQueries({ queryKey: ["product", variables.productId] });
+        queryClient.invalidateQueries({
+          queryKey: ["product", variables.productId],
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
@@ -443,9 +574,9 @@ export type RecommendedProductsQuery = {
 };
 
 const getRecommendedProducts = async (
-  params: RecommendedProductsQuery
+  params: RecommendedProductsQuery,
 ): Promise<ProductsResponse> => {
-  const queryParams: Record<string, any> = { ...params };
+  const queryParams: Record<string, unknown> = { ...params };
   if (Array.isArray(queryParams.categories)) {
     queryParams.categories = queryParams.categories.join(",");
   }

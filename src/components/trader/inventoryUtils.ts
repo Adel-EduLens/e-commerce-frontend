@@ -19,6 +19,8 @@ export interface InventoryItem {
   sku: string;
   price: string;
   priceNum: number;
+  depositAmount?: number;
+  securityDeposit?: number;
   date: string;
   createdAtRaw: number;
   status: InventoryStatus;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRetailProductBySlug, useRetailProductById } from '../hooks/useRetailProducts'
+import { useRetailProductById } from '../hooks/useRetailProducts'
 import useRetailNotifyMe from '../hooks/useRetailNotifyMe'
 import { useAuthStore } from '../store/useAuthStore'
 import { useAddRetailProductToCart } from '../hooks/useCart'
@@ -18,12 +18,9 @@ function toNumber(value: any) {
 export default function RetailProductDetailsPage() {
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuthStore()
-  const { slug, id } = useParams()
-  const { data: bySlug, isLoading: loadingSlug, error: slugError } = useRetailProductBySlug(slug ?? '')
-  const { data: byId, isLoading: loadingId, error: idError } = useRetailProductById(id ?? '')
-  const product: any = bySlug ?? byId
-  const isLoading = loadingSlug || loadingId
-  const error = slugError || idError
+  const { id } = useParams()
+  const { data: byId, isLoading, error } = useRetailProductById(id ?? '')
+  const product: any = byId
 
   const notify = useRetailNotifyMe(user?.id)
   const addRetailProductToCart = useAddRetailProductToCart()

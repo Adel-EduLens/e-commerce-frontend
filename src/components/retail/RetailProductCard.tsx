@@ -79,12 +79,12 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
 
   const handleAddToCart = () => {
     if (product.stock <= 0) {
-      navigate(`/retail/${product.slug}`)
+      navigate(`/retail/${product.id}`)
       return
     }
 
     if (hasOptions) {
-      navigate(`/retail/${product.slug}`)
+      navigate(`/retail/${product.id}`)
       return
     }
 
@@ -163,7 +163,7 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
 
       <button
         type="button"
-        onClick={() => navigate(`/retail/${product.slug}`)}
+        onClick={() => navigate(`/retail/${product.id}`)}
         className="absolute inset-0 z-0"
         aria-label={`Open details for ${product.name}`}
       >

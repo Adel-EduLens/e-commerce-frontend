@@ -1,13 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, type UseQueryResult, type UseQueryOptions } from "@tanstack/react-query";
 import retailApi from "../services/retailApi";
+import type { RetailCategory } from "../types/retail";
 
-export function useRetailCategories() {
+export function useRetailCategories(
+  options?: Omit<UseQueryOptions<{ data: RetailCategory[] }, Error, { data: RetailCategory[] }, string[]>, "queryKey" | "queryFn">
+): UseQueryResult<{ data: RetailCategory[] }, Error> {
   return useQuery({
     queryKey: ["retailCategories"],
-    queryFn: async () => {
+    queryFn: async (): Promise<{ data: RetailCategory[] }> => {
       const data = await retailApi.getRetailCategories();
       return data;
     },
+    ...options,
   });
 }
 
@@ -39,7 +43,7 @@ export function useCreateRetailCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: any) => retailApi.createRetailCategory(data),
+    mutationFn: (data: Partial<RetailCategory> | FormData | Record<string, unknown>) => retailApi.createRetailCategory(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["retailCategories"] });
     },
@@ -50,11 +54,13 @@ export function useUpdateRetailCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) =>
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<RetailCategory> | FormData | Record<string, unknown> }) =>
       retailApi.updateRetailCategory({ id, data }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["retailCategories"] });
-      queryClient.invalidateQueries({ queryKey: ["retailCategory", variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["retailCategory", variables.id],
+      });
     },
   });
 }

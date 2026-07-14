@@ -35,10 +35,8 @@ export function RetailCategoryFormModal({
   onSave: (data: Partial<RetailCategory> | FormData | Record<string, unknown>) => Promise<void>;
 }) {
   const [name, setName] = useState(category?.name || "");
-  const [slug, setSlug] = useState(category?.slug || "");
-  const [description, setDescription] = useState(category?.description || "");
-  const [imageUrl, setImageUrl] = useState(category?.imageUrl || "");
-  const [isActive, setIsActive] = useState(category?.isActive ?? true);
+  const [image, setImage] = useState(category?.image || "");
+  const [appearOnHome, setAppearOnHome] = useState(category?.appearOnHome ?? false);
   
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -62,7 +60,7 @@ export function RetailCategoryFormModal({
     try {
       setUploading(true);
       const url = await uploadImageFile(file);
-      setImageUrl(url);
+      setImage(url);
     } catch (err) {
 
       alert("Failed to upload image");
@@ -75,7 +73,7 @@ export function RetailCategoryFormModal({
   const handleSaveClick = async () => {
     setIsSubmitting(true);
     try {
-      await onSave({ name, slug, description, imageUrl, isActive });
+      await onSave({ name, image, appearOnHome });
     } finally {
       setIsSubmitting(false);
     }
@@ -105,55 +103,26 @@ export function RetailCategoryFormModal({
             <input
               placeholder="Enter category name"
               value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                if (!category) {
-                  setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
-                }
-              }}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background"
-            />
-          </div>
-
-          <div>
-            <label className="block font-['Montserrat'] text-xs font-semibold text-foreground mb-1">
-              Slug *
-            </label>
-            <input
-              placeholder="e.g. category-name"
-              value={slug}
-              onChange={(e) => setSlug(e.target.value)}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background"
-            />
-          </div>
-
-          <div>
-            <label className="block font-['Montserrat'] text-xs font-semibold text-foreground mb-1">
-              Description
-            </label>
-            <textarea
-              placeholder="Brief description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background"
             />
           </div>
 
           <div className="flex justify-between items-center">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Is Active
+              Appear on Home
             </label>
             <button
               type="button"
-              onClick={() => setIsActive(!isActive)}
-              aria-label={isActive ? `disable category` : `enable category`}
+              onClick={() => setAppearOnHome(!appearOnHome)}
+              aria-label={appearOnHome ? `disable appear on home` : `enable appear on home`}
               className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                isActive ? "bg-primary" : "bg-stroke"
+                appearOnHome ? "bg-primary" : "bg-stroke"
               }`}
             >
               <span
                 className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                  isActive ? "translate-x-5" : "translate-x-0.5"
+                  appearOnHome ? "translate-x-5" : "translate-x-0.5"
                 }`}
               />
             </button>
@@ -171,10 +140,10 @@ export function RetailCategoryFormModal({
             />
           </div>
 
-          {imageUrl && (
+          {image && (
             <div className="relative w-24 h-24 rounded-xl border border-stroke overflow-hidden mt-2">
               <img
-                src={imageUrl}
+                src={image}
                 className="h-full w-full object-cover"
                 alt="Preview"
               />
@@ -191,7 +160,7 @@ export function RetailCategoryFormModal({
             </button>
             <button
               type="button"
-              disabled={uploading || isSubmitting || !name || !slug}
+              disabled={uploading || isSubmitting || !name}
               onClick={handleSaveClick}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
             >
@@ -410,10 +379,10 @@ export function RetailCategoryTablePanel({
                 className="relative flex flex-col overflow-hidden rounded-lg border border-stroke bg-card"
               >
                 <div className="relative mx-2 mt-2 h-48 overflow-hidden rounded-lg bg-background">
-                  {c.imageUrl ? (
+                  {c.image ? (
                     <img
                       className="h-full w-full object-cover"
-                      src={c.imageUrl}
+                      src={c.image}
                       alt=""
                     />
                   ) : (
@@ -424,9 +393,11 @@ export function RetailCategoryTablePanel({
                   <p className="truncate font-['Montserrat'] text-base font-semibold text-foreground">
                     {c.name}
                   </p>
-                  <p className="truncate font-['Montserrat'] text-xs text-gray-text">
-                    Slug: {c.slug}
-                  </p>
+                  {c.appearOnHome && (
+                    <p className="font-['Montserrat'] text-xs text-primary mb-2">
+                      Appears on Home
+                    </p>
+                  )}
                   <div className="flex items-center justify-between pt-2 border-t border-stroke">
                     <div className="flex items-center gap-2">
                       <button
@@ -444,13 +415,6 @@ export function RetailCategoryTablePanel({
                         <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="" />
                       </button>
                     </div>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        c.isActive ? "bg-success text-white" : "bg-gray-text text-white"
-                      }`}
-                    >
-                      {c.isActive ? "Active" : "Inactive"}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -468,10 +432,7 @@ export function RetailCategoryTablePanel({
                     Name
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Slug
-                  </th>
-                  <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Status
+                    Home
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
                     Actions
@@ -485,10 +446,10 @@ export function RetailCategoryTablePanel({
                     className={idx % 2 === 0 ? "bg-card" : "bg-background"}
                   >
                     <td className="px-4 py-3 text-center">
-                      {c.imageUrl ? (
+                      {c.image ? (
                         <img
                           className="mx-auto h-8 w-8 rounded-lg object-cover"
-                          src={c.imageUrl}
+                          src={c.image}
                           alt=""
                         />
                       ) : (
@@ -499,16 +460,7 @@ export function RetailCategoryTablePanel({
                       {c.name}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                      {c.slug}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                          c.isActive ? "bg-success text-white" : "bg-gray-text text-white"
-                        }`}
-                      >
-                        {c.isActive ? "Active" : "Inactive"}
-                      </span>
+                      {c.appearOnHome ? "Yes" : "No"}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-1.5">
@@ -643,7 +595,9 @@ export default function TraderRetailCategoriesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editCategory, setEditCategory] = useState<RetailCategory | null>(null);
 
-  const { data: categories = [], isLoading } = useRetailCategories();
+  const { data: categoriesResponse, isLoading } = useRetailCategories();
+  const categories = categoriesResponse?.data || [];
+
   const createCategory = useCreateRetailCategory();
   const updateCategory = useUpdateRetailCategory();
   const deleteCategory = useDeleteRetailCategory();
@@ -688,7 +642,7 @@ export default function TraderRetailCategoriesPage() {
       )}
 
       <RetailCategoryTablePanel
-        categories={categories?.data || categories || []}
+        categories={categories}
         loading={isLoading}
         onAdd={() => setShowAddModal(true)}
         onEdit={setEditCategory}

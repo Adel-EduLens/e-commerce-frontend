@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import retailApi from '../services/retailApi'
 import type { RetailProduct } from '../types/retail'
 
-export function useRetailProducts(params: Record<string, string | number | boolean | undefined | null> = {}) {
+export function useRetailProducts(params: Record<string, string | number | boolean | undefined | null> = {}, options?: any) {
   const filtered: Record<string, string | number | boolean> = {}
   Object.keys(params || {}).forEach((k) => {
     const v = params[k]
@@ -17,6 +17,7 @@ export function useRetailProducts(params: Record<string, string | number | boole
       const data = await retailApi.getRetailProducts(filtered)
       return data
     },
+    ...options
   })
 }
 
@@ -31,14 +32,21 @@ export function useRetailProductById(id: string | number) {
   })
 }
 
-export function useRetailProductBySlug(slug: string) {
+export function useTraderRetailProducts(params: Record<string, string | number | boolean | undefined | null> = {}) {
+  const filtered: Record<string, string | number | boolean> = {}
+  Object.keys(params || {}).forEach((k) => {
+    const v = params[k]
+    if (v === undefined || v === null) return
+    if (typeof v === 'string' && v.trim() === '') return
+    filtered[k] = v
+  })
+
   return useQuery({
-    queryKey: ['retailProduct', 'slug', slug],
+    queryKey: ['traderRetailProducts', JSON.stringify(filtered)],
     queryFn: async () => {
-      const data = await retailApi.getRetailProductBySlug(slug)
+      const data = await retailApi.getRetailProducts(filtered)
       return data
     },
-    enabled: !!slug,
   })
 }
 
@@ -48,6 +56,7 @@ export function useCreateRetailProduct() {
     mutationFn: (data: Partial<RetailProduct> | FormData | Record<string, unknown>) => retailApi.createRetailProduct(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['retailProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['traderRetailProducts'] })
     },
   })
 }
@@ -58,6 +67,7 @@ export function useUpdateRetailProduct() {
     mutationFn: (args: { id: string | number; data: Partial<RetailProduct> | FormData | Record<string, unknown> }) => retailApi.updateRetailProduct(args),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['retailProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['traderRetailProducts'] })
       queryClient.invalidateQueries({ queryKey: ['retailProduct', 'id', variables.id] })
     },
   })
@@ -69,6 +79,7 @@ export function useDeleteRetailProduct() {
     mutationFn: (id: string | number) => retailApi.deleteRetailProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['retailProducts'] })
+      queryClient.invalidateQueries({ queryKey: ['traderRetailProducts'] })
     },
   })
 }

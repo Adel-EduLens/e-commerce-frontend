@@ -2469,6 +2469,7 @@ interface InventoryTablePanelProps {
   onEdit: (item: InventoryItem) => void;
   onDelete: (item: InventoryItem) => void;
   showTypeFilter?: boolean;
+  showRetailColumns?: boolean;
   title?: string;
   addLabel?: string;
 }
@@ -2481,6 +2482,7 @@ export function InventoryTablePanel({
   onEdit,
   onDelete,
   showTypeFilter = true,
+  showRetailColumns = false,
   title = "Products Table",
   addLabel = "Add Item",
 }: InventoryTablePanelProps) {
@@ -2582,6 +2584,7 @@ export function InventoryTablePanel({
       "stock",
       "sku",
       "price",
+      ...(showRetailColumns ? ["Deposit", "Security"] : []),
       "date",
       "status",
       "actions",
@@ -2593,6 +2596,7 @@ export function InventoryTablePanel({
       "stock",
       "sku",
       "price",
+      ...(showRetailColumns ? ["Deposit", "Security"] : []),
       "date",
       "status",
       "actions",
@@ -2838,6 +2842,7 @@ export function InventoryTablePanel({
                     "Stock",
                     "SKU",
                     "Price",
+                    ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
                     "Date",
                     "Status",
                   ]
@@ -2847,6 +2852,7 @@ export function InventoryTablePanel({
                     "Stock",
                     "SKU",
                     "Price",
+                    ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
                     "Date",
                     "Status",
                   ];
@@ -2859,6 +2865,7 @@ export function InventoryTablePanel({
                       i.stock,
                       i.sku,
                       i.priceNum,
+                      ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
                       i.date,
                       i.status,
                     ]
@@ -2868,6 +2875,7 @@ export function InventoryTablePanel({
                       i.stock,
                       i.sku,
                       i.priceNum,
+                      ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
                       i.date,
                       i.status,
                     ],
@@ -3043,7 +3051,7 @@ export function InventoryTablePanel({
                       key={col}
                       className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap"
                     >
-                      {t(col)}
+                      {col === "Deposit" || col === "Security" ? col : t(col)}
                     </th>
                   ))}
                 </tr>
@@ -3115,6 +3123,16 @@ export function InventoryTablePanel({
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                         {item.price}
                       </td>
+                      {showRetailColumns && (
+                        <>
+                          <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                            ${item.depositAmount ?? 0}
+                          </td>
+                          <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                            ${item.securityDeposit ?? 0}
+                          </td>
+                        </>
+                      )}
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground whitespace-nowrap">
                         {item.date}
                       </td>
