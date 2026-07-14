@@ -90,6 +90,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
             res.data.items.map((dbItem: any) => ({
               id: dbItem.id,
               productId: dbItem.productId,
+              categoryId: dbItem.categoryId,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -123,6 +124,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
             res.data.items.map((dbItem: any) => ({
               id: dbItem.id,
               productId: dbItem.productId,
+              categoryId: dbItem.categoryId,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -160,6 +162,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
             res.data.items.map((dbItem: any) => ({
               id: dbItem.id,
               productId: dbItem.productId,
+              categoryId: dbItem.categoryId,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -207,9 +210,10 @@ export const useCartStore = create<CartStore>()((set, get) => ({
   },
 
   setItems: (items) => {
+    const sortedItems = [...items].sort((a, b) => a.id.localeCompare(b.id));
     const currentItems = get().items;
-    if (JSON.stringify(currentItems) !== JSON.stringify(items)) {
-      set({ items });
+    if (JSON.stringify(currentItems) !== JSON.stringify(sortedItems)) {
+      set({ items: sortedItems });
     }
   },
 }));
