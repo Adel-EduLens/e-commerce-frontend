@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   type InventoryItem,
   getStatus,
+  COLOR_OPTIONS,
+  SIZE_OPTIONS,
 } from "../../components/trader/inventoryUtils";
-import { InventoryTablePanel } from "../../components/trader/InventoryShared";
+import { InventoryTablePanel, MultiSelect } from "../../components/trader/InventoryShared";
 import { Toggle } from "../../components/ui";
 import { toast } from "sonner";
 import {
-  useRetailProducts,
+  useTraderRetailProducts,
   useCreateRetailProduct,
   useUpdateRetailProduct,
   useDeleteRetailProduct,
 } from "../../hooks/useRetailProducts";
 import { useRetailCategories } from "../../hooks/useRetailCategories";
+import { useRetailBrands } from "../../hooks/queries/retailBrandQuery";
 import type { RetailProduct, RetailCategory } from "../../types/retail";
 import ImageCropModal, {
   validateImageDimensions,
@@ -40,17 +43,15 @@ export function RetailProductFormModal({
     data: Partial<RetailProduct> | FormData | Record<string, unknown>,
   ) => Promise<void>;
 }) {
-  const { data: categoriesData = [] } = useRetailCategories();
+  const { data: categoriesData } = useRetailCategories();
   const categories: RetailCategory[] =
-    categoriesData?.data || categoriesData || [];
+    ((categoriesData as unknown) as { data?: RetailCategory[] })?.data || ((categoriesData as unknown) as RetailCategory[]) || [];
+
+  const { data: brandsData } = useRetailBrands();
+  const brands: { id: string; name: string }[] = ((brandsData as unknown) as { data?: { id: string; name: string }[] })?.data || ((brandsData as unknown) as { id: string; name: string }[]) || [];
 
   const [name, setName] = useState(product?.name || "");
-  const [slug, setSlug] = useState(product?.slug || "");
   const [price, setPrice] = useState(product?.price || 0);
-  const [discountPrice, setDiscountPrice] = useState(
-    product?.discountPrice || "",
-  );
-  const [stock, setStock] = useState(product?.stock || 0);
   const [categoryId, setCategoryId] = useState(product?.categoryId || "");
   const [depositAmount, setDepositAmount] = useState(
     product?.depositAmount || 0,
@@ -60,10 +61,7 @@ export function RetailProductFormModal({
   );
 
   const [sku, setSku] = useState(product?.sku || "");
-  const [brand, setBrand] = useState(product?.brand || "");
-  const [shortDescription, setShortDescription] = useState(
-    product?.shortDescription || "",
-  );
+  const [brandId, setBrandId] = useState(product?.brand?.id || product?.brandId || "");
   const [description, setDescription] = useState(product?.description || "");
   const [termsAndConditions, setTermsAndConditions] = useState(
     product?.termsAndConditions || "",
@@ -71,86 +69,150 @@ export function RetailProductFormModal({
   const [privacyPolicy, setPrivacyPolicy] = useState(
     product?.privacyPolicy || "",
   );
-
   const [isFeatured, setIsFeatured] = useState(product?.isFeatured ?? false);
-  const [isActive, setIsActive] = useState(product?.isActive ?? true);
 
-  const [imageUrl, setImageUrl] = useState(
-    product?.images?.find((i) => i.isMain)?.url ||
-      product?.images?.[0]?.url ||
-      "",
-  );
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [productColors, setProductColors] = useState<{
+    color: string;
+    variants: { size: string; quantity: number }[];
+    images: File[];
+    existingImages: { url: string }[];
+  }[]>([]);
 
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  useEffect(() => {
+    if (product) {
+      const colorsArr = (product.colors as unknown as Record<string, unknown>[]) || [];
+      const initColorNames = Array.from(new Set(colorsArr.map((c) => (c.name || c.color || c) as string)));
+      setSelectedColors(initColorNames);
+
+      const initColors = initColorNames.map((colorName) => {
+        const imagesArr = (product.images as unknown as Record<string, unknown>[]) || [];
+        const matchingImages = imagesArr.filter((i) => i.color === colorName);
+
+        const sizesArr = (product.sizes as unknown as Record<string, unknown>[]) || [];
+        const matchingSizes = sizesArr.filter((s) => s.color === colorName);
+
+        return {
+          color: colorName,
+          variants: matchingSizes.map((s) => ({
+            size: (s.name || s.size) as string,
+            quantity: (s.stock || s.quantity || 0) as number,
+          })),
+          images: [],
+          existingImages: matchingImages.map((i) => ({ url: i.url as string })),
+        };
+      });
+
+      if (initColors.length > 0) {
+        setProductColors(initColors);
+      }
+    }
+  }, [product]);
+
+  const handleColorsChange = (colors: string[]) => {
+    setSelectedColors(colors);
+    setProductColors((prev) => {
+      const updated = colors.map((c) => {
+        const existing = prev.find((p) => p.color === c);
+        return existing || { color: c, variants: [], images: [], existingImages: [] };
+      });
+      return updated;
+    });
+  };
+
+  const [cropState, setCropState] = useState<{
+    color: string;
+    src: string;
+    name: string;
+  } | null>(null);
+
   const [uploading, setUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const error = await validateImageDimensions(file);
-    if (error) {
-      alert(error);
-      return;
-    }
-
-    setCropSrc(URL.createObjectURL(file));
-    e.target.value = "";
-  };
-
-  const handleCrop = async (file: File) => {
-    try {
-      setUploading(true);
-      const url = await uploadImageFile(file);
-      setImageUrl(url);
-    } catch (err) {
-
-      alert("Failed to upload image");
-    } finally {
-      setUploading(false);
-      setCropSrc(null);
-    }
-  };
 
   const handleSaveClick = async () => {
     setIsSubmitting(true);
-
-    const payload = {
-      name,
-      slug,
-      price: Number(price),
-      discountPrice: discountPrice !== "" ? Number(discountPrice) : undefined,
-      stock: Number(stock),
-      categoryId: Number(categoryId),
-      depositAmount: Number(depositAmount),
-      securityDeposit: Number(securityDeposit),
-      sku: sku || undefined,
-      brand: brand || undefined,
-      shortDescription: shortDescription || undefined,
-      description: description || undefined,
-      termsAndConditions: termsAndConditions || undefined,
-      privacyPolicy: privacyPolicy || undefined,
-      isFeatured,
-      isActive,
-      images: imageUrl ? [{ url: imageUrl, isMain: true }] : [],
-    };
+    setUploading(true);
 
     try {
+      const colorsData = await Promise.all(
+        productColors.map(async (pc) => {
+          const uploadedUrls = await Promise.all(
+            pc.images.map((f) => uploadImageFile(f))
+          );
+          const combinedUrls = [
+            ...(pc.existingImages || []).map((e) => e.url),
+            ...uploadedUrls,
+          ];
+
+          return {
+            color: pc.color,
+            images: combinedUrls.map((url) => ({ url, color: pc.color })),
+            sizes: pc.variants.map((v) => ({
+              size: v.size,
+              quantity: v.quantity,
+              color: pc.color,
+            })),
+            stock: pc.variants.reduce((acc, v) => acc + (v.quantity || 0), 0),
+          };
+        })
+      );
+
+      const allImages = colorsData.flatMap((c) => c.images);
+      const allSizes = colorsData.flatMap((c) => c.sizes);
+      const allColors = colorsData.map((c) => c.color);
+      const totalStock = colorsData.reduce((acc, c) => acc + c.stock, 0);
+
+      const payload = {
+        name,
+        price: Number(price),
+        stock: totalStock,
+        categoryId: Number(categoryId),
+        depositAmount: Number(depositAmount),
+        securityDeposit: Number(securityDeposit),
+        sku: sku || undefined,
+        brandId: brandId || undefined,
+        description: description || undefined,
+        termsAndConditions: termsAndConditions || undefined,
+        privacyPolicy: privacyPolicy || undefined,
+        isFeatured,
+        images: allImages,
+        colors: allColors,
+        sizes: allSizes,
+      };
+
       await onSave(payload);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(error.message || "Failed to save product");
     } finally {
+      setUploading(false);
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      {cropSrc && (
+      {cropState && (
         <ImageCropModal
-          imageSrc={cropSrc}
-          fileName="retail-product.jpg"
-          onCancel={() => setCropSrc(null)}
-          onConfirm={handleCrop}
+          imageSrc={cropState.src}
+          fileName={cropState.name}
+          onConfirm={(croppedFile) => {
+            URL.revokeObjectURL(cropState.src);
+            const col = cropState.color;
+            setCropState(null);
+            setProductColors((prev) =>
+              prev.map((pc) =>
+                pc.color === col
+                  ? { ...pc, images: [...pc.images, croppedFile] }
+                  : pc
+              )
+            );
+          }}
+          onCancel={() => {
+            URL.revokeObjectURL(cropState.src);
+            setCropState(null);
+          }}
         />
       )}
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
@@ -178,20 +240,7 @@ export function RetailProductFormModal({
             placeholder="Name *"
             required
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (!product) {
-                setSlug(e.target.value.toLowerCase().replace(/\s+/g, "-"));
-              }
-            }}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
-          />
-
-          <input
-            placeholder="Slug *"
-            required
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
           />
 
@@ -216,15 +265,22 @@ export function RetailProductFormModal({
               onChange={(e) => setSku(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             />
-            <input
-              placeholder="Brand"
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
+            <select
+              required
+              value={brandId}
+              onChange={(e) => setBrandId(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
-            />
+            >
+              <option value="">Select Brand *</option>
+              {brands.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <input
               type="number"
               min="0"
@@ -235,27 +291,9 @@ export function RetailProductFormModal({
               onChange={(e) => setPrice(Number(e.target.value))}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             />
-            <input
-              type="number"
-              min="0"
-              step="1"
-              placeholder="Discount Price"
-              value={discountPrice}
-              onChange={(e) => setDiscountPrice(e.target.value)}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
-            />
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <input
-              type="number"
-              min="0"
-              required
-              placeholder="Stock *"
-              value={stock || ""}
-              onChange={(e) => setStock(Number(e.target.value))}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
-            />
+          <div className="grid grid-cols-2 gap-2">
             <input
               type="number"
               min="0"
@@ -275,14 +313,6 @@ export function RetailProductFormModal({
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             />
           </div>
-
-          <textarea
-            placeholder="Short Description"
-            rows={3}
-            value={shortDescription}
-            onChange={(e) => setShortDescription(e.target.value)}
-            className="rounded-xl border border-stroke p-3 min-h-[80px] font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground resize-y"
-          />
 
           <textarea
             placeholder="Main Description"
@@ -308,43 +338,226 @@ export function RetailProductFormModal({
             className="rounded-xl border border-stroke p-3 min-h-[80px] font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground resize-y"
           />
 
-          <div>
-            <label className="mb-2 block font-['Montserrat'] text-sm font-semibold text-foreground">
-              Product Image
-            </label>
-            <div className="flex items-start gap-4">
-              <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-stroke bg-gray-50 transition hover:bg-gray-100">
-                <span className="text-2xl text-gray-text">+</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFile}
-                  className="hidden"
-                />
-              </label>
-              {imageUrl && (
-                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-stroke">
-                  <img
-                    src={imageUrl}
-                    alt="preview"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <MultiSelect
+            label="Select colors *"
+            options={COLOR_OPTIONS}
+            selected={selectedColors}
+            onChange={handleColorsChange}
+          />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center justify-between rounded-xl border border-stroke p-3">
-              <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                Is Active
-              </span>
-              <Toggle
-                checked={isActive}
-                onChange={setIsActive}
-                size="md"
-              />
+          {productColors.map((pc) => (
+            <div
+              key={pc.color}
+              className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+            >
+              <div className="flex items-center justify-between border-b border-stroke pb-2">
+                <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
+                  <span
+                    className="inline-block w-3 h-3 rounded-full border border-stroke"
+                    style={{ backgroundColor: pc.color.toLowerCase() }}
+                  />
+                  {pc.color}
+                </h4>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleColorsChange(
+                      selectedColors.filter((c) => c !== pc.color)
+                    )
+                  }
+                  className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
+                >
+                  Remove Color
+                </button>
+              </div>
+
+              {/* Multiple Image Upload */}
+              <div className="space-y-2">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Upload Images *
+                </p>
+                <div className="flex flex-wrap gap-2 items-center">
+                  {pc.existingImages?.map((img, imgIdx) => (
+                    <div
+                      key={`existing-${imgIdx}`}
+                      className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                    >
+                      <img src={img.url} alt="preview" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductColors((prev) =>
+                            prev.map((item) =>
+                              item.color === pc.color
+                                ? { ...item, existingImages: item.existingImages?.filter((_, idx) => idx !== imgIdx) }
+                                : item
+                            )
+                          );
+                        }}
+                        className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                  {pc.images.map((imgFile, imgIdx) => {
+                    const previewUrl = URL.createObjectURL(imgFile);
+                    return (
+                      <div
+                        key={`new-${imgIdx}`}
+                        className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group"
+                      >
+                        <img
+                          src={previewUrl}
+                          alt="preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            URL.revokeObjectURL(previewUrl);
+                            setProductColors((prev) =>
+                              prev.map((item) =>
+                                item.color === pc.color
+                                  ? {
+                                      ...item,
+                                      images: item.images.filter((_, idx) => idx !== imgIdx),
+                                    }
+                                  : item,
+                              ),
+                            );
+                          }}
+                          className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    );
+                  })}
+                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
+                    <span className="text-xl font-bold">+</span>
+                    <span className="text-[9px] font-['Montserrat']">Add</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const err = await validateImageDimensions(file);
+                          if (err) {
+                            toast.error(`${pc.color} Image: ${err}`);
+                            e.target.value = "";
+                            return;
+                          }
+                          setCropState({
+                            color: pc.color,
+                            src: URL.createObjectURL(file),
+                            name: file.name,
+                          });
+                        }
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Variant Table (Sizes & Stock) */}
+              <div className="space-y-2">
+                <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                  Sizes & Quantities
+                </p>
+                {pc.variants.length > 0 && (
+                  <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
+                    <thead>
+                      <tr className="bg-secondary text-primary font-bold">
+                        <th className="p-2 border-b border-stroke">Size</th>
+                        <th className="p-2 border-b border-stroke">Quantity</th>
+                        <th className="p-2 border-b border-stroke text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pc.variants.map((v, vIdx) => (
+                        <tr key={vIdx} className="bg-white border-b border-stroke last:border-none">
+                          <td className="p-2 font-semibold">{v.size}</td>
+                          <td className="p-2">
+                            <input
+                              type="number"
+                              min="0"
+                              value={v.quantity === 0 ? "" : v.quantity}
+                              onChange={(e) => {
+                                const val = Number(e.target.value);
+                                setProductColors((prev) =>
+                                  prev.map((item) =>
+                                    item.color === pc.color
+                                      ? {
+                                          ...item,
+                                          variants: item.variants.map((v2, i2) =>
+                                            i2 === vIdx ? { ...v2, quantity: val } : v2
+                                          ),
+                                        }
+                                      : item
+                                  )
+                                );
+                              }}
+                              className="w-16 rounded border border-stroke px-2 py-1 outline-none focus:border-primary text-foreground"
+                            />
+                          </td>
+                          <td className="p-2 text-right">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProductColors((prev) =>
+                                  prev.map((item) =>
+                                    item.color === pc.color
+                                      ? {
+                                          ...item,
+                                          variants: item.variants.filter((_, i2) => i2 !== vIdx),
+                                        }
+                                      : item
+                                  )
+                                );
+                              }}
+                              className="text-red-500 font-semibold text-[10px]"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                <div className="flex items-center gap-2 mt-2">
+                  <select
+                    className="flex-1 rounded-lg border border-stroke px-2 py-1.5 font-['Montserrat'] text-xs outline-none focus:border-primary"
+                    onChange={(e) => {
+                      const sz = e.target.value;
+                      if (!sz) return;
+                      setProductColors((prev) =>
+                        prev.map((item) => {
+                          if (item.color === pc.color) {
+                            if (item.variants.some((v) => v.size === sz)) return item;
+                            return { ...item, variants: [...item.variants, { size: sz, quantity: 0 }] };
+                          }
+                          return item;
+                        })
+                      );
+                      e.target.value = ""; // reset
+                    }}
+                  >
+                    <option value="">Add Size</option>
+                    {SIZE_OPTIONS.map((sz) => (
+                      <option key={sz} value={sz}>{sz}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
+          ))}
+
+          <div className="grid grid-cols-1 gap-4 mt-2">
             <div className="flex items-center justify-between rounded-xl border border-stroke p-3">
               <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
                 Is Featured
@@ -371,9 +584,10 @@ export function RetailProductFormModal({
                 uploading ||
                 isSubmitting ||
                 !name ||
-                !slug ||
                 !price ||
-                !categoryId
+                !categoryId ||
+                !brandId ||
+                productColors.length === 0
               }
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
@@ -385,6 +599,7 @@ export function RetailProductFormModal({
     </div>
   );
 }
+
 
 // Fallback date to avoid calling Date.now() during render (react-hooks/purity)
 const FALLBACK_DATE_RAW = Date.now();
@@ -407,7 +622,7 @@ export default function TraderRetailProductsPage() {
     isLoading,
     isError,
     error: errorMsg,
-  } = useRetailProducts();
+  } = useTraderRetailProducts();
 
   const createProduct = useCreateRetailProduct();
   const updateProduct = useUpdateRetailProduct();
@@ -415,17 +630,17 @@ export default function TraderRetailProductsPage() {
 
   // Handle parsing the array properly in case it is nested
   const raw = rawProducts as Record<string, unknown>;
-  const rawData = raw?.data as Record<string, unknown> | undefined;
 
-  const productsArray: RetailProduct[] = Array.isArray(rawProducts)
-    ? rawProducts
-    : Array.isArray(rawData?.data)
-      ? (rawData.data as RetailProduct[])
-      : Array.isArray(raw?.data)
-        ? (raw.data as RetailProduct[])
-        : Array.isArray(raw?.products)
-          ? (raw.products as RetailProduct[])
-          : [];
+  let productsArray: RetailProduct[] = [];
+  if (Array.isArray(rawProducts)) {
+    productsArray = rawProducts as RetailProduct[];
+  } else if (Array.isArray(raw?.data)) {
+    productsArray = raw.data as RetailProduct[];
+  } else if (Array.isArray((raw?.data as Record<string, unknown>)?.products)) {
+    productsArray = (raw.data as Record<string, unknown>).products as RetailProduct[];
+  } else if (Array.isArray(raw?.products)) {
+    productsArray = raw.products as RetailProduct[];
+  }
 
   // Map into InventoryItem format for the shared InventoryTablePanel
   const items: InventoryItem[] = productsArray.map((p) => {
@@ -438,18 +653,32 @@ export default function TraderRetailProductsPage() {
         ? new Date(pRaw.createdAt)
         : null;
 
+    const imagesArr = (p.images as unknown as Record<string, unknown>[]) || [];
+    const allImages: { url: string; color?: string }[] = imagesArr.map((i) => ({ url: i.url as string, color: i.color as string }));
+    if (allImages.length === 0 && mainImg) {
+      allImages.push({ url: mainImg });
+    }
+
+    const sizesArr = (p.sizes as unknown as Record<string, unknown>[]) || [];
+    const uniqueSizes = Array.from(new Set(sizesArr.map((s) => (s.name || s.size) as string)));
+    
+    const colorsArr = (p.colors as unknown as Record<string, unknown>[]) || [];
+    const uniqueColors = Array.from(new Set(colorsArr.map((c) => (c.name || c.color || c) as string)));
+
     return {
       id: String(p.id),
       image: mainImg,
-      imagesByColor: mainImg ? [{ url: mainImg }] : [],
+      imagesByColor: allImages,
       product: p.name,
       category: p.category?.name || "No Category",
       categoryId: String(p.categoryId),
-      brandId: p.brand || "",
+      brandId: p.brandId || p.brand?.id || "",
       stock: p.stock ?? 0,
       sku: p.sku || "",
       price: `$${p.price}`,
-      priceNum: p.price,
+      priceNum: Number(p.price) || 0,
+      depositAmount: p.depositAmount,
+      securityDeposit: p.securityDeposit,
       date: pDate
         ? pDate.toLocaleDateString("en-US", {
             month: "short",
@@ -461,12 +690,12 @@ export default function TraderRetailProductsPage() {
       status: getStatus(p.stock ?? 0),
       type: "product" as const,
       description: p.description || "",
-      sizes: p.sizes?.map((s) => s.name) || [],
-      colors: p.colors?.map((c) => c.name) || [],
+      sizes: uniqueSizes as string[],
+      colors: uniqueColors as string[],
       minOrder: 1,
-      isMustHave: p.isFeatured ?? false,
+      isMustHave: false,
       isFlashDeals: false,
-      flashDealPrice: p.discountPrice || null,
+      flashDealPrice: null,
       flashDealEndsAt: null,
       isBestDeal: false,
       isMostPopular: false,
@@ -548,6 +777,7 @@ export default function TraderRetailProductsPage() {
           });
         }}
         showTypeFilter={false}
+        showRetailColumns={true}
         title="Retail Products"
         addLabel="Add Retail Product"
       />

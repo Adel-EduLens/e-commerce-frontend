@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, type UseQueryResult, type UseQueryOptions } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
@@ -20,10 +20,14 @@ const getCategories = async (isWholesale?: boolean): Promise<Category[]> => {
   return data.data;
 };
 
-export const useCategories = (isWholesale?: boolean) => {
+export const useCategories = (
+  isWholesale?: boolean,
+  options?: Omit<UseQueryOptions<Category[], Error, Category[], (string | boolean | undefined)[]>, "queryKey" | "queryFn">
+): UseQueryResult<Category[], Error> => {
   return useQuery({
     queryKey: ["categories", isWholesale],
     queryFn: () => getCategories(isWholesale),
+    ...options
   });
 };
 

@@ -35,7 +35,8 @@ const COLOR_HEX: Record<string, string> = {
   navy: "#2c3e7f",
 };
 
-function colorToHex(name: string): string {
+function colorToHex(name?: string): string {
+  if (!name || typeof name !== "string") return "#000";
   return COLOR_HEX[name.toLowerCase()] ?? name;
 }
 
@@ -137,6 +138,7 @@ export default function ProductCard({
   wholesaleCard = false,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
+  const safeColors = Array.isArray(colors) ? colors.filter((c) => typeof c === 'string' && c.trim() !== '') : [];
   const { label: countdownLabel, expired } = useCountdown(
     showFlashDeal ? flashDealEndsAt : undefined,
   );
@@ -219,9 +221,9 @@ export default function ProductCard({
       const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
 
       if (isWholesale) {
-        const allColorsStr = colors.join(", ") || "All Colors";
+        const allColorsStr = safeColors.join(", ") || "All Colors";
         const allSizesStr = wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
-        const selectedColor = colors[activeColorIdx] ?? "Default";
+        const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
         addItem({
           id: `${actualProductId}-wholesale`,
@@ -245,8 +247,8 @@ export default function ProductCard({
                 ? sizeLabel.split(",")[0].trim() 
                 : sizeLabel.trim())
           : "Default";
-        const firstColor = colors && colors.length > 0 ? colors[0] : "Default";
-        const firstColorHex = colors && colors.length > 0 ? colorToHex(colors[0]) : "#000";
+        const firstColor = safeColors.length > 0 ? safeColors[0] : "Default";
+        const firstColorHex = safeColors.length > 0 ? colorToHex(safeColors[0]) : "#000";
 
         addItem({
           id: `${actualProductId}-${firstSize}-${firstColor}`,
@@ -430,7 +432,7 @@ export default function ProductCard({
         {/* Colors and Sizes */}
         <div className={`${useWholesaleCard ? "mt-1 gap-3" : "mt-4 justify-between"} flex items-center`}>
           <div className="flex items-center gap-2">
-            {colors.slice(0, useWholesaleCard ? 4 : colors.length).map((c, i) => {
+            {safeColors.slice(0, useWholesaleCard ? 4 : safeColors.length).map((c, i) => {
               const matchedImg = images?.find((img) => img.color?.toLowerCase() === c.toLowerCase());
               const isSelected = useWholesaleCard
                 ? i === activeColorIdx
@@ -463,8 +465,8 @@ export default function ProductCard({
                 />
               );
             })}
-            {useWholesaleCard && colors.length > 4 && (
-              <span className="text-[10px] text-gray-text">+{colors.length - 4}</span>
+            {useWholesaleCard && safeColors.length > 4 && (
+              <span className="text-[10px] text-gray-text">+{safeColors.length - 4}</span>
             )}
           </div>
 

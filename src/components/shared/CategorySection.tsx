@@ -1,14 +1,25 @@
 import { Link } from "react-router-dom";
-import { useCategories } from "../../hooks/queries/categoriesQuery";
+import { useCategories, type Category } from "../../hooks/queries/categoriesQuery";
+import { useRetailCategories } from "../../hooks/useRetailCategories";
+import type { RetailCategory } from "../../types/retail";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface CategoriesSectionProps {
   isWholesale?: boolean;
+  isRetail?: boolean;
 }
 
-function CategoriesSection({ isWholesale = false }: CategoriesSectionProps) {
-  const { data: categories = [], isLoading: isCategoriesLoading } =
-    useCategories(isWholesale);
+function CategoriesSection({ isWholesale = false, isRetail = false }: CategoriesSectionProps) {
+  const { data: standardCategories = [], isLoading: isStandardLoading } = useCategories(isWholesale, { enabled: !isRetail });
+  const { data: retailCategoriesResponse, isLoading: isRetailLoading } = useRetailCategories({ enabled: isRetail });
+
+  const isCategoriesLoading = isRetail ? isRetailLoading : isStandardLoading;
+  
+  // Normalize retail categories response which might be wrapped
+  let categories: (Category | RetailCategory)[] = standardCategories;
+  if (isRetail) {
+    categories = retailCategoriesResponse?.data || [];
+  }
 
   return (
     <div className="mt-16 flex w-full flex-col items-center justify-start gap-10">
@@ -21,11 +32,17 @@ function CategoriesSection({ isWholesale = false }: CategoriesSectionProps) {
         )}
         {!isCategoriesLoading &&
           categories
-            .filter((category) => category.appearOnHome || isWholesale)
+            .filter((category) => category.appearOnHome || isWholesale || isRetail)
             .map((category) => (
               <Link
                 key={category.id}
-                to={isWholesale ? `/wholesale?category=${category.name}` : `/products?category=${category.name}`}
+                to={
+                  isWholesale
+                    ? `/wholesale?category=${category.name}`
+                    : isRetail
+                    ? `/retail?categoryId=${category.id}`
+                    : `/products?category=${category.name}`
+                }
                 className="relative w-full overflow-hidden rounded-2xl bg-white no-underline aspect-[448/547]"
               >
                 <img
