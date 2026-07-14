@@ -110,7 +110,7 @@ export default function ProductsPage() {
 
 
   const combinedProducts = useMemo(() => {
-    console.log(data?.products);
+
     const items: React.ReactNode[] = [];
     if (data?.products) {
       data.products.forEach((product) => {

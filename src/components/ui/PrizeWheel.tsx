@@ -112,8 +112,7 @@ export default PrizeWheel;
 //   if (mustSpin) return;
 
 //   const winner = weightedRandom();
-//   console.log("Winner Index:", winner);
-//   console.log("Winner Prize:", prizes[winner]);
+
 
 //   setPrizeNumber(winner);
 //   setMustSpin(true);

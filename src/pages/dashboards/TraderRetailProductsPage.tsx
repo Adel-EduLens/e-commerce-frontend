@@ -105,7 +105,7 @@ export function RetailProductFormModal({
       const url = await uploadImageFile(file);
       setImageUrl(url);
     } catch (err) {
-      console.log(err);
+
       alert("Failed to upload image");
     } finally {
       setUploading(false);

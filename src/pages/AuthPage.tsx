@@ -94,7 +94,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           : loggedInUser.role === 'admin'
             ? '/dashboard/admin'
             : redirectPath || '/'
-      console.log('[Login] navigating to:', dest, 'role:', loggedInUser.role)
+
       navigate(dest, { replace: true })
     } catch (error) {
       handleApiError(error, t('toast.loginFailed'))
@@ -108,7 +108,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
     try {
       const response = await api.post('/auth/signup', data)
       const { token, user } = response.data.data
-      console.log(user)
+
       setAuth(user, token)
       toast.success(t('toast.signupSuccess'))
       navigate(
