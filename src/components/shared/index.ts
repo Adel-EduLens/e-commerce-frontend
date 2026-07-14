@@ -6,3 +6,5 @@ export { default as SidebarFilters } from './SidebarFilters'
 export { default as AccountSidebar } from './AccountSidebar'
 export { default as CollapsibleFAQ } from './CollapsibleFAQ'
 export { default as LoadingSpinner } from './LoadingSpinner'
+export { default as FilterCategory } from './FilterCategory'
+
