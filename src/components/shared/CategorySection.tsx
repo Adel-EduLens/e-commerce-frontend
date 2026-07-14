@@ -40,7 +40,7 @@ function CategoriesSection({ isWholesale = false, isRetail = false }: Categories
                   isWholesale
                     ? `/wholesale?category=${category.name}`
                     : isRetail
-                    ? `/retail?categoryId=${category.id}`
+                    ? `/retail/shop?category=${category.name}`
                     : `/products?category=${category.name}`
                 }
                 className="relative w-full overflow-hidden rounded-2xl bg-white no-underline aspect-[448/547]"

@@ -8,20 +8,22 @@ export interface RetailCategory {
 export interface RetailProductImage {
   id: number | string
   url: string
-  alt?: string
-  isMain: boolean
+  color?: string
+  productId?: number | string
 }
 
 export interface RetailProductColor {
   id: number | string
-  name: string
-  hexCode?: string
+  color: string
+  productId?: number | string
 }
 
 export interface RetailProductSize {
   id: number | string
-  name: string
-  stock?: number
+  size: string
+  quantity: number
+  color?: string
+  productId?: number | string
 }
 
 export interface RetailProduct {
@@ -36,11 +38,15 @@ export interface RetailProduct {
   isFeatured: boolean
   categoryId: number | string
   category?: RetailCategory
-  images: RetailProductImage[]
-  colors: RetailProductColor[]
-  sizes: RetailProductSize[]
-  depositAmount: number
-  securityDeposit: number
+  images?: RetailProductImage[]
+  colors?: RetailProductColor[]
+  sizes?: RetailProductSize[]
+  depositAmount?: number
+  securityDeposit?: number
   termsAndConditions?: string
   privacyPolicy?: string
+  rating: number
+  traderId?: number | string
+  createdAt?: string | Date
+  updatedAt?: string | Date
 }

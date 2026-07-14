@@ -4,19 +4,36 @@ import { useTranslation } from "react-i18next";
 
 import {
   ProductCard,
-  SidebarFilters,
-  LoadingSpinner,
+  FilterCategory,
 } from "../components/shared";
-import Pagination from "../components/shared/Pagination";
-import { useProducts } from "../hooks/queries/productsQuery";
-import { useCategories } from "../hooks/queries/categoriesQuery";
-import { useBrands } from "../hooks/queries/brandsQuery";
+import { useRetailProducts } from "../hooks/useRetailProducts";
+import { useRetailCategories } from "../hooks/useRetailCategories";
+import { useRetailBrands } from "../hooks/queries/retailBrandQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
-import { useHomeFilters } from "../hooks/utils/HomeFilters";
+
+import type { RetailProduct, RetailCategory, RetailProductSize, RetailProductColor, RetailProductImage } from "../types/retail";
+
+type RetailApiResponse = {
+  data?: {
+    products?: RetailProduct[];
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  } | RetailProduct[];
+  products?: RetailProduct[];
+  pagination?: {
+    page: number;
+    totalPages: number;
+  };
+  totalPages?: number;
+  currentPage?: number;
+};
 
 export default function RetailShopPage() {
   const { t } = useTranslation("productSection");
-  const { filters: filter2 } = useHomeFilters();
   const [searchParams] = useSearchParams();
 
   const urlSearch = searchParams.get("search") ?? "";
@@ -37,13 +54,16 @@ export default function RetailShopPage() {
   const effectiveCategoryName = filters.category;
   const [page, setPage] = useState(1);
 
-  const { data: categories = [] } = useCategories();
-  const { data: brands = [] } = useBrands();
+  const { data: catData } = useRetailCategories();
+  const categories = Array.isArray(catData) ? catData : catData?.data || [];
+
+  const { data: brandsData } = useRetailBrands();
+  const brands = Array.isArray(brandsData) ? brandsData : brandsData?.data || [];
 
   const categoryId = useMemo(() => {
     if (!effectiveCategoryName) return "";
     const matchedId = categories.find(
-      (c) => c.name.toLowerCase() === effectiveCategoryName.toLowerCase(),
+      (c: RetailCategory) => c.name.toLowerCase() === effectiveCategoryName.toLowerCase(),
     )?.id;
 
     return matchedId ?? "0000000";
@@ -52,12 +72,12 @@ export default function RetailShopPage() {
   const brandId = useMemo(() => {
     if (!filters.brand) return "";
     const matchedId = brands.find(
-      (b) => b.name.toLowerCase() === filters.brand!.toLowerCase(),
+      (b: { id: string; name: string }) => b.name.toLowerCase() === filters.brand!.toLowerCase(),
     )?.id;
     return matchedId ?? "0000000";
   }, [brands, filters.brand]);
 
-  const { data, isLoading, isError } = useProducts({
+  const { data, isLoading, isError } = useRetailProducts({
     search: filters.search,
     categoryId,
     brandId,
@@ -103,58 +123,86 @@ export default function RetailShopPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
+  const products: RetailProduct[] = useMemo(() => {
+    const typedData = data as RetailApiResponse | RetailProduct[] | undefined;
+    if (Array.isArray(typedData)) return typedData;
+    if (typedData && !Array.isArray(typedData)) {
+      if (Array.isArray(typedData.products)) return typedData.products;
+      if (Array.isArray(typedData.data)) return typedData.data;
+      if (typedData.data && !Array.isArray(typedData.data) && Array.isArray(typedData.data.products)) return typedData.data.products;
+    }
+    return [];
+  }, [data]);
+
   const availableSizes = useMemo(() => {
-    if (!data?.products) return undefined;
+    if (products.length === 0) return undefined;
     const sizes = new Set<string>();
-    data.products.forEach((product) => {
-      product.colors?.forEach((color) => {
-        color.variants?.forEach((variant) => {
-          if (variant.size) sizes.add(variant.size);
-        });
+    products.forEach((product: RetailProduct) => {
+      product.sizes?.forEach((size: RetailProductSize) => {
+        if (size.size) sizes.add(size.size);
       });
     });
     return Array.from(sizes);
-  }, [data]);
+  }, [products]);
+
+  const availableColors = useMemo(() => {
+    if (products.length === 0) return undefined;
+    const colors = new Set<string>();
+    products.forEach((product: RetailProduct) => {
+      product.colors?.forEach((c: RetailProductColor) => {
+        if (c.color) colors.add(c.color);
+      });
+    });
+    return Array.from(colors);
+  }, [products]);
+
+  const filter2 = useMemo(() => [
+    { key: 'category', label: 'Category', options: categories.map((c: RetailCategory) => c.name) },
+    { key: 'brand', label: 'Brand', options: brands.map((b: { id: string; name: string }) => b.name) },
+    { key: 'size', label: 'Size', options: availableSizes || [] },
+    { key: 'color', label: 'Color', options: availableColors || [] },
+  ], [categories, brands, availableSizes, availableColors]);
 
   const productsList = useMemo(() => {
-    if (!data?.products) return [];
+    if (products.length === 0) return [];
 
-    return data.products.map((product) => (
-      <ProductCard
-        key={`retail-${product.id}`}
-        title={product.name}
-        productId={product.id}
-        colors={
-          product.colors
-            ?.map((c) => c.colorName || c.color)
-            .filter(Boolean) as string[]
-        }
-        images={product.images}
-        price={`$${product.price}`}
-        imageSrc={
-          product.colors?.[0]?.images?.[0]?.imageUrl ||
-          product.colors?.[0]?.images?.[0]?.url ||
-          product.images?.[0]?.url
-        }
-        sizeLabel={Array.from(
-          new Set(
-            product.colors?.flatMap(
-              (c) => c.variants?.map((v) => v.size) ?? [],
-            ) ?? [],
-          ),
-        ).join(" - ")}
-        featured={product.rating >= 4}
-        isMustHave={product.isMustHave}
-        isFlashDeals={product.isFlashDeals}
-        flashDealPrice={product.flashDealPrice}
-        rating={product.rating}
-        productType="SHOP"
-        showTypeBadge={!!filters.search}
-        to={`/product-details/${product.id}`}
-        subtitle={product.description}
-      />
-    ));
-  }, [data, filters.search]);
+    return products.map((product: RetailProduct) => {
+      let sizeLabels: string[] = [];
+      if (product.sizes && Array.isArray(product.sizes)) {
+         sizeLabels = product.sizes.map((s: RetailProductSize) => s.size).filter(Boolean) as string[];
+      }
+      
+      const colorsList = product.colors
+            ?.map((c: RetailProductColor) => c.color)
+            .filter(Boolean) as string[];
+
+      const imageSrc = product.images?.[0]?.url;
+
+      return (
+        <ProductCard
+          key={`retail-${product.id}`}
+          title={product.name}
+          productId={String(product.id)}
+          colors={colorsList}
+          images={product.images?.map((img: RetailProductImage) => ({ 
+            ...img, 
+            id: String(img.id),
+            productId: img.productId ? String(img.productId) : undefined 
+          }))}
+          price={`$${product.price}`}
+          imageSrc={imageSrc}
+          sizeLabel={sizeLabels.join(" - ")}
+          featured={product.isFeatured ?? (product.rating >= 4)}
+     
+          rating={product.rating}
+          productType="SHOP"
+          showTypeBadge={!!filters.search}
+          to={`/product-details/${product.id}`}
+          subtitle={product.description}
+        />
+      );
+    });
+  }, [products, filters.search]);
 
   if (isError) {
     return (
@@ -166,47 +214,29 @@ export default function RetailShopPage() {
 
   return (
     <div className="w-full bg-background min-h-screen text-foreground transition-colors">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* Sidebar */}
-          <div className="w-full shrink-0 lg:w-64">
-            <SidebarFilters
-              filters={filter2}
-              initialValues={filters}
-              onFilterChange={setFilters}
-              availableSizes={availableSizes}
-            />
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1">
-            {isLoading && (
-              <LoadingSpinner containerClassName="py-12" text={t("Loading")} />
-            )}
-
-            {!isLoading && (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {productsList}
-              </div>
-            )}
-
-            {!isLoading && productsList.length === 0 && (
-              <div className="mt-20 text-center text-xl text-gray-500">
-                {t("No products found.")}
-              </div>
-            )}
-
-            {!isLoading && data && data.pagination.totalPages > 1 && (
-              <Pagination
-                className="mt-12 mb-8"
-                currentPage={data.pagination.page}
-                totalPages={data.pagination.totalPages}
-                onPageChange={setPage}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+      <FilterCategory
+        filtersConfig={filter2}
+        initialValues={filters}
+        onFilterChange={setFilters}
+        isAnyLoading={isLoading}
+        combinedProducts={productsList}
+        totalPages={
+          (data as RetailApiResponse)?.data && !Array.isArray((data as RetailApiResponse)?.data)
+            ? ((data as RetailApiResponse).data as Exclude<RetailApiResponse["data"], RetailProduct[] | undefined>)?.pagination?.totalPages || 1
+            : (data as RetailApiResponse)?.pagination?.totalPages || (data as RetailApiResponse)?.totalPages || 1
+        }
+        currentPage={
+          (data as RetailApiResponse)?.data && !Array.isArray((data as RetailApiResponse)?.data)
+            ? ((data as RetailApiResponse).data as Exclude<RetailApiResponse["data"], RetailProduct[] | undefined>)?.pagination?.page || page
+            : (data as RetailApiResponse)?.pagination?.page || (data as RetailApiResponse)?.currentPage || page
+        }
+        onPageChange={setPage}
+        noProductsText={t("No products found.")}
+        loadingText={t("Loading")}
+        availableSizes={availableSizes && availableSizes.length > 0 ? availableSizes : undefined}
+        categories={categories}
+        brands={brands}
+      />
     </div>
   );
 }
