@@ -198,17 +198,38 @@ function ViewAllButton({ to }: { to: string }) {
 }
 
 function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: Parameters<typeof useWholesales>[0]; viewAllLink?: string }) {
+  const initialCategory = baseFilters?.category ?? null
+
   const [filterState, setFilterState] = useState<FilterValues>({
     search: '',
     priceMin: null,
     priceMax: null,
+    category: initialCategory,
   })
+
+  // Tracks whether the user has manually changed a filter (vs. the initial URL-driven value)
+  const [userModified, setUserModified] = useState(false)
+
+  // Reset local filter state whenever the base filters change (e.g. navigating to a new category)
+  useEffect(() => {
+    setFilterState({
+      search: '',
+      priceMin: null,
+      priceMax: null,
+      category: baseFilters?.category ?? null,
+    })
+    setUserModified(false)
+  }, [baseFilters?.category, baseFilters?.isBestDeal, baseFilters?.isMostPopular, baseFilters?.isPremiumCollection])
 
   const queryFilters = useMemo(() => ({
     ...baseFilters,
     search: filterState.search || undefined,
-    category: filterState.category || baseFilters?.category,
-  }), [baseFilters, filterState])
+    // If the user has explicitly interacted with the filter, respect their choice (even if null = all).
+    // Otherwise fall back to the URL category so initial load is pre-filtered.
+    category: userModified
+      ? (filterState.category || undefined)
+      : (baseFilters?.category || undefined),
+  }), [baseFilters, filterState, userModified])
 
   const { data: products = [], isLoading } = useWholesales(queryFilters)
 
@@ -219,12 +240,15 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
     { key: 'brand', label: 'Brand', options: allBrands },
   ], [allCategories, allBrands])
 
-  const handleFilter = useCallback((f: FilterValues) => setFilterState(f), [])
+  const handleFilter = useCallback((f: FilterValues) => {
+    setFilterState(f)
+    setUserModified(true)
+  }, [])
 
+  // Client-side filtering for search and price; category is already handled server-side
   const filtered = useMemo(() => {
     return products.filter((item) => {
       if (filterState.search && !item.name.toLowerCase().includes(filterState.search.toLowerCase())) return false
-      if (filterState.category && item.category.name !== filterState.category) return false
       if (filterState.priceMin !== null && item.price < Number(filterState.priceMin)) return false
       if (filterState.priceMax !== null && item.price > Number(filterState.priceMax)) return false
       return true
@@ -238,7 +262,11 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
-          <CatalogFilters filters={filterConfigs} onFilterChange={handleFilter} />
+          <CatalogFilters
+            filters={filterConfigs}
+            initialValues={{ category: initialCategory }}
+            onFilterChange={handleFilter}
+          />
           {isLoading ? (
             <p className="font-['Montserrat'] text-lg text-gray-text">Loading...</p>
           ) : (
@@ -286,8 +314,6 @@ export default function WholesalePage() {
   const categoryFilter = searchParams.get('category')
   const filterParam = searchParams.get('filter')
   const categoryName = categoryFilter
-    ? categoryFilter.charAt(0).toUpperCase() + categoryFilter.slice(1).toLowerCase()
-    : null
 
   const filterMap: Record<string, { label: string; filters: Parameters<typeof useWholesales>[0] }> = {
     'best-deals': { label: 'Best Deals', filters: { isBestDeal: true } },
