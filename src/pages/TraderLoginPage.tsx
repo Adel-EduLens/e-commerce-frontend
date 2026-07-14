@@ -13,36 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { api } from '../lib/axios'
 import { useTranslation } from 'react-i18next'
 import { handleApiError } from '../lib/utils';
-
-function Toggle({
-  checked,
-  onChange,
-}: {
-  checked: boolean
-  onChange: (v: boolean) => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onChange(!checked)}
-      className="relative h-[20px] w-[40px] shrink-0 cursor-pointer overflow-hidden rounded-[36.5px] border-[0.5px] border-gray-light transition-colors"
-      style={{
-        backgroundColor: checked
-          ? 'var(--primary, #A81324)'
-          : 'var(--gray-light, #ededed)',
-      }}
-    >
-      <div
-        className="absolute top-0 h-[20px] w-[20px] transition-[left] duration-200 rtl:transition-[right]"
-        style={{
-          left: checked ? 20 : 0,
-        }}
-      >
-        <div className="absolute inset-[10%] rounded-[12px] bg-card shadow-[1px_1px_2px_-1px_rgba(51,51,51,0.3)]" />
-      </div>
-    </button>
-  )
-}
+import { Toggle } from '../components/ui'
 
 const TraderLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -164,6 +135,7 @@ const TraderLoginPage = () => {
                           <Toggle
                             checked={rememberMe}
                             onChange={setRememberMe}
+                            size="sm"
                           />
                           <span className="font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-foreground">
                             {t('rememberMe')}
