@@ -6,6 +6,7 @@ import {
   Package,
   Loader2,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoadingSpinner } from "../components/shared";
 import { Toggle } from "../components/ui";
@@ -174,6 +175,15 @@ export default function NotificationsPage() {
   const { data: subscribedIds = [] } = useCategorySubscriptions();
   const { subscribe, unsubscribe } = useToggleCategorySubscription();
   const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+
+  // Auto-mark all as read once when the page opens (after data loads)
+  const hasAutoMarked = useRef(false);
+  useEffect(() => {
+    if (!hasAutoMarked.current && notifications.length > 0 && unreadCount > 0) {
+      hasAutoMarked.current = true;
+      markAllReadMutation.mutate();
+    }
+  }, [notifications, unreadCount]);
 
   if (isLoading) {
     return <LoadingSpinner containerClassName="py-20" />;

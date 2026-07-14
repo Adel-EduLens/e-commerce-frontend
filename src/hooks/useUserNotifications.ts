@@ -47,6 +47,8 @@ export function useMarkAllNotificationsRead() {
     mutationFn: () => userNotificationApi.markAllAsRead(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all })
+      // Also invalidate the Navbar's notifications query so the badge clears
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
       toast.success('All notifications marked as read')
     },
   })

@@ -111,7 +111,7 @@ function NotificationBell() {
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-['Montserrat'] text-xs font-semibold text-foreground truncate">{n.title}</p>
-                <p className="font-['Montserrat'] text-xs text-gray-text line-clamp-2 mt-0.5">{n.body}</p>
+                <p className="font-['Montserrat'] text-xs text-gray-text line-clamp-2 mt-0.5">{n.message ?? n.body}</p>
               </div>
               {!n.isRead && (
                 <span className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />

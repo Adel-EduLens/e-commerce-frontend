@@ -4,7 +4,8 @@ import { api } from '../../lib/axios'
 export interface AppNotification {
   id: number
   title: string
-  body: string
+  body?: string
+  message?: string
   imageUrl?: string
   productId?: string
   categoryId?: string
@@ -14,7 +15,10 @@ export interface AppNotification {
 
 const getNotifications = async () => {
   const { data } = await api.get('/notifications')
-  return data.data as { notifications: AppNotification[]; unread: number }
+  // Backend returns { success, data: UserNotification[] }
+  const notifications: AppNotification[] = data.data || []
+  const unread = notifications.filter((n) => !n.isRead).length
+  return { notifications, unread }
 }
 
 export const useNotifications = () =>
@@ -62,7 +66,10 @@ export const useMarkRead = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: markRead,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['userNotifications'] })
+    },
   })
 }
 
@@ -70,6 +77,9 @@ export const useMarkAllRead = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: markAllRead,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notifications'] })
+      qc.invalidateQueries({ queryKey: ['userNotifications'] })
+    },
   })
 }
