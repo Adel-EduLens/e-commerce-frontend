@@ -90,9 +90,18 @@ function NotificationCard({
           {notification.productId && (
             <button
               type="button"
-              onClick={() =>
-                navigate(`/product-details/${notification.productId}`)
-              }
+              onClick={() => {
+                const titleLower = (notification.title || "").toLowerCase();
+                const messageLower = (notification.message || "").toLowerCase();
+
+                if (titleLower.includes("wholesale") || messageLower.includes("wholesale")) {
+                  navigate(`/wholesale/${notification.productId}`);
+                } else if (titleLower.includes("retail") || messageLower.includes("retail")) {
+                  navigate(`/retail/${notification.productId}`);
+                } else {
+                  navigate(`/product-details/${notification.productId}`);
+                }
+              }}
               className="font-['Montserrat'] text-xs font-semibold text-primary-foreground bg-primary rounded-lg px-2.5 py-1 hover:opacity-90 transition"
             >
               View Product

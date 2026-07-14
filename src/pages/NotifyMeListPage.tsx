@@ -24,11 +24,22 @@ function ProductRequestCard({
     product?.images?.[0]?.url ||
     "";
 
+  const handleProductClick = () => {
+    if (!product) return;
+    if (notification.targetType === "WHOLESALE_RESTOCK") {
+      navigate(`/wholesale/${product.id}`);
+    } else if (notification.targetType === "RETAIL_RESTOCK") {
+      navigate(`/retail/${product.slug || product.id}`);
+    } else {
+      navigate(`/product-details/${product.id}`);
+    }
+  };
+
   return (
     <div className="flex items-start gap-4 rounded-2xl bg-card p-4 border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] transition-all hover:shadow-md">
       <button
         type="button"
-        onClick={() => navigate(`/product-details/${product?.id}`)}
+        onClick={handleProductClick}
         className="h-32 w-28 sm:h-40 sm:w-36 rounded-xl overflow-hidden bg-gray-light shrink-0 cursor-pointer"
       >
         {mainImage ? (
@@ -48,7 +59,7 @@ function ProductRequestCard({
       <div className="flex flex-1 flex-col gap-2 py-1">
         <button
           type="button"
-          onClick={() => navigate(`/product-details/${product?.id}`)}
+          onClick={handleProductClick}
           className="font-['Montserrat'] text-base sm:text-lg font-semibold text-foreground text-left hover:underline"
         >
           {product?.name || "Unknown Product"}
