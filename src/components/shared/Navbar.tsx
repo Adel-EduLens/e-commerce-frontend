@@ -74,15 +74,6 @@ function NotificationBell() {
         <span className="font-['Montserrat'] text-sm font-bold text-foreground">
           Notifications {unread > 0 && <span className="text-primary">({unread})</span>}
         </span>
-        {unread > 0 && (
-          <button
-            type="button"
-            onClick={() => markAllRead.mutate()}
-            className="font-['Montserrat'] text-xs text-gray-text hover:text-primary transition-colors"
-          >
-            Mark all read
-          </button>
-        )}
       </div>
 
       {/* List */}
@@ -132,11 +123,21 @@ function NotificationBell() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-stroke p-3">
+      <div className="border-t border-stroke p-3 flex gap-2">
+        {unread > 0 && (
+          <button
+            type="button"
+            onClick={() => markAllRead.mutate()}
+            disabled={markAllRead.isPending}
+            className="flex-1 rounded-xl border border-stroke bg-card py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:bg-gray-light transition disabled:opacity-50"
+          >
+            Read All
+          </button>
+        )}
         <button
           type="button"
           onClick={handleSeeAll}
-          className="w-full rounded-xl bg-primary py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:opacity-90 transition-opacity"
+          className="flex-1 rounded-xl bg-primary py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:opacity-90 transition-opacity"
         >
           See All
         </button>
