@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { ProductCard, SidebarFilters, LoadingSpinner } from "../components/shared";
+import { ProductCard, FilterCategory } from "../components/shared";
 import ShopBanner from "../components/product/ShopBanner";
-import Pagination from "../components/shared/Pagination";
 import { useProducts } from "../hooks/queries/productsQuery";
 import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
@@ -114,7 +113,7 @@ export default function ProductsPage() {
 
   const availableSizes = useMemo(() => {
     const sizes = new Set<string>();
-    
+
     // Add sizes from retail products
     if (data?.products) {
       data.products.forEach((product) => {
@@ -219,48 +218,20 @@ export default function ProductsPage() {
 
     <div className="w-full bg-background min-h-screen text-foreground transition-colors">
       <ShopBanner />
+      <FilterCategory
+        filtersConfig={filter2}
+        initialValues={filters}
+        onFilterChange={setFilters}
+        isAnyLoading={isAnyLoading}
+        combinedProducts={combinedProducts}
+        totalPages={data?.pagination.totalPages}
+        currentPage={data?.pagination.page}
+        onPageChange={setPage}
+        noProductsText={t("No products found.")}
+        loadingText={t("Loading")}
+        availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-8 lg:flex-row">
-          {/* Sidebar */}
-          <div className="w-full shrink-0 lg:w-64">
-            <SidebarFilters
-              filters={filter2}
-              initialValues={filters}
-              onFilterChange={setFilters}
-              availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
-            />
-          </div>
-
-          {/* Main content */}
-          <div className="flex-1">
-            {isAnyLoading && (
-              <LoadingSpinner containerClassName="py-12" text={t("Loading")} />
-            )}
-
-            {!isAnyLoading && (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-                {combinedProducts}
-              </div>
-            )}
-
-            {!isAnyLoading && combinedProducts.length === 0 && (
-              <div className="mt-20 text-center text-xl text-gray-500">
-                {t("No products found.")}
-              </div>
-            )}
-
-            {!isAnyLoading && data && data.pagination.totalPages > 1 && (
-              <Pagination
-                className="mt-12 mb-8"
-                currentPage={data.pagination.page}
-                totalPages={data.pagination.totalPages}
-                onPageChange={setPage}
-              />
-            )}
-          </div>
-        </div>
-      </div>
+      />
     </div>
   );
 }
