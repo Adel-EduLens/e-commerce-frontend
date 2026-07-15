@@ -53,7 +53,7 @@ function GeneralInfoTab() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed disabled:opacity-60"
+          className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground transition hover:bg-primary-pressed disabled:opacity-60"
         >
           {isSaving ? "Saving…" : saveSuccess ? "Saved!" : "Save"}
         </button>
@@ -72,13 +72,13 @@ function GeneralInfoTab() {
           />
           <div
             onClick={() => !avatarUploading && fileInputRef.current?.click()}
-            className="relative flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-gray-100 transition hover:bg-gray-200 overflow-hidden border border-stroke"
+            className="relative flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-gray-light transition hover:bg-stroke overflow-hidden border border-stroke"
           >
             {user?.avatar ? (
               <img src={user.avatar} className="h-full w-full object-cover" alt="Avatar" />
             ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gray-100">
-                <svg className="h-8 w-8 text-gray-300" viewBox="0 0 24 24" fill="currentColor">
+              <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-gray-light">
+                <svg className="h-8 w-8 text-gray-text" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
                 </svg>
                 <img src="/store setting/tabler_photo-up.svg" className="h-4 w-4 opacity-40" alt="Upload" />
@@ -99,7 +99,7 @@ function GeneralInfoTab() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-80 rounded-lg border border-stroke bg-white p-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-stroke"
+            className="w-80 rounded-lg border border-stroke bg-card p-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-primary"
           />
         </div>
 
@@ -110,7 +110,7 @@ function GeneralInfoTab() {
             type="email"
             value={user?.email ?? ""}
             readOnly
-            className="w-80 rounded-lg border border-stroke bg-gray-50 p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
+            className="w-80 rounded-lg border border-stroke bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
           />
         </div>
 
@@ -121,7 +121,7 @@ function GeneralInfoTab() {
             type="tel"
             value={user?.phone ?? ""}
             disabled
-            className="w-80 rounded-lg border border-stroke bg-gray-50 p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
+            className="w-80 rounded-lg border border-stroke bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none cursor-not-allowed"
           />
         </div>
 
@@ -151,7 +151,7 @@ function ShippingSettingsTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Shipping Settings</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -162,7 +162,7 @@ function ShippingSettingsTab() {
             Default Shipping Region
           </label>
           <div className="relative">
-            <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke">
+            <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-primary">
               <option>Default Shipping Region</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
@@ -179,7 +179,7 @@ function ShippingSettingsTab() {
           </label>
           <div className="flex items-center gap-6">
             <div className="relative w-80">
-              <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke">
+              <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-primary">
                 <option>Shipping Provider</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
@@ -189,7 +189,7 @@ function ShippingSettingsTab() {
               </div>
             </div>
             <div className="relative w-80">
-              <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke">
+              <select className="h-16 w-full appearance-none rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition focus:border-primary">
                 <option>Shipping Provider</option>
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
@@ -206,7 +206,7 @@ function ShippingSettingsTab() {
           <input
             type="text"
             placeholder="Shipping Rate"
-            className="h-16 w-full rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke"
+            className="h-16 w-full rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text outline-none transition focus:border-primary"
           />
         </div>
 
@@ -215,7 +215,7 @@ function ShippingSettingsTab() {
           <input
             type="text"
             placeholder="Free Shipping Above"
-            className="h-16 w-full rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke"
+            className="h-16 w-full rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text outline-none transition focus:border-primary"
           />
         </div>
 
@@ -224,7 +224,7 @@ function ShippingSettingsTab() {
           <input
             type="text"
             placeholder="Estimated Delivery Time"
-            className="h-16 w-full rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke"
+            className="h-16 w-full rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text outline-none transition focus:border-primary"
           />
         </div>
       </div>
@@ -240,7 +240,7 @@ function TaxSettingsTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Tax settings</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -260,7 +260,7 @@ function TaxSettingsTab() {
           <input
             type="text"
             placeholder="VAT Percentage"
-            className="h-16 w-full rounded-lg border border-stroke bg-white px-4 font-['Montserrat'] text-base font-medium text-gray-text outline-none transition focus:border-stroke"
+            className="h-16 w-full rounded-lg border border-stroke bg-card px-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text outline-none transition focus:border-primary"
           />
         </div>
 
@@ -268,7 +268,7 @@ function TaxSettingsTab() {
           <span className="font-['Montserrat'] text-base font-semibold text-foreground">Include VAT in Prices</span>
           <button
             onClick={() => setIncludeVat(!includeVat)}
-            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-white transition hover:bg-gray-50"
+            className="flex h-8 w-8 items-center justify-center rounded border border-stroke bg-card transition hover:bg-gray-light"
           >
             {includeVat && (
               <svg className="h-5 w-5 text-foreground" viewBox="0 0 20 20" fill="currentColor">
@@ -294,12 +294,12 @@ function TeamMembersTab() {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Team Members</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
 
-      <div className="flex flex-col gap-6 max-w-4xl rounded-2xl border border-stroke bg-white overflow-hidden pb-4 shadow-sm">
+      <div className="flex flex-col gap-6 max-w-4xl rounded-2xl border border-stroke bg-card text-foreground overflow-hidden pb-4 shadow-sm">
         <div className="p-6 pb-2">
           <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Team Member Table</h3>
         </div>
@@ -307,9 +307,9 @@ function TeamMembersTab() {
         <div className="w-full overflow-x-auto px-4">
           <table className="w-full text-left font-['Montserrat']">
             <thead>
-              <tr className="bg-secondary text-xs font-medium text-primary">
+              <tr className="bg-primary-tint text-xs font-medium text-primary">
                 <th className="px-4 py-3 rounded-l-lg w-12 text-center">
-                  <div className="mx-auto h-5 w-5 rounded border border-primary bg-secondary flex items-center justify-center">
+                  <div className="mx-auto h-5 w-5 rounded border border-primary bg-primary-tint flex items-center justify-center">
                     <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>
@@ -326,7 +326,7 @@ function TeamMembersTab() {
               {teamMembers.map((member, i) => (
                 <tr key={i} className="text-xs font-medium text-foreground border-b border-stroke last:border-0">
                   <td className="px-4 py-3 text-center">
-                    <div className="mx-auto h-5 w-5 rounded border border-stroke bg-white flex items-center justify-center" />
+                    <div className="mx-auto h-5 w-5 rounded border border-stroke bg-card flex items-center justify-center" />
                   </td>
                   <td className="px-4 py-3">{member.name}</td>
                   <td className="px-4 py-3">{member.role}</td>
@@ -335,15 +335,15 @@ function TeamMembersTab() {
                     <span
                       className={`inline-flex items-center justify-center rounded-2xl px-2 py-1 text-xs font-medium ${
                         member.status === "Active"
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-amber-100 text-amber-800"
+                          ? "bg-success/10 text-success"
+                          : "bg-warning/10 text-warning"
                       }`}
                     >
                       {member.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button className="flex h-6 w-6 mx-auto items-center justify-center text-gray-400 hover:text-gray-600">
+                    <button className="flex h-6 w-6 mx-auto items-center justify-center text-gray-text hover:text-foreground">
                       <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
                         <circle cx="8" cy="3" r="1.5" />
                         <circle cx="8" cy="8" r="1.5" />
@@ -366,7 +366,7 @@ function PlaceholderTab({ title }: { title: string }) {
     <div className="flex-1 p-8">
       <div className="mb-8 flex items-center justify-between max-w-4xl">
         <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{title}</h2>
-        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-white transition hover:bg-primary-pressed">
+        <button className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground transition hover:bg-primary-pressed">
           Save
         </button>
       </div>
@@ -387,15 +387,15 @@ export default function TraderStoreSettingsPage() {
   ];
 
   return (
-    <div className="flex min-h-[800px] overflow-hidden rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
+    <div className="flex min-h-[800px] overflow-hidden rounded-2xl border border-stroke bg-card text-foreground shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
       {/* Settings Sidebar */}
-      <div className="w-60 shrink-0 border-r-2 border-stroke flex flex-col p-4 gap-2 bg-white">
+      <div className="w-60 shrink-0 border-r-2 border-stroke flex flex-col p-4 gap-2 bg-card text-foreground">
         {tabs.map((item) => (
           <button
             key={item.name}
             onClick={() => setActiveTab(item.name)}
             className={`flex h-14 w-full items-center gap-2 rounded-2xl px-4 py-4 text-left font-['Montserrat'] text-base font-semibold transition ${
-              activeTab === item.name ? "bg-primary text-foreground" : "text-foreground hover:bg-gray-50"
+              activeTab === item.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-gray-light dark:hover:bg-white/5"
             }`}
           >
             <div className="flex h-6 w-6 shrink-0 items-center justify-center">

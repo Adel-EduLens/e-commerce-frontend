@@ -25,6 +25,7 @@ import TraderWholesalePage from "../pages/dashboards/TraderWholesalePage";
 import TraderBrandPartnersPage from "../pages/dashboards/TraderBrandPartnersPage";
 import TraderNotificationsPage from "../pages/dashboards/TraderNotificationsPage";
 import TraderStoreSettingsPage from "../pages/dashboards/TraderStoreSettingsPage";
+import TraderPreferencesPage from "../pages/dashboards/TraderPreferencesPage";
 import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
 import TraderLayout from "../components/layout/TraderLayout";
 import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
@@ -391,6 +392,10 @@ export const router = createBrowserRouter([
           {
             path: "help-center",
             element: <TraderHelpCenterPage />,
+          },
+          {
+            path: "preferences",
+            element: <TraderPreferencesPage />,
           },
           {
             path: "designs",

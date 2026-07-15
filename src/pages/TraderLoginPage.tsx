@@ -4,7 +4,6 @@ import { Eye, EyeOff } from 'lucide-react'
 import { FaFacebookSquare } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import { toast } from 'sonner'
-import type { ApiErrorResponse } from '../types/api'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/useAuthStore'
 import { useForm } from 'react-hook-form'
@@ -48,7 +47,7 @@ const TraderLoginPage = () => {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="flex min-h-screen w-full items-center justify-center    px-0 py-6 font-['Inter'] sm:px-4 lg:px-6"
+      className="flex min-h-screen w-full items-center justify-center bg-background text-foreground px-0 py-6 font-['Inter'] sm:px-4 lg:px-6"
     >
       <div className="relative flex w-full max-w-[1440px] flex-col overflow-hidden rounded-none bg-card sm:rounded-[24px] lg:h-[1024px] lg:min-h-[820px] lg:flex-row">
         {/* Form area */}
@@ -56,7 +55,7 @@ const TraderLoginPage = () => {
           <div className="flex w-full max-w-[480px] flex-col">
             <div className="flex justify-between mb-5 items-center">
               <img
-                src="/images/auth/logo.png?v=2"
+                src="/home-page/Logo.png  "
                 alt="Gen Z"
                 className="h-[40px] w-[75px] object-contain sm:h-[48px] sm:w-[90px]"
               />
@@ -86,11 +85,11 @@ const TraderLoginPage = () => {
                     <input
                       type="email"
                       placeholder={t('fields.email.placeholder')}
-                      className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                      className="h-[56px] w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text focus:border-primary"
                       {...registerLogin('email')}
                     />
                     {loginErrors.email && (
-                      <p className="text-[13px] text-red-500">
+                      <p className="text-[13px] text-error">
                         {loginErrors.email.message}
                       </p>
                     )}
@@ -106,7 +105,7 @@ const TraderLoginPage = () => {
                         <input
                           type={showPassword ? 'text' : 'password'}
                           placeholder={t('fields.password.placeholder')}
-                          className="h-full w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text"
+                          className="h-full w-full rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] pe-[48px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none placeholder:text-gray-text focus:border-primary"
                           {...registerLogin('password')}
                         />
                         <button
@@ -125,7 +124,7 @@ const TraderLoginPage = () => {
                         </button>
                       </div>
                       {loginErrors.password && (
-                        <p className="text-[13px] text-red-500">
+                        <p className="text-[13px] text-error">
                           {loginErrors.password.message}
                         </p>
                       )}
@@ -158,7 +157,7 @@ const TraderLoginPage = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex w-full items-center justify-center rounded-[16px] bg-secondary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="flex w-full items-center justify-center rounded-[16px] bg-primary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
                 >
                   {isLoading ? t('login.submitting') : t('login.submit')}
                 </button>
@@ -173,14 +172,14 @@ const TraderLoginPage = () => {
                 <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
                   <button
                     type="button"
-                    className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
+                    className="flex gap-x-4 bg-social-bg rounded-[14px] py-4 flex-1 justify-center text-gray-text transition-colors hover:bg-stroke/50"
                   >
                     <FaFacebookSquare size={24} color="#1877F2 " />
                     {t('socials.facebook')}
                   </button>
                   <button
                     type="button"
-                    className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
+                    className="flex gap-x-4 bg-social-bg rounded-[14px] py-4 flex-1 justify-center text-gray-text transition-colors hover:bg-stroke/50"
                   >
                     <FcGoogle size={24} />
                     {t('socials.google')}

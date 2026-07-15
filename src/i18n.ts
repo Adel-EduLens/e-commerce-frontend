@@ -163,7 +163,15 @@ i18n
       },
     },
 
-    fallbackLng: "en",
+    fallbackLng: "ar",
+    lng:
+      typeof window !== "undefined" && localStorage.getItem("i18nextLng")
+        ? localStorage.getItem("i18nextLng")!
+        : "ar",
+    detection: {
+      order: ["localStorage"],
+      caches: ["localStorage"],
+    },
 
     interpolation: {
       escapeValue: false,

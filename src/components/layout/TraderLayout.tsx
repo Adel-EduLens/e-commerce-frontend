@@ -117,6 +117,11 @@ const sidebarItems = [
     path: "/dashboard/trader/help-center",
   },
   {
+    label: "preferences",
+    icon: "solar_settings-linear.svg",
+    path: "/dashboard/trader/preferences",
+  },
+  {
     label: "storeSettings",
     icon: "solar_settings-linear.svg",
     path: "/dashboard/trader/settings",
