@@ -1,14 +1,16 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useBlankProducts } from '../hooks/queries/blankProductQuery'
 import ProductCard from '../components/shared/ProductCard'
 
 const CreateYourDesignPage = () => {
+  const { t } = useTranslation("productSection")
   const { data: blankProducts, isLoading, error } = useBlankProducts()
 
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-foreground">
-        Loading...
+        {t("Loading", "Loading...")}
       </div>
     )
   }
@@ -16,7 +18,7 @@ const CreateYourDesignPage = () => {
   if (error) {
     return (
       <div className="flex min-h-[60vh] w-full items-center justify-center bg-background text-danger">
-        Failed to load blank products
+        {t("failedToLoadBlankProducts", "Failed to load blank products")}
       </div>
     )
   }
@@ -25,7 +27,7 @@ const CreateYourDesignPage = () => {
     <div className="min-h-screen w-full bg-background px-4 py-8 text-foreground transition-colors sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-10 font-['Montserrat'] text-3xl font-bold sm:text-4xl">
-          Create your design
+          {t("createYourDesign", "Create your design")}
         </h1>
         
         {/* Filter section omitted as requested */}
@@ -53,7 +55,7 @@ const CreateYourDesignPage = () => {
           {/* Fallback if no products */}
           {blankProducts?.length === 0 && (
             <div className="col-span-full py-12 text-center text-gray-text">
-              No blank products available yet.
+              {t("noBlankProductsAvailable", "No blank products available yet.")}
             </div>
           )}
         </div>

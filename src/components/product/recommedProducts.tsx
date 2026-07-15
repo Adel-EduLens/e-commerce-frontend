@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import ProductCard from "../shared/ProductCard";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import { useRecommendedProducts, useProductFilters, type ProductColor } from "../../hooks/queries/productsQuery";
@@ -15,6 +16,7 @@ export function RecommedProducts({
   currentProductId,
 }: RecommedProductsProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation("productDetails");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // 1. Get Top Categories from the user's Recommendation Model
@@ -80,10 +82,10 @@ export function RecommedProducts({
     return filtersData?.colors ?? [];
   }, [filtersData]);
 
-  const priceSortOptions = [
-    { label: "Price: Low to High", value: "low-to-high" },
-    { label: "Price: High to Low", value: "high-to-low" }
-  ];
+  const priceSortOptions = useMemo(() => [
+    { label: t("priceSortLowToHigh"), value: "low-to-high" },
+    { label: t("priceSortHighToLow"), value: "high-to-low" }
+  ], [t]);
 
   // 4. Products returned from server-side filtering
   const filteredProducts = useMemo(() => {
@@ -97,7 +99,7 @@ export function RecommedProducts({
       <section className="flex flex-col items-start justify-start gap-6 sm:gap-8 w-full font-['Montserrat'] select-none mt-10">
         <div className="w-full">
           <h2 className="text-2xl font-bold text-foreground md:text-3xl sm:text-4xl">
-            Recommended for You
+            {t("recommendedForYou")}
           </h2>
         </div>
         <div className="flex w-full justify-center mt-8">
@@ -115,10 +117,10 @@ export function RecommedProducts({
     <section className="flex flex-col items-start justify-start gap-6 sm:gap-8 w-full font-['Montserrat'] select-none mt-10">
       <div className="w-full">
         <h2 className="text-2xl font-bold text-foreground md:text-3xl sm:text-4xl">
-          Recommended for You
+          {t("recommendedForYou")}
         </h2>
         <div className="mt-4 flex flex-col gap-2">
-          <span className="text-sm font-medium text-foreground/80">Filter by</span>
+          <span className="text-sm font-medium text-foreground/80">{t("filterBy")}</span>
           <div ref={dropdownRef} className="flex flex-wrap items-center gap-3 relative z-30">
             {/* Category Filter */}
             <div className="relative">
@@ -126,21 +128,21 @@ export function RecommedProducts({
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === "Category" ? null : "Category")}
                 className={`flex items-center justify-between gap-2 rounded-lg bg-background px-4 py-2 text-sm font-medium text-foreground/80 cursor-pointer hover:bg-gray-light border border-stroke transition ${selectedCategory ? "border-primary text-primary" : ""
-                  }`}
-              >
-                {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : "Category"}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {activeDropdown === "Category" && (
-                <div className="absolute top-full left-0 mt-1 z-40 min-w-[160px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
-                  <div
-                    onClick={() => { setSelectedCategory(null); setActiveDropdown(null); }}
-                    className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
-                  >
-                    All Categories
-                  </div>
+                }`}
+            >
+              {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : t("categoryLabel")}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {activeDropdown === "Category" && (
+              <div className="absolute top-full left-0 mt-1 z-40 min-w-[160px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
+                <div
+                  onClick={() => { setSelectedCategory(null); setActiveDropdown(null); }}
+                  className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
+                >
+                  {t("allCategories")}
+                </div>
                   {availableCategories.map((cat) => (
                     <div
                       key={cat.id}
@@ -161,21 +163,21 @@ export function RecommedProducts({
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === "Size" ? null : "Size")}
                 className={`flex items-center justify-between gap-2 rounded-lg bg-background px-4 py-2 text-sm font-medium text-foreground/80 cursor-pointer hover:bg-gray-light border border-stroke transition ${selectedSize ? "border-primary text-primary" : ""
-                  }`}
-              >
-                {selectedSize ? `Size: ${selectedSize}` : "Size"}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {activeDropdown === "Size" && (
-                <div className="absolute top-full left-0 mt-1 z-40 min-w-[120px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
-                  <div
-                    onClick={() => { setSelectedSize(null); setActiveDropdown(null); }}
-                    className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
-                  >
-                    All Sizes
-                  </div>
+                }`}
+            >
+              {selectedSize ? `${t("size")}: ${selectedSize}` : t("size")}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {activeDropdown === "Size" && (
+              <div className="absolute top-full left-0 mt-1 z-40 min-w-[120px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
+                <div
+                  onClick={() => { setSelectedSize(null); setActiveDropdown(null); }}
+                  className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
+                >
+                  {t("allSizes")}
+                </div>
                   {availableSizes.map((s) => (
                     <div
                       key={s}
@@ -196,21 +198,21 @@ export function RecommedProducts({
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === "Color" ? null : "Color")}
                 className={`flex items-center justify-between gap-2 rounded-lg bg-background px-4 py-2 text-sm font-medium text-foreground/80 cursor-pointer hover:bg-gray-light border border-stroke transition ${selectedColor ? "border-primary text-primary" : ""
-                  }`}
-              >
-                {selectedColor ? `Color: ${selectedColor}` : "Color"}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {activeDropdown === "Color" && (
-                <div className="absolute top-full left-0 mt-1 z-40 min-w-[140px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
-                  <div
-                    onClick={() => { setSelectedColor(null); setActiveDropdown(null); }}
-                    className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
-                  >
-                    All Colors
-                  </div>
+                }`}
+            >
+              {selectedColor ? `${t("color")}: ${selectedColor}` : t("color")}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {activeDropdown === "Color" && (
+              <div className="absolute top-full left-0 mt-1 z-40 min-w-[140px] rounded-xl bg-card border border-stroke shadow-lg p-2 max-h-60 overflow-y-auto">
+                <div
+                  onClick={() => { setSelectedColor(null); setActiveDropdown(null); }}
+                  className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
+                >
+                  {t("allColors")}
+                </div>
                   {availableColors.map((c) => (
                     <div
                       key={c}
@@ -231,21 +233,21 @@ export function RecommedProducts({
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === "Price" ? null : "Price")}
                 className={`flex items-center justify-between gap-2 rounded-lg bg-background px-4 py-2 text-sm font-medium text-foreground/80 cursor-pointer hover:bg-gray-light border border-stroke transition ${selectedPriceSort ? "border-primary text-primary" : ""
-                  }`}
-              >
-                {selectedPriceSort ? priceSortOptions.find(o => o.value === selectedPriceSort)?.label : "Price"}
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {activeDropdown === "Price" && (
-                <div className="absolute top-full left-0 mt-1 z-40 min-w-[160px] rounded-xl bg-card border border-stroke shadow-lg p-2">
-                  <div
-                    onClick={() => { setSelectedPriceSort(null); setActiveDropdown(null); }}
-                    className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
-                  >
-                    Default
-                  </div>
+                }`}
+            >
+              {selectedPriceSort ? priceSortOptions.find(o => o.value === selectedPriceSort)?.label : t("priceLabel")}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            {activeDropdown === "Price" && (
+              <div className="absolute top-full left-0 mt-1 z-40 min-w-[160px] rounded-xl bg-card border border-stroke shadow-lg p-2">
+                <div
+                  onClick={() => { setSelectedPriceSort(null); setActiveDropdown(null); }}
+                  className="px-3 py-2 text-sm text-foreground/85 hover:bg-gray-light rounded-lg cursor-pointer transition font-medium"
+                >
+                  {t("defaultPriceSort")}
+                </div>
                   {priceSortOptions.map((opt) => (
                     <div
                       key={opt.value}
@@ -272,7 +274,7 @@ export function RecommedProducts({
                 }}
                 className="text-xs font-semibold text-primary hover:underline ml-2 cursor-pointer"
               >
-                Clear
+                {t("clearFilters")}
               </button>
             )}
           </div>
@@ -281,7 +283,7 @@ export function RecommedProducts({
 
       <div className="flex w-full flex-col items-center justify-center gap-8 mt-2">
         {filteredProducts.length === 0 ? (
-          <p className="font-['Montserrat'] text-lg text-gray-text py-8">No recommended products match these filters.</p>
+          <p className="font-['Montserrat'] text-lg text-gray-text py-8">{t("noRecommendedProducts")}</p>
         ) : (
           <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => {
@@ -304,7 +306,7 @@ export function RecommedProducts({
                   productId={product.id}
                   title={product.name}
                   subtitle={product.description || "High-end product tailored for you"}
-                  price={`${product.price} EGP`}
+                  price={`${product.price} ${t("egp")}`}
                   imageSrc={imageSrc}
                   sizeLabel={sizeLabel}
                   colors={
@@ -323,7 +325,7 @@ export function RecommedProducts({
           onClick={() => navigate(`/products?category=${encodeURIComponent("kids")}`)}
           className="mt-2 rounded-md border border-primary px-8 py-2 text-sm font-bold text-primary hover:bg-primary-tint transition"
         >
-          View More
+          {t("viewMore")}
         </button>
       </div>
     </section>

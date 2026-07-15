@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifyMeApi, type NotifyMeTargetType } from '../services/notifyMeApi'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export const notifyMeKeys = {
   all: ['notifyMe'] as const,
@@ -31,30 +32,32 @@ export function useNotifyMeCheck(targetType: NotifyMeTargetType, targetId: strin
 
 export function useNotifyMeSubscribe() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('notify')
   return useMutation({
     mutationFn: ({ targetType, targetId }: { targetType: NotifyMeTargetType; targetId: string }) =>
       notifyMeApi.subscribe(targetType, targetId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notifyMeKeys.all })
-      toast.success('You will be notified!')
+      toast.success(t('youWillBeNotified'))
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to subscribe')
+      toast.error(error.response?.data?.message || t('failedToSubscribe'))
     },
   })
 }
 
 export function useNotifyMeUnsubscribe() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('notify')
   return useMutation({
     mutationFn: ({ targetType, targetId }: { targetType: NotifyMeTargetType; targetId: string }) =>
       notifyMeApi.unsubscribe(targetType, targetId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notifyMeKeys.all })
-      toast.success('Unsubscribed')
+      toast.success(t('unsubscribedToast'))
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to unsubscribe')
+      toast.error(error.response?.data?.message || t('failedToUnsubscribe'))
     },
   })
 }

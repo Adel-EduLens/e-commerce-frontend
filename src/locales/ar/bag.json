@@ -24,7 +24,8 @@
     "size": "المقاس",
     "color": "اللون",
     "lineTotal": "إجمالي المنتج",
-    "off": "خصم {{discount}}%"
+    "off": "خصم {{discount}}%",
+    "defaultSize": "المقاس الافتراضي"
   },
   "empty": {
     "title": "سلة التسوق فارغة",
@@ -34,7 +35,8 @@
   "favorites": {
     "favorites": "المفضلة",
     "recentlyViewed": "شوهدت مؤخراً",
-    "emptyRecent": "لا توجد منتجات تمت مشاهدتها مؤخراً."
+    "emptyRecent": "لا توجد منتجات تمت مشاهدتها مؤخراً.",
+    "viewAll": "عرض الكل"
   },
   "toast": {
     "enterCoupon": "أدخل كود الخصم أولاً",
@@ -45,6 +47,15 @@
     "checkout": "جارٍ الانتقال إلى صفحة الدفع",
     "removed": "تمت إزالة {{title}} من السلة",
     "loginFirst": "يرجى تسجيل الدخول أولاً",
-    "userRequired" : "يرجى تسجيل الدخول كمستخدم"
-  }
+    "userRequired" : "يرجى تسجيل الدخول كمستخدم",
+    "checkingStock": "جارٍ التحقق من توفر المخزون...",
+    "couldNotVerifyStock": "تعذر التحقق من المخزون للمنتج \"{{title}}\".",
+    "wholesaleStockError": "الكمية المطلوبة غير متوفرة للمنتج \"{{title}}\" ({{color}}). المتوفر في المخزون {{availableStock}} عبوة فقط.",
+    "retailStockError": "الكمية المطلوبة غير متوفرة للمنتج \"{{title}}\" ({{size}}). المتوفر في المخزون {{availableStock}} قطعة فقط.",
+    "shopStockError": "الكمية المطلوبة غير متوفرة للمنتج \"{{title}}\"{{variantDesc}}. المتوفر في المخزون {{availableStock}} قطعة فقط.",
+    "verifyStockError": "فشل في التحقق من توفر المخزون. يرجى المحاولة مرة أخرى.",
+    "wholesaleMinOrderError": "لا يمكن إتمام الطلب. إجمالي العبوات للمنتج بالجملة \"{{title}}\" في سلتك ({{sum}}) أقل من الحد الأدنى للطلب ({{minOrder}})."
+  },
+  "loadingBagItems": "جارٍ تحميل منتجات السلة...",
+  "EGP": "ج.م"
 }

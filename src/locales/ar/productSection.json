@@ -17,5 +17,12 @@
   "Kids": "أطفال",
   
   "No products found.": "لم يتم العثور على منتجات.",
-  "Something went wrong. Please try again later.": "حدث خطأ، يرجى المحاولة مرة أخرى لاحقًا."
+  "Something went wrong. Please try again later.": "حدث خطأ، يرجى المحاولة مرة أخرى لاحقًا.",
+  "createYourDesign": "اصنع تصميمك",
+  "failedToLoadBlankProducts": "فشل في تحميل المنتجات الخام",
+  "noBlankProductsAvailable": "لا توجد منتجات خام متاحة بعد.",
+  "wholesaleBannerTitle": "من المصنع إليك مباشرة – كميات أكبر، أرباح أكثر.",
+  "viewAll": "عرض الكل",
+  "noWholesaleProductsAvailable": "لا توجد منتجات جملة متاحة بعد.",
+  "Premium Collections": "المجموعات المميزة"
 }

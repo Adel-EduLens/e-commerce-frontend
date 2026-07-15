@@ -146,10 +146,10 @@ function OrderHeader({ order }: { order: Order }) {
       </div>
       <div className="flex flex-col items-start sm:items-end gap-1">
         <span className="font-['Montserrat'] text-xs font-bold text-gray-text/60 uppercase tracking-wider">
-          Total Amount
+          {t("Total Amount")}
         </span>
         <span className="font-['Montserrat'] text-xl font-extrabold text-foreground">
-          EGP {order.total.toFixed(2)}
+          {t("EGP")} {order.total.toFixed(2)}
         </span>
       </div>
     </div>
@@ -193,10 +193,10 @@ function OrderItemCard({ item }: { item: OrderItem }) {
         </div>
         <div className="flex items-center justify-between gap-4 mt-2">
           <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">
-            Qty: {item.quantity}
+            {t("Qty")} {item.quantity}
           </span>
           <span className="font-['Montserrat'] text-base sm:text-lg font-extrabold text-foreground">
-            EGP {item.price.toFixed(2)}
+            {t("EGP")} {item.price.toFixed(2)}
           </span>
         </div>
       </div>
@@ -212,10 +212,10 @@ function OrderStatus({ order }: { order: Order }) {
     return (
       <div className="w-full lg:w-80 shrink-0 rounded-xl bg-urgent/5 border border-urgent/20 p-5 self-start">
         <span className="font-['Montserrat'] text-base font-bold text-urgent">
-          Order Cancelled
+          {t("Order Cancelled")}
         </span>
         <p className="mt-3 font-['Montserrat'] text-sm font-medium text-urgent leading-relaxed">
-          This order has been cancelled and is no longer being processed. If you believe this is an error, please contact customer support.
+          {t("orderCancelledDesc")}
         </p>
       </div>
     );
@@ -282,38 +282,39 @@ function OrderStatus({ order }: { order: Order }) {
 }
 
 function OrderDetailsCard({ order }: { order: Order }) {
+  const { t } = useTranslation("orders");
   return (
     <div className="rounded-xl border border-stroke bg-card p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 border-b border-stroke pb-3">
         <MapPin className="h-5 w-5 text-secondary" />
-        <span className="font-['Montserrat'] text-base font-bold text-foreground">Delivery & Payment Info</span>
+        <span className="font-['Montserrat'] text-base font-bold text-foreground">{t("Delivery & Payment Info")}</span>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-['Montserrat'] text-sm">
         <div className="space-y-2">
-          <div className="text-gray-text font-medium">Recipient & Address</div>
+          <div className="text-gray-text font-medium">{t("Recipient & Address")}</div>
           <div className="font-bold text-foreground">
             {order.firstName} {order.lastName}
           </div>
           <div className="text-gray-text leading-relaxed">
-            {order.apartment && `Apt ${order.apartment}, `}
+            {order.apartment && `${t("Apt")} ${order.apartment}, `}
             {order.streetAddress}, {order.area}, {order.city}, {order.country}
           </div>
-          <div className="text-gray-text">Phone: {order.phone}</div>
+          <div className="text-gray-text">{t("Phone")} {order.phone}</div>
         </div>
 
         <div className="space-y-3">
           <div className="space-y-1">
-            <div className="text-gray-text font-medium">Payment Details</div>
+            <div className="text-gray-text font-medium">{t("Payment Details")}</div>
             <div className="flex items-center gap-2 font-bold text-foreground">
               <CreditCard className="h-4 w-4 text-gray-text" />
-              {order.paymentMethod === "COD" ? "Cash on Delivery" : "Card Payment"}
+              {order.paymentMethod === "COD" ? t("Cash on Delivery") : t("Card Payment")}
             </div>
           </div>
 
           {order.mapAddress && (
             <div className="space-y-1">
-              <div className="text-gray-text font-medium">Pinned Map Address</div>
+              <div className="text-gray-text font-medium">{t("Pinned Map Address")}</div>
               <div className="text-xs font-semibold text-success break-words leading-relaxed">
                 {order.mapAddress}
               </div>
@@ -326,6 +327,7 @@ function OrderDetailsCard({ order }: { order: Order }) {
 }
 
 export default function MyOrdersPage() {
+  const { t } = useTranslation("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>("active");
@@ -339,13 +341,13 @@ export default function MyOrdersPage() {
         setOrders(res.data?.data || []);
       } catch (err: any) {
         console.error("Failed to fetch orders:", err);
-        toast.error("Could not load your orders. Please try again.");
+        toast.error(t("couldNotLoadOrders"));
       } finally {
         setLoading(false);
       }
     };
     fetchOrders();
-  }, []);
+  }, [t]);
 
   // Filter orders by active tabs
   const filteredOrders = orders.filter((order) => {
@@ -372,7 +374,7 @@ export default function MyOrdersPage() {
     } else {
       setSelectedOrderId(null);
     }
-  }, [activeTab, orders]);
+  }, [activeTab, orders, filteredOrders, selectedOrderId]);
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) || null;
 
@@ -388,16 +390,16 @@ export default function MyOrdersPage() {
             <ShoppingBag className="h-8 w-8" />
           </div>
           <h3 className="font-['Montserrat'] text-xl font-bold text-foreground mb-2">
-            No {activeTab} orders found
+            {t("noOrdersFound", { tab: t(activeTab === 'active' ? 'Active' : activeTab === 'completed' ? 'Completed' : 'Cancelled') })}
           </h3>
           <p className="font-['Montserrat'] text-sm text-gray-text max-w-sm mb-6 leading-relaxed">
-            It looks like you don't have any orders in this category. Browse our shop to find something you love!
+            {t("noOrdersDesc")}
           </p>
           <Link
             to="/"
             className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-['Montserrat'] text-sm font-bold text-foreground hover:opacity-90 transition-all shadow-sm"
           >
-            Start Shopping
+            {t("Start Shopping")}
           </Link>
         </div>
       ) : (
@@ -405,7 +407,7 @@ export default function MyOrdersPage() {
           {/* Orders list selection sidebar */}
           <div className="w-full lg:w-72 shrink-0 flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
             <span className="font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider px-1">
-              Select Order to Track
+              {t("Select Order to Track")}
             </span>
             {filteredOrders.map((order) => {
               const isSelected = order.id === selectedOrderId;
@@ -421,10 +423,10 @@ export default function MyOrdersPage() {
                 >
                   <div className="space-y-1 min-w-0">
                     <div className={`font-['Montserrat'] text-sm font-bold truncate ${isSelected ? "text-secondary-foreground" : "text-foreground"}`}>
-                      Order #{order.id.slice(-8).toUpperCase()}
+                      {t("Order")} #{order.id.slice(-8).toUpperCase()}
                     </div>
                     <div className={`font-['Montserrat'] text-xs ${isSelected ? "text-secondary-foreground/75" : "text-gray-text"}`}>
-                      {date} • {order.items.length} {order.items.length === 1 ? "item" : "items"}
+                      {date} • {order.items.length} {order.items.length === 1 ? t("item") : t("items")}
                     </div>
                   </div>
                   <ChevronRight className={`h-4 w-4 shrink-0 transition-transform ${isSelected ? "translate-x-1 text-secondary-foreground" : "text-gray-text"}`} />
@@ -442,7 +444,7 @@ export default function MyOrdersPage() {
 
                 <div className="flex flex-col gap-3.5">
                   <span className="font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider px-1">
-                    Items List
+                    {t("Items List")}
                   </span>
                   {selectedOrder.items.map((item) => (
                     <OrderItemCard key={item.id} item={item} />

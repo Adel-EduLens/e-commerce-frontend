@@ -24,7 +24,8 @@
     "size": "Size",
     "color": "Color",
     "lineTotal": "Line total",
-    "off": "{{discount}}% OFF"
+    "off": "{{discount}}% OFF",
+    "defaultSize": "default size"
   },
   "empty": {
     "title": "Your bag is empty",
@@ -34,7 +35,8 @@
   "favorites": {
     "favorites": "Favorites",
     "recentlyViewed": "Recently Viewed",
-    "emptyRecent": "No recently viewed items yet."
+    "emptyRecent": "No recently viewed items yet.",
+    "viewAll": "View All"
   },
   "toast": {
     "enterCoupon": "Enter a discount code first",
@@ -45,6 +47,15 @@
     "checkout": "Taking you to checkout",
     "removed": "{{title}} removed from bag",
     "loginFirst": "Please login first",
-    "userRequired" : "Please login as a user"
-  }
+    "userRequired" : "Please login as a user",
+    "checkingStock": "Checking stock availability...",
+    "couldNotVerifyStock": "Could not verify stock for \"{{title}}\".",
+    "wholesaleStockError": "Quantity out of stock for \"{{title}}\" ({{color}}). Only {{availableStock}} package(s) available in stock.",
+    "retailStockError": "Quantity out of stock for \"{{title}}\" ({{size}}). Only {{availableStock}} item(s) available in stock.",
+    "shopStockError": "Quantity out of stock for \"{{title}}\"{{variantDesc}}. Only {{availableStock}} item(s) available in stock.",
+    "verifyStockError": "Failed to verify product stock. Please try again.",
+    "wholesaleMinOrderError": "Cannot proceed to checkout. The total packages for wholesale product \"{{title}}\" in your cart ({{sum}}) is less than the minimum order requirement ({{minOrder}})."
+  },
+  "loadingBagItems": "Loading bag items...",
+  "EGP": "EGP"
 }

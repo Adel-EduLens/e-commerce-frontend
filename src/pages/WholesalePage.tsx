@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ProductCard, FilterCategory } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
@@ -162,11 +163,12 @@ function HeroOutlineFan() {
 }
 
 function HeroBanner() {
+  const { t } = useTranslation("productSection")
   return (
     <div className="relative mx-4 sm:mx-6 overflow-hidden rounded-3xl bg-[#C4B5FD]">
       <div className="relative z-10 px-6 py-8 sm:px-10 sm:py-12 lg:py-16 lg:px-[352px] lg:min-h-[384px]">
         <div className="font-['Montserrat'] text-2xl sm:text-3xl lg:text-5xl font-semibold text-foreground max-w-lg">
-          From Factory to You – Big Quantities, Bigger Profits.
+          {t("wholesaleBannerTitle", "From Factory to You – Big Quantities, Bigger Profits.")}
         </div>
       </div>
       <img
@@ -182,10 +184,11 @@ function HeroBanner() {
 }
 
 function ViewAllButton({ to }: { to: string }) {
+  const { t } = useTranslation("productSection")
   return (
     <Link to={to} className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4 no-underline">
       <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
-        View All
+        {t("viewAll", "View All")}
       </div>
       <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
         <AssetImage
@@ -198,6 +201,7 @@ function ViewAllButton({ to }: { to: string }) {
 }
 
 function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: Parameters<typeof useWholesales>[0]; viewAllLink?: string }) {
+  const { t } = useTranslation("productSection")
   const initialCategory = baseFilters?.category ?? null
 
   const [filterState, setFilterState] = useState<FilterValues>({
@@ -236,9 +240,9 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
   const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
   const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
   const filterConfigs = useMemo(() => [
-    { key: 'category', label: 'Category', options: allCategories },
-    { key: 'brand', label: 'Brand', options: allBrands },
-  ], [allCategories, allBrands])
+    { key: 'category', label: t('Category', 'Category'), options: allCategories },
+    { key: 'brand', label: t('Brand', 'Brand'), options: allBrands },
+  ], [allCategories, allBrands, t])
 
   const handleFilter = useCallback((f: FilterValues) => {
     setFilterState(f)
@@ -258,7 +262,7 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
   return (
     <div className="mx-4 sm:mx-6 mt-24 flex flex-col items-start justify-start gap-10">
       <div className="self-stretch font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        {title}
+        {t(title, title)}
       </div>
       <div className="flex w-full flex-col items-center justify-start gap-8">
         <div className="flex w-full flex-col items-start justify-start gap-6">
@@ -268,7 +272,7 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
             onFilterChange={handleFilter}
           />
           {isLoading ? (
-            <p className="font-['Montserrat'] text-lg text-gray-text">Loading...</p>
+            <p className="font-['Montserrat'] text-lg text-gray-text">{t("Loading", "Loading...")}</p>
           ) : (
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filtered.length > 0 ? (
@@ -295,7 +299,7 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
                 ))
               ) : (
                 <p className="col-span-4 text-center font-['Montserrat'] text-lg text-gray-text">
-                  No wholesale products available yet.
+                  {t("noWholesaleProductsAvailable", "No wholesale products available yet.")}
                 </p>
               )}
             </div>
@@ -312,6 +316,7 @@ function WholesaleFilterSection({
 }: {
   baseFilters?: Parameters<typeof useWholesales>[0]
 }) {
+  const { t } = useTranslation("productSection")
   const [filters, setFilters] = useState<FilterValues>({
     search: '',
     category: baseFilters?.category ?? null,
@@ -408,11 +413,14 @@ function WholesaleFilterSection({
       combinedProducts={combinedProducts}
       availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
       isWholesale={true}
+      noProductsText={t("noWholesaleProductsAvailable", "No wholesale products available yet.")}
+      loadingText={t("Loading", "Loading...")}
     />
   )
 }
 
 export default function WholesalePage() {
+  const { t } = useTranslation("productSection")
   const [searchParams] = useSearchParams()
 
   const categoryFilter = searchParams.get('category')
@@ -436,7 +444,7 @@ export default function WholesalePage() {
         <HeroBanner />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-12">
           <h1 className="font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-            {categoryName || activeFilter!.label}
+            {categoryName ? t(categoryName, categoryName) : activeFilter ? t(activeFilter.label, activeFilter.label) : ""}
           </h1>
         </div>
         <WholesaleFilterSection

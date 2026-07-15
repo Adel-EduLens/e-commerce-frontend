@@ -47,7 +47,7 @@ function FooterColumn({
   return (
     <div className="flex flex-col items-start gap-3">
       <div className="font-['Montserrat'] text-lg sm:text-xl lg:text-2xl font-medium text-foreground">
-        {title}
+        {t(title)}
       </div>
       {items.map((item) => (
         <Link

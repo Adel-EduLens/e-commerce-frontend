@@ -5,5 +5,20 @@
   "Size": "Size",
   "Color": "Color",
 
-  "Requested on": "Requested on"
+  "Requested on": "Requested on",
+  "Notify Me List": "Notify Me List",
+  "Unknown Product": "Unknown Product",
+  "Back in Stock!": "Back in Stock!",
+  "Still Out of Stock": "Still Out of Stock",
+  "No Notifications Yet": "No Notifications Yet",
+  "noNotificationsDesc": "When you subscribe to out-of-stock products, they'll appear here so you never miss a restock.",
+  "Browse Products": "Browse Products",
+  "failedToLoadNotifications": "Failed to load notifications. Please try again.",
+  "EGP": "EGP",
+  "youWillBeNotified": "You will be notified!",
+  "failedToSubscribe": "Failed to subscribe",
+  "unsubscribedToast": "Unsubscribed successfully",
+  "failedToUnsubscribe": "Failed to unsubscribe",
+  "addedToNotifyList": "Added to your notify list",
+  "unableToSaveRequest": "Unable to save notify me request."
 }

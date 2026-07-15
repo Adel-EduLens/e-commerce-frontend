@@ -18,5 +18,12 @@
   "Kids": "Kids",
   
   "No products found.": "No products found.",
-  "Something went wrong. Please try again later.": "Something went wrong. Please try again later."
+  "Something went wrong. Please try again later.": "Something went wrong. Please try again later.",
+  "createYourDesign": "Create your design",
+  "failedToLoadBlankProducts": "Failed to load blank products",
+  "noBlankProductsAvailable": "No blank products available yet.",
+  "wholesaleBannerTitle": "From Factory to You – Big Quantities, Bigger Profits.",
+  "viewAll": "View All",
+  "noWholesaleProductsAvailable": "No wholesale products available yet.",
+  "Premium Collections": "Premium Collections"
 }

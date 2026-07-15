@@ -15,11 +15,11 @@ import type { BagProduct } from "../types/product";
 type BagTab = "favorites" | "recent";
 
 
-const formatCurrency = (amount: number) =>
+const formatCurrency = (amount: number, currencySuffix = "EGP") =>
   `${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(amount)} EGP`;
+  }).format(amount)} ${currencySuffix}`;
 
 function PlusIcon({ size = 24 }: { size?: 14 | 24 }) {
   const line = size === 24 ? "h-3.5 w-0.5" : "h-3 w-0.5";
@@ -111,7 +111,7 @@ function SummaryCard({
       <div className="flex flex-col gap-3">
         <div className="flex justify-between font-['Montserrat'] text-base text-foreground">
           <span>{t("summary.subtotal")}</span>
-          <span className="font-bold">{formatCurrency(subtotal)}</span>
+          <span className="font-bold">{formatCurrency(subtotal, t("EGP", "EGP"))}</span>
         </div>
 
         {discount > 0 && appliedCouponDetails && (
@@ -119,7 +119,7 @@ function SummaryCard({
             <span>
               {t("summary.discount", { code: appliedCouponDetails.code })}
             </span>
-            <span className="font-bold">-{formatCurrency(discount)}</span>
+            <span className="font-bold">-{formatCurrency(discount, t("EGP", "EGP"))}</span>
           </div>
         )}
 
@@ -138,7 +138,7 @@ function SummaryCard({
 
       <div className="flex justify-between items-center font-['Montserrat'] text-xl font-bold text-foreground">
         <span>{t("summary.total")}</span>
-        <span>{formatCurrency(total)}</span>
+        <span>{formatCurrency(total, t("EGP", "EGP"))}</span>
       </div>
 
       <button
@@ -208,10 +208,10 @@ function BagItemCard({
             {hasDiscount ? (
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-['Montserrat'] text-2xl font-bold text-red-500">
-                  {formatCurrency(discountedPrice)}
+                  {formatCurrency(discountedPrice, t("EGP", "EGP"))}
                 </span>
                 <span className="font-['Montserrat'] text-base text-gray-text line-through">
-                  {formatCurrency(item.unitPrice)}
+                  {formatCurrency(item.unitPrice, t("EGP", "EGP"))}
                 </span>
                 <span className="rounded-full bg-red-100 dark:bg-red-950 px-2 py-0.5 font-['Montserrat'] text-xs font-semibold text-red-600 dark:text-red-400">
                   {t("bagItem.off", { discount: appliedCoupon!.discount })}
@@ -219,7 +219,7 @@ function BagItemCard({
               </div>
             ) : (
               <span className="font-['Montserrat'] text-2xl font-bold text-foreground">
-                {formatCurrency(item.unitPrice)}
+                {formatCurrency(item.unitPrice, t("EGP", "EGP"))}
               </span>
             )}
           </div>
@@ -273,7 +273,7 @@ function BagItemCard({
                   : "text-foreground"
               }
             >
-              {formatCurrency(discountedPrice * item.quantity)}
+              {formatCurrency(discountedPrice * item.quantity, t("EGP", "EGP"))}
             </span>
           </div>
         </div>
@@ -371,7 +371,7 @@ function FavoritesSection({
             {products.map((product: BagProduct, index: number) => {
               const title = product.title || product.name || "Product";
               const rawPrice = product.price ?? product.unitPrice ?? "";
-              const price = typeof rawPrice === "number" ? `${rawPrice} EGP` : rawPrice;
+              const price = typeof rawPrice === "number" ? `${rawPrice} ${t("EGP", "EGP")}` : rawPrice;
               const sizeLabel = product.sizeLabel || (Array.isArray(product.sizes) ? product.sizes.map((s: any) => typeof s === "string" ? s : (s.size || s.name || "")).filter(Boolean).join(" - ") : "") || Array.from(new Set(product.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ");
               const imageSrc = product.imageSrc || product.image || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === "string" ? product.images[0] : product.images[0].url) : undefined) || product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url;
 
@@ -396,7 +396,7 @@ function FavoritesSection({
                 to={viewAllLink}
                 className="rounded-2xl bg-primary px-8 py-4 font-['Montserrat'] text-base font-semibold text-foreground hover:opacity-90 transition"
               >
-                View All
+                {t("favorites.viewAll")}
               </Link>
             </div>
           )}
@@ -503,7 +503,7 @@ export default function BagPage() {
     }
 
     setIsValidatingStock(true);
-    const toastId = toast.loading("Checking stock availability...");
+    const toastId = toast.loading(t("toast.checkingStock"));
 
     try {
       // 1. Gather all unique products to check to avoid double-fetching
@@ -538,7 +538,7 @@ export default function BagPage() {
       for (const item of items) {
         const productInfo = productDetailsMap[item.productId];
         if (!productInfo || !productInfo.data) {
-          errors.push(`Could not verify stock for "${item.title}".`);
+          errors.push(t("toast.couldNotVerifyStock", { title: item.title }));
           continue;
         }
 
@@ -553,7 +553,7 @@ export default function BagPage() {
 
           if (item.quantity > availableStock) {
             errors.push(
-              `Quantity out of stock for "${item.title}" (${item.color}). Only ${availableStock} package(s) available in stock.`
+              t("toast.wholesaleStockError", { title: item.title, color: item.color, availableStock })
             );
           }
         } else if (productInfo.type === "RETAIL") {
@@ -564,7 +564,11 @@ export default function BagPage() {
 
           if (item.quantity > availableStock) {
             errors.push(
-              `Quantity out of stock for "${item.title}" (${item.size || "default size"}). Only ${availableStock} item(s) available in stock.`
+              t("toast.retailStockError", {
+                title: item.title,
+                size: item.size || t("bagItem.defaultSize"),
+                availableStock
+              })
             );
           }
         } else {
@@ -581,7 +585,7 @@ export default function BagPage() {
           if (item.quantity > availableStock) {
             const variantDesc = item.color || item.size ? ` (${[item.color, item.size].filter(Boolean).join(" / ")})` : "";
             errors.push(
-              `Quantity out of stock for "${item.title}"${variantDesc}. Only ${availableStock} item(s) available in stock.`
+              t("toast.shopStockError", { title: item.title, variantDesc, availableStock })
             );
           }
         }
@@ -597,7 +601,7 @@ export default function BagPage() {
     } catch (err: any) {
       toast.dismiss(toastId);
       console.error("Stock validation error:", err);
-      toast.error("Failed to verify product stock. Please try again.");
+      toast.error(t("toast.verifyStockError"));
       setIsValidatingStock(false);
       return;
     }
@@ -617,7 +621,7 @@ export default function BagPage() {
     for (const productId in groupedWholesale) {
       const { sum, minOrder, title } = groupedWholesale[productId];
       if (sum < minOrder) {
-        toast.error(`Cannot proceed to checkout. The total packages for wholesale product "${title}" in your cart (${sum}) is less than the minimum order requirement (${minOrder}).`);
+        toast.error(t("toast.wholesaleMinOrderError", { title, sum, minOrder }));
         return;
       }
     }
@@ -665,7 +669,7 @@ export default function BagPage() {
           {isLoading && items.length === 0 ? (
             <LoadingSpinner
               containerClassName="py-20 bg-card rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
-              text="Loading bag items..."
+              text={t("loadingBagItems")}
             />
           ) : items.length ? (
             items.map((item) => (

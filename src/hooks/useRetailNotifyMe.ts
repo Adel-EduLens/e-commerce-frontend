@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import retailApi from '../services/retailApi'
+import { useTranslation } from 'react-i18next'
 
 export function useRetailNotifyMe(userId?: string | number) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('notify')
 
   const query = useQuery({
     queryKey: ['retailNotifyMe', userId],
@@ -18,13 +20,13 @@ export function useRetailNotifyMe(userId?: string | number) {
       return retailApi.createRetailNotifyMe(payload)
     },
     onSuccess: () => {
-      toast.success('Added to your notify list')
+      toast.success(t('addedToNotifyList'))
       queryClient.invalidateQueries({ queryKey: ['retailNotifyMe'] })
       queryClient.invalidateQueries({ queryKey: ['retailProducts'] })
     },
     onError: (error: any) => {
 
-      toast.error(error?.response?.data?.message ?? error?.message ?? 'Unable to save notify me request.')
+      toast.error(error?.response?.data?.message ?? error?.message ?? t('unableToSaveRequest'))
     },
   })
 

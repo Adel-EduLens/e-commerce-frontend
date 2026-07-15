@@ -1,12 +1,13 @@
 import { Trash2, Bell, Package, Loader2 } from "lucide-react";
 import { useNotifyMeList, useNotifyMeUnsubscribe } from "../hooks/useNotifyMe";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const formatCurrency = (amount: number) =>
+const formatCurrency = (amount: number, currencySuffix = "EGP") =>
   `${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(amount)} EGP`;
+  }).format(amount)} ${currencySuffix}`;
 
 function ProductRequestCard({
   notification,
@@ -17,6 +18,7 @@ function ProductRequestCard({
   onRemove: () => void;
   isRemoving: boolean;
 }) {
+  const { t } = useTranslation("notify");
   const navigate = useNavigate();
   const product = notification.product;
   const mainImage =
@@ -62,29 +64,29 @@ function ProductRequestCard({
           onClick={handleProductClick}
           className="font-['Montserrat'] text-base sm:text-lg font-semibold text-foreground text-left hover:underline"
         >
-          {product?.name || "Unknown Product"}
+          {product?.name || t("Unknown Product")}
         </button>
 
         <div className="font-['Montserrat'] text-lg sm:text-xl font-bold text-foreground">
-          {product?.price ? formatCurrency(product.price) : "—"}
+          {product?.price ? formatCurrency(product.price, t("EGP", "EGP")) : "—"}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mt-1">
           {product?.stock > 0 ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 border border-primary px-3 py-1 font-['Montserrat'] text-xs font-semibold text-foreground">
               <span className="h-2 w-2 rounded-full bg-primary" />
-              Back in Stock!
+              {t("Back in Stock!")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-card border border-stroke px-3 py-1 font-['Montserrat'] text-xs font-semibold text-urgent">
               <span className="h-2 w-2 rounded-full bg-urgent animate-pulse" />
-              Still Out of Stock
+              {t("Still Out of Stock")}
             </span>
           )}
         </div>
 
         <div className="font-['Montserrat'] text-xs text-gray-text mt-1">
-          Requested on{" "}
+          {t("Requested on")}{" "}
           {new Date(notification.createdAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "short",
@@ -114,6 +116,7 @@ function ProductRequestCard({
 }
 
 function EmptyState() {
+  const { t } = useTranslation("notify");
   const navigate = useNavigate();
   return (
     <div className="flex flex-col items-center justify-center gap-5 py-16">
@@ -122,11 +125,10 @@ function EmptyState() {
       </div>
       <div className="text-center">
         <div className="font-['Montserrat'] text-2xl font-bold text-foreground mb-2">
-          No Notifications Yet
+          {t("No Notifications Yet")}
         </div>
         <div className="font-['Montserrat'] text-base text-gray-text max-w-sm">
-          When you subscribe to out-of-stock products, they'll appear here so you
-          never miss a restock.
+          {t("noNotificationsDesc")}
         </div>
       </div>
       <button
@@ -134,13 +136,14 @@ function EmptyState() {
         onClick={() => navigate("/products")}
         className="rounded-2xl bg-primary px-6 py-3 font-['Montserrat'] text-base font-semibold text-primary-foreground hover:opacity-90 transition"
       >
-        Browse Products
+        {t("Browse Products")}
       </button>
     </div>
   );
 }
 
 export default function NotifyMeListPage() {
+  const { t } = useTranslation("notify");
   const { data: notifications = [], isLoading, isError } = useNotifyMeList();
   const unsubscribeMutation = useNotifyMeUnsubscribe();
 
@@ -155,7 +158,7 @@ export default function NotifyMeListPage() {
   if (isError) {
     return (
       <div className="flex items-center justify-center py-20 font-['Montserrat'] text-base text-urgent">
-        Failed to load notifications. Please try again.
+        {t("failedToLoadNotifications")}
       </div>
     );
   }
@@ -166,11 +169,11 @@ export default function NotifyMeListPage() {
         <div className="flex items-center gap-3">
           <Bell className="h-7 w-7 text-foreground" />
           <h1 className="font-['Montserrat'] text-2xl sm:text-3xl font-bold text-foreground">
-            Notify Me List
+            {t("Notify Me List")}
           </h1>
         </div>
         <p className="font-['Montserrat'] text-base text-gray-text">
-          You'll be notified as soon as these items come back in stock.
+          {t("You'll be notified as soon as these items come back in stock.")}
         </p>
       </div>
 

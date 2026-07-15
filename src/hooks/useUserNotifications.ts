@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { userNotificationApi } from '../services/userNotificationApi'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export const notificationKeys = {
   all: ['userNotifications'] as const,
@@ -42,6 +43,7 @@ export function useMarkNotificationRead() {
 
 export function useMarkAllNotificationsRead() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('notifications')
 
   return useMutation({
     mutationFn: () => userNotificationApi.markAllAsRead(),
@@ -49,19 +51,20 @@ export function useMarkAllNotificationsRead() {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all })
       // Also invalidate the Navbar's notifications query so the badge clears
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
-      toast.success('All notifications marked as read')
+      toast.success(t('allMarkedRead'))
     },
   })
 }
 
 export function useDeleteNotification() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('notifications')
 
   return useMutation({
     mutationFn: (id: number) => userNotificationApi.deleteNotification(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: notificationKeys.all })
-      toast.success('Notification removed')
+      toast.success(t('notificationRemoved'))
     },
   })
 }

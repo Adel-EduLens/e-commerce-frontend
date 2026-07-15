@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/axios'
+import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export interface AppNotification {
   id: number
@@ -43,13 +45,26 @@ const unsubscribe = async (categoryId: string) => {
 
 export const useToggleCategorySubscription = () => {
   const qc = useQueryClient()
+  const { t } = useTranslation('notifications')
   const sub = useMutation({
     mutationFn: subscribe,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notification-subscriptions'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notification-subscriptions'] })
+      toast.success(t('subscribedToCategory'))
+    },
+    onError: () => {
+      toast.error(t('subscriptionError'))
+    },
   })
   const unsub = useMutation({
     mutationFn: unsubscribe,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notification-subscriptions'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['notification-subscriptions'] })
+      toast.success(t('unsubscribedFromCategory'))
+    },
+    onError: () => {
+      toast.error(t('subscriptionError'))
+    },
   })
   return { subscribe: sub.mutate, unsubscribe: unsub.mutate }
 }

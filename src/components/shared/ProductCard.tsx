@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Star } from "../ui/star";
 import { asset } from "../../lib/utils";
 import { MdCompare } from "react-icons/md";
@@ -146,6 +147,7 @@ export default function ProductCard({
   const [activeColorIdx, setActiveColorIdx] = useState(0);
   const [isCompared, setIsCompared] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation("productDetails");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const actualProductId =
     productId ||
@@ -184,7 +186,7 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     if (!isAuthenticated) {
-      toast.error("Please login first");
+      toast.error(t("pleaseLoginFirst"));
       navigate("/login");
       return;
     }
@@ -199,14 +201,14 @@ export default function ProductCard({
       if (isCompared) {
         removeCompareProduct(actualProductId);
         setIsCompared(false);
-        toast.success("Removed from compare");
+        toast.success(t("removedFromCompareToast"));
       } else {
         addCompareProduct(actualProductId);
         setIsCompared(true);
-        toast.success("Added to compare");
+        toast.success(t("addedToCompareToast"));
       }
     } catch {
-      toast.error("You can compare up to 4 products.");
+      toast.error(t("compareLimitError"));
     }
   };
 
@@ -216,7 +218,7 @@ export default function ProductCard({
 
     if (existingCartItem) {
       removeItem(existingCartItem.id);
-      toast.success("Removed from cart");
+      toast.success(t("removedFromCartToast"));
     } else {
       const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
 
@@ -266,7 +268,7 @@ export default function ProductCard({
         });
       }
 
-      toast.success("Added to cart");
+      toast.success(t("addedToCartToast"));
     }
   };
 
@@ -505,7 +507,7 @@ export default function ProductCard({
           onClick={handleToggleCart}
           className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl bg-danger py-3 text-center text-white transition-colors hover:bg-red-800`}
         >
-          {isInCart ? "Remove from cart" : "Add to cart"}
+          {isInCart ? t("removeFromCart") : t("addToCart")}
         </button>
       </div>
     </div>

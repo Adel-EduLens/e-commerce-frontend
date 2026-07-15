@@ -64,7 +64,7 @@ export function ProductInfoPanel({
 
   const handleNotifyMeToggle = () => {
     if (!isAuthenticated) {
-      toast.error("Please log in first to subscribe to notifications.");
+      toast.error(t("loginToSubscribe"));
       navigate("/login");
       return;
     }
@@ -163,10 +163,10 @@ export function ProductInfoPanel({
   // Stock status styling
   const stockLabel =
     availableStock === 0
-      ? "Out of Stock"
+      ? t("outOfStock")
       : availableStock <= 5
-        ? "Low Stock"
-        : "In Stock";
+        ? t("lowStock")
+        : t("inStock");
 
   const stockBadgeClass =
     availableStock === 0
@@ -196,11 +196,11 @@ export function ProductInfoPanel({
   };
   const handleAddToCart = () => {
     if (availableStock <= 0) {
-      toast.error("This option is currently out of stock.");
+      toast.error(t("outOfStockOption"));
       return;
     }
     if (quantity > availableStock) {
-      toast.error(`Cannot add to cart. Only ${availableStock} available in stock.`);
+      toast.error(t("cannotAddToCartStock", { count: availableStock }));
       return;
     }
 
@@ -276,17 +276,17 @@ export function ProductInfoPanel({
 
   const handleBuyNow = () => {
     if (availableStock <= 0) {
-      toast.error("This option is currently out of stock.");
+      toast.error(t("outOfStockOption"));
       return;
     }
     if (quantity > availableStock) {
-      toast.error(`Cannot proceed to checkout. Only ${availableStock} available in stock.`);
+      toast.error(t("cannotCheckoutStock", { count: availableStock }));
       return;
     }
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
     
     if (isWholesale && quantity < minQty) {
-      toast.error(`The quantity (${quantity}) is less than the minimum order quantity (${minQty}).`);
+      toast.error(t("lessThanMinOrder", { quantity, minQty }));
       return;
     }
 
@@ -297,7 +297,7 @@ export function ProductInfoPanel({
     const newTotalQty = currentCartQty + quantity;
 
     if (isWholesale && newTotalQty < minQty) {
-      toast.error(`Cannot proceed to checkout. The total quantity of packages for this wholesale product in your cart (${newTotalQty}) must be at least the minimum order quantity (${minQty}).`);
+      toast.error(t("wholesaleMinCartQtyError", { totalQty: newTotalQty, minQty }));
       handleAddToCart();
       return;
     }
@@ -311,15 +311,15 @@ export function ProductInfoPanel({
       if (isCompared) {
         removeCompareProduct(item.id);
         setIsCompared(false);
-        toast.success("Removed from compare");
+        toast.success(t("removedFromCompareToast"));
         return;
       }
 
       addCompareProduct(item.id);
       setIsCompared(true);
-      toast.success("Added to compare");
+      toast.success(t("addedToCompareToast"));
     } catch {
-      toast.error("You can compare up to 4 products.");
+      toast.error(t("compareLimitError"));
     }
   };
 
@@ -353,20 +353,20 @@ export function ProductInfoPanel({
           onClick={handleCompare}
           className="ml-auto text-xs text-primary hover:underline font-semibold"
         >
-          {isCompared ? "✓ In Comparison" : "+ Add to Product Comparison"}
+          {isCompared ? `✓ ${t("inComparison")}` : t("addToCompareLink")}
         </button>
       </div>
 
       {/* Price */}
       <div className="flex items-baseline gap-3 flex-wrap">
         <span className="text-2xl font-extrabold text-foreground">
-          {activePrice.toLocaleString()} EGP
+          {activePrice.toLocaleString()} {t("egp")}
         </span>
         {oldPrice && (
           <>
-            <span className="text-base text-gray-text line-through">{oldPrice.toLocaleString()} EGP</span>
+            <span className="text-base text-gray-text line-through">{oldPrice.toLocaleString()} {t("egp")}</span>
             <span className="bg-primary-tint text-primary text-xs font-bold px-2 py-0.5 rounded">
-              {discountPercent}% OFF
+              {discountPercent}% {t("off")}
             </span>
           </>
         )}
@@ -375,7 +375,7 @@ export function ProductInfoPanel({
       {/* Brand */}
       {item.brandName && (
         <div className="flex items-center gap-2 py-2 border-t border-b border-stroke">
-          <span className="text-xs font-bold text-gray-text uppercase tracking-wider">Brand:</span>
+          <span className="text-xs font-bold text-gray-text uppercase tracking-wider">{t("brandLabel")}</span>
           <span className="text-sm font-bold text-foreground uppercase tracking-wide">{item.brandName}</span>
         </div>
       )}
@@ -384,7 +384,7 @@ export function ProductInfoPanel({
       {item.colors.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-            {isWholesale ? "PACKAGE COLOR:" : "COLOR:"} <span className="text-foreground normal-case font-bold">{selectedColor}</span>
+            {isWholesale ? t("packageColor") : t("colorLabel")} <span className="text-foreground normal-case font-bold">{selectedColor}</span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             {item.colors.map((color) => {
@@ -414,7 +414,7 @@ export function ProductInfoPanel({
               className="ml-auto text-xs text-gray-text hover:text-primary flex items-center gap-1"
             >
               <RiShareForwardLine className="h-4 w-4" />
-              Size Guide
+              {t("sizeGuide")}
             </button>
           </div>
         </div>
@@ -424,7 +424,7 @@ export function ProductInfoPanel({
       {colorVariants.length > 0 && (
         <div className="flex flex-col gap-2">
           <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-            {isWholesale ? "AVAILABLE SIZES:" : `SIZE: ${selectedSize}`}
+            {isWholesale ? t("availableSizes") : t("sizeLabel", { size: selectedSize })}
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
@@ -453,7 +453,7 @@ export function ProductInfoPanel({
           </div>
           {isWholesale && (
             <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-md font-medium mt-1">
-              Note: You are purchasing a wholesale package that contains all the sizes listed above.
+              {t("wholesaleSizesNote")}
             </p>
           )}
         </div>
@@ -461,7 +461,7 @@ export function ProductInfoPanel({
 
       {/* Quantity */}
       <div className="flex items-center gap-3">
-        <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">QUANTITY:</span>
+        <span className="text-xs font-bold text-foreground/80 uppercase tracking-wider">{t("quantityLabel")}</span>
         <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
@@ -489,7 +489,7 @@ export function ProductInfoPanel({
         </span>
         {productType === "WHOLESALE" && (colorObj?.minOrder ?? item.minOrder) && (
           <span className="text-xs font-semibold text-danger bg-red-50 border border-red-200 px-2 py-0.5 rounded ml-2">
-            Min. Order: {colorObj?.minOrder ?? item.minOrder}
+            {t("minOrderLabel", { min: colorObj?.minOrder ?? item.minOrder })}
           </span>
         )}
       </div>
@@ -502,7 +502,7 @@ export function ProductInfoPanel({
           }`}
       >
         <Heart className={`h-4 w-4 ${isFavorite ? "fill-primary text-primary" : ""}`} />
-        {isFavorite ? "Wishlisted" : t("addToFavorite")}
+        {isFavorite ? t("wishlisted") : t("addToFavorite")}
       </button>
 
       {/* Action Buttons */}
@@ -539,12 +539,12 @@ export function ProductInfoPanel({
             {isSubscribed ? (
               <>
                 <Check className="h-4 w-4" />
-                Subscribed for restock
+                {t("subscribedForRestock")}
               </>
             ) : (
               <>
                 <Bell className="h-4 w-4 animate-bounce" />
-                Notify me when in stock
+                {t("notifyMeInStock")}
               </>
             )}
           </button>

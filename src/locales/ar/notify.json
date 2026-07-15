@@ -5,5 +5,20 @@
   "Size": "المقاس",
   "Color": "اللون",
 
-  "Requested on": "تم الطلب في"
+  "Requested on": "تم الطلب في",
+  "Notify Me List": "قائمة التنبيه عند التوفر",
+  "Unknown Product": "منتج غير معروف",
+  "Back in Stock!": "متوفر في المخزون الآن!",
+  "Still Out of Stock": "لا يزال غير متوفر",
+  "No Notifications Yet": "لا توجد تنبيهات بعد",
+  "noNotificationsDesc": "عندما تشترك في تنبيهات المنتجات غير المتوفرة، ستظهر هنا حتى لا يفوتك توفرها مرة أخرى.",
+  "Browse Products": "تصفح المنتجات",
+  "failedToLoadNotifications": "فشل في تحميل التنبيهات. يرجى المحاولة مرة أخرى.",
+  "EGP": "ج.م",
+  "youWillBeNotified": "سيتم إشعارك عند التوفر!",
+  "failedToSubscribe": "فشل في الاشتراك",
+  "unsubscribedToast": "تم إلغاء الاشتراك بنجاح",
+  "failedToUnsubscribe": "فشل في إلغاء الاشتراك",
+  "addedToNotifyList": "تمت الإضافة إلى قائمة التنبيهات",
+  "unableToSaveRequest": "تعذر حفظ طلب التنبيه."
 }

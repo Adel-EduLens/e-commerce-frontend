@@ -34,16 +34,17 @@ function NotificationCard({
   isDeleting: boolean;
 }) {
   const navigate = useNavigate();
+  const { t } = useTranslation("notifications");
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 1) return t("Just now");
+    if (minutes < 60) return t("mAgo", { minutes });
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) return t("hAgo", { hours });
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return t("dAgo", { days });
   };
 
   return (
@@ -105,7 +106,7 @@ function NotificationCard({
               }}
               className="font-['Montserrat'] text-xs font-semibold text-primary-foreground bg-primary rounded-lg px-2.5 py-1 hover:opacity-90 transition"
             >
-              View Product
+              {t("View Product")}
             </button>
           )}
         </div>
@@ -118,7 +119,7 @@ function NotificationCard({
             type="button"
             onClick={onMarkRead}
             className="h-8 w-8 rounded-full bg-card border border-stroke flex items-center justify-center hover:bg-gray-light transition"
-            title="Mark as read"
+            title={t("Mark as read")}
           >
             <Check className="h-4 w-4 text-gray-text" />
           </button>
@@ -128,7 +129,7 @@ function NotificationCard({
           onClick={onDelete}
           disabled={isDeleting}
           className="h-8 w-8 rounded-full bg-card border border-stroke flex items-center justify-center hover:bg-gray-light transition disabled:opacity-50"
-          title="Delete"
+          title={t("Delete")}
         >
           {isDeleting ? (
             <Loader2 className="h-4 w-4 animate-spin text-gray-text" />
@@ -142,17 +143,17 @@ function NotificationCard({
 }
 
 function EmptyNotifications() {
+  const { t } = useTranslation("notifications");
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-16">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-light">
         <Bell className="h-8 w-8 text-gray-text" />
       </div>
       <div className="font-['Montserrat'] text-xl font-bold text-foreground">
-        No Notifications
+        {t("No Notifications")}
       </div>
       <div className="font-['Montserrat'] text-sm text-gray-text text-center max-w-xs">
-        You're all caught up! Notifications about restocked products will appear
-        here.
+        {t("noNotificationsDesc")}
       </div>
     </div>
   );
@@ -182,7 +183,7 @@ export default function NotificationsPage() {
   if (isError) {
     return (
       <div className="flex items-center justify-center py-20 font-['Montserrat'] text-base text-urgent">
-        Failed to load notifications. Please try again.
+        {t("failedToLoadNotifications")}
       </div>
     );
   }
@@ -202,7 +203,7 @@ export default function NotificationsPage() {
             className="flex items-center gap-1.5 rounded-xl bg-card border border-stroke px-3 py-2 font-['Montserrat'] text-xs font-semibold text-foreground hover:bg-gray-light transition disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" />
-            Mark all read
+            {t("Mark all read")}
           </button>
         )}
       </div>
@@ -237,8 +238,8 @@ export default function NotificationsPage() {
                   size="sm"
                   aria-label={
                     enabled
-                      ? `Unsubscribe from ${cat.name}`
-                      : `Subscribe to ${cat.name}`
+                      ? t("unsubscribeFrom", { name: t(cat.name) })
+                      : t("subscribeTo", { name: t(cat.name) })
                   }
                 />
               </div>
