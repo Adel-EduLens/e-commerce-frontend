@@ -5,5 +5,11 @@
   "retail": "البيع بالتجزئة",
   "designLab": "معمل التصميم",
   "dropshipping": "الدروبشيبينج",
-  "searchPlaceholder": "بحث..."
+  "searchPlaceholder": "بحث...",
+  "notifications": "الإشعارات",
+  "noNotificationsYet": "لا توجد إشعارات بعد",
+  "readAll": "قراءة الكل",
+  "seeAll": "عرض الكل",
+  "favorites": "المفضلة",
+  "account": "الحساب"
 }

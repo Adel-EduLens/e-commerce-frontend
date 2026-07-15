@@ -5,5 +5,11 @@
   "retail": "Retail",
   "designLab": "Design Lab",
   "dropshipping": "Dropshipping",
-  "searchPlaceholder": "Search..."
+  "searchPlaceholder": "Search...",
+  "notifications": "Notifications",
+  "noNotificationsYet": "No notifications yet",
+  "readAll": "Read All",
+  "seeAll": "See All",
+  "favorites": "Favorites",
+  "account": "Account"
 }

@@ -21,6 +21,7 @@ const navLinks = [
 ];
 
 function NotificationBell() {
+  const { t } = useTranslation("navbar");
   const { data } = useNotifications();
   const markAllRead = useMarkAllRead();
   const navigate = useNavigate();
@@ -72,7 +73,7 @@ function NotificationBell() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-stroke">
         <span className="font-['Montserrat'] text-sm font-bold text-foreground">
-          Notifications {unread > 0 && <span className="text-primary">({unread})</span>}
+          {t("notifications", "Notifications")} {unread > 0 && <span className="text-primary">({unread})</span>}
         </span>
       </div>
 
@@ -80,7 +81,7 @@ function NotificationBell() {
       <div className="max-h-72 overflow-y-auto divide-y divide-stroke">
         {recent.length === 0 ? (
           <p className="px-4 py-6 text-center font-['Montserrat'] text-sm text-gray-text">
-            No notifications yet
+            {t("noNotificationsYet", "No notifications yet")}
           </p>
         ) : (
           recent.map((n) => (
@@ -131,7 +132,7 @@ function NotificationBell() {
             disabled={markAllRead.isPending}
             className="flex-1 rounded-xl border border-stroke bg-card py-2 font-['Montserrat'] text-sm font-bold text-foreground hover:bg-gray-light transition disabled:opacity-50"
           >
-            Read All
+            {t("readAll", "Read All")}
           </button>
         )}
         <button
@@ -139,7 +140,7 @@ function NotificationBell() {
           onClick={handleSeeAll}
           className="flex-1 rounded-xl text-white bg-primary py-2 font-['Montserrat'] text-sm font-bold hover:opacity-90 transition-opacity"
         >
-          See All
+          {t("seeAll", "See All")}
         </button>
       </div>
     </div>
@@ -152,7 +153,7 @@ function NotificationBell() {
         type="button"
         onClick={handleOpen}
         className="relative flex items-center justify-center"
-        aria-label="Notifications"
+        aria-label={t("notifications", "Notifications")}
       >
         <Bell
           className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
@@ -302,14 +303,14 @@ export default function Navbar() {
 
             {isAuthenticated && <NotificationBell />}
 
-            <Link to="/favorites" className="hidden md:block shrink-0">
+            <Link to="/favorites" className="hidden md:block shrink-0" aria-label={t("favorites", "Favorites")}>
               <Heart
                 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
                 strokeWidth={1.5}
               />
             </Link>
 
-            <Link to="/settings" className="hidden md:block shrink-0">
+            <Link to="/settings" className="hidden md:block shrink-0" aria-label={t("account", "Account")}>
               <User
                 className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
                 strokeWidth={1.5}

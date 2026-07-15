@@ -50,10 +50,10 @@ export default function SeasonMustHavesPage() {
     limit: 4,
   });
 
-  const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category.name))], [allProducts]);
+  const allCategories = useMemo(() => [...new Set(allProducts.map((p) => p.category?.name).filter(Boolean) as string[])], [allProducts]);
   const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
-  const allSizes = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []))], [allProducts]);
-  const allColors = useMemo(() => [...new Set(allProducts.flatMap((p) => p.colors?.map((c) => c.colorName || c.color) ?? []))], [allProducts]);
+  const allSizes = useMemo(() => [...new Set((allProducts.flatMap((p) => p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).filter(Boolean) as string[])], [allProducts]);
+  const allColors = useMemo(() => [...new Set((allProducts.flatMap((p) => p.colors?.map((c) => c.colorName || c.color) ?? [])).filter(Boolean) as string[])], [allProducts]);
   const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
 
   const filterConfigs = useMemo(

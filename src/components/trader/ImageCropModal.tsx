@@ -86,11 +86,13 @@ export async function getCroppedFile(imageSrc: string, pixelCrop: Area, fileName
 export default function ImageCropModal({
   imageSrc,
   fileName,
+  aspect,
   onConfirm,
   onCancel,
 }: {
   imageSrc: string;
   fileName: string;
+  aspect?: number;
   onConfirm: (file: File) => void;
   onCancel: () => void;
 }) {
@@ -109,6 +111,8 @@ export default function ImageCropModal({
     try {
       const file = await getCroppedFile(imageSrc, croppedAreaPixels, fileName);
       onConfirm(file);
+    } catch (e) {
+      console.error("Failed to crop image:", e);
     } finally {
       setApplying(false);
     }
@@ -123,7 +127,7 @@ export default function ImageCropModal({
         </div>
 
         <p className="font-['Montserrat'] text-xs text-gray-text">
-          Drag to reposition · Pinch or scroll to zoom · Crop is 4:5 (matches product card)
+          Drag to reposition · Pinch or scroll to zoom · Crop is {aspect ? `${Math.round(aspect * 100) / 100}:1` : "4:5"}
         </p>
 
         {/* Crop area */}
@@ -132,7 +136,7 @@ export default function ImageCropModal({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={CROP_ASPECT}
+            aspect={aspect ?? CROP_ASPECT}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}

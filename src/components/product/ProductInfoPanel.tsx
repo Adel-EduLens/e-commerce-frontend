@@ -29,7 +29,7 @@ type ProductInfoPanelProps = {
   item: DetailItem;
   reviewCount?: number;
   productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
-  rawProduct?: Record<string, unknown>;
+  rawProduct?: any;
   /** When provided, overrides the internal add-to-cart logic */
   onAddToCart?: () => void;
   /** When provided, overrides the internal buy-now logic */
@@ -69,7 +69,7 @@ export function ProductInfoPanel({
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : productType === "RETAIL" ? "RETAIL_RESTOCK" : "SHOP_RESTOCK";
-  const targetId = item.id;
+  const targetId = String(item.id);
 
   const { data: checkData } = useNotifyMeCheck(targetType, targetId);
   const isSubscribed = checkData?.isSubscribed ?? false;
@@ -186,10 +186,10 @@ export function ProductInfoPanel({
     rawProduct?.flashDealPrice &&
     rawProduct?.flashDealPrice < item.price;
 
-  const activePrice = hasFlashDeal ? rawProduct.flashDealPrice : item.price;
+  const activePrice = Number(hasFlashDeal ? rawProduct.flashDealPrice : item.price);
   const oldPrice = hasFlashDeal ? item.price : null;
   const discountPercent = hasFlashDeal
-    ? Math.round(((item.price - rawProduct.flashDealPrice) / item.price) * 100)
+    ? Math.round(((item.price - Number(rawProduct.flashDealPrice)) / item.price) * 100)
     : null;
 
   // Stock status styling
@@ -208,11 +208,19 @@ export function ProductInfoPanel({
         : "text-green-600 bg-green-50 border-green-200";
 
   const handleShare = async () => {
-    try {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: item.name,
+          text: `Check out ${item.name}`,
+          url: window.location.href,
+        });
+      } catch {
+        // share cancelled/failed
+      }
+    } else {
       await navigator.clipboard.writeText(window.location.href);
-      toast.success(t("copiedLink"));
-    } catch {
-      toast.error(t("copyFailed"));
+      toast.success("Link copied to clipboard!");
     }
   };
 
@@ -235,13 +243,14 @@ export function ProductInfoPanel({
       toast.error(t("outOfStockOption"));
       return;
     }
-    if (quantity > availableStock) {
-      toast.error(t("cannotAddToCartStock", { count: availableStock }));
+    
+    const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
+    if (isWholesale && minQty && quantity < minQty) {
+      toast.error(t("wholesaleMinCartQtyError", { totalQty: quantity, minQty }));
       return;
     }
 
-    if (isWholesale) {
-      const minQty = colorObj?.minOrder ?? item.minOrder ?? 1;
+    if (isWholesale && colorObj) {
       const sizesForSelectedColor = colorObj
         ? (colorObj.sizes || []).map((s: any) => s.size).join(", ")
         : "";
@@ -250,8 +259,8 @@ export function ProductInfoPanel({
 
       addItem({
         id: cartItemId,
-        productId: item.id,
-        categoryId: item.category?.id ?? '',
+        productId: String(item.id),
+        categoryId: item.category?.id ? String(item.category.id) : undefined,
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
@@ -286,8 +295,8 @@ export function ProductInfoPanel({
 
       addItem({
         id: `${item.id}-${selectedSize}-${selectedColor}`,
-        productId: item.id,
-        categoryId: item.category?.id ?? '',
+        productId: String(item.id),
+        categoryId: item.category?.id ? String(item.category.id) : undefined,
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
