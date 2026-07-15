@@ -1,22 +1,14 @@
 import { useState } from "react";
-import { useActiveShopBanners } from "../../hooks/queries/shopBannerQuery";
 import { useNavigate } from "react-router-dom";
+import { useActiveShopBanners } from "../../hooks/queries/shopBannerQuery";
+
+const isArabic = (text: string) => /[\u0600-\u06FF]/.test(text);
 
 const ShopBanner = () => {
   const navigate = useNavigate();
   const { data: banners, isPending } = useActiveShopBanners("shop");
 
   const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleBannerClick = () => {
-    const link = banner.buttonLink || "/";
-
-    if (link.startsWith(window.location.origin)) {
-      navigate(new URL(link).pathname, { replace: true });
-    } else {
-      window.location.assign(link);
-    }
-  };
 
   if (isPending) {
     return (
@@ -32,6 +24,19 @@ const ShopBanner = () => {
 
   const banner = banners[activeIndex];
 
+  const isBannerArabic =
+    isArabic(banner.title) || isArabic(banner.description);
+
+  const handleBannerClick = () => {
+    const link = banner.buttonLink || "/";
+
+    if (link.startsWith(window.location.origin)) {
+      navigate(new URL(link).pathname, { replace: true });
+    } else {
+      window.location.assign(link);
+    }
+  };
+
   return (
     <section
       className="relative h-screen w-full overflow-hidden flex items-center"
@@ -41,7 +46,12 @@ const ShopBanner = () => {
     >
       <div className="mx-auto grid grid-cols-1 lg:grid-cols-2 items-center h-full w-full">
         {/* Content */}
-        <div className="text-white order-2 lg:order-1 px-6">
+        <div
+          dir={isBannerArabic ? "rtl" : "ltr"}
+          className={`text-white order-2 lg:order-1 px-6 ${
+            isBannerArabic ? "text-right" : "text-left"
+          }`}
+        >
           <h1 className="text-4xl md:text-5xl font-bold mb-5">
             {banner.title}
           </h1>
@@ -61,11 +71,11 @@ const ShopBanner = () => {
         </div>
 
         {/* Image */}
-        <div className="order-1 lg:order-2 hidden lg:block  h-full">
+        <div className="order-1 lg:order-2 hidden lg:block h-full">
           <img
             src={banner.image}
             alt={banner.title}
-            className="w-full h-full object-cover "
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
