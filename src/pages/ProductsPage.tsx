@@ -39,7 +39,12 @@ export default function ProductsPage() {
 
   const [page, setPage] = useState(1);
 
-  const { data: categories = [] } = useCategories();
+  const { data: rawCategories = [] } = useCategories(false);
+  const categories = useMemo(() => {
+    return rawCategories.filter(
+      (c) => !c.isWholesale && (c as any).type !== "WHOLESALE" && (c as any).type !== "RETAIL"
+    );
+  }, [rawCategories]);
   const { data: brands = [] } = useBrands();
 
   const categoryId = useMemo(() => {
@@ -230,6 +235,8 @@ export default function ProductsPage() {
         noProductsText={t("No products found.")}
         loadingText={t("Loading")}
         availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
+        isWholesale={false}
+        categories={categories}
       />
     </div>
   );
