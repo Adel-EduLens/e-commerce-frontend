@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { asset } from "../../components/trader/inventoryUtils";
 import { WholesaleCategoryFormModal } from "../../components/trader/WholesaleCategoryFormModal";
 import { LoadingSpinner } from "../../components/shared";
@@ -26,6 +27,7 @@ export function CategoryTablePanel({
   onEdit,
   onDelete,
 }: CategoryTablePanelProps) {
+  const { t } = useTranslation("traderWholesaleCategories");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
@@ -78,7 +80,7 @@ export function CategoryTablePanel({
           />
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -93,7 +95,7 @@ export function CategoryTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Wholesale Category
+          {t("addWholesaleCategory")}
         </button>
       </div>
 
@@ -101,7 +103,7 @@ export function CategoryTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Wholesale Categories Table
+              {t("tableHeading")}
             </h2>
 
             <div className="relative">
@@ -113,7 +115,7 @@ export function CategoryTablePanel({
                 }}
                 className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 font-['Montserrat'] text-xs font-medium transition ${sortBy !== "date-desc" && sortBy !== "none" ? "border-primary bg-primary text-foreground" : "border-stroke bg-white text-foreground hover:bg-background"}`}
               >
-                Sort by
+                {t("sortBy")}
                 <img
                   className={`h-4 w-4 transition-transform ${openFilter === "sort" ? "-rotate-90" : "rotate-90"}`}
                   src={asset("weui_arrow-outlined.svg")}
@@ -123,11 +125,11 @@ export function CategoryTablePanel({
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-white shadow-lg py-1">
                   {[
-                    { value: "none", label: "No sort" },
-                    { value: "date-desc", label: "Newest first" },
-                    { value: "date-asc", label: "Oldest first" },
-                    { value: "name-asc", label: "Name: A → Z" },
-                    { value: "name-desc", label: "Name: Z → A" },
+                    { value: "none", label: t("sortNone") },
+                    { value: "date-desc", label: t("sortNewestFirst") },
+                    { value: "date-asc", label: t("sortOldestFirst") },
+                    { value: "name-asc", label: t("sortNameAsc") },
+                    { value: "name-desc", label: t("sortNameDesc") },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -149,11 +151,11 @@ export function CategoryTablePanel({
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading categories..." containerClassName="py-20" className="h-8 w-8" />
+          <LoadingSpinner text={t("loadingCategories")} containerClassName="py-20" className="h-8 w-8" />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              No categories found.
+              {t("noCategoriesFound")}
             </p>
           </div>
         ) : (
@@ -162,16 +164,16 @@ export function CategoryTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Image
+                    {t("colImage")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Name
+                    {t("colName")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Date
+                    {t("colDate")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Actions
+                    {t("colActions")}
                   </th>
                 </tr>
               </thead>
@@ -245,7 +247,7 @@ export function CategoryTablePanel({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
+              {itemsPerPage} {t("perPage")}
               <img
                 className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
                 src={asset("weui_arrow-outlined.svg")}
@@ -265,7 +267,7 @@ export function CategoryTablePanel({
                     }}
                     className={`w-full px-3 py-2 text-left font-['Inter'] text-sm font-medium transition hover:bg-background ${itemsPerPage === size ? "text-primary" : "text-foreground"}`}
                   >
-                    {size} per page
+                    {size} {t("perPage")}
                   </button>
                 ))}
               </div>
@@ -278,7 +280,7 @@ export function CategoryTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              <span className="text-gray-text">{t("of")} {filtered.length}</span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -313,11 +315,10 @@ export function CategoryTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Category
+              {t("deleteModalHeading")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Are you sure you want to delete this category? This action cannot
-              be undone.
+              {t("deleteModalText")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -325,7 +326,7 @@ export function CategoryTablePanel({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-white"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -335,7 +336,7 @@ export function CategoryTablePanel({
                 }}
                 className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>
@@ -346,6 +347,7 @@ export function CategoryTablePanel({
 }
 
 export default function TraderWholesaleCategoriesPage() {
+  const { t } = useTranslation("traderWholesaleCategories");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
 
@@ -363,12 +365,12 @@ export default function TraderWholesaleCategoriesPage() {
             try {
               await createCategory.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Wholesale category created successfully");
+              toast.success(t("createSuccess"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to create category",
+                  : t("createError"),
               );
             }
           }}

@@ -747,7 +747,7 @@ export function AddItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`${pc.color} Image: ${err}`);
+                                toast.error(t("imageDimensionsErrorWithColor", { color: pc.color, err, defaultValue: `${pc.color} Image: ${err}` }));
                                 e.target.value = "";
                                 return;
                               }
@@ -1090,7 +1090,7 @@ export function AddItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`Image dimensions error: ${err}`);
+                                toast.error(t("imageDimensionsErrorGeneral", { err, defaultValue: `Image dimensions error: ${err}` }));
                                 e.target.value = "";
                                 return;
                               }
@@ -1770,7 +1770,7 @@ export function EditItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`Image dimensions: ${err}`);
+                                toast.error(t("imageDimensionsError", { err, defaultValue: `Image dimensions: ${err}` }));
                                 return;
                               }
                               const fd = new FormData();
@@ -2029,7 +2029,7 @@ export function EditItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`New color image: ${err}`);
+                                toast.error(t("newColorImageError", { err, defaultValue: `New color image: ${err}` }));
                                 return;
                               }
                               setNewColorCropState({
@@ -2347,7 +2347,7 @@ export function EditItemModal({
                             if (file) {
                               const err = await validateImageDimensions(file);
                               if (err) {
-                                toast.error(`Image dimensions error: ${err}`);
+                                toast.error(t("imageDimensionsErrorGeneral", { err, defaultValue: `Image dimensions error: ${err}` }));
                                 e.target.value = "";
                                 return;
                               }

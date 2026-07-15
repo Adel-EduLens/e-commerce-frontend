@@ -1,6 +1,7 @@
 import Cropper from "react-easy-crop";
 import { useCallback, useState } from "react";
 import type { Area, Point } from "react-easy-crop";
+import i18n from "../../i18n";
 
 export const MIN_IMG_WIDTH = 100;
 export const MIN_IMG_HEIGHT = 100;
@@ -15,13 +16,22 @@ export function validateImageDimensions(file: File): Promise<string | null> {
       URL.revokeObjectURL(url);
       if (img.naturalWidth < MIN_IMG_WIDTH || img.naturalHeight < MIN_IMG_HEIGHT) {
         resolve(
-          `Image is too small (${img.naturalWidth}×${img.naturalHeight}px). Minimum required: ${MIN_IMG_WIDTH}×${MIN_IMG_HEIGHT}px.`
+          i18n.t("traderProduct:imageTooSmall", {
+            width: img.naturalWidth,
+            height: img.naturalHeight,
+            minWidth: MIN_IMG_WIDTH,
+            minHeight: MIN_IMG_HEIGHT,
+            defaultValue: `Image is too small (${img.naturalWidth}×${img.naturalHeight}px). Minimum required: ${MIN_IMG_WIDTH}×${MIN_IMG_HEIGHT}px.`
+          })
         );
       } else {
         resolve(null);
       }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); resolve("Could not read image."); };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(i18n.t("traderProduct:couldNotReadImage", "Could not read image."));
+    };
     img.src = url;
   });
 }

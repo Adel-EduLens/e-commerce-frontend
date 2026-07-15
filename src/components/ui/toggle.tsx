@@ -42,8 +42,12 @@ export function Toggle({
   // - sm: 20px height, 36px width, 14px knob -> 3px padding all around.
   // - md: 24px height, 44px width, 20px knob -> 2px padding all around.
   const knobTransformClasses = {
-    sm: checked ? "translate-x-[19px]" : "translate-x-[3px]",
-    md: checked ? "translate-x-[22px]" : "translate-x-[2px]",
+    sm: checked
+      ? "translate-x-[19px] rtl:-translate-x-[19px]"
+      : "translate-x-[3px] rtl:-translate-x-[3px]",
+    md: checked
+      ? "translate-x-[22px] rtl:-translate-x-[22px]"
+      : "translate-x-[2px] rtl:-translate-x-[2px]",
   };
 
   return (

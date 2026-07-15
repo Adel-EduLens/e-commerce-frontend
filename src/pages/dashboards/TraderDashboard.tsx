@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useTranslation } from "react-i18next";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
 
@@ -10,34 +11,34 @@ const dateRanges = ["29 Oct - 11 Nov", "Last 30 days", "This quarter"] as const;
 
 const summaryCards = [
   {
-    label: "Total Revenue",
-    value: "$87,250",
+    label: "totalRevenue",
+    value: "totalRevenueVal",
     delta: "8.5%",
-    note: "Up from yesterday",
+    note: "upFromYesterday",
     trend: "up",
     icon: "dashicons_money-alt.svg",
   },
   {
-    label: "Total Orders",
-    value: "1,234 Orders",
+    label: "totalOrders",
+    value: "totalOrdersVal",
     delta: "8.5%",
-    note: "Down from yesterday",
+    note: "downFromYesterday",
     trend: "down",
     icon: "mynaui_cart.svg",
   },
   {
-    label: "Customers",
-    value: "658 Users",
+    label: "customers",
+    value: "customersVal",
     delta: "8.5%",
-    note: "Up from yesterday",
+    note: "upFromYesterday",
     trend: "up",
     icon: "majesticons_users-line.svg",
   },
   {
-    label: "Conversion Rate",
-    value: "6.3%",
+    label: "conversionRate",
+    value: "conversionRateVal",
     delta: "8.5%",
-    note: "Up from yesterday",
+    note: "upFromYesterday",
     trend: "up",
     icon: "hugeicons_trade-up.svg",
   },
@@ -57,37 +58,37 @@ const revenueSeries = [
 ] as const;
 
 const orderStatus = [
-  { label: "New", share: 35, color: "#A81324" },
-  { label: "Confirmed", share: 25, color: "#FCD34D" },
-  { label: "Shipped", share: 30, color: "#7DD3FC" },
-  { label: "Delivered", share: 10, color: "#A855F7" },
+  { label: "new", share: 35, color: "#A81324" },
+  { label: "confirmed", share: 25, color: "#FCD34D" },
+  { label: "shipped", share: 30, color: "#7DD3FC" },
+  { label: "delivered", share: 10, color: "#A855F7" },
 ] as const;
 
 const alerts = [
   {
-    title: "Low Stock Alert",
-    body: 'Basic Tee #122" only 3 items left in stock.',
-    time: "Oct 4, 10:32 AM",
+    title: "lowStockAlert",
+    body: "alertBody1",
+    time: "oct4_1032",
     icon: "solar_danger-triangle-bold.svg",
   },
   {
-    title: "Payment Received",
-    body: "Payout batch for the week was deposited successfully.",
-    time: "Oct 4, 08:10 AM",
+    title: "paymentReceived",
+    body: "alertBody2",
+    time: "oct4_0810",
     icon: "solar_box-linear.svg",
   },
   {
-    title: "Shipment Delay",
-    body: "Courier exception detected for 2 wholesale orders.",
-    time: "Oct 3, 06:45 PM",
+    title: "shipmentDelay",
+    body: "alertBody3",
+    time: "oct3_0645",
     icon: "entypo_cross.svg",
   },
 ] as const;
 
 const inventorySnapshot = [
-  { label: "In Stock", count: 320, percent: 80, icon: "solar_box-linear.svg" },
-  { label: "Low Stock", count: 54, percent: 14, icon: "solar_danger-triangle-bold.svg" },
-  { label: "Out of Stock", count: 24, percent: 6, icon: "entypo_cross.svg" },
+  { label: "inStock", count: 320, percent: 80, icon: "solar_box-linear.svg" },
+  { label: "lowStock", count: 54, percent: 14, icon: "solar_danger-triangle-bold.svg" },
+  { label: "outOfStock", count: 24, percent: 6, icon: "entypo_cross.svg" },
 ] as const;
 
 const topProducts = [
@@ -146,14 +147,14 @@ const transactions = [
 ] as const;
 
 const customerOverview = [
-  { label: "Returning", value: 62, color: "#A81324" },
-  { label: "New", value: 38, color: "#7DD3FC" },
+  { label: "returning", value: 62, color: "#A81324" },
+  { label: "new", value: 38, color: "#7DD3FC" },
 ] as const;
 
 const customerStats = [
-  { label: "Avg. Orders per Customer", value: "2.3", icon: "solar_box-linear-1.svg" },
-  { label: "Avg. Spend per Customer", value: "$38", icon: "akar-icons_money.svg" },
-  { label: "Most Active Day", value: "Friday", icon: "solar_calendar-linear.svg" },
+  { label: "avgOrdersPerCustomer", value: "2.3", icon: "solar_box-linear-1.svg" },
+  { label: "avgSpendPerCustomer", value: "$38", icon: "akar-icons_money.svg" },
+  { label: "mostActiveDay", value: "friday", icon: "solar_calendar-linear.svg" },
 ] as const;
 
 function Panel({
@@ -201,12 +202,13 @@ function SummaryCard({
   trend: "up" | "down";
   icon: string;
 }) {
+  const { t } = useTranslation("traderOverview");
   return (
     <div className="rounded-[24px] border border-stroke bg-white p-4 shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] sm:p-5">
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{label}</p>
-          <p className="mt-2 font-['Montserrat'] text-2xl font-semibold text-foreground">{value}</p>
+          <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{t(label, label)}</p>
+          <p className="mt-2 font-['Montserrat'] text-2xl font-semibold text-foreground">{t(value, value)}</p>
         </div>
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary">
           <img className="h-8 w-8" src={traderAsset(icon)} alt="" />
@@ -220,7 +222,7 @@ function SummaryCard({
         />
         <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
           <span className={trend === "up" ? "text-[#00B69B]" : "text-[#F93C65]"}>{delta}</span>{" "}
-          {note}
+          {t(note, note)}
         </p>
       </div>
     </div>
@@ -228,6 +230,7 @@ function SummaryCard({
 }
 
 function RevenueChart() {
+  const { t } = useTranslation("traderOverview");
   const width = 760;
   const height = 260;
   const padding = { top: 20, right: 12, bottom: 34, left: 12 };
@@ -254,12 +257,12 @@ function RevenueChart() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="font-['Montserrat'] text-sm font-medium text-gray-text">
-            Annual sales trend across channels
+            {t("annualSalesTrend")}
           </span>
         </div>
         <button className="inline-flex items-center gap-2 rounded-2xl border border-stroke px-4 py-2 text-sm font-medium text-foreground transition hover:border-stroke hover:bg-background">
           <img className="h-5 w-5" src={traderAsset("download-cloud-02.svg")} alt="" />
-          Export
+          {t("export")}
         </button>
       </div>
 
@@ -338,6 +341,7 @@ function RevenueChart() {
 }
 
 function OrdersByStatus() {
+  const { t } = useTranslation("traderOverview");
   const gradientStops = orderStatus
     .reduce(
       (segments, item, index) => {
@@ -365,7 +369,7 @@ function OrdersByStatus() {
             <div className="mt-2 flex items-center gap-2">
               <img className="h-5 w-5" src={traderAsset("hugeicons_trade-up-1.svg")} alt="" />
               <p className="font-['Montserrat'] text-xs font-medium text-gray-text">
-                <span className="text-[#00B69B]">8.5%</span> Total Orders
+                <span className="text-[#00B69B]">8.5%</span> {t("totalOrders")}
               </p>
             </div>
           </div>
@@ -380,7 +384,7 @@ function OrdersByStatus() {
               style={{ backgroundColor: item.color }}
             />
             <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
-              {item.label} - {item.share}%
+              {t(item.label, item.label)} - {item.share}%
             </span>
           </div>
         ))}
@@ -401,6 +405,7 @@ export default function TraderDashboard() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<(typeof dateRanges)[number]>(dateRanges[0]);
+  const { t } = useTranslation("traderOverview");
 
   const firstName = user?.name?.trim().split(/\s+/)[0] || "Maan";
 
@@ -410,11 +415,10 @@ export default function TraderDashboard() {
           <section className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <h1 className="font-['Montserrat'] text-3xl font-semibold text-foreground sm:text-4xl">
-                Good morning, {firstName}{" "}
-                <span className="inline-block align-middle">👋</span>
+                {t("goodMorning", { name: firstName })}
               </h1>
               <p className="mt-2 text-sm text-gray-text">
-                Here&apos;s what&apos;s moving across your store today.
+                {t("subheading")}
               </p>
             </div>
 
@@ -434,7 +438,7 @@ export default function TraderDashboard() {
                 >
                   {dateRanges.map((range) => (
                     <option key={range} value={range}>
-                      {range}
+                      {t(range === "29 Oct - 11 Nov" ? "dateRange1" : range === "Last 30 days" ? "last30Days" : "thisQuarter", range)}
                     </option>
                   ))}
                 </select>
@@ -450,7 +454,7 @@ export default function TraderDashboard() {
                 onClick={() => navigate("/")}
                 className="rounded-2xl border border-stroke bg-white px-5 py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
               >
-                Storefront
+                {t("storefront")}
               </button>
             </div>
           </section>
@@ -462,17 +466,17 @@ export default function TraderDashboard() {
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_360px]">
-            <Panel title="Revenue Overview">
+            <Panel title={t("revenueOverview")}>
               <RevenueChart />
             </Panel>
 
-            <Panel title="Orders by Status">
+            <Panel title={t("ordersByStatus")}>
               <OrdersByStatus />
             </Panel>
           </section>
 
           <section className="grid gap-6 xl:grid-cols-3">
-            <Panel title="Recent Alerts" action="View All">
+            <Panel title={t("recentAlerts")} action={t("viewAll")}>
               <div className="space-y-3">
                 {alerts.map((alert) => (
                   <article
@@ -483,28 +487,28 @@ export default function TraderDashboard() {
                       <div className="flex items-center gap-2">
                         <img className="h-5 w-5" src={traderAsset(alert.icon)} alt="" />
                         <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                          {alert.title}
+                          {t(alert.title, alert.title)}
                         </p>
                       </div>
-                      <span className="text-xs font-medium text-gray-text">{alert.time}</span>
+                      <span className="text-xs font-medium text-gray-text">{t(alert.time, alert.time)}</span>
                     </div>
-                    <p className="mt-3 text-sm font-medium text-gray-text">{alert.body}</p>
+                    <p className="mt-3 text-sm font-medium text-gray-text">{t(alert.body, alert.body)}</p>
                   </article>
                 ))}
               </div>
             </Panel>
 
-            <Panel title="Inventory Snapshot" action="View All">
+            <Panel title={t("inventorySnapshot")} action={t("viewAll")}>
               <div className="space-y-4">
                 {inventorySnapshot.map((item) => (
                   <div key={item.label} className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <img className="h-5 w-5" src={traderAsset(item.icon)} alt="" />
                       <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                        {item.label}
+                        {t(item.label, item.label)}
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-text">{item.count} items</span>
+                    <span className="text-sm font-medium text-gray-text">{t("itemsCount", { count: item.count, defaultValue: `${item.count} items` })}</span>
                   </div>
                 ))}
 
@@ -523,15 +527,15 @@ export default function TraderDashboard() {
                         className="h-3.5 w-3.5 rounded-md"
                         style={{
                           backgroundColor:
-                            item.label === "In Stock"
+                            item.label === "inStock"
                               ? "#037847"
-                              : item.label === "Low Stock"
+                              : item.label === "lowStock"
                               ? "#FACC15"
                               : "#FF0000",
                         }}
                       />
                       <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        {item.label} {item.percent}%
+                        {t(item.label, item.label)} {item.percent}%
                       </span>
                     </div>
                   ))}
@@ -539,7 +543,7 @@ export default function TraderDashboard() {
               </div>
             </Panel>
 
-            <Panel title="Top-Selling Products" action="View All">
+            <Panel title={t("topSellingProducts")} action={t("viewAll")}>
               <div className="space-y-3">
                 {topProducts.map((product) => (
                   <article
@@ -557,15 +561,15 @@ export default function TraderDashboard() {
                           {product.name}
                         </p>
                         <p className="text-xs font-medium text-gray-text">
-                          Revenue <span className="font-semibold text-foreground">{product.revenue}</span>
+                          {t("revenue")} <span className="font-semibold text-foreground">{product.revenue}</span>
                         </p>
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-gray-text">
                         <span>
-                          Units Sold <span className="font-semibold text-foreground">{product.units}</span>
+                          {t("unitsSold")} <span className="font-semibold text-foreground">{product.units}</span>
                         </span>
                         <span>
-                          Unit Price <span className="font-semibold text-foreground">{product.unitPrice}</span>
+                          {t("unitPrice")} <span className="font-semibold text-foreground">{product.unitPrice}</span>
                         </span>
                       </div>
                     </div>
@@ -576,25 +580,25 @@ export default function TraderDashboard() {
           </section>
 
           <section className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <Panel title="Recent Transactions" action="View All">
+            <Panel title={t("recentTransactions")} action={t("viewAll")}>
               <div className="overflow-x-auto">
                 <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl">
                   <thead>
                     <tr className="bg-secondary">
                       <th className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary">
-                        Order ID
+                        {t("orderId")}
                       </th>
                       <th className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary">
-                        Customer
+                        {t("customer")}
                       </th>
                       <th className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary">
-                        Total
+                        {t("total")}
                       </th>
                       <th className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary">
-                        Date
+                        {t("date")}
                       </th>
                       <th className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary">
-                        Status
+                        {t("status")}
                       </th>
                     </tr>
                   </thead>
@@ -622,7 +626,7 @@ export default function TraderDashboard() {
                               transaction.status,
                             )}`}
                           >
-                            {transaction.status}
+                            {t(transaction.status.toLowerCase(), transaction.status)}
                           </span>
                         </td>
                       </tr>
@@ -632,13 +636,13 @@ export default function TraderDashboard() {
               </div>
             </Panel>
 
-            <Panel title="Customers Overview" action="View All">
+            <Panel title={t("customersOverview")} action={t("viewAll")}>
               <div className="space-y-5">
                 {customerOverview.map((item) => (
                   <div key={item.label} className="space-y-2">
                     <div className="flex items-center justify-between gap-3">
                       <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                        {item.label}
+                        {t(item.label, item.label)}
                       </span>
                       <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
                         {item.value}%
@@ -659,20 +663,20 @@ export default function TraderDashboard() {
                       <div className="flex items-center gap-2">
                         <img className="h-5 w-5" src={traderAsset(item.icon)} alt="" />
                         <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">
-                          {item.label}
+                          {t(item.label, item.label)}
                         </span>
                       </div>
                       <span className="font-['Montserrat'] text-sm font-medium text-foreground">
-                        {item.value}
+                        {t(item.value.toLowerCase(), item.value)}
                       </span>
                     </div>
                   ))}
                 </div>
 
                 <p className="rounded-2xl bg-background px-4 py-3 text-sm font-medium text-gray-text">
-                  <span className="text-gray-text">Insight: </span>
+                  <span className="text-gray-text">{t("insightLabel")}</span>
                   <span className="text-foreground">
-                    Returning customers increased by +5% compared to last month.
+                    {t("insightText")}
                   </span>
                 </p>
               </div>

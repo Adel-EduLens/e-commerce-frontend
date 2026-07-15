@@ -214,7 +214,7 @@ export default function TraderLayout() {
                   )}
                   <div className="min-w-0">
                     <p className="truncate font-['Montserrat'] text-sm font-semibold text-foreground">
-                      {user?.name || "Maan Hassan"}
+                      {user?.name || t("defaultTraderName", "Maan Hassan")}
                     </p>
                     <p className="truncate text-xs font-medium uppercase tracking-[0.16em] text-primary">
                       {user?.role === "trader" ? t("traderRole") : user?.role}

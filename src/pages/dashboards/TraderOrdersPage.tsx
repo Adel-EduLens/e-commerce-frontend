@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, Calendar, User, Mail, Phone, MapPin, CreditCard, ShoppingBag } from "lucide-react";
@@ -53,14 +54,25 @@ function statusPill(status: string) {
   return { bg: "bg-rose-50", text: "text-rose-700", ring: "outline-rose-700" };
 }
 
-function getTimelineSteps(status: string, dateStr: string, timeStr: string) {
+function getLocalizedStatus(status: string, t: any) {
+  const norm = status.toUpperCase();
+  if (norm === "COMPLETED") return t("statusCompleted");
+  if (norm === "DELIVERED") return t("statusDelivered");
+  if (norm === "SHIPPED") return t("statusShipped");
+  if (norm === "PROCESSING") return t("statusProcessing");
+  if (norm === "PENDING") return t("statusPending");
+  if (norm === "CANCELLED") return t("statusCancelled");
+  return status;
+}
+
+function getTimelineSteps(status: string, dateStr: string, timeStr: string, t: any) {
   const s = status.toUpperCase();
   const baseTime = `${dateStr} ${timeStr}`;
   return [
-    { label: "Order Placed", time: baseTime, done: true },
-    { label: "Processing", time: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" ? "In progress" : "Pending", done: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" },
-    { label: "Shipped", time: s === "SHIPPED" || s === "COMPLETED" ? "Shipped" : "Pending", done: s === "SHIPPED" || s === "COMPLETED" },
-    { label: "Delivered", time: s === "COMPLETED" ? "Delivered" : "Pending", done: s === "COMPLETED" },
+    { label: t("timelineOrderPlaced"), time: baseTime, done: true },
+    { label: t("timelineProcessing"), time: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" ? t("timelineInProgress") : t("timelinePending"), done: s === "PROCESSING" || s === "SHIPPED" || s === "COMPLETED" },
+    { label: t("timelineShipped"), time: s === "SHIPPED" || s === "COMPLETED" ? t("timelineShipped") : t("timelinePending"), done: s === "SHIPPED" || s === "COMPLETED" },
+    { label: t("timelineDelivered"), time: s === "COMPLETED" ? t("timelineDelivered") : t("timelinePending"), done: s === "COMPLETED" },
   ];
 }
 
@@ -72,6 +84,7 @@ interface OrderDetailProps {
 }
 
 function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
+  const { t } = useTranslation("traderOrders");
   const pill = statusPill(order.status);
   const [itemSelected, setItemSelected] = useState<Set<string>>(new Set());
   const [updating, setUpdating] = useState(false);
@@ -102,7 +115,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
     }
   };
 
-  const timelineSteps = getTimelineSteps(order.status, order.date, order.time);
+  const timelineSteps = getTimelineSteps(order.status, order.date, order.time, t);
 
   return (
     <div className="space-y-6">
@@ -113,7 +126,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Orders
+        {t("backToOrders")}
       </button>
 
       {/* Three info cards */}
@@ -121,19 +134,19 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         {/* Order Info */}
         <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            Order Details
+            {t("orderDetails")}
           </h3>
           <div className="flex flex-col gap-3 font-['Montserrat'] text-sm">
             <div className="flex justify-between items-center py-1.5 border-b border-stroke">
-              <span className="text-gray-text font-medium">Order ID:</span>
+              <span className="text-gray-text font-medium">{t("orderIdLabel")}</span>
               <span className="font-bold text-foreground">{order.orderId}</span>
             </div>
             <div className="flex justify-between items-center py-1.5 border-b border-stroke">
-              <span className="text-gray-text font-medium">Date & Time:</span>
+              <span className="text-gray-text font-medium">{t("dateTimeLabel")}</span>
               <span className="font-semibold text-foreground">{order.date} — {order.time}</span>
             </div>
             <div className="flex justify-between items-center py-1.5 border-b border-stroke">
-              <span className="text-gray-text font-medium">Status:</span>
+              <span className="text-gray-text font-medium">{t("statusLabel")}</span>
               <div className="flex items-center gap-2">
                 {updating ? (
                   <Loader2 className="h-4 w-4 animate-spin text-secondary" />
@@ -143,17 +156,17 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                     onChange={handleStatusChange}
                     className={`inline-flex rounded-xl px-2 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring} bg-white cursor-pointer focus:outline-none`}
                   >
-                    <option value="PENDING">Pending</option>
-                    <option value="PROCESSING">Processing</option>
-                    <option value="SHIPPED">Shipped</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="CANCELLED">Cancelled</option>
+                    <option value="PENDING">{t("statusPending")}</option>
+                    <option value="PROCESSING">{t("statusProcessing")}</option>
+                    <option value="SHIPPED">{t("statusShipped")}</option>
+                    <option value="COMPLETED">{t("statusCompleted")}</option>
+                    <option value="CANCELLED">{t("statusCancelled")}</option>
                   </select>
                 )}
               </div>
             </div>
             <div className="flex justify-between items-center py-1.5 border-b border-stroke">
-              <span className="text-gray-text font-medium">Payment Type:</span>
+              <span className="text-gray-text font-medium">{t("paymentTypeLabel")}</span>
               <span className="font-semibold text-foreground">{order.payment}</span>
             </div>
           </div>
@@ -161,13 +174,13 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
 
         {/* Customer Information */}
         <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
-          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Customer Information</h3>
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("customerInformation")}</h3>
           <div className="flex flex-col gap-3">
             {[
-              { icon: <User className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Name", value: order.customer },
-              { icon: <Mail className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Email", value: order.customerEmail },
-              { icon: <Phone className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Phone", value: order.customerPhone },
-              { icon: <MapPin className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: "Address", value: order.address },
+              { icon: <User className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custName"), value: order.customer },
+              { icon: <Mail className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custEmail"), value: order.customerEmail },
+              { icon: <Phone className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custPhone"), value: order.customerPhone },
+              { icon: <MapPin className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custAddress"), value: order.address },
             ].map((row, idx) => (
               <div key={idx} className="flex items-start gap-2.5">
                 {row.icon}
@@ -182,7 +195,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
 
         {/* Order Timeline */}
         <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
-          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Order Timeline</h3>
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderTimeline")}</h3>
           <div className="flex flex-col gap-0">
             {timelineSteps.map((step, i) => (
               <div key={step.label} className="flex items-start gap-3">
@@ -211,7 +224,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
       {/* Ordered Items Table */}
       <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
-          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">Ordered Items</h3>
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderedItems")}</h3>
         </div>
 
         <div className="overflow-x-auto">
@@ -230,8 +243,8 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                     )}
                   </div>
                 </th>
-                {["Image", "Product Details", "Quantity", "Price", "Subtotal"].map((col) => (
-                  <th key={col} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider">
+                {[t("colImage"), t("colProductDetails"), t("colQuantity"), t("colPrice"), t("colSubtotal")].map((col, cIdx) => (
+                  <th key={cIdx} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider">
                     {col}
                   </th>
                 ))}
@@ -272,12 +285,12 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                       <div className="flex justify-center gap-2 mt-1">
                         {item.size && (
                           <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
-                            Size: {item.size}
+                            {t("sizeLabel")}: {item.size}
                           </span>
                         )}
                         {item.color && (
                           <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
-                            Color: {item.color}
+                            {t("colorLabel")}: {item.color}
                           </span>
                         )}
                       </div>
@@ -302,19 +315,19 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         <div className="flex flex-col items-end gap-2 border-t border-stroke px-6 py-5 bg-zinc-50/50">
           <div className="w-64 space-y-2 font-['Montserrat'] text-xs font-medium">
             <div className="flex justify-between">
-              <span className="text-gray-text">Trader Subtotal:</span>
+              <span className="text-gray-text">{t("traderSubtotal")}</span>
               <span className="text-foreground font-bold">{order.subtotal}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-text">Total Shipping:</span>
+              <span className="text-gray-text">{t("totalShipping")}</span>
               <span className="text-foreground">{order.shipping}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-text">Total Discount:</span>
+              <span className="text-gray-text">{t("totalDiscount")}</span>
               <span className="text-foreground">{order.discount}</span>
             </div>
             <div className="flex justify-between text-sm font-bold pt-2 border-t border-stroke text-foreground">
-              <span>Order Grand Total:</span>
+              <span>{t("orderGrandTotal")}</span>
               <span>{order.total}</span>
             </div>
           </div>
@@ -326,6 +339,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function TraderOrdersPage() {
+  const { t } = useTranslation("traderOrders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -342,7 +356,7 @@ export default function TraderOrdersPage() {
       setOrders(res.data?.data || []);
     } catch (err) {
       console.error("Failed to fetch trader orders:", err);
-      toast.error("Could not fetch orders. Please try again.");
+      toast.error(t("fetchOrdersError"));
     } finally {
       setLoading(false);
     }
@@ -355,7 +369,7 @@ export default function TraderOrdersPage() {
   const handleUpdateStatus = async (orderId: string, status: string) => {
     try {
       await api.patch(`/orders/trader/${orderId}/status`, { status });
-      toast.success("Order status updated successfully!");
+      toast.success(t("statusUpdateSuccess"));
       // Update local state
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status } : o))
@@ -365,7 +379,7 @@ export default function TraderOrdersPage() {
       }
     } catch (err) {
       console.error("Failed to update status:", err);
-      toast.error("Could not update order status.");
+      toast.error(t("statusUpdateError"));
     }
   };
 
@@ -414,10 +428,10 @@ export default function TraderOrdersPage() {
   const cancelledCount = orders.filter(o => o.status.toUpperCase() === "CANCELLED").length;
 
   const summaryCards = [
-    { label: "Total Orders", value: `${totalOrdersCount} Orders`, note: "All time received", up: true },
-    { label: "Active Orders", value: String(activeCount), note: "Pending/Processing/Shipped", up: true },
-    { label: "Completed Orders", value: String(completedCount), note: "Delivered to clients", up: true },
-    { label: "Cancelled Orders", value: String(cancelledCount), note: "Cancelled/Returned", up: false },
+    { label: t("cardTotalOrders"), value: `${totalOrdersCount} ${t("ordersWord")}`, note: t("noteAllTimeReceived"), up: true },
+    { label: t("cardActiveOrders"), value: String(activeCount), note: t("noteActiveStatuses"), up: true },
+    { label: t("cardCompletedOrders"), value: String(completedCount), note: t("noteDeliveredToClients"), up: true },
+    { label: t("cardCancelledOrders"), value: String(cancelledCount), note: t("noteCancelledReturned"), up: false },
   ];
 
   if (loading) {
@@ -471,7 +485,7 @@ export default function TraderOrdersPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Search by ID, customer name..."
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full rounded-xl border border-stroke bg-zinc-50 py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
@@ -485,12 +499,12 @@ export default function TraderOrdersPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
               >
-                <option value="">All Statuses</option>
-                <option value="PENDING">Pending</option>
-                <option value="PROCESSING">Processing</option>
-                <option value="SHIPPED">Shipped</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="CANCELLED">Cancelled</option>
+                <option value="">{t("allStatuses")}</option>
+                <option value="PENDING">{t("statusPending")}</option>
+                <option value="PROCESSING">{t("statusProcessing")}</option>
+                <option value="SHIPPED">{t("statusShipped")}</option>
+                <option value="COMPLETED">{t("statusCompleted")}</option>
+                <option value="CANCELLED">{t("statusCancelled")}</option>
               </select>
             </div>
 
@@ -501,9 +515,9 @@ export default function TraderOrdersPage() {
                 onChange={(e) => setPaymentFilter(e.target.value)}
                 className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
               >
-                <option value="">All Payments</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
+                <option value="">{t("allPayments")}</option>
+                <option value="Cash">{t("paymentCash")}</option>
+                <option value="Card">{t("paymentCard")}</option>
               </select>
             </div>
 
@@ -529,7 +543,7 @@ export default function TraderOrdersPage() {
                 }}
                 className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
               >
-                Reset Filters
+                {t("resetFilters")}
               </button>
             )}
           </div>
@@ -538,7 +552,7 @@ export default function TraderOrdersPage() {
           <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
             {/* Panel header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
-              <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">Orders History Table</h2>
+              <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("ordersHistoryTable")}</h2>
             </div>
 
             {/* Table */}
@@ -558,9 +572,9 @@ export default function TraderOrdersPage() {
                         )}
                       </div>
                     </th>
-                    {["Order ID", "Customer Name", "Date & Time", "Payment", "Trader Subtotal", "Order Total", "Status"].map((col) => (
+                    {[t("colOrderId"), t("colCustomerName"), t("colDateTime"), t("colPayment"), t("colTraderSubtotal"), t("colOrderTotal"), t("colStatus")].map((col, cIdx) => (
                       <th
-                        key={col}
+                        key={cIdx}
                         className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider whitespace-nowrap"
                       >
                         {col}
@@ -572,7 +586,7 @@ export default function TraderOrdersPage() {
                   {filtered.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="px-6 py-12 text-center text-gray-text font-medium font-['Montserrat']">
-                        No orders found
+                        {t("noOrdersFound")}
                       </td>
                     </tr>
                   ) : (
@@ -615,7 +629,7 @@ export default function TraderOrdersPage() {
                           </td>
                           <td className="px-4 py-4 text-center whitespace-nowrap">
                             <span className={`inline-flex rounded-xl px-2.5 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
-                              {order.status}
+                              {getLocalizedStatus(order.status, t)}
                             </span>
                           </td>
                         </tr>

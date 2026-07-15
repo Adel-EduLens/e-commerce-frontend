@@ -31,5 +31,9 @@
   "paymentOverdue": "دفعة متأخرة",
   "active": "نشط",
   "pending": "قيد الانتظار",
-  "inactive": "غير نشط"
+  "inactive": "غير نشط",
+  "statOrdersValue": "1,245 طلب",
+  "statUnitsValue": "18,320 قطعة",
+  "statClientsValue": "126 عميل",
+  "pcsMin": "{{count}} قطع كحد أدنى"
 }

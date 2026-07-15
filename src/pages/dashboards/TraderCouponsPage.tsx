@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Trash2, Plus, Calendar, Tag, Percent, ShoppingBag, Eye, ChevronDown, X } from "lucide-react";
 import { api } from "../../lib/axios";
@@ -35,6 +36,7 @@ function SearchableSelect({
   onChange: (value: string) => void;
   emptyLabel: string;
 }) {
+  const { t } = useTranslation("traderCoupons");
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -128,7 +130,7 @@ function SearchableSelect({
               ))
             ) : (
               <div className="px-4 py-3 text-center text-sm text-gray-text">
-                No matches found
+                {t("noMatchesFound")}
               </div>
             )}
           </div>
@@ -139,6 +141,7 @@ function SearchableSelect({
 }
 
 export default function TraderCouponsPage() {
+  const { t } = useTranslation("traderCoupons");
   const queryClient = useQueryClient();
   const { data: coupons = [], isLoading: isLoadingCoupons } = useCoupons();
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
@@ -165,7 +168,7 @@ export default function TraderCouponsPage() {
       return data;
     },
     onSuccess: () => {
-      toast.success("Coupon created successfully!");
+      toast.success(t("couponCreatedSuccess"));
       // Reset form
       setCode("");
       setDiscount(10);
@@ -177,7 +180,7 @@ export default function TraderCouponsPage() {
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
     },
     onError: (error) => {
-      handleApiError(error, "Failed to create coupon");
+      handleApiError(error, t("failedToCreateCoupon"));
     }
   });
 
@@ -187,26 +190,26 @@ export default function TraderCouponsPage() {
       return data;
     },
     onSuccess: (_, variables) => {
-      toast.success(`Coupon ${variables.isActive ? "activated" : "deactivated"} successfully`);
+      toast.success(variables.isActive ? t("couponActivatedSuccess") : t("couponDeactivatedSuccess"));
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
     },
     onError: (error) => {
-      handleApiError(error, "Failed to update coupon status");
+      handleApiError(error, t("failedToUpdateCouponStatus"));
     }
   });
 
   const handleCreateCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim()) {
-      toast.error("Coupon code is required");
+      toast.error(t("couponCodeRequired"));
       return;
     }
     if (discount <= 0 || discount > 100) {
-      toast.error("Discount percentage must be between 1 and 100");
+      toast.error(t("discountRangeError"));
       return;
     }
     if (!validUntil) {
-      toast.error("Expiration date is required");
+      toast.error(t("expirationDateRequired"));
       return;
     }
 
@@ -231,8 +234,8 @@ export default function TraderCouponsPage() {
       {/* ── Heading / Create Coupon Trigger ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="font-['Montserrat'] text-2xl font-bold text-foreground">Trader Coupons</h1>
-          <p className="text-sm text-gray-text">Manage, activate/deactivate, and view your store coupons.</p>
+          <h1 className="font-['Montserrat'] text-2xl font-bold text-foreground">{t("traderCouponsTitle")}</h1>
+          <p className="text-sm text-gray-text">{t("traderCouponsSubtitle")}</p>
         </div>
         <button
           type="button"
@@ -240,7 +243,7 @@ export default function TraderCouponsPage() {
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer shadow-sm"
         >
           <Plus className="h-5 w-5" style={{ strokeWidth: 3 }} />
-          <span>Create Coupon</span>
+          <span>{t("createCoupon")}</span>
         </button>
       </div>
 
@@ -251,7 +254,7 @@ export default function TraderCouponsPage() {
             <Percent className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-text">Active Coupons</p>
+            <p className="text-sm font-semibold text-gray-text">{t("activeCoupons")}</p>
             <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
               {coupons.filter(c => c.isActive && new Date(c.validUntil) > new Date()).length}
             </p>
@@ -262,7 +265,7 @@ export default function TraderCouponsPage() {
             <Tag className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-text">Total Coupons</p>
+            <p className="text-sm font-semibold text-gray-text">{t("totalCoupons")}</p>
             <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{coupons.length}</p>
           </div>
         </div>
@@ -271,7 +274,7 @@ export default function TraderCouponsPage() {
             <Calendar className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-text">Expired Coupons</p>
+            <p className="text-sm font-semibold text-gray-text">{t("expiredCoupons")}</p>
             <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
               {coupons.filter(c => new Date(c.validUntil) <= new Date()).length}
             </p>
@@ -282,30 +285,30 @@ export default function TraderCouponsPage() {
       {/* ── Coupons List Table ── */}
       <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm w-full">
         <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
-          Coupon Management
+          {t("couponManagement")}
         </h2>
 
         {loading ? (
           <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-            Loading coupons...
+            {t("loadingCoupons")}
           </div>
         ) : coupons.length === 0 ? (
           <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-            No coupons created yet. Use the left form to add your first coupon!
+            {t("noCouponsMessage")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
-                  <th className="py-3 pr-4">Code</th>
-                  <th className="py-3 px-4">Discount</th>
-                  <th className="py-3 px-4">Restrictions</th>
-                  <th className="py-3 px-4">Uses / Limit</th>
-                  <th className="py-3 px-4">Expiry</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Used By</th>
-                  <th className="py-3 pl-4 text-right">Actions</th>
+                  <th className="py-3 pr-4">{t("colCode")}</th>
+                  <th className="py-3 px-4">{t("colDiscount")}</th>
+                  <th className="py-3 px-4">{t("colRestrictions")}</th>
+                  <th className="py-3 px-4">{t("colUsesLimit")}</th>
+                  <th className="py-3 px-4">{t("colExpiry")}</th>
+                  <th className="py-3 px-4">{t("colStatus")}</th>
+                  <th className="py-3 px-4">{t("colUsedBy")}</th>
+                  <th className="py-3 pl-4 text-right">{t("colActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -317,7 +320,7 @@ export default function TraderCouponsPage() {
                         {coupon.code}
                       </td>
                       <td className="py-4 px-4 font-['Montserrat'] font-semibold">
-                        {coupon.discount}% OFF
+                        {coupon.discount}% {t("off")}
                       </td>
                       <td className="py-4 px-4">
                         {coupon.product ? (
@@ -331,7 +334,7 @@ export default function TraderCouponsPage() {
                             {coupon.category.name}
                           </span>
                         ) : (
-                          <span className="text-gray-text text-xs">Global Coupon</span>
+                          <span className="text-gray-text text-xs">{t("globalCoupon")}</span>
                         )}
                       </td>
                       <td className="py-4 px-4 font-['Montserrat'] text-xs font-semibold text-gray-text">
@@ -343,19 +346,19 @@ export default function TraderCouponsPage() {
                       <td className="py-4 px-4">
                         {!coupon.isActive ? (
                           <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
-                            Inactive
+                            {t("statusInactive")}
                           </span>
                         ) : isExpired ? (
                           <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
-                            Expired
+                            {t("statusExpired")}
                           </span>
                         ) : coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit ? (
                           <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
-                            Limit Reached
+                            {t("statusLimitReached")}
                           </span>
                         ) : (
                           <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
-                            Active
+                            {t("statusActive")}
                           </span>
                         )}
                       </td>
@@ -367,11 +370,11 @@ export default function TraderCouponsPage() {
                             setIsModalOpen(true);
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 text-secondary hover:bg-primary/20 transition text-xs font-semibold cursor-pointer"
-                          aria-label="View coupon usages"
-                          title="View usages"
+                          aria-label={t("viewUsages")}
+                          title={t("viewUsages")}
                         >
                           <Eye className="h-4 w-4" />
-                          <span>View Usages</span>
+                          <span>{t("viewUsages")}</span>
                         </button>
                       </td>
                       <td className="py-4 pl-4 text-right">
@@ -382,7 +385,7 @@ export default function TraderCouponsPage() {
                             onChange={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
                             size="md"
                             variant="success"
-                            title={coupon.isActive ? "Deactivate Coupon" : "Activate Coupon"}
+                            title={coupon.isActive ? t("deactivateCoupon") : t("activateCoupon")}
                           />
                         </div>
                       </td>
@@ -409,10 +412,10 @@ export default function TraderCouponsPage() {
             <div className="flex items-center justify-between pb-4 border-b border-stroke mb-4">
               <div>
                 <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-                  Coupon Usages: <span className="text-secondary">{selectedCouponForModal.code}</span>
+                  {t("couponUsages")}: <span className="text-secondary">{selectedCouponForModal.code}</span>
                 </h3>
                 <p className="text-xs font-semibold text-gray-text mt-0.5">
-                  Discount: {selectedCouponForModal.discount}% OFF &middot; Limit: {selectedCouponForModal.usageLimit !== null ? selectedCouponForModal.usageLimit : "Unlimited"}
+                  {t("discountLabel")}: {selectedCouponForModal.discount}% {t("off")} &middot; {t("limitLabel")}: {selectedCouponForModal.usageLimit !== null ? selectedCouponForModal.usageLimit : t("unlimited")}
                 </p>
               </div>
               <button
@@ -429,30 +432,30 @@ export default function TraderCouponsPage() {
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {!selectedCouponForModal.usages || selectedCouponForModal.usages.length === 0 ? (
                 <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-                  No users have used this coupon yet.
+                  {t("noUsagesYet")}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
-                        <th className="py-2.5 pr-4">User Name</th>
-                        <th className="py-2.5 px-4">Email</th>
-                        <th className="py-2.5 px-4">Phone</th>
-                        <th className="py-2.5 pl-4 text-right">Used At</th>
+                        <th className="py-2.5 pr-4">{t("colUserName")}</th>
+                        <th className="py-2.5 px-4">{t("colEmail")}</th>
+                        <th className="py-2.5 px-4">{t("colPhone")}</th>
+                        <th className="py-2.5 pl-4 text-right">{t("colUsedAt")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {selectedCouponForModal.usages.map((usage) => (
                         <tr key={usage.id} className="border-b border-stroke text-sm text-foreground hover:bg-background transition">
                           <td className="py-3 pr-4 font-['Montserrat'] font-semibold text-foreground">
-                            {usage.user.name || "N/A"}
+                            {usage.user.name || t("na")}
                           </td>
                           <td className="py-3 px-4 font-['Montserrat'] text-gray-text">
                             {usage.user.email}
                           </td>
                           <td className="py-3 px-4 font-['Montserrat'] text-gray-text">
-                            {usage.user.phone || "N/A"}
+                            {usage.user.phone || t("na")}
                           </td>
                           <td className="py-3 pl-4 text-right font-['Montserrat'] text-xs text-gray-text">
                             {new Date(usage.usedAt).toLocaleString()}
@@ -483,23 +486,23 @@ export default function TraderCouponsPage() {
 
             <h2 className="font-['Montserrat'] text-xl font-bold text-foreground mb-6 flex items-center gap-2">
               <Plus className="h-6 w-6 text-primary" style={{ strokeWidth: 3 }} />
-              Create New Coupon
+              {t("createNewCoupon")}
             </h2>
 
             <form onSubmit={handleCreateCoupon} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-text mb-1">Coupon Code</label>
+                <label className="block text-sm font-semibold text-gray-text mb-1">{t("couponCodeLabel")}</label>
                 <input
                   type="text"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="e.g. SUMMER30"
+                  placeholder={t("couponCodePlaceholder")}
                   className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-text mb-1">Discount (%)</label>
+                <label className="block text-sm font-semibold text-gray-text mb-1">{t("discountPercentageLabel")}</label>
                 <input
                   type="number"
                   min="1"
@@ -511,7 +514,7 @@ export default function TraderCouponsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-text mb-1">Valid Until</label>
+                <label className="block text-sm font-semibold text-gray-text mb-1">{t("validUntilLabel")}</label>
                 <input
                   type="datetime-local"
                   value={validUntil}
@@ -521,33 +524,33 @@ export default function TraderCouponsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-text mb-1">Usage Limit (Optional)</label>
+                <label className="block text-sm font-semibold text-gray-text mb-1">{t("usageLimitLabel")}</label>
                 <input
                   type="number"
                   min="1"
                   value={usageLimit}
                   onChange={(e) => setUsageLimit(e.target.value)}
-                  placeholder="e.g. 100 (Blank for unlimited)"
+                  placeholder={t("usageLimitPlaceholder")}
                   className="w-full h-11 px-4 border border-stroke rounded-2xl font-['Montserrat'] text-sm focus:outline-none focus:border-secondary"
                 />
               </div>
 
               <SearchableSelect
-                label="Category Restriction (Optional)"
-                placeholder="Search or select category..."
+                label={t("categoryRestrictionLabel")}
+                placeholder={t("searchCategoryPlaceholder")}
                 options={categories}
                 value={selectedCategory}
                 onChange={setSelectedCategory}
-                emptyLabel="No Restriction (Applies to all)"
+                emptyLabel={t("noRestrictionLabel")}
               />
 
               <SearchableSelect
-                label="Product Restriction (Optional)"
-                placeholder="Search or select product..."
+                label={t("productRestrictionLabel")}
+                placeholder={t("searchProductPlaceholder")}
                 options={products}
                 value={selectedProduct}
                 onChange={setSelectedProduct}
-                emptyLabel="No Restriction (Applies to all)"
+                emptyLabel={t("noRestrictionLabel")}
               />
 
               <div className="pt-4 flex gap-3">
@@ -556,14 +559,14 @@ export default function TraderCouponsPage() {
                   onClick={() => setIsCreateModalOpen(false)}
                   className="flex-1 h-12 border border-stroke text-foreground hover:bg-background font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={createCouponMutation.isPending}
                   className="flex-1 h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50 cursor-pointer"
                 >
-                  {createCouponMutation.isPending ? "Creating..." : "Create Coupon"}
+                  {createCouponMutation.isPending ? t("creating") : t("createCoupon")}
                 </button>
               </div>
             </form>

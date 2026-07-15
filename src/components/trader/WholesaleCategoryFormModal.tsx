@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../../lib/axios";
 import { type Category } from "../../hooks/queries/categoriesQuery";
 import ImageCropModal, {
@@ -30,6 +31,7 @@ export function WholesaleCategoryFormModal({
   onSave,
   onClose,
 }: WholesaleCategoryFormModalProps) {
+  const { t } = useTranslation("traderWholesaleCategories");
   const [name, setName] = useState(category?.name ?? "");
   const [image, setImage] = useState(category?.image ?? "");
   const [cropSrc, setCropSrc] = useState<string | null>(null);
@@ -55,8 +57,7 @@ export function WholesaleCategoryFormModal({
       const url = await uploadImageFile(file);
       setImage(url);
     } catch (err) {
-
-      alert("Failed to upload image");
+      alert(t("uploadFailedAlert"));
     } finally {
       setUploading(false);
       setCropSrc(null);
@@ -68,7 +69,7 @@ export function WholesaleCategoryFormModal({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col animate-fadeIn">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {category ? "Edit Wholesale Category" : "Add Wholesale Category"}
+            {category ? t("editWholesaleCategory") : t("addWholesaleCategoryTitle")}
           </h2>
           <button
             type="button"
@@ -81,7 +82,7 @@ export function WholesaleCategoryFormModal({
 
         <div className="flex flex-col gap-4 p-5 overflow-y-auto">
           <input
-            placeholder="Category name *"
+            placeholder={t("categoryNamePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
@@ -89,7 +90,7 @@ export function WholesaleCategoryFormModal({
 
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Category Image *
+              {t("categoryImageLabel")}
             </label>
             <input
               type="file"
@@ -115,7 +116,7 @@ export function WholesaleCategoryFormModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button"
@@ -123,7 +124,7 @@ export function WholesaleCategoryFormModal({
               onClick={() => onSave({ name: name.trim(), image, appearOnHome: false, isWholesale: true })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : "Save"}
+              {uploading ? t("uploading") : t("save")}
             </button>
           </div>
         </div>

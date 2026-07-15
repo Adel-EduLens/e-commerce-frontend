@@ -71,6 +71,27 @@ import traderWholesaleAr from "./locales/ar/traderWholesale.json";
 import traderProductEn from "./locales/en/traderProduct.json";
 import traderProductAr from "./locales/ar/traderProduct.json";
 
+import traderOverviewEn from "./locales/en/traderOverview.json";
+import traderOverviewAr from "./locales/ar/traderOverview.json";
+
+import traderBrandsEn from "./locales/en/traderBrands.json";
+import traderBrandsAr from "./locales/ar/traderBrands.json";
+
+import traderCouponsEn from "./locales/en/traderCoupons.json";
+import traderCouponsAr from "./locales/ar/traderCoupons.json";
+
+import traderOrdersEn from "./locales/en/traderOrders.json";
+import traderOrdersAr from "./locales/ar/traderOrders.json";
+
+import traderDesignsEn from "./locales/en/traderDesigns.json";
+import traderDesignsAr from "./locales/ar/traderDesigns.json";
+
+import traderHelpCenterEn from "./locales/en/traderHelpCenter.json";
+import traderHelpCenterAr from "./locales/ar/traderHelpCenter.json";
+
+import traderWholesaleCategoriesEn from "./locales/en/traderWholesaleCategories.json";
+import traderWholesaleCategoriesAr from "./locales/ar/traderWholesaleCategories.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -100,6 +121,13 @@ i18n
         traderInventory: traderInventoryEn,
         traderWholesale: traderWholesaleEn,
         traderProduct: traderProductEn,
+        traderOverview: traderOverviewEn,
+        traderBrands: traderBrandsEn,
+        traderCoupons: traderCouponsEn,
+        traderOrders: traderOrdersEn,
+        traderDesigns: traderDesignsEn,
+        traderHelpCenter: traderHelpCenterEn,
+        traderWholesaleCategories: traderWholesaleCategoriesEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -125,6 +153,13 @@ i18n
         traderInventory: traderInventoryAr,
         traderWholesale: traderWholesaleAr,
         traderProduct: traderProductAr,
+        traderOverview: traderOverviewAr,
+        traderBrands: traderBrandsAr,
+        traderCoupons: traderCouponsAr,
+        traderOrders: traderOrdersAr,
+        traderDesigns: traderDesignsAr,
+        traderHelpCenter: traderHelpCenterAr,
+        traderWholesaleCategories: traderWholesaleCategoriesAr,
       },
     },
 

@@ -15,7 +15,7 @@
     "analytics": "التحليلات",
     "helpCenter": "مركز المساعدة",
     "storeSettings": "إعدادات المتجر",
-    "dashboard": "لوح ة التحكم",
+    "dashboard": "لوحة التحكم",
     "logout": "تسجيل الخروج",
     "loggedOut": "تم تسجيل الخروج بنجاح",
     "traderRole": "تاجر",
@@ -24,5 +24,8 @@
     "Shop Banner": "بانر المتجر",
     "Home Page Banner": "بانر الصفحة الرئيسية",
     "Collections": "المجموعات",
-    "designs": "التصاميم"
+    "designs": "التصاميم",
+    "Retail Categories": "فئات التجزئة",
+    "Retail Products": "منتجات التجزئة",
+    "defaultTraderName": "معن حسن"
 }

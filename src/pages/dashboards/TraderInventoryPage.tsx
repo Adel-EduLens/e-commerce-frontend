@@ -22,17 +22,17 @@ import { useTranslation } from "react-i18next";
 const alerts = [
   {
     title: "lowStockAlert",
-    message: 'Basic Tee #122" only 3 items left in stock.',
+    message: "alertMessageSample",
     time: "Oct 4, 10:32 AM",
   },
   {
     title: "lowStockAlert",
-    message: 'Basic Tee #122" only 3 items left in stock.',
+    message: "alertMessageSample",
     time: "Oct 4, 10:32 AM",
   },
   {
     title: "lowStockAlert",
-    message: 'Basic Tee #122" only 3 items left in stock.',
+    message: "alertMessageSample",
     time: "Oct 4, 10:32 AM",
   },
 ];
@@ -40,20 +40,20 @@ const alerts = [
 const activityLogs = [
   {
     title: "Hoodie – Black (+20)",
-    addedBy: "Added by Ahmed",
-    note: "Restocked from supplier",
+    addedBy: "addedByAhmed",
+    note: "restockedFromSupplier",
     time: "Oct 3, 10:30 AM",
   },
   {
     title: "Hoodie – Black (+20)",
-    addedBy: "Added by Ahmed",
-    note: "Restocked from supplier",
+    addedBy: "addedByAhmed",
+    note: "restockedFromSupplier",
     time: "Oct 3, 10:30 AM",
   },
   {
     title: "Hoodie – Black (+20)",
-    addedBy: "Added by Ahmed",
-    note: "Restocked from supplier",
+    addedBy: "addedByAhmed",
+    note: "restockedFromSupplier",
     time: "Oct 3, 10:30 AM",
   },
 ];
@@ -298,7 +298,7 @@ export default function TraderInventoryPage() {
                     </p>
                   </div>
                   <p className="mt-1.5 font-['Montserrat'] text-sm font-medium text-gray-text">
-                    {alert.message}
+                    {t(alert.message, alert.message)}
                   </p>
                   <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">
                     {alert.time}
@@ -377,9 +377,9 @@ export default function TraderInventoryPage() {
             </div>
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
               {[
-                { label: `In Stock ${inStockPct}%`, color: "bg-emerald-700" },
-                { label: `Low Stock ${lowStockPct}%`, color: "bg-yellow-400" },
-                { label: `Out Stock ${outStockPct}%`, color: "bg-red-500" },
+                { label: `${t("inStock")} ${inStockPct}%`, color: "bg-emerald-700" },
+                { label: `${t("lowStock")} ${lowStockPct}%`, color: "bg-yellow-400" },
+                { label: `${t("outStock")} ${outStockPct}%`, color: "bg-red-500" },
               ].map((leg) => (
                 <div key={leg.label} className="flex items-center gap-1.5">
                   <div className={`h-4 w-4 rounded-md shrink-0 ${leg.color}`} />
@@ -425,10 +425,10 @@ export default function TraderInventoryPage() {
                     </p>
                   </div>
                   <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">
-                    {log.addedBy}
+                    {t(log.addedBy, log.addedBy)}
                   </p>
                   <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
-                    {log.note}
+                    {t(log.note, log.note)}
                   </p>
                   <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">
                     {log.time}

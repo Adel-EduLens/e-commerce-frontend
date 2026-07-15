@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   type InventoryItem,
   getStatus,
@@ -43,6 +44,7 @@ export function RetailProductFormModal({
     data: Partial<RetailProduct> | FormData | Record<string, unknown>,
   ) => Promise<void>;
 }) {
+  const { t } = useTranslation("traderProduct");
   const { data: categoriesData } = useRetailCategories();
   const categories: RetailCategory[] =
     ((categoriesData as unknown) as { data?: RetailCategory[] })?.data || ((categoriesData as unknown) as RetailCategory[]) || [];
@@ -184,7 +186,7 @@ export function RetailProductFormModal({
       await onSave(payload);
     } catch (err: unknown) {
       const error = err as Error;
-      toast.error(error.message || "Failed to save product");
+      toast.error(error.message || t("failedToSaveProduct"));
     } finally {
       setUploading(false);
       setIsSubmitting(false);
@@ -218,7 +220,7 @@ export function RetailProductFormModal({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {product ? "Edit Retail Product" : "Add Retail Product"}
+            {product ? t("editRetailProduct") : t("addRetailProduct")}
           </h2>
           <button
             type="button"
@@ -237,7 +239,7 @@ export function RetailProductFormModal({
           className="flex flex-col gap-4 p-5 overflow-y-auto custom-scrollbar"
         >
           <input
-            placeholder="Name *"
+            placeholder={t("nameRequired")}
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -250,7 +252,7 @@ export function RetailProductFormModal({
             onChange={(e) => setCategoryId(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
           >
-            <option value="">Select Category *</option>
+            <option value="">{t("selectCategory")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -260,7 +262,7 @@ export function RetailProductFormModal({
 
           <div className="grid grid-cols-2 gap-2">
             <input
-              placeholder="SKU"
+              placeholder={t("sku")}
               value={sku}
               onChange={(e) => setSku(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
@@ -271,7 +273,7 @@ export function RetailProductFormModal({
               onChange={(e) => setBrandId(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             >
-              <option value="">Select Brand *</option>
+              <option value="">{t("selectBrand")}</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -286,7 +288,7 @@ export function RetailProductFormModal({
               min="0"
               step="1"
               required
-              placeholder="Price *"
+              placeholder={t("priceRequired")}
               value={price || ""}
               onChange={(e) => setPrice(Number(e.target.value))}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
@@ -298,7 +300,7 @@ export function RetailProductFormModal({
               type="number"
               min="0"
               required
-              placeholder="Deposit *"
+              placeholder={t("depositRequired")}
               value={depositAmount || ""}
               onChange={(e) => setDepositAmount(Number(e.target.value))}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
@@ -307,7 +309,7 @@ export function RetailProductFormModal({
               type="number"
               min="0"
               required
-              placeholder="Sec. Deposit *"
+              placeholder={t("secDepositRequired")}
               value={securityDeposit || ""}
               onChange={(e) => setSecurityDeposit(Number(e.target.value))}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
@@ -315,7 +317,7 @@ export function RetailProductFormModal({
           </div>
 
           <textarea
-            placeholder="Main Description"
+            placeholder={t("mainDescription")}
             rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -323,7 +325,7 @@ export function RetailProductFormModal({
           />
 
           <textarea
-            placeholder="Terms & Conditions"
+            placeholder={t("termsAndConditionsLabel")}
             rows={3}
             value={termsAndConditions}
             onChange={(e) => setTermsAndConditions(e.target.value)}
@@ -331,7 +333,7 @@ export function RetailProductFormModal({
           />
 
           <textarea
-            placeholder="Privacy Policy"
+            placeholder={t("privacyPolicyLabel")}
             rows={3}
             value={privacyPolicy}
             onChange={(e) => setPrivacyPolicy(e.target.value)}
@@ -339,7 +341,7 @@ export function RetailProductFormModal({
           />
 
           <MultiSelect
-            label="Select colors *"
+            label={t("selectColorsRequired")}
             options={COLOR_OPTIONS}
             selected={selectedColors}
             onChange={handleColorsChange}
@@ -367,14 +369,14 @@ export function RetailProductFormModal({
                   }
                   className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
                 >
-                  Remove Color
+                  {t("removeColor")}
                 </button>
               </div>
 
               {/* Multiple Image Upload */}
               <div className="space-y-2">
                 <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Upload Images *
+                  {t("uploadImagesRequired")}
                 </p>
                 <div className="flex flex-wrap gap-2 items-center">
                   {pc.existingImages?.map((img, imgIdx) => (
@@ -396,7 +398,7 @@ export function RetailProductFormModal({
                         }}
                         className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
                       >
-                        Delete
+                        {t("delete")}
                       </button>
                     </div>
                   ))}
@@ -429,14 +431,14 @@ export function RetailProductFormModal({
                           }}
                           className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
                         >
-                          Delete
+                          {t("delete")}
                         </button>
                       </div>
                     );
                   })}
                   <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                     <span className="text-xl font-bold">+</span>
-                    <span className="text-[9px] font-['Montserrat']">Add</span>
+                    <span className="text-[9px] font-['Montserrat']">{t("add")}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -446,7 +448,7 @@ export function RetailProductFormModal({
                         if (file) {
                           const err = await validateImageDimensions(file);
                           if (err) {
-                            toast.error(`${pc.color} Image: ${err}`);
+                            toast.error(t("imageDimensionsErrorWithColor", { color: pc.color, err, defaultValue: `${pc.color} Image: ${err}` }));
                             e.target.value = "";
                             return;
                           }
@@ -466,15 +468,15 @@ export function RetailProductFormModal({
               {/* Variant Table (Sizes & Stock) */}
               <div className="space-y-2">
                 <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Sizes & Quantities
+                  {t("sizesQuantities")}
                 </p>
                 {pc.variants.length > 0 && (
                   <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
                     <thead>
                       <tr className="bg-secondary text-primary font-bold">
-                        <th className="p-2 border-b border-stroke">Size</th>
-                        <th className="p-2 border-b border-stroke">Quantity</th>
-                        <th className="p-2 border-b border-stroke text-right">Action</th>
+                        <th className="p-2 border-b border-stroke">{t("size")}</th>
+                        <th className="p-2 border-b border-stroke">{t("quantity")}</th>
+                        <th className="p-2 border-b border-stroke text-right">{t("action")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -521,7 +523,7 @@ export function RetailProductFormModal({
                               }}
                               className="text-red-500 font-semibold text-[10px]"
                             >
-                              Remove
+                              {t("remove")}
                             </button>
                           </td>
                         </tr>
@@ -547,7 +549,7 @@ export function RetailProductFormModal({
                       e.target.value = ""; // reset
                     }}
                   >
-                    <option value="">Add Size</option>
+                    <option value="">{t("addSize")}</option>
                     {SIZE_OPTIONS.map((sz) => (
                       <option key={sz} value={sz}>{sz}</option>
                     ))}
@@ -560,7 +562,7 @@ export function RetailProductFormModal({
           <div className="grid grid-cols-1 gap-4 mt-2">
             <div className="flex items-center justify-between rounded-xl border border-stroke p-3">
               <span className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                Is Featured
+                {t("isFeatured")}
               </span>
               <Toggle
                 checked={isFeatured}
@@ -576,7 +578,7 @@ export function RetailProductFormModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-gray-50"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="submit"
@@ -591,7 +593,7 @@ export function RetailProductFormModal({
               }
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : isSubmitting ? "Saving..." : "Save"}
+              {uploading ? t("uploading") : isSubmitting ? t("saving") : t("save")}
             </button>
           </div>
         </form>
@@ -616,6 +618,7 @@ const FALLBACK_DATE_STR = new Date(FALLBACK_DATE_RAW).toLocaleDateString(
 export default function TraderRetailProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editProduct, setEditProduct] = useState<RetailProduct | null>(null);
+  const { t } = useTranslation("traderProduct");
 
   const {
     data: rawProducts = [],
@@ -670,7 +673,7 @@ export default function TraderRetailProductsPage() {
       image: mainImg,
       imagesByColor: allImages,
       product: p.name,
-      category: p.category?.name || "No Category",
+      category: p.category?.name || t("noCategory"),
       categoryId: String(p.categoryId),
       brandId: p.brandId || p.brand?.id || "",
       stock: p.stock ?? 0,
@@ -712,7 +715,7 @@ export default function TraderRetailProductsPage() {
           }
         )?.response?.data?.message ??
           (errorMsg as { message?: string })?.message ??
-          "Failed to load products",
+          t("failedToLoadProducts"),
       ]
     : [];
 
@@ -725,12 +728,12 @@ export default function TraderRetailProductsPage() {
             try {
               await createProduct.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Retail product created successfully");
+              toast.success(t("retailProductCreatedSuccess"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to create product",
+                  : t("failedToCreateProduct"),
               );
             }
           }}
@@ -747,12 +750,12 @@ export default function TraderRetailProductsPage() {
                 data: formData,
               });
               setEditProduct(null);
-              toast.success("Retail product updated successfully");
+              toast.success(t("retailProductUpdatedSuccess"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to update product",
+                  : t("failedToUpdateProduct"),
               );
             }
           }}
@@ -772,8 +775,8 @@ export default function TraderRetailProductsPage() {
         }}
         onDelete={(item) => {
           deleteProduct.mutate(item.id, {
-            onSuccess: () => toast.success("Product deleted"),
-            onError: () => toast.error("Failed to delete product"),
+            onSuccess: () => toast.success(t("productDeletedSuccess")),
+            onError: () => toast.error(t("failedToDeleteProduct")),
           });
         }}
         showTypeFilter={false}

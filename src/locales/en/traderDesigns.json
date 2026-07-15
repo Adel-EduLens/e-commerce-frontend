@@ -1,0 +1,19 @@
+{
+  "imageLabel": "Image",
+  "removeImage": "Remove image",
+  "clickToUpload": "Click to upload an image",
+  "deleteSuccess": "Image deleted successfully",
+  "deleteError": "Failed to delete image",
+  "noImagesYet": "No images added yet.",
+  "deleteImage": "Delete image",
+  "loadImagesError": "Failed to load images",
+  "uploadSuccess": "Image uploaded successfully",
+  "uploadError": "Failed to upload image",
+  "addNewDesign": "Add New Design",
+  "titleLabel": "Title",
+  "titlePlaceholder": "e.g. Men",
+  "titleRequired": "Title is required.",
+  "imageRequired": "Please upload an image.",
+  "addDesignButton": "Add design",
+  "imagesHeading": "Images"
+}

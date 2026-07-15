@@ -1,53 +1,54 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const asset = (file: string) =>
   `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
 
 
-// ─── Data ──────────────────────────────────────────────────────────────────
+// ─── Data Helpers ──────────────────────────────────────────────────────────
 
-const statCards = [
-  { label: "Total Partner Brands", value: "24 Brands", trend: "8.5%", trendUp: true, sub: "Up from yesterday" },
-  { label: "Active Brands", value: "18 Active", trend: "8.5%", trendUp: true, sub: "Up from yesterday" },
-  { label: "Total Brand Revenue", value: "$124,560", trend: "8.5%", trendUp: false, sub: "Down from yesterday" },
-  { label: "Commission Earned", value: "$8,240", trend: "8.5%", trendUp: true, sub: "Up from yesterday" },
+const getStatCards = (t: (key: string) => string) => [
+  { label: t("totalPartnerBrands"), value: t("totalPartnerBrandsValue"), trend: "8.5%", trendUp: true, sub: t("upFromYesterday") },
+  { label: t("activeBrands"), value: t("activeBrandsValue"), trend: "8.5%", trendUp: true, sub: t("upFromYesterday") },
+  { label: t("totalBrandRevenue"), value: "$124,560", trend: "8.5%", trendUp: false, sub: t("downFromYesterday") },
+  { label: t("commissionEarned"), value: "$8,240", trend: "8.5%", trendUp: true, sub: t("upFromYesterday") },
 ];
 
-const earningsData = [
-  { month: "Jan", value: 55000 },
-  { month: "Feb", value: 72000 },
-  { month: "Mar", value: 61000 },
-  { month: "Apr", value: 88000 },
-  { month: "May", value: 74000 },
-  { month: "Jun", value: 95000 },
-  { month: "Jul", value: 110000 },
-  { month: "Aug", value: 124560 },
+const getEarningsData = (t: (key: string) => string) => [
+  { month: t("jan"), value: 55000 },
+  { month: t("feb"), value: 72000 },
+  { month: t("mar"), value: 61000 },
+  { month: t("apr"), value: 88000 },
+  { month: t("may"), value: 74000 },
+  { month: t("jun"), value: 95000 },
+  { month: t("jul"), value: 110000 },
+  { month: t("aug"), value: 124560 },
 ];
 
-const barData = [
-  { label: "Jan", value: 55 },
-  { label: "Feb", value: 72 },
-  { label: "Mar", value: 61 },
-  { label: "Apr", value: 88 },
-  { label: "May", value: 74 },
-  { label: "Jun", value: 95 },
-  { label: "Jul", value: 82 },
-  { label: "Aug", value: 100 },
-  { label: "Sep", value: 78 },
+const getBarData = (t: (key: string) => string) => [
+  { label: t("jan"), value: 55 },
+  { label: t("feb"), value: 72 },
+  { label: t("mar"), value: 61 },
+  { label: t("apr"), value: 88 },
+  { label: t("may"), value: 74 },
+  { label: t("jun"), value: 95 },
+  { label: t("jul"), value: 82 },
+  { label: t("aug"), value: 100 },
+  { label: t("sep"), value: 78 },
 ];
 
-const categorySegments = [
-  { label: "Men", value: 35, color: "#A81324" },
-  { label: "Women", value: 25, color: "#FCD34D" },
-  { label: "Kids", value: 30, color: "#7DD3FC" },
-  { label: "Craft", value: 10, color: "#C084FC" },
+const getCategorySegments = (t: (key: string) => string) => [
+  { label: t("men"), value: 35, color: "#A81324" },
+  { label: t("women"), value: 25, color: "#FCD34D" },
+  { label: t("kids"), value: 30, color: "#7DD3FC" },
+  { label: t("craft"), value: 10, color: "#C084FC" },
 ];
 
-const commissionRows = [
-  { brand: "Alpha Fashion", sales: "$32,400", commPct: "8%", commEarned: "$2,592", status: "Paid" },
-  { brand: "Beta Apparel", sales: "$28,100", commPct: "7%", commEarned: "$1,967", status: "Pending" },
-  { brand: "Gamma Wear", sales: "$21,600", commPct: "9%", commEarned: "$1,944", status: "Paid" },
-  { brand: "Delta Styles", sales: "$16,200", commPct: "6%", commEarned: "$972", status: "Pending" },
+const getCommissionRows = (t: (key: string) => string) => [
+  { brand: "Alpha Fashion", sales: "$32,400", commPct: "8%", commEarned: "$2,592", statusKey: "paid", statusLabel: t("paid") },
+  { brand: "Beta Apparel", sales: "$28,100", commPct: "7%", commEarned: "$1,967", statusKey: "pending", statusLabel: t("pending") },
+  { brand: "Gamma Wear", sales: "$21,600", commPct: "9%", commEarned: "$1,944", statusKey: "paid", statusLabel: t("paid") },
+  { brand: "Delta Styles", sales: "$16,200", commPct: "6%", commEarned: "$972", statusKey: "pending", statusLabel: t("pending") },
 ];
 
 const topProducts = [
@@ -56,10 +57,10 @@ const topProducts = [
   { name: "Hooded Sweatshirt", sku: "SKU-003", units: "1,800 pcs", revenue: "$32,400" },
 ];
 
-const supportAlerts = [
-  { title: "Contract Renewal", desc: "Alpha Fashion contract expires in 14 days.", time: "1 day ago", color: "bg-amber-400" },
-  { title: "New Brand Request", desc: "Sigma Styles has requested a partnership.", time: "3 hrs ago", color: "bg-emerald-400" },
-  { title: "Dispute Filed", desc: "Delta Styles filed a commission dispute.", time: "2 days ago", color: "bg-rose-400" },
+const getSupportAlerts = (t: (key: string) => string) => [
+  { title: t("contractRenewal"), desc: t("contractRenewalDesc"), time: t("dayAgo"), color: "bg-amber-400" },
+  { title: t("newBrandRequest"), desc: t("newBrandRequestDesc"), time: t("hrsAgo"), color: "bg-emerald-400" },
+  { title: t("disputeFiled"), desc: t("disputeFiledDesc"), time: t("daysAgo"), color: "bg-rose-400" },
 ];
 
 const topBrands = [
@@ -78,15 +79,16 @@ function pillStyle(status: string) {
 }
 
 function Pagination() {
+  const { t } = useTranslation("traderBrands");
   return (
     <div className="flex items-center justify-end gap-2 border-t border-stroke px-4 py-3">
       <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
-        <span className="font-['Inter'] text-sm font-medium text-foreground">6 per page</span>
+        <span className="font-['Inter'] text-sm font-medium text-foreground">{t("perPage", { count: 6, defaultValue: "6 per page" })}</span>
         <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
       </div>
       <div className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5">
         <span className="font-['Inter'] text-sm font-medium text-foreground">
-          1-6 <span className="text-gray-text">of 14</span>
+          1-6 <span className="text-gray-text">{t("of")} 14</span>
         </span>
         <span className="mx-1 h-5 border-l border-stroke" />
         <button type="button" className="flex h-5 w-5 rotate-180 items-center justify-center">
@@ -101,6 +103,7 @@ function Pagination() {
 }
 
 function ExportBtn() {
+  const { t } = useTranslation("traderBrands");
   return (
     <button
       type="button"
@@ -110,7 +113,7 @@ function ExportBtn() {
         <rect x="1.5" y="2.5" width="17" height="14" rx="1.5" stroke="#111827" strokeWidth="1.5" />
         <path d="M1.5 7h17" stroke="#111827" strokeWidth="1.5" />
       </svg>
-      Export
+      {t("export")}
     </button>
   );
 }
@@ -143,6 +146,8 @@ function DarkTH({ cols }: { cols: string[] }) {
 }
 
 function EarningsChart() {
+  const { t } = useTranslation("traderBrands");
+  const earningsData = getEarningsData(t);
   const max = Math.max(...earningsData.map((d) => d.value));
   const w = 600, h = 200;
   const padL = 40, padR = 20, padT = 20, padB = 30;
@@ -180,6 +185,8 @@ function EarningsChart() {
 }
 
 function BrandPerformanceBar() {
+  const { t } = useTranslation("traderBrands");
+  const barData = getBarData(t);
   const maxVal = Math.max(...barData.map((d) => d.value));
   return (
     <div className="flex flex-col gap-2">
@@ -206,6 +213,8 @@ function BrandPerformanceBar() {
 }
 
 function CategoryDonut() {
+  const { t } = useTranslation("traderBrands");
+  const categorySegments = getCategorySegments(t);
   const cx = 80, cy = 80, r = 65, innerR = 40;
   let startAngle = -Math.PI / 2;
 
@@ -233,7 +242,7 @@ function CategoryDonut() {
           <path key={seg.label} d={seg.d} fill={seg.color} />
         ))}
         <text x={cx} y={cy - 4} textAnchor="middle" fontSize="13" fontWeight="700" fill="#111827">24</text>
-        <text x={cx} y={cy + 12} textAnchor="middle" fontSize="8" fill="#6B7280">Brands</text>
+        <text x={cx} y={cy + 12} textAnchor="middle" fontSize="8" fill="#6B7280">{t("brandsLabel")}</text>
       </svg>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full">
         {categorySegments.map((seg) => (
@@ -263,7 +272,11 @@ function StarRating({ rating }: { rating: number }) {
 // ─── Page ──────────────────────────────────────────────────────────────────
 
 export default function TraderBrandPartnersPage() {
+  const { t } = useTranslation("traderBrands");
   const [search, setSearch] = useState("");
+  const statCards = getStatCards(t);
+  const commissionRows = getCommissionRows(t);
+  const supportAlerts = getSupportAlerts(t);
 
   const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-background");
 
@@ -287,13 +300,13 @@ export default function TraderBrandPartnersPage() {
               <img className="pointer-events-none absolute left-4 h-5 w-5" src={asset("mynaui_search.svg")} alt="" />
               <input
                 type="text"
-                placeholder="Search brands or partners"
+                placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full rounded-2xl border border-stroke bg-white py-2.5 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none placeholder:text-gray-text focus:border-stroke"
               />
             </label>
-            {["Date Range", "Status"].map((f) => (
+            {[t("dateRange"), t("statusFilter")].map((f) => (
               <button key={f} type="button" className="flex h-11 items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
                 {f}
                 <img className="h-5 w-5 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
@@ -328,9 +341,9 @@ export default function TraderBrandPartnersPage() {
           {/* Earnings Over Time */}
           <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Earnings Over Time</h2>
+              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{t("earningsOverTime")}</h2>
               <button type="button" className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
-                Partner
+                {t("partner")}
                 <img className="h-5 w-5 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
               </button>
             </div>
@@ -340,11 +353,11 @@ export default function TraderBrandPartnersPage() {
           {/* Bar chart + Donut side by side */}
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Brand Performance Overview</h2>
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("brandPerformanceOverview")}</h2>
               <BrandPerformanceBar />
             </div>
             <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Product Category</h2>
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("productCategory")}</h2>
               <CategoryDonut />
             </div>
           </div>
@@ -352,15 +365,15 @@ export default function TraderBrandPartnersPage() {
           {/* Commission & Revenue Share Summary */}
           <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
-              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Commission & Revenue Share Summary</h2>
+              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{t("commissionSummaryTitle")}</h2>
               <ExportBtn />
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full border-separate border-spacing-0">
-                <DarkTH cols={["Brand", "Total Sales", "Commission %", "Commission Earned", "Payment Status", "Actions"]} />
+                <DarkTH cols={[t("colBrand"), t("colTotalSales"), t("colCommPct"), t("colCommEarned"), t("colPaymentStatus"), t("colActions")]} />
                 <tbody>
                   {commissionRows.map((row, idx) => {
-                    const pill = pillStyle(row.status);
+                    const pill = pillStyle(row.statusKey);
                     return (
                       <tr key={idx} className={rowBg(idx)}>
                         <CheckBox checked={idx === 0} />
@@ -370,7 +383,7 @@ export default function TraderBrandPartnersPage() {
                         <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{row.commEarned}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>
-                            {row.status}
+                            {row.statusLabel}
                           </span>
                         </td>
                         <td className="px-4 py-3"><ThreeDot /></td>
@@ -389,9 +402,9 @@ export default function TraderBrandPartnersPage() {
             {/* Top-Selling Products */}
             <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Top-Selling Products</h2>
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">{t("topSellingProducts")}</h2>
                 <button type="button" className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-1.5 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background">
-                  Brands
+                  {t("filterBrands")}
                   <img className="h-4 w-4 rotate-90" src={asset("weui_arrow-outlined.svg")} alt="" />
                 </button>
               </div>
@@ -416,7 +429,7 @@ export default function TraderBrandPartnersPage() {
 
             {/* Support Panel */}
             <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Support Panel</h2>
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("supportPanel")}</h2>
               <div className="space-y-3">
                 {supportAlerts.map((alert, idx) => (
                   <div key={idx} className="flex gap-3 rounded-xl border border-stroke p-3">
@@ -433,7 +446,7 @@ export default function TraderBrandPartnersPage() {
 
             {/* Top Performing Brands */}
             <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Top Performing Brands</h2>
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("topPerformingBrands")}</h2>
               <div className="space-y-3">
                 {topBrands.map((brand, idx) => (
                   <div key={idx} className="flex items-center gap-3 rounded-xl border border-stroke p-3">

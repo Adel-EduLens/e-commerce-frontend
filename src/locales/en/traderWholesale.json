@@ -31,5 +31,9 @@
   "paymentOverdue": "Payment Overdue",
   "active": "Active",
   "pending": "Pending",
-  "inactive": "Inactive"
+  "inactive": "Inactive",
+  "statOrdersValue": "1,245 Orders",
+  "statUnitsValue": "18,320 pcs",
+  "statClientsValue": "126 Clients",
+  "pcsMin": "{{count}} pcs min"
 }

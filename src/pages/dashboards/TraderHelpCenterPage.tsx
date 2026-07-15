@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoadingSpinner } from '../../components/shared'
 import {
   FaChevronDown,
@@ -38,6 +39,7 @@ function CategorySelect({
   onChange: (value: string) => void
   categories: HelpCenterCategory[]
 }) {
+  const { t } = useTranslation('traderHelpCenter')
   const [open, setOpen] = useState(false)
 
   return (
@@ -50,7 +52,7 @@ function CategorySelect({
         <span
           className={`font-['Montserrat'] text-base font-medium ${value ? 'text-foreground' : 'text-gray-text'}`}
         >
-          {value ?? 'Select a category'}
+          {value ?? t('selectCategory')}
         </span>
         <FaChevronDown
           className={`h-4 w-4 text-gray-text transition-transform ${open ? 'rotate-180' : ''}`}
@@ -63,7 +65,7 @@ function CategorySelect({
           <div className="absolute left-0 top-[calc(100%+8px)] z-20 flex max-h-60 w-full flex-col overflow-y-auto rounded-2xl bg-white shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] text-foreground">
             {categories.length === 0 ? (
               <div className="px-4 py-3 text-left font-['Montserrat'] text-sm text-gray-text">
-                No categories available. Please add one first.
+                {t('noCategoriesAvailable')}
               </div>
             ) : (
               categories.map((category) => (
@@ -74,9 +76,8 @@ function CategorySelect({
                     onChange(category.name)
                     setOpen(false)
                   }}
-                  className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-gray-light ${
-                    value === category.name ? 'text-foreground' : 'text-gray-text'
-                  }`}
+                  className={`px-4 py-3 text-left font-['Montserrat'] text-base font-medium hover:bg-gray-light ${value === category.name ? 'text-foreground' : 'text-gray-text'
+                    }`}
                 >
                   {category.name}
                 </button>
@@ -98,6 +99,7 @@ function AddVideoForm({
   onCancelEdit: () => void
   categories: HelpCenterCategory[]
 }) {
+  const { t } = useTranslation('traderHelpCenter')
   const [title, setTitle] = useState(editingVideo?.title ?? '')
   const [youtubeInput, setYoutubeInput] = useState(
     editingVideo?.youtubeId ?? ''
@@ -130,10 +132,10 @@ function AddVideoForm({
             youtubeId,
           },
         })
-        toast.success('Video updated successfully')
+        toast.success(t('videoUpdatedSuccess'))
         onCancelEdit()
       } catch (error) {
-        handleApiError(error, 'Failed to update video')
+        handleApiError(error, t('videoUpdateError'))
       }
       return
     }
@@ -144,31 +146,31 @@ function AddVideoForm({
         category,
         youtubeId,
       })
-      toast.success('Video added successfully')
+      toast.success(t('videoAddedSuccess'))
       setTitle('')
       setYoutubeInput('')
       setCategory(null)
       setTouched(false)
     } catch (error) {
-      handleApiError(error, 'Failed to add video')
+      handleApiError(error, t('videoAddError'))
     }
   }
 
   return (
     <div className="flex w-full flex-col gap-6 rounded-2xl ">
       <div className="font-['Montserrat'] text-2xl font-semibold text-foreground">
-        {editingVideo ? 'Edit video' : 'Add a help video'}
+        {editingVideo ? t('editVideoHeading') : t('addHelpVideoHeading')}
       </div>
 
       <div className="flex flex-col gap-2">
         <label className="font-['Montserrat'] text-sm font-medium text-foreground">
-          Title
+          {t('titleLabel')}
         </label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="e.g. How to track your order"
+          placeholder={t('videoTitlePlaceholder')}
           disabled={isSubmitting}
           className="w-full rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none disabled:opacity-60"
         />
@@ -176,7 +178,7 @@ function AddVideoForm({
 
       <div className="flex flex-col gap-2">
         <label className="font-['Montserrat'] text-sm font-medium text-foreground">
-          YouTube video code
+          {t('youtubeCodeLabel')}
         </label>
         <div className="flex items-center gap-2 rounded-2xl bg-gray-light p-4">
           <FaYoutube className="h-5 w-5 shrink-0 text-gray-text" />
@@ -185,14 +187,14 @@ function AddVideoForm({
             value={youtubeInput}
             onChange={(e) => setYoutubeInput(e.target.value)}
             onBlur={() => setTouched(true)}
-            placeholder="e.g. dQw4w9WgXcQ"
+            placeholder={t('youtubeCodePlaceholder')}
             disabled={isSubmitting}
             className="w-full bg-transparent font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none disabled:opacity-60"
           />
         </div>
         {youtubeInputHasError && (
           <div className="font-['Montserrat'] text-sm font-medium text-red-500">
-            Video codes are 11 characters (letters, numbers, - and _).
+            {t('youtubeCodeError')}
           </div>
         )}
         {youtubeId && (
@@ -200,7 +202,7 @@ function AddVideoForm({
             <iframe
               className="h-full w-full"
               src={`https://www.youtube.com/embed/${youtubeId}`}
-              title="Video preview"
+              title={t('videoPreviewTitle')}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
@@ -210,7 +212,7 @@ function AddVideoForm({
 
       <div className="flex flex-col gap-2">
         <label className="font-['Montserrat'] text-sm font-medium text-foreground">
-          Category
+          {t('categoryLabel')}
         </label>
         <CategorySelect value={category} onChange={setCategory} categories={categories} />
       </div>
@@ -223,7 +225,7 @@ function AddVideoForm({
           className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-primary p-4 font-['Montserrat'] text-base font-semibold text-foreground disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <FaPlus className="h-4 w-4" />
-          {editingVideo ? 'Save changes' : 'Add video'}
+          {editingVideo ? t('saveChanges') : t('addVideo')}
         </button>
         {editingVideo && (
           <button
@@ -232,7 +234,7 @@ function AddVideoForm({
             disabled={isSubmitting}
             className="inline-flex w-fit items-center justify-center gap-2 self-start rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-semibold text-foreground disabled:opacity-60"
           >
-            Cancel
+            {t('cancel')}
           </button>
         )}
       </div>
@@ -251,11 +253,12 @@ function VideoList({
   onDelete: (id: string) => void
   isDeleting: boolean
 }) {
+  const { t } = useTranslation('traderHelpCenter')
   if (videos.length === 0) {
     return (
       <div className="flex w-full flex-col items-center justify-center gap-2 rounded-2xl bg-background p-10 text-center">
         <div className="font-['Montserrat'] text-base font-medium text-gray-text">
-          No videos added yet. Fill in the form to add your first one.
+          {t('noVideosYet')}
         </div>
       </div>
     )
@@ -286,7 +289,7 @@ function VideoList({
               type="button"
               onClick={() => onEdit(video.id)}
               disabled={isDeleting}
-              aria-label="Edit video"
+              aria-label={t('editVideo')}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-light text-foreground hover:bg-stroke disabled:opacity-50"
             >
               <FaPen className="h-4 w-4" />
@@ -295,7 +298,7 @@ function VideoList({
               type="button"
               onClick={() => onDelete(video.id)}
               disabled={isDeleting}
-              aria-label="Delete video"
+              aria-label={t('deleteVideo')}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-light text-red-500 hover:bg-red-100 disabled:opacity-50"
             >
               <FaTrash className="h-4 w-4" />
@@ -308,8 +311,9 @@ function VideoList({
 }
 
 export default function TraderHelpCenterPage() {
+  const { t } = useTranslation('traderHelpCenter')
   const [editingId, setEditingId] = useState<string | null>(null)
-  
+
   const { data: videos = [], isLoading: isLoadingVideos } = useTraderHelpCenterVideos()
   const { data: categories = [], isLoading: isLoadingCategories } = useTraderHelpCenterCategories()
 
@@ -325,47 +329,44 @@ export default function TraderHelpCenterPage() {
       await addCategoryMutation.mutateAsync({
         name: newCategoryName.trim(),
       })
-      toast.success('Category added successfully')
+      toast.success(t('categoryAddedSuccess'))
       setNewCategoryName('')
     } catch (error) {
-      handleApiError(error, 'Failed to add category')
+      handleApiError(error, t('categoryAddError'))
     }
   }
 
   const handleDeleteCategory = async (id: string) => {
     if (deleteCategoryMutation.isPending) return
-    if (!window.confirm('Are you sure you want to delete this category?')) return
+    if (!window.confirm(t('confirmDeleteCategory'))) return
     try {
       await deleteCategoryMutation.mutateAsync(id)
-      toast.success('Category deleted successfully')
+      toast.success(t('categoryDeletedSuccess'))
     } catch (error) {
-      handleApiError(error, 'Failed to delete category')
+      handleApiError(error, t('categoryDeleteError'))
     }
   }
 
   const handleDeleteVideo = async (id: string) => {
     if (deleteVideoMutation.isPending) return
-    if (!window.confirm('Are you sure you want to delete this video?')) return
+    if (!window.confirm(t('confirmDeleteVideo'))) return
     try {
       await deleteVideoMutation.mutateAsync(id)
-      toast.success('Video deleted successfully')
+      toast.success(t('videoDeletedSuccess'))
       if (editingId === id) setEditingId(null)
     } catch (error) {
-      handleApiError(error, 'Failed to delete video')
+      handleApiError(error, t('videoDeleteError'))
     }
   }
 
   const editingVideo = videos.find((v) => v.id === editingId) ?? null
 
   if (isLoadingVideos || isLoadingCategories) {
-    return <LoadingSpinner text="Loading Help Center..." containerClassName="h-[50vh]" />
+    return <LoadingSpinner text={t('loadingHelpCenter')} containerClassName="h-[50vh]" />
   }
 
   return (
     <div className="flex w-full flex-col gap-10 px-6 py-10">
-      <div className="font-['Montserrat'] text-3xl font-bold text-foreground">
-        Help Center
-      </div>
 
       <AddVideoForm
         key={editingId ?? 'new'}
@@ -376,14 +377,14 @@ export default function TraderHelpCenterPage() {
 
       <div className="flex w-full flex-col gap-6 rounded-2xl ">
         <div className="font-['Montserrat'] text-2xl font-semibold text-foreground">
-          Manage Categories
+          {t('manageCategoriesHeading')}
         </div>
         <div className="flex items-center gap-2">
           <input
             type="text"
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
-            placeholder="New Category Name"
+            placeholder={t('newCategoryPlaceholder')}
             disabled={addCategoryMutation.isPending}
             className="flex-1 rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none disabled:opacity-60"
           />
@@ -394,7 +395,7 @@ export default function TraderHelpCenterPage() {
             className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 font-['Montserrat'] text-base font-semibold text-foreground disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <FaPlus className="h-4 w-4" />
-            Add
+            {t('addButton')}
           </button>
         </div>
 
@@ -424,7 +425,7 @@ export default function TraderHelpCenterPage() {
 
       <div className="flex flex-col gap-4">
         <div className="font-['Montserrat'] text-2xl font-semibold text-foreground">
-          Videos
+          {t('videosHeading')}
         </div>
         <VideoList
           videos={videos}

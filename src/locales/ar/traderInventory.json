@@ -1,19 +1,22 @@
 {
-  "inStock": "متوفر في المخزون",
+  "inStock": "متوفر",
   "lowStock": "مخزون منخفض",
   "outOfStock": "غير متوفر",
   "totalProducts": "إجمالي المنتجات",
   "inventoryTable": "جدول المخزون",
-  "recentAlerts": "التنبيهات الأخيرة",
+  "recentAlerts": "أحدث التنبيهات",
   "inventorySnapshot": "ملخص المخزون",
   "activityLog": "سجل النشاط",
   "viewAll": "عرض الكل",
   "items": "عناصر",
   "addedBy": "تمت الإضافة بواسطة",
-  "restockedFromSupplier": "تم إعادة التخزين من المورد",
+  "restockedFromSupplier": "تم إعادة التزويد من المورد",
   "lowStockAlert": "تنبيه مخزون منخفض",
   "onlyItemsLeft": "متبقي فقط {{count}} عناصر في المخزون.",
-  "outStock": "نفد المخزون",
+  "outStock": "غير متوفر",
   "products": "المنتجات",
-  "wholesales": "الجملة"
+  "wholesales": "الجملة",
+  "alertMessageSample": "تيشيرت أساسي #122\" متبقي 3 قطع فقط في المخزون.",
+  "addedByAhmed": "أضيف بواسطة أحمد",
+  "addItem": "إضافة عنصر"
 }

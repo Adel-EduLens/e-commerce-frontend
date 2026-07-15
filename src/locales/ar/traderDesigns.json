@@ -1,0 +1,19 @@
+{
+  "imageLabel": "الصورة",
+  "removeImage": "إزالة الصورة",
+  "clickToUpload": "انقر لرفع صورة",
+  "deleteSuccess": "تم حذف الصورة بنجاح",
+  "deleteError": "فشل في حذف الصورة",
+  "noImagesYet": "لم يتم إضافة أي صور بعد.",
+  "deleteImage": "حذف الصورة",
+  "loadImagesError": "فشل في تحميل الصور",
+  "uploadSuccess": "تم رفع الصورة بنجاح",
+  "uploadError": "فشل في رفع الصورة",
+  "addNewDesign": "إضافة تصميم جديد",
+  "titleLabel": "العنوان",
+  "titlePlaceholder": "مثال: رجالي",
+  "titleRequired": "العنوان مطلوب.",
+  "imageRequired": "يرجى رفع صورة.",
+  "addDesignButton": "إضافة تصميم",
+  "imagesHeading": "الصور"
+}

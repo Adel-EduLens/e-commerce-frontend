@@ -20,6 +20,7 @@ const statCards = [
   {
     label: "totalOrders",
     value: "1,245 Orders",
+    valueKey: "statOrdersValue",
     trend: "8.5%",
     trendUp: true,
     sub: "upFromYesterday",
@@ -34,6 +35,7 @@ const statCards = [
   {
     label: "totalUnitsSold",
     value: "18,320 pcs",
+    valueKey: "statUnitsValue",
     trend: "8.5%",
     trendUp: false,
     sub: "downFromYesterday",
@@ -41,6 +43,7 @@ const statCards = [
   {
     label: "activeClients",
     value: "126 Clients",
+    valueKey: "statClientsValue",
     trend: "8.5%",
     trendUp: true,
     sub: "upFromYesterday",
@@ -323,7 +326,7 @@ export default function TraderWholesalePage() {
   const topSellingProducts = traderWholesales.slice(0, 3).map((w, idx) => ({
     name: w.name,
     sku: `SKU-${String(idx + 1).padStart(3, "0")}`,
-    units: `${w.minOrder} pcs min`,
+    units: t("pcsMin", { count: w.minOrder, defaultValue: `${w.minOrder} pcs min` }),
     revenue: `$${w.price}`,
   }));
 
@@ -365,7 +368,7 @@ export default function TraderWholesalePage() {
                   {t(card.label)}
                 </p>
                 <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">
-                  {card.value}
+                  {(card as any).valueKey ? t((card as any).valueKey, card.value) : card.value}
                 </p>
               </div>
               <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
@@ -479,7 +482,7 @@ export default function TraderWholesalePage() {
                         <span
                           className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
                         >
-                          {row.status}
+                          {t(row.status.toLowerCase(), row.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
