@@ -12,7 +12,7 @@ export const useDesigns = () => {
   return useQuery<VoteDesign[]>({
     queryKey: ['designs'],
     queryFn: async () => {
-      const { data } = await api.get('/upload/images');
+      const { data } = await api.get('/trader/designs/images');
       return data?.data?.images || [];
     },
   });

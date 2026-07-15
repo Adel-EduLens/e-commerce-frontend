@@ -22,7 +22,8 @@ api.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const isLoginRequest = error.config?.url?.includes('/login')
+    if (error.response && error.response.status === 401 && !isLoginRequest) {
       useAuthStore.getState().clearAuth()
       window.location.href = '/login'
     }

@@ -205,7 +205,7 @@ function VoteSection() {
     if (!current || voting) return
     setVoting(true)
     try {
-      const res = await api.put(`/upload/vote/${current.id}`)
+      const res = await api.put(`/trader/designs/vote/${current.id}`)
       if (res.status === 200) {
         toast.success('Your vote has been counted!')
         queryClient.setQueryData(['designs'], (prev: VoteDesign[] | undefined) =>

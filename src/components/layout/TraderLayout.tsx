@@ -107,6 +107,11 @@ const sidebarItems = [
     path: "/dashboard/trader/collections",
   },
   {
+    label: "designs",
+    icon: "vote.svg",
+    path: "/dashboard/trader/designs",
+  },
+  {
     label: "helpCenter",
     icon: "help-circle.svg",
     path: "/dashboard/trader/help-center",

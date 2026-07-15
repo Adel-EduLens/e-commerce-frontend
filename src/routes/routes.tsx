@@ -48,7 +48,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import TestPage from "../pages/TestPage";
 import AdminHelpCenterPage from "../pages/admin/AdminHelpCenterPage";
 import HelpCenterCategorie from "../pages/HelpCenterCategorie";
-import AdminDesignPage from "../pages/admin/AdminDesignPage";
+import TraderDesignPage from "../pages/dashboards/TraderDesignPage";
 import TraderLoginPage from "../pages/TraderLoginPage";
 
 import ProductsPage from "../pages/ProductsPage";
@@ -296,16 +296,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/admin/designs",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout>
-              <AdminDesignPage />
-            </AdminLayout>
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: "dashboard/trader",
         element: (
           <ProtectedRoute allowedRoles={["trader"]}>
@@ -401,6 +391,10 @@ export const router = createBrowserRouter([
           {
             path: "help-center",
             element: <TraderHelpCenterPage />,
+          },
+          {
+            path: "designs",
+            element: <TraderDesignPage />,
           },
         ],
       },
