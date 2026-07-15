@@ -570,7 +570,7 @@ export default function ProductCard({
         {/* Add to cart button */}
         <button
           onClick={handleToggleCart}
-          className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl bg-danger py-3 text-center text-white transition-colors hover:bg-red-800`}
+          className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
         >
           {isInCart ? t("removeFromCart") : t("addToCart")}
         </button>

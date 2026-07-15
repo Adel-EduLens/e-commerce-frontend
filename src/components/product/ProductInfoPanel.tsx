@@ -562,7 +562,7 @@ export function ProductInfoPanel({
               type="button"
               onClick={handleAddToCart}
               disabled={isAddingToCart}
-              className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 h-11 btn-cart-gradient rounded-md font-bold text-sm flex items-center justify-center gap-2 transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               <BsBag className="h-4 w-4" />
               {isAddingToCart ? t("adding") ?? 'Adding...' : t("addToCart")}

@@ -343,3 +343,24 @@ body {
 .animate-swap-fade {
   animation: swap-fade 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Add-to-cart gradient button */
+.btn-cart-gradient {
+  background: linear-gradient(135deg, #7a1024 0%, #c1121f 30%, #e85d40 60%, #ff9a76 100%);
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  box-shadow: 0 4px 15px rgba(193, 18, 31, 0.35);
+  transition: all 0.4s ease;
+  color: white !important;
+}
+
+.btn-cart-gradient:hover {
+  background-position: 100% 50%;
+  box-shadow: 0 6px 25px rgba(193, 18, 31, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-cart-gradient:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(193, 18, 31, 0.25);
+}
