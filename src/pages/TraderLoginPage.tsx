@@ -1,6 +1,6 @@
 import type { AxiosError } from 'axios'
 import { useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Globe, ChevronDown } from 'lucide-react'
 import { FaFacebookSquare } from 'react-icons/fa'
 import { FcGoogle } from 'react-icons/fc'
 import { toast } from 'sonner'
@@ -19,10 +19,12 @@ const TraderLoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
+  const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
   const { t, i18n } = useTranslation('auth')
   const isRTL = i18n.language?.startsWith('ar')
+  const lang = isRTL ? 'AR' : 'EN'
   const {
     register: registerLogin,
     handleSubmit: handleLoginSubmit,
@@ -56,10 +58,51 @@ const TraderLoginPage = () => {
           <div className="flex w-full max-w-[480px] flex-col">
             <div className="flex justify-between mb-5 items-center">
               <img
-                src="/images/auth/logo.png?v=2"
+                src="/home-page/Logo.png?v=2"
                 alt="Gen Z"
                 className="h-[40px] w-[75px] object-contain sm:h-[48px] sm:w-[90px]"
               />
+              {/* Language switcher */}
+              <div className="relative inline-block">
+                <button
+                  onClick={() => setOpen(!open)}
+                  className="flex items-center gap-2 rounded-2xl bg-social-bg px-4 py-3 text-gray-text sm:gap-4 sm:px-6 sm:py-4 cursor-pointer"
+                >
+                  <Globe size={20} className="sm:size-6" />
+                  <span className="text-[13px] font-semibold sm:text-[14px]">
+                    {lang}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    className={`transition sm:size-6 ${open ? 'rotate-180' : ''
+                      }`}
+                  />
+                </button>
+
+                {open && (
+                  <div className="absolute mt-2 w-full overflow-hidden rounded-xl bg-social-bg shadow-lg z-10 text-gray-text">
+                    <button
+                      onClick={() => {
+                        setOpen(false)
+                        i18n.changeLanguage('en')
+                      }}
+                      className="block w-full px-4 py-3 text-left hover:bg-gray-pressed transition-colors cursor-pointer"
+                    >
+                      English
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setOpen(false)
+                        i18n.changeLanguage('ar')
+                      }}
+                      className="block w-full px-4 py-3 text-left hover:bg-gray-pressed transition-colors cursor-pointer"
+                    >
+                      العربية
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <form
               onSubmit={handleLoginSubmit(onLogin)}
@@ -158,7 +201,7 @@ const TraderLoginPage = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex w-full items-center justify-center rounded-[16px] bg-secondary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="flex w-full items-center justify-center rounded-[16px] bg-primary py-[17px] font-['Montserrat'] text-[18px] font-bold leading-normal text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60 cursor-pointer"
                 >
                   {isLoading ? t('login.submitting') : t('login.submit')}
                 </button>
@@ -173,14 +216,14 @@ const TraderLoginPage = () => {
                 <div className="my-2 flex w-full flex-col gap-4 sm:my-6 sm:flex-row">
                   <button
                     type="button"
-                    className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
+                    className="flex gap-x-4 bg-social-bg rounded-[14px] py-4 flex-1 justify-center text-gray-text cursor-pointer hover:opacity-90 transition-opacity"
                   >
                     <FaFacebookSquare size={24} color="#1877F2 " />
                     {t('socials.facebook')}
                   </button>
                   <button
                     type="button"
-                    className="flex gap-x-4 bg-secondary rounded-[14px] py-4 flex-1 justify-center text-white"
+                    className="flex gap-x-4 bg-social-bg rounded-[14px] py-4 flex-1 justify-center text-gray-text cursor-pointer hover:opacity-90 transition-opacity"
                   >
                     <FcGoogle size={24} />
                     {t('socials.google')}
@@ -193,9 +236,9 @@ const TraderLoginPage = () => {
 
         {/* Hero image panel — hidden on mobile/tablet, shown from lg breakpoint up */}
         <div className="order-2 hidden w-1/2 p-[32px] lg:block lg:order-none">
-          <div className="relative h-full w-full overflow-hidden rounded-[32px] bg-black">
+          <div className="relative h-full w-full overflow-hidden rounded-[32px] bg-card">
             <img
-              src={'/images/auth/signup-hero.png'}
+              src={'/images/auth/login-hero.png'}
               alt=""
               className="absolute inset-0 h-full w-full object-cover"
             />
