@@ -191,10 +191,10 @@ export function ShopBannerFormModal({
           </div>
 
           {image && (
-            <div className="relative w-full h-32 rounded-xl border border-stroke overflow-hidden mt-2">
+            <div className="relative w-full h-48 rounded-xl border border-stroke overflow-hidden mt-2 bg-gray-50 flex items-center justify-center">
               <img
                 src={image}
-                className="h-full w-full object-cover"
+                className="h-full max-w-full object-contain"
                 alt="Preview"
               />
             </div>
