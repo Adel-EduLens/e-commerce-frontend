@@ -2,10 +2,15 @@ import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ThumbsUp } from "lucide-react";
 import { useProductReviews } from "../../hooks/queries/reviewQuery";
+import { useRetailReviews } from "../../hooks/queries/retailReviewQuery";
 import { useAuthStore } from "../../store/useAuthStore";
 import { Star } from "../ui/star";
 import { ReviewForm } from "./ReviewForm";
 import { useTranslation } from "react-i18next";
+
+interface ReviewsSectionProps {
+  productType?: "PRODUCT" | "RETAIL";
+}
 
 type ReviewFilterValue = "all" | "5" | "4" | "3" | "2" | "1";
 type ReviewSortValue = "newest" | "oldest" | "highest" | "lowest";
@@ -32,12 +37,15 @@ const SORT_OPTIONS: {
   { label: "lowestRating", value: "lowest" },
 ];
 
-export function ReviewsSection() {
+export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps) {
   const { id } = useParams();
   const { user } = useAuthStore();
 
-  // Use the requested wrapper hookuseProductReviews()
-  const { data: reviews = [], isPending, isError } = useProductReviews(id);
+  const productReviewsQuery = useProductReviews(productType === "PRODUCT" ? id : undefined);
+  const retailReviewsQuery = useRetailReviews(productType === "RETAIL" ? id : undefined);
+
+  const query = productType === "RETAIL" ? retailReviewsQuery : productReviewsQuery;
+  const { data: reviews = [], isPending, isError } = query;
 
   const [filterValue, setFilterValue] = useState<ReviewFilterValue>("all");
   const [sortValue, setSortValue] = useState<ReviewSortValue>("newest");
@@ -238,6 +246,7 @@ export function ReviewsSection() {
       {showForm && (
         <ReviewForm
           productId={id!}
+          productType={productType}
           existingReview={myReview}
           onDone={() => setShowForm(false)}
         />

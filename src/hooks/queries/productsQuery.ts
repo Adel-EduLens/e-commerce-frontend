@@ -246,6 +246,19 @@ export const useCompareProducts = (ids: string[]) => {
   });
 };
 
+export const useCompareRetailProducts = (ids: string[]) => {
+  return useQueries({
+    queries: ids.map((id) => ({
+      queryKey: ["retailProduct", id],
+      queryFn: async () => {
+        const { retailApi } = await import("../../services/retailApi");
+        return retailApi.getRetailProductById(id);
+      },
+      enabled: !!id,
+    })),
+  });
+};
+
 const getTraderProducts = async (
   traderId: string | number,
 ): Promise<Product[]> => {

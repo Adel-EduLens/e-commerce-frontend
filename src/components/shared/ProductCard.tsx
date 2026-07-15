@@ -47,7 +47,7 @@ type ImageType = {
   color?: string;
   productId?: string;
 };
-
+type CompareProductType = "SHOP" | "WHOLESALE" | "RETAIL";
 export type ProductCardProps = {
   title?: string;
   subtitle?: string;
@@ -139,7 +139,9 @@ export default function ProductCard({
   wholesaleCard = false,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
-  const safeColors = Array.isArray(colors) ? colors.filter((c) => typeof c === 'string' && c.trim() !== '') : [];
+  const safeColors = Array.isArray(colors)
+    ? colors.filter((c) => typeof c === "string" && c.trim() !== "")
+    : [];
   const { label: countdownLabel, expired } = useCountdown(
     showFlashDeal ? flashDealEndsAt : undefined,
   );
@@ -167,20 +169,30 @@ export default function ProductCard({
 
   const isWholesale = productType === "WHOLESALE";
   const useWholesaleCard = isWholesale && wholesaleCard;
-
-  const existingCartItem = cartItems.find(
-    (item) =>
-      item.productId === actualProductId &&
-      (isWholesale ? item.id.endsWith("-wholesale") : !item.id.endsWith("-wholesale"))
-  );
+  const compareType: CompareProductType = productType ?? "SHOP";
+  const existingCartItem = cartItems.find((item) => {
+    const matchId =
+      String(item.productId) === String(actualProductId) ||
+      String(item.retailProductId) === String(actualProductId) ||
+      String(item.wholesaleProductId) === String(actualProductId);
+    const matchWholesale = isWholesale
+      ? item.id.endsWith("-wholesale")
+      : !item.id.endsWith("-wholesale");
+    return matchId && matchWholesale;
+  });
   const isInCart = Boolean(existingCartItem);
 
   useEffect(() => {
     setActiveImage(imageSrc);
   }, [imageSrc]);
   useEffect(() => {
-    setIsCompared(isProductCompared(actualProductId));
-  }, [actualProductId]);
+    setIsCompared(
+      isProductCompared(
+        actualProductId,
+        compareType,
+      ),
+    );
+  }, [actualProductId, compareType]);
 
   const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -199,11 +211,11 @@ export default function ProductCard({
 
     try {
       if (isCompared) {
-        removeCompareProduct(actualProductId);
+        removeCompareProduct(actualProductId, compareType);
         setIsCompared(false);
         toast.success(t("removedFromCompareToast"));
       } else {
-        addCompareProduct(actualProductId);
+        addCompareProduct(actualProductId,compareType);
         setIsCompared(true);
         toast.success(t("addedToCompareToast"));
       }
@@ -224,7 +236,8 @@ export default function ProductCard({
 
       if (isWholesale) {
         const allColorsStr = safeColors.join(", ") || "All Colors";
-        const allSizesStr = wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
+        const allSizesStr =
+          wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
         const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
         addItem({
@@ -233,7 +246,9 @@ export default function ProductCard({
           title,
           unitPrice: numPrice,
           currency: "EGP",
-          size: useWholesaleCard ? wholesaleSizes[0] ?? sizeLabel ?? "Default" : allSizesStr,
+          size: useWholesaleCard
+            ? (wholesaleSizes[0] ?? sizeLabel ?? "Default")
+            : allSizesStr,
           color: useWholesaleCard ? selectedColor : allColorsStr,
           colorHex: useWholesaleCard ? colorToHex(selectedColor) : "",
           imageSrc: useWholesaleCard ? activeImage : imageSrc,
@@ -243,14 +258,15 @@ export default function ProductCard({
         });
       } else {
         const firstSize = sizeLabel
-          ? (sizeLabel.includes("-") 
-              ? sizeLabel.split("-")[0].trim() 
-              : sizeLabel.includes(",") 
-                ? sizeLabel.split(",")[0].trim() 
-                : sizeLabel.trim())
+          ? sizeLabel.includes("-")
+            ? sizeLabel.split("-")[0].trim()
+            : sizeLabel.includes(",")
+              ? sizeLabel.split(",")[0].trim()
+              : sizeLabel.trim()
           : "Default";
         const firstColor = safeColors.length > 0 ? safeColors[0] : "Default";
-        const firstColorHex = safeColors.length > 0 ? colorToHex(safeColors[0]) : "#000";
+        const firstColorHex =
+          safeColors.length > 0 ? colorToHex(safeColors[0]) : "#000";
 
         addItem({
           id: `${actualProductId}-${firstSize}-${firstColor}`,
@@ -279,12 +295,16 @@ export default function ProductCard({
       {/* Image container */}
       <Link
         to={to}
-        className={`relative block aspect-[4/5] w-full overflow-hidden ${useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
-          }`}
+        className={`relative block aspect-[4/5] w-full overflow-hidden ${
+          useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
+        }`}
       >
         <img
-          className={`h-full w-full object-cover ${useWholesaleCard ? "transition-transform duration-300 group-hover:scale-105" : ""
-            }`}
+          className={`h-full w-full object-cover ${
+            useWholesaleCard
+              ? "transition-transform duration-300 group-hover:scale-105"
+              : ""
+          }`}
           src={activeImage}
           alt={imageAlt ?? title}
           draggable={false}
@@ -305,8 +325,9 @@ export default function ProductCard({
           {/* Flash deal countdown badge */}
           {showFlashDeal && countdownLabel && (
             <div
-              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${expired ? "bg-gray-text" : "bg-urgent"
-                }`}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${
+                expired ? "bg-gray-text" : "bg-urgent"
+              }`}
             >
               <svg
                 className="h-3 w-3 shrink-0"
@@ -339,18 +360,24 @@ export default function ProductCard({
           type="button"
           onClick={handleToggleWishlist}
           disabled={toggleWishlist.isPending}
-          className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${useWholesaleCard ? "bg-white shadow-md" : "bg-black/60 backdrop-blur-sm"
-            }`}
+          className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${
+            useWholesaleCard
+              ? "bg-white shadow-md"
+              : "bg-black/60 backdrop-blur-sm"
+          }`}
         >
           <Heart
             size={useWholesaleCard ? 18 : 20}
             strokeWidth={useWholesaleCard ? 2 : 1.8}
-            className={`transition-colors ${useWholesaleCard
-                ? isWishlisted ? "text-primary" : "text-[#555]"
+            className={`transition-colors ${
+              useWholesaleCard
+                ? isWishlisted
+                  ? "text-primary"
+                  : "text-[#555]"
                 : isWishlisted
                   ? "text-primary"
                   : "text-gray-300"
-              }`}
+            }`}
             fill={isWishlisted ? "currentColor" : "none"}
           />
         </button>
@@ -360,17 +387,20 @@ export default function ProductCard({
           <button
             onClick={handleCompare}
             aria-label={isCompared ? "Remove from compare" : "Add to compare"}
-            className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${isCompared
+            className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
+              isCompared
                 ? "bg-primary text-primary-foreground"
                 : "bg-black/60 text-gray-300 hover:text-white"
-              }`}
+            }`}
           >
             <MdCompare size={18} />
           </button>
         )}
 
         {/* Carousel indicators (mock) */}
-        <div className={`${useWholesaleCard ? "bottom-3" : "bottom-4"} absolute left-1/2 flex -translate-x-1/2 gap-1.5 z-20`}>
+        <div
+          className={`${useWholesaleCard ? "bottom-3" : "bottom-4"} absolute left-1/2 flex -translate-x-1/2 gap-1.5 z-20`}
+        >
           {images.slice(0, useWholesaleCard ? 5 : 3).map((img, index) => (
             <button
               key={`${img.id}-${index}`}
@@ -379,24 +409,29 @@ export default function ProductCard({
                 e.stopPropagation();
                 setActiveImage(img.url);
               }}
-              className={`rounded-full ${useWholesaleCard
+              className={`rounded-full ${
+                useWholesaleCard
                   ? activeImage === img.url
                     ? "h-1.5 w-4 bg-danger transition-all"
                     : "h-1.5 w-1.5 bg-black/40 transition-all"
                   : activeImage === img.url
                     ? "h-2 w-2 bg-danger"
                     : "h-2 w-2 bg-black"
-                }`}
+              }`}
             />
           ))}
         </div>
       </Link>
 
       {/* Info container */}
-      <div className={`flex flex-col font-['Montserrat'] ${useWholesaleCard ? "gap-2 p-4" : "p-5"}`}>
+      <div
+        className={`flex flex-col font-['Montserrat'] ${useWholesaleCard ? "gap-2 p-4" : "p-5"}`}
+      >
         {/* Brand row for Wholesale */}
         {isWholesale && brand && (
-          <div className={`flex items-center gap-2 ${useWholesaleCard ? "" : "mb-2"}`}>
+          <div
+            className={`flex items-center gap-2 ${useWholesaleCard ? "" : "mb-2"}`}
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 text-[10px] font-black text-foreground shrink-0">
               {brand.slice(0, 1).toUpperCase()}
             </div>
@@ -405,7 +440,9 @@ export default function ProductCard({
                 {brand}
               </p>
               {category && (
-                <p className="text-[11px] text-gray-text truncate">{category}</p>
+                <p className="text-[11px] text-gray-text truncate">
+                  {category}
+                </p>
               )}
             </div>
           </div>
@@ -421,63 +458,77 @@ export default function ProductCard({
 
         {/* Subtitle */}
         {subtitle && (
-          <p className={`${useWholesaleCard ? "text-xs" : "mt-1 text-sm"} text-gray-text line-clamp-1`}>
+          <p
+            className={`${useWholesaleCard ? "text-xs" : "mt-1 text-sm"} text-gray-text line-clamp-1`}
+          >
             {subtitle}
           </p>
         )}
 
         {/* Description for Wholesale */}
         {isWholesale && description && (
-          <p className="mt-1 text-xs text-gray-text line-clamp-1">{description}</p>
+          <p className="mt-1 text-xs text-gray-text line-clamp-1">
+            {description}
+          </p>
         )}
 
         {/* Colors and Sizes */}
-        <div className={`${useWholesaleCard ? "mt-1 gap-3" : "mt-4 justify-between"} flex items-center`}>
+        <div
+          className={`${useWholesaleCard ? "mt-1 gap-3" : "mt-4 justify-between"} flex items-center`}
+        >
           <div className="flex items-center gap-2">
-            {safeColors.slice(0, useWholesaleCard ? 4 : safeColors.length).map((c, i) => {
-              const matchedImg = images?.find((img) => img.color?.toLowerCase() === c.toLowerCase());
-              const isSelected = useWholesaleCard
-                ? i === activeColorIdx
-                : matchedImg
-                  ? activeImage === matchedImg.url
-                  : i === 0;
-              return (
-                <div
-                  key={i}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setActiveColorIdx(i);
-                    if (matchedImg) {
-                      setActiveImage(matchedImg.url);
-                    }
-                  }}
-                  title={c}
-                  className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${useWholesaleCard
-                      ? isSelected
-                        ? "border-foreground scale-110"
-                        : "border-transparent hover:border-gray-400"
-                      : isSelected
-                        ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
-                        : "hover:scale-105"
+            {safeColors
+              .slice(0, useWholesaleCard ? 4 : safeColors.length)
+              .map((c, i) => {
+                const matchedImg = images?.find(
+                  (img) => img.color?.toLowerCase() === c.toLowerCase(),
+                );
+                const isSelected = useWholesaleCard
+                  ? i === activeColorIdx
+                  : matchedImg
+                    ? activeImage === matchedImg.url
+                    : i === 0;
+                return (
+                  <div
+                    key={i}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setActiveColorIdx(i);
+                      if (matchedImg) {
+                        setActiveImage(matchedImg.url);
+                      }
+                    }}
+                    title={c}
+                    className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${
+                      useWholesaleCard
+                        ? isSelected
+                          ? "border-foreground scale-110"
+                          : "border-transparent hover:border-gray-400"
+                        : isSelected
+                          ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
+                          : "hover:scale-105"
                     }`}
-                  style={{
-                    backgroundColor: colorToHex(c),
-                  }}
-                />
-              );
-            })}
+                    style={{
+                      backgroundColor: colorToHex(c),
+                    }}
+                  />
+                );
+              })}
             {useWholesaleCard && safeColors.length > 4 && (
-              <span className="text-[10px] text-gray-text">+{safeColors.length - 4}</span>
+              <span className="text-[10px] text-gray-text">
+                +{safeColors.length - 4}
+              </span>
             )}
           </div>
 
           {sizeLabel && (
             <div
-              className={`rounded-full border ${useWholesaleCard
+              className={`rounded-full border ${
+                useWholesaleCard
                   ? "ml-auto shrink-0 whitespace-nowrap border-gray-400 px-2.5 py-0.5 text-[10px] text-gray-500"
                   : "border-gray-500 px-3 py-1 text-xs text-gray-400"
-                }`}
+              }`}
             >
               {sizeLabel}
             </div>
@@ -485,17 +536,31 @@ export default function ProductCard({
         </div>
 
         {/* Rating and Price */}
-        <div className={`${useWholesaleCard ? "mt-2" : "mt-6"} flex items-center justify-between`}>
-          <div className={`flex items-center ${useWholesaleCard ? "gap-1" : "gap-1.5"}`}>
+        <div
+          className={`${useWholesaleCard ? "mt-2" : "mt-6"} flex items-center justify-between`}
+        >
+          <div
+            className={`flex items-center ${useWholesaleCard ? "gap-1" : "gap-1.5"}`}
+          >
             <Star fill={1} size={useWholesaleCard ? 16 : 20} />
-            <span className={`${useWholesaleCard ? "text-sm" : "text-base"} font-medium text-foreground`}>{rating}</span>
+            <span
+              className={`${useWholesaleCard ? "text-sm" : "text-base"} font-medium text-foreground`}
+            >
+              {rating}
+            </span>
           </div>
-          <div className={`${useWholesaleCard ? "text-right text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}>
+          <div
+            className={`${useWholesaleCard ? "text-right text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
+          >
             {showFlashDeal && flashDealPrice
               ? `$${flashDealPrice.toFixed(2)}`
               : price}
             {isWholesale && (
-              <span className={useWholesaleCard ? "text-xs font-normal text-gray-text" : ""}>
+              <span
+                className={
+                  useWholesaleCard ? "text-xs font-normal text-gray-text" : ""
+                }
+              >
                 {useWholesaleCard ? "/Pack" : " / Pack"}
               </span>
             )}

@@ -5,16 +5,23 @@ import {
   useCreateReview,
   useUpdateReview,
 } from "../../hooks/queries/reviewQuery";
-import type { Review } from "../../hooks/queries/reviewQuery";
 import { useTranslation } from "react-i18next";
+import {
+  useCreateRetailReview,
+  useUpdateRetailReview,
+} from "../../hooks/queries/retailReviewQuery";
+import type { Review } from "../../hooks/queries/reviewQuery";
+import type { RetailReview } from "../../hooks/queries/retailReviewQuery";
 interface ReviewFormProps {
   productId: string;
-  existingReview?: Review;
+  productType?: "PRODUCT" | "RETAIL";
+    existingReview?: Review | RetailReview;
   onDone: () => void;
 }
 
 export function ReviewForm({
   productId,
+  productType = "PRODUCT",
   existingReview,
   onDone,
 }: ReviewFormProps) {
@@ -22,14 +29,19 @@ export function ReviewForm({
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState(existingReview?.comment ?? "");
 
-  const { mutate: createReview, isPending: isCreating } =
-    useCreateReview(productId);
-  const { mutate: updateReview, isPending: isUpdating } =
-    useUpdateReview(productId);
+  const createProductReview = useCreateReview(productId);
+  const updateProductReview = useUpdateReview(productId);
+
+  const createRetailReviewMutation = useCreateRetailReview(productId);
+  const updateRetailReviewMutation = useUpdateRetailReview(productId);
 
   const { t } = useTranslation("reviewForm");
 
-  const isPending = isCreating || isUpdating;
+  const isPending =
+    createProductReview.isPending ||
+    updateProductReview.isPending ||
+    createRetailReviewMutation.isPending ||
+    updateRetailReviewMutation.isPending;
   const isEditMode = !!existingReview;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,12 +49,29 @@ export function ReviewForm({
     if (rating === 0) return;
 
     if (isEditMode) {
-      updateReview(
-        { id: existingReview.id, rating, comment },
-        { onSuccess: onDone },
-      );
+      if (productType === "RETAIL") {
+        updateRetailReviewMutation.mutate(
+          { id: existingReview.id, rating, comment },
+          { onSuccess: onDone },
+        );
+      } else {
+        updateProductReview.mutate(
+          { id: existingReview.id, rating, comment },
+          { onSuccess: onDone },
+        );
+      }
     } else {
-      createReview({ productId, rating, comment }, { onSuccess: onDone });
+      if (productType === "RETAIL") {
+        createRetailReviewMutation.mutate(
+          { retailProductId: Number(productId), rating, comment },
+          { onSuccess: onDone },
+        );
+      } else {
+        createProductReview.mutate(
+          { productId, rating, comment },
+          { onSuccess: onDone },
+        );
+      }
     }
   };
 

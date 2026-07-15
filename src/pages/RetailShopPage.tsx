@@ -197,7 +197,7 @@ export default function RetailShopPage() {
           rating={product.rating}
           productType="SHOP"
           showTypeBadge={!!filters.search}
-          to={`/product-details/${product.id}`}
+          to={`/retail/shop/${product.id}`}
           subtitle={product.description}
         />
       );

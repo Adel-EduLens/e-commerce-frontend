@@ -648,7 +648,7 @@ export default function TraderRetailProductsPage() {
   // Map into InventoryItem format for the shared InventoryTablePanel
   const items: InventoryItem[] = productsArray.map((p) => {
     const mainImg =
-      p.images?.find((i) => i.isMain)?.url || p.images?.[0]?.url || "";
+       p.images?.[0]?.url || "";
 
     const pRaw = p as RetailProduct & { createdAt?: string | number };
     const pDate =
