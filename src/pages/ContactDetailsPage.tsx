@@ -182,8 +182,9 @@ function AddressCard({
 
   return (
     <div
-      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${isAddressLoading ? "pointer-events-none opacity-50" : ""
-        }`}
+      className={`w-full rounded-xl p-4 shadow-sm transition-all hover:shadow-md ${
+        isAddressLoading ? "pointer-events-none opacity-50" : ""
+      }`}
     >
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-3">
@@ -215,7 +216,6 @@ function AddressCard({
                 label={t("Edit address")}
                 onClick={onDelete}
               />
-
             </>
           )}
         </div>
@@ -614,10 +614,10 @@ export default function ContactDetailsPage() {
           isEditing
           isNew={isAdding}
           isAddressLoading={isAddingAddress}
-          onEdit={() => { }}
+          onEdit={() => {}}
           onDraftChange={setAddressDraft}
           onCancel={handleCancelEditingAddress}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onSave={
             isAdding
               ? handleCreateAddress

@@ -1,18 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useBlankProduct } from '../hooks/queries/blankProductQuery';
-import { Rnd } from 'react-rnd';
-import { Maximize2, Upload, LayoutGrid, Share, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useBlankProduct } from "../hooks/queries/blankProductQuery";
+import { Rnd } from "react-rnd";
+import {
+  Maximize2,
+  Upload,
+  LayoutGrid,
+  Share,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const CreateYourDesignDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: blankProduct, isLoading, error } = useBlankProduct(id ?? '');
-  
-  const [activeImage, setActiveImage] = useState<string>('');
-  const [activeColor, setActiveColor] = useState<string>('');
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const { data: blankProduct, isLoading, error } = useBlankProduct(id ?? "");
 
+  const [activeImage, setActiveImage] = useState<string>("");
+  const [activeColor, setActiveColor] = useState<string>("");
+  const [activeMaterial, setActiveMaterial] = useState<string>("");
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [activeDirection, setActiveDirection] = useState<string>("");
   const [rndState, setRndState] = useState({
     x: 50,
     y: 50,
@@ -21,17 +29,24 @@ const CreateYourDesignDetailPage = () => {
   });
 
   useEffect(() => {
-    const func=()=>{
+    const func = () => {
+      if (!blankProduct) return;
 
-        if (blankProduct) {
-            if (blankProduct.images?.length > 0) {
-                setActiveImage(blankProduct.images[0].url);
-            }
-            if (blankProduct.colors?.length > 0) {
-                setActiveColor(blankProduct.colors[0].color);
-            }
+      if (blankProduct.colors.length > 0) {
+        const firstColor = blankProduct.colors[0];
+
+        setActiveColor(firstColor.color);
+
+        if (firstColor.images.length > 0) {
+          setActiveDirection(firstColor.images[0].direction);
+          setActiveImage(firstColor.images[0].url);
         }
-    }
+      }
+
+      if (blankProduct.materials.length > 0) {
+        setActiveMaterial(blankProduct.materials[0].material);
+      }
+    };
     func();
   }, [blankProduct]);
 
@@ -48,12 +63,29 @@ const CreateYourDesignDetailPage = () => {
 
   const handleColorClick = (color: string) => {
     setActiveColor(color);
-    const matchedImage = blankProduct?.images?.find((img) => img.color === color);
-    if (matchedImage) {
-      setActiveImage(matchedImage.url);
+
+    const colorObj = blankProduct?.colors.find((c) => c.color === color);
+
+    if (!colorObj) return;
+
+    if (colorObj.images.length > 0) {
+      setActiveDirection(colorObj.images[0].direction);
+      setActiveImage(colorObj.images[0].url);
     }
   };
+  const handleDirectionClick = (direction: string) => {
+    setActiveDirection(direction);
 
+    const colorObj = blankProduct?.colors.find((c) => c.color === activeColor);
+
+    if (!colorObj) return;
+
+    const image = colorObj.images.find((img) => img.direction === direction);
+
+    if (image) {
+      setActiveImage(image.url);
+    }
+  };
   if (isLoading) {
     return (
       <div className="flex min-h-[80vh] w-full items-center justify-center bg-background text-foreground">
@@ -66,7 +98,12 @@ const CreateYourDesignDetailPage = () => {
     return (
       <div className="flex min-h-[80vh] w-full flex-col items-center justify-center gap-4 bg-background text-danger">
         <p>Failed to load the product.</p>
-        <button onClick={() => navigate('/createYourDesign')} className="underline">Go Back</button>
+        <button
+          onClick={() => navigate("/createYourDesign")}
+          className="underline"
+        >
+          Go Back
+        </button>
       </div>
     );
   }
@@ -74,22 +111,20 @@ const CreateYourDesignDetailPage = () => {
   return (
     <div className="min-h-screen w-full bg-background px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-6 lg:flex-row">
-        
         {/* Left Column: Viewer */}
-        <div className="relative flex min-h-[500px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-background lg:min-h-[700px]">
-          
+        <div className="relative flex min-h-[500px] flex-1 items-center justify-center overflow-hidden rounded-[24px] bg-card border border-stroke lg:min-h-[700px]">
           {/* Header Info inside Viewer */}
           <div className="absolute left-6 top-6 z-10 md:left-10 md:top-10">
-            <h2 className="font-['Montserrat'] text-lg font-medium text-gray-400">
+            <h2 className="font-['Montserrat'] text-lg font-medium text-gray-text">
               {blankProduct.name}
             </h2>
-            <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-white">
+            <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-foreground">
               {blankProduct.price}$
             </p>
           </div>
-          
+
           {/* Maximize Button */}
-          <button className="absolute right-6 top-6 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-transform hover:scale-110 md:right-10 md:top-10">
+          <button className="absolute right-6 top-6 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card border border-stroke text-foreground shadow-sm transition-transform hover:scale-110 hover:bg-gray-light md:right-10 md:top-10">
             <Maximize2 size={18} />
           </button>
 
@@ -102,12 +137,14 @@ const CreateYourDesignDetailPage = () => {
 
           {/* Bounding Box / Print Area Overlay */}
           {/* The bounding box defines where the design can be visible (overflow hidden) */}
-          <div className="absolute inset-0 m-auto h-[280px] w-[220px] overflow-hidden border-2 border-dashed border-[#0EA5E9]/50 sm:h-[400px] sm:w-[300px]">
+          <div className="absolute inset-0 m-auto h-[280px] w-[220px] overflow-hidden border-2 border-dashed border-info sm:h-[400px] sm:w-[300px]">
             {uploadedImage && (
               <Rnd
                 position={{ x: rndState.x, y: rndState.y }}
                 size={{ width: rndState.width, height: rndState.height }}
-                onDragStop={(e, d) => setRndState({ ...rndState, x: d.x, y: d.y })}
+                onDragStop={(e, d) =>
+                  setRndState({ ...rndState, x: d.x, y: d.y })
+                }
                 onResizeStop={(e, direction, ref, delta, position) => {
                   setRndState({
                     width: parseInt(ref.style.width, 10),
@@ -132,25 +169,28 @@ const CreateYourDesignDetailPage = () => {
         </div>
 
         {/* Right Column: Controls */}
-        <div className="flex w-full flex-col gap-8 rounded-[24px] bg-background p-6 lg:w-[420px] xl:w-[480px]">
-          
+        <div className="flex w-full flex-col gap-8 rounded-[24px] bg-card border border-stroke p-6 lg:w-[420px] xl:w-[480px]">
           {/* Sub Navigation */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
-            <button className="text-gray-400 transition-colors hover:text-white">
+          <div className="flex items-center justify-between border-b border-stroke pb-6">
+            <button className="text-gray-text transition-colors hover:text-foreground">
               <ChevronLeft size={20} />
             </button>
-            <span className="font-['Montserrat'] text-lg font-medium text-white">Hood</span>
-            <button className="text-gray-400 transition-colors hover:text-white">
+            <span className="font-['Montserrat'] text-lg font-medium text-foreground">
+              Hood
+            </span>
+            <button className="text-gray-text transition-colors hover:text-foreground">
               <ChevronRight size={20} />
             </button>
-            <button className="ml-auto rounded-xl border border-white/10 px-4 py-2 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
+            <button className="ml-auto rounded-xl border border-stroke px-4 py-2 text-sm text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
               Menu
             </button>
           </div>
 
           {/* Color Section */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-['Montserrat'] text-base font-semibold text-white">Color</h3>
+            <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
+              Color
+            </h3>
             <div className="flex flex-wrap gap-3">
               {blankProduct.colors?.map((colorObj) => (
                 <button
@@ -158,8 +198,8 @@ const CreateYourDesignDetailPage = () => {
                   onClick={() => handleColorClick(colorObj.color)}
                   className={`h-9 w-9 rounded-full border-2 transition-all ${
                     activeColor === colorObj.color
-                      ? 'border-white ring-2 ring-white/20'
-                      : 'border-transparent'
+                      ? "border-foreground ring-2 ring-foreground/50"
+                      : "border-foreground/10 "
                   }`}
                   style={{ backgroundColor: colorObj.color }}
                   title={colorObj.color}
@@ -169,48 +209,66 @@ const CreateYourDesignDetailPage = () => {
           </div>
 
           {/* Material Section */}
-          <div className="flex flex-col gap-4">
-            <h3 className="font-['Montserrat'] text-base font-semibold text-white">Material</h3>
-            <div className="flex flex-wrap gap-3">
-              {['Cotton', 'Fleece', 'Jersey', 'Recycled'].map((mat) => (
-                <button
-                  key={mat}
-                  className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
-                    mat === blankProduct.material
-                      ? 'bg-danger text-white'
-                      : 'border border-white/10 text-gray-400 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  {mat}
-                </button>
-              ))}
+          {blankProduct.materials?.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
+                Material
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {blankProduct.materials.map((mat) => (
+                  <button
+                    key={mat.id}
+                    onClick={() => setActiveMaterial(mat.material)}
+                    className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
+                      mat.material === activeMaterial
+                        ? "bg-primary text-primary-foreground"
+                        : "border border-stroke text-gray-text hover:bg-gray-light hover:text-foreground"
+                    }`}
+                  >
+                    {mat.material}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          {(() => {
+            const selectedColor = blankProduct.colors.find(
+              (c) => c.color === activeColor,
+            );
 
-          {/* Pattern Section */}
-          <div className="flex flex-col gap-4">
-            <h3 className="font-['Montserrat'] text-base font-semibold text-white">Pattern</h3>
-            <div className="flex flex-wrap gap-3">
-              {['Plain', 'Stripes', 'Camouflage', 'Gradient'].map((pat) => (
-                <button
-                  key={pat}
-                  className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
-                    pat === blankProduct.pattern
-                      ? 'bg-danger text-white'
-                      : 'border border-white/10 text-gray-400 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  {pat}
-                </button>
-              ))}
-            </div>
-          </div>
+            if (!selectedColor) return null;
 
+            return (
+              <div className="flex flex-col gap-4">
+                <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
+                  View
+                </h3>
+
+                <div className="flex flex-wrap gap-3">
+                  {selectedColor.images.map((image) => (
+                    <button
+                      key={image.id}
+                      onClick={() => handleDirectionClick(image.direction)}
+                      className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-colors ${
+                        activeDirection === image.direction
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-stroke text-gray-text hover:bg-gray-light hover:text-foreground"
+                      }`}
+                    >
+                      {image.direction}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           {/* Print / Upload Section */}
           <div className="flex flex-col gap-4">
-            <h3 className="font-['Montserrat'] text-base font-semibold text-white">Print</h3>
+            <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
+              Print
+            </h3>
             <div className="flex gap-3">
-              <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white">
+              <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-stroke px-4 py-3 text-sm font-medium text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
                 <Upload size={18} />
                 Upload Your Own
                 <input
@@ -220,7 +278,7 @@ const CreateYourDesignDetailPage = () => {
                   onChange={handleImageUpload}
                 />
               </label>
-              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white">
+              <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-stroke px-4 py-3 text-sm font-medium text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
                 <LayoutGrid size={18} />
                 Browse Library
               </button>
@@ -229,14 +287,13 @@ const CreateYourDesignDetailPage = () => {
 
           {/* Bottom Actions */}
           <div className="mt-auto flex gap-4 pt-6">
-            <button className="flex-1 rounded-xl bg-danger py-4 font-['Montserrat'] text-base font-semibold text-white transition-all hover:bg-red-800 hover:scale-[1.02]">
+            <button className="flex-1 rounded-xl bg-primary py-4 font-['Montserrat'] text-base font-semibold text-primary-foreground transition-all hover:opacity-90 hover:scale-[1.02]">
               Done
             </button>
-            <button className="flex items-center justify-center rounded-xl border border-white/10 px-5 text-gray-300 transition-colors hover:bg-white/5 hover:text-white">
+            <button className="flex items-center justify-center rounded-xl border border-stroke px-5 text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
               <Share size={20} />
             </button>
           </div>
-
         </div>
       </div>
     </div>

@@ -38,14 +38,16 @@ const CreateYourDesignPage = () => {
               key={product.id}
               productId={product.id}
               title={product.name}
-              subtitle={product.description || `${product.material}, ${product.pattern}`}
+              subtitle={product.description || product.materials?.map(m => m.material).join(', ')}
               price={`${product.price} EGP`}
-              imageSrc={product.images?.[0]?.url}
-              images={product.images?.map(img => ({
-                id: img.id,
-                url: img.url,
-                color: img.color,
-              }))}
+              imageSrc={product.colors?.[0]?.images?.[0]?.url}
+              images={product.colors?.flatMap(c => 
+                c.images.map(img => ({
+                  id: img.id,
+                  url: img.url,
+                  color: c.color,
+                }))
+              )}
               colors={product.colors?.map(c => c.color)}
               to={`/createYourDesign/${product.id}`}
               productType="SHOP"

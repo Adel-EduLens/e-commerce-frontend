@@ -1,9 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 
-export interface BlankProductColor {
+export type ImageDirection =
+  | "FRONT"
+  | "BACK"
+  | "LEFT"
+  | "RIGHT"
+  | "TOP"
+  | "BOTTOM";
+
+export interface BlankProductMaterial {
   id: string;
-  color: string;
+  material: string;
   blankProductId: string;
   createdAt: string;
 }
@@ -11,21 +19,29 @@ export interface BlankProductColor {
 export interface BlankProductImage {
   id: string;
   url: string;
+  direction: ImageDirection;
+  colorId: string;
+  createdAt: string;
+}
+
+export interface BlankProductColor {
+  id: string;
   color: string;
   blankProductId: string;
+  createdAt: string;
+
+  images: BlankProductImage[];
 }
 
 export interface BlankProduct {
   id: string;
   name: string;
   description?: string | null;
-  material: string;
-  pattern: string;
   price?: number | null;
   isActive: boolean;
 
+  materials: BlankProductMaterial[];
   colors: BlankProductColor[];
-  images: BlankProductImage[];
 
   createdAt: string;
   updatedAt: string;
@@ -36,25 +52,26 @@ export interface CreateBlankProductData {
 
   description?: string | null;
 
-  material: string;
-
-  pattern: string;
-
   price?: number | null;
 
   isActive?: boolean;
 
-  colors: {
-    color: string;
+  materials: {
+    material: string;
   }[];
 
-  images: {
-    url: string;
+  colors: {
     color: string;
+
+    images: {
+      url: string;
+      direction: ImageDirection;
+    }[];
   }[];
 }
 
 export type UpdateBlankProductData = Partial<CreateBlankProductData>;
+
 // ======================
 // GET ALL
 // ======================
@@ -68,7 +85,6 @@ const getBlankProducts = async (): Promise<BlankProduct[]> => {
 export const useBlankProducts = () => {
   return useQuery({
     queryKey: ["blank-products"],
-
     queryFn: getBlankProducts,
   });
 };
@@ -86,9 +102,7 @@ const getBlankProduct = async (id: string): Promise<BlankProduct> => {
 export const useBlankProduct = (id: string) => {
   return useQuery({
     queryKey: ["blank-product", id],
-
     queryFn: () => getBlankProduct(id),
-
     enabled: !!id,
   });
 };
