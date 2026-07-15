@@ -42,8 +42,8 @@ function LanguageField() {
             <button
               onClick={() => changeLanguage("en")}
               className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${i18n.language.startsWith("en")
-                  ? "bg-primary text-primary-foreground"
-                  : "text-foreground hover:bg-primary/60"
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-primary/60"
                 }`}
             >
               English
@@ -52,8 +52,8 @@ function LanguageField() {
             <button
               onClick={() => changeLanguage("ar")}
               className={`w-full px-4 py-3 text-left transition  hover:cursor-pointer ${i18n.language.startsWith("ar")
-                  ? "bg-primary text-primary-foreground"
-                  : "text-foreground hover:bg-primary/60"
+                ? "bg-primary text-primary-foreground"
+                : "text-foreground hover:bg-primary/60"
                 }`}
             >
               العربية
@@ -67,10 +67,10 @@ function LanguageField() {
 function ThemeMockup({ isDark = false }: { isDark?: boolean }) {
   return (
     <div
-      className={`h-36 w-full overflow-hidden ${isDark ? "bg-black" : "bg-white"}`}
+      className={`h-36 w-full overflow-hidden ${isDark ? "bg-black" : "bg-[#ffffff]"}`}
     >
       <div
-        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-zinc-900" : "bg-background"}`}
+        className={`mx-4 mt-4 h-32 overflow-hidden ${isDark ? "bg-zinc-900" : "bg-[#ffffff]"}`}
       >
         <div className="grid grid-cols-2 gap-2 p-2">
           <div className="h-10 bg-primary" />
@@ -97,12 +97,19 @@ function ThemeCard({
   return (
     <div
       onClick={onClick}
-      className={`relative w-full sm:w-60 overflow-hidden rounded-lg bg-gray-light cursor-pointer transition-all hover:opacity-90 outline outline-2 outline-offset-[-2px] ${selected ? "outline-primary" : "outline-stroke"
-        }`}
+      className={`relative w-full sm:w-60 overflow-hidden rounded-lg cursor-pointer transition-all hover:opacity-90 outline outline-2 outline-offset-[-2px] ${
+        selected ? "outline-primary" : "outline-stroke"
+      } ${isDark ? "bg-gray-light" : "bg-[#ffffff]"}`}
     >
       <ThemeMockup isDark={isDark} />
-      <div className="flex items-center justify-between border-t border-stroke bg-card px-3 py-3">
-        <div className="font-['Montserrat'] text-sm sm:text-base font-medium leading-4 tracking-tight text-foreground">
+      <div
+        className={`flex items-center justify-between border-t px-3 py-3 ${
+          isDark
+            ? "border-stroke bg-card text-foreground"
+            : "border-gray-200 bg-[#ffffff] text-gray-800"
+        }`}
+      >
+        <div className="font-['Montserrat'] text-sm sm:text-base font-medium leading-4 tracking-tight">
           {label}
         </div>
         {selected && (
