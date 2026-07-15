@@ -13,7 +13,6 @@ export function ProductGallery({
   setSelectedImage,
   item,
 }: ProductGalleryProps) {
-  // Filter images to show ONLY images corresponding to the selected color
   const colorImages = item.images.filter(
     (image) =>
       image.color &&
@@ -50,11 +49,10 @@ export function ProductGallery({
               type="button"
               key={image.id}
               onClick={() => setSelectedImage(image.url)}
-              className={`relative h-[88px] w-full shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition-all outline-none bg-[#f5f5f5] ${
-                isSelected
+              className={`relative h-[88px] w-full shrink-0 cursor-pointer overflow-hidden rounded-md border-2 transition-all outline-none bg-[#f5f5f5] ${isSelected
                   ? "border-primary"
                   : "border-stroke hover:border-gray-text"
-              }`}
+                }`}
               aria-label={`Open product image ${index + 1}`}
             >
               <img

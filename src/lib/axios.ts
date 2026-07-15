@@ -9,7 +9,7 @@ api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token
     if (token) {
-      config.headers.Authorization = `${token}`
+      config.headers.token = `${token}`
     }
     return config
   },
