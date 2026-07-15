@@ -62,9 +62,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
       const dest =
         loggedInUser.role === 'trader'
           ? '/dashboard/trader'
-          : loggedInUser.role === 'admin'
-            ? '/dashboard/admin'
-            : redirectPath || '/'
+          : redirectPath || '/'
 
       navigate(dest, { replace: true })
     } catch (error) {
@@ -85,9 +83,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
       navigate(
         user.role === 'trader'
           ? '/dashboard/trader'
-          : user.role === 'admin'
-            ? '/dashboard/admin'
-            : '/'
+          : '/'
       )
     } catch (error) {
       handleApiError(error, t('toast.signupFailed'))

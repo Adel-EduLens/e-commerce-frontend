@@ -11,8 +11,7 @@ import NotificationsPage from "../pages/NotificationsPage";
 import NotifyMeListPage from "../pages/NotifyMeListPage";
 import SettingsPage from "../pages/SettingsPage";
 import AuthPage from "../pages/AuthPage";
-import AdminDashboard from "../pages/dashboards/AdminDashboard";
-import PrizeControllerPage from "../pages/dashboards/PrizeControllerPage";
+
 import TraderDashboard from "../pages/dashboards/TraderDashboard";
 import TraderProductsPage from "../pages/dashboards/TraderProductsPage";
 import TraderCustomersPage from "../pages/dashboards/TraderCustomersPage";
@@ -43,11 +42,7 @@ import WholesaleDetailsPage from "../pages/WholesaleDetailsPage";
 import DesignLabPage from "../pages/DesignLabPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-import AdminLoginPage from "../pages/admin/AdminLoginPage";
-import AdminLayout from "../layouts/AdminLayout";
-
 import TestPage from "../pages/TestPage";
-import AdminHelpCenterPage from "../pages/admin/AdminHelpCenterPage";
 import HelpCenterCategorie from "../pages/HelpCenterCategorie";
 import TraderDesignPage from "../pages/dashboards/TraderDesignPage";
 import TraderLoginPage from "../pages/TraderLoginPage";
@@ -271,31 +266,7 @@ export const router = createBrowserRouter([
         path: "signup",
         element: <AuthPage mode="signup" />,
       },
-      {
-        path: "dashboard/admin",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout>
-              <AdminDashboard />
-            </AdminLayout>
-          </ProtectedRoute>
-        ),
-      },
 
-      {
-        path: "dashboard/admin/login",
-        element: <AdminLoginPage />,
-      },
-      {
-        path: "dashboard/admin/prizes",
-        element: (
-          <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminLayout>
-              <PrizeControllerPage />
-            </AdminLayout>
-          </ProtectedRoute>
-        ),
-      },
       {
         path: "dashboard/trader",
         element: (

@@ -4,10 +4,10 @@ import { useAuthStore } from '../store/useAuthStore'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  allowedRoles?: Array<'user' | 'trader' | 'admin'>
+  allowedRoles?: Array<'user' | 'trader'>
 }
 
-type roles = 'user' | 'trader' | 'admin'
+type roles = 'user' | 'trader'
 
 export default function ProtectedRoute({
   children,
@@ -20,10 +20,7 @@ export default function ProtectedRoute({
   if (!_hasHydrated) return null
 
   if (!isAuthenticated || !user) {
-    const fallbackRoute = allowedRoles?.includes('admin')
-      ? '/dashboard/admin/login'
-      : '/login'
-    return <Navigate to={fallbackRoute} replace />
+    return <Navigate to="/login" replace />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role as roles)) {

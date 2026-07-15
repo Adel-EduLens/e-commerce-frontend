@@ -42,8 +42,8 @@ function GeneralInfoTab() {
 
   const addressLabel = pickedLocation
     ? [pickedLocation.streetAddress, pickedLocation.area, pickedLocation.city]
-        .filter(Boolean)
-        .join(", ")
+      .filter(Boolean)
+      .join(", ")
     : null;
 
   return (
@@ -333,11 +333,10 @@ function TeamMembersTab() {
                   <td className="px-4 py-3">{member.email}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`inline-flex items-center justify-center rounded-2xl px-2 py-1 text-xs font-medium ${
-                        member.status === "Active"
-                          ? "bg-success/10 text-success"
-                          : "bg-warning/10 text-warning"
-                      }`}
+                      className={`inline-flex items-center justify-center rounded-2xl px-2 py-1 text-xs font-medium ${member.status === "Active"
+                        ? "bg-success/10 text-success"
+                        : "bg-warning/10 text-warning"
+                        }`}
                     >
                       {member.status}
                     </span>
@@ -394,9 +393,8 @@ export default function TraderStoreSettingsPage() {
           <button
             key={item.name}
             onClick={() => setActiveTab(item.name)}
-            className={`flex h-14 w-full items-center gap-2 rounded-2xl px-4 py-4 text-left font-['Montserrat'] text-base font-semibold transition ${
-              activeTab === item.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-gray-light dark:hover:bg-white/5"
-            }`}
+            className={`flex h-14 w-full items-center gap-2 rounded-2xl px-4 py-4 text-left font-['Montserrat'] text-sm font-semibold transition ${activeTab === item.name ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-gray-light dark:hover:bg-white/5"
+              }`}
           >
             <div className="flex h-6 w-6 shrink-0 items-center justify-center">
               <img
