@@ -150,23 +150,28 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
 
           <div className="flex flex-wrap gap-1.5">
             {product.colors && product.colors.length > 0 ? (
-              product.colors.map((color) => (
-                <span
-                  key={color.id}
-                  className="
-                    rounded-full
-                    border
-                    border-stroke
-                    bg-background
-                    px-2
-                    py-1
-                    text-xs
-                    text-foreground
-                  "
-                >
-                  {color.colorName}
-                </span>
-              ))
+              product.colors.map((color, idx) => {
+                const colorValue = color.color || color.colorName;
+                return (
+                  <div
+                    key={color.id || idx}
+                    title={colorValue}
+                    className="
+                      h-6 w-6
+                      rounded-full
+                      border
+                      border-stroke
+                      p-0.5
+                      flex items-center justify-center
+                    "
+                  >
+                    <span
+                      className="w-full h-full rounded-full inline-block border border-black/10"
+                      style={{ backgroundColor: colorValue ? colorValue.toLowerCase() : "#ddd" }}
+                    />
+                  </div>
+                );
+              })
             ) : (
               <span className="text-xs text-gray-text">—</span>
             )}

@@ -23,8 +23,8 @@ export function CompareHeader({ count, onClear }: CompareHeaderProps) {
             <p className="mt-1 text-sm text-gray-text">
               {t("header.comparing")}
               <span className="font-semibold text-foreground">
-                {count}
-              </span>{" "}
+                {" "} {count} {" "}
+              </span>
               {count === 1 ? t("header.product") : t("header.products")}
             </p>
           </div>
