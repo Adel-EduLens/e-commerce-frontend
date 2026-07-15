@@ -22,7 +22,7 @@ export const retailApi = {
   },
 
   async getRetailProductById(id: string | number) {
-    const response = await api.get(`${API_PREFIX}//${id}`);
+    const response = await api.get(`${API_PREFIX}/${id}`);
     return normalizeProductResponse(response.data);
   },
 

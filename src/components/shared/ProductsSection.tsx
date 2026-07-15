@@ -269,7 +269,7 @@ export default function ProductsSection({
                 rating={product.rating}
                 to={
                   isRetail
-                    ? `/retail/${product.id}`
+                    ? `/retail/shop/${product.id}`
                     : `/product-details/${product.id}`
                 }
               />

@@ -28,8 +28,18 @@ type ProductInfoPanelProps = {
   setQuantity: (qty: number) => void;
   item: DetailItem;
   reviewCount?: number;
-  productType?: 'SHOP' | 'WHOLESALE';
-  rawProduct?: any;
+  productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
+  rawProduct?: Record<string, unknown>;
+  /** When provided, overrides the internal add-to-cart logic */
+  onAddToCart?: () => void;
+  /** When provided, overrides the internal buy-now logic */
+  onBuyNow?: () => void;
+  /** When provided, overrides the internal notify-me logic */
+  onNotifyMe?: () => void;
+  /** External loading state for add-to-cart */
+  isAddingToCart?: boolean;
+  /** External subscribed state for notify-me */
+  isNotifySubscribed?: boolean;
 };
 
 export function ProductInfoPanel({
@@ -43,6 +53,11 @@ export function ProductInfoPanel({
   reviewCount = 0,
   productType = 'SHOP',
   rawProduct,
+  onAddToCart: externalAddToCart,
+  onBuyNow: externalBuyNow,
+  onNotifyMe: externalNotifyMe,
+  isAddingToCart = false,
+  isNotifySubscribed,
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
@@ -53,7 +68,7 @@ export function ProductInfoPanel({
   const isFavorite = Boolean(wishlistStatus?.isWishlisted);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : "SHOP_RESTOCK";
+  const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : productType === "RETAIL" ? "RETAIL_RESTOCK" : "SHOP_RESTOCK";
   const targetId = item.id;
 
   const { data: checkData } = useNotifyMeCheck(targetType, targetId);
@@ -81,10 +96,14 @@ export function ProductInfoPanel({
   const [isCompared, setIsCompared] = useState(false);
 
   useEffect(() => {
-    setIsCompared(isProductCompared(item.id));
-  }, [item.id]);
+  const func=()=>{
+    setIsCompared(isProductCompared(item.id, (productType as "WHOLESALE" | "RETAIL" | "SHOP") || "SHOP"));
+  }
+  func();
+  }, [item.id, productType]);
 
   const isWholesale = productType === 'WHOLESALE';
+  const isRetail = productType === 'RETAIL';
 
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = isWholesale
@@ -101,8 +120,14 @@ export function ProductInfoPanel({
         (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
     );
 
+  // Retail products have a flat `sizes` array with quantity per size+color combo,
+  // whereas shop products nest variants under each color object.
   const colorVariants = isWholesale
     ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: colorObj?.stock ?? 0 }))
+    : isRetail
+    ? ((rawProduct?.sizes || []) as any[]).filter(
+        (s: any) => !s.color || !selectedColor || s.color.toLowerCase() === selectedColor.toLowerCase()
+      ).map((s: any) => ({ size: s.size, quantity: s.quantity ?? 0 }))
     : colorObj?.variants || [];
 
   // Find currently selected size variant info
@@ -120,6 +145,13 @@ export function ProductInfoPanel({
     const stockVal = (() => {
       if (isWholesale) {
         return colorObj?.stock ?? 0;
+      }
+      if (isRetail) {
+        // Retail: use size-level quantity if a variant is selected, otherwise product-level stock
+        if (hasSizes && selectedVariant) {
+          return selectedVariant.quantity;
+        }
+        return (rawProduct?.stock as number) ?? item.stock ?? 0;
       }
       if (hasColors && hasSizes) {
         return selectedVariant ? selectedVariant.quantity : 0;
@@ -195,6 +227,10 @@ export function ProductInfoPanel({
     );
   };
   const handleAddToCart = () => {
+    if (externalAddToCart) {
+      externalAddToCart();
+      return;
+    }
     if (availableStock <= 0) {
       toast.error(t("outOfStockOption"));
       return;
@@ -215,7 +251,7 @@ export function ProductInfoPanel({
       addItem({
         id: cartItemId,
         productId: item.id,
-        categoryId: item.category.id,
+        categoryId: item.category?.id ?? '',
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
@@ -251,7 +287,7 @@ export function ProductInfoPanel({
       addItem({
         id: `${item.id}-${selectedSize}-${selectedColor}`,
         productId: item.id,
-        categoryId: item.category.id,
+        categoryId: item.category?.id ?? '',
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
@@ -275,6 +311,10 @@ export function ProductInfoPanel({
   };
 
   const handleBuyNow = () => {
+    if (externalBuyNow) {
+      externalBuyNow();
+      return;
+    }
     if (availableStock <= 0) {
       toast.error(t("outOfStockOption"));
       return;
@@ -309,13 +349,13 @@ export function ProductInfoPanel({
   const handleCompare = () => {
     try {
       if (isCompared) {
-        removeCompareProduct(item.id);
+        removeCompareProduct(item.id, (productType as any) || "SHOP");
         setIsCompared(false);
         toast.success(t("removedFromCompareToast"));
         return;
       }
 
-      addCompareProduct(item.id);
+      addCompareProduct(item.id, (productType as any) || "SHOP");
       setIsCompared(true);
       toast.success(t("addedToCompareToast"));
     } catch {
@@ -512,10 +552,11 @@ export function ProductInfoPanel({
             <button
               type="button"
               onClick={handleAddToCart}
-              className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed transition"
+              disabled={isAddingToCart}
+              className="flex-1 h-11 bg-primary text-white rounded-md font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary-pressed transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               <BsBag className="h-4 w-4" />
-              {t("addToCart")}
+              {isAddingToCart ? t("adding") ?? 'Adding...' : t("addToCart")}
             </button>
             <button
               type="button"
@@ -528,15 +569,15 @@ export function ProductInfoPanel({
         ) : (
           <button
             type="button"
-            onClick={handleNotifyMeToggle}
+            onClick={externalNotifyMe ?? handleNotifyMeToggle}
             disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
             className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${
-              isSubscribed
+              (isNotifySubscribed ?? isSubscribed)
                 ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
                 : "border-primary text-primary bg-transparent hover:bg-primary/5"
             }`}
           >
-            {isSubscribed ? (
+            {(isNotifySubscribed ?? isSubscribed) ? (
               <>
                 <Check className="h-4 w-4" />
                 {t("subscribedForRestock")}

@@ -69,6 +69,7 @@ export const useUpdateReview = (productId: string) => {
     mutationFn: updateReview,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
   });
 };
