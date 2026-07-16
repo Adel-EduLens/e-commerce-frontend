@@ -92,6 +92,9 @@ import traderHelpCenterAr from "./locales/ar/traderHelpCenter.json";
 import traderWholesaleCategoriesEn from "./locales/en/traderWholesaleCategories.json";
 import traderWholesaleCategoriesAr from "./locales/ar/traderWholesaleCategories.json";
 
+import traderFAQsEn from "./locales/en/traderFAQs.json";
+import traderFAQsAr from "./locales/ar/traderFAQs.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -128,6 +131,7 @@ i18n
         traderDesigns: traderDesignsEn,
         traderHelpCenter: traderHelpCenterEn,
         traderWholesaleCategories: traderWholesaleCategoriesEn,
+        traderFAQs: traderFAQsEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -160,6 +164,7 @@ i18n
         traderDesigns: traderDesignsAr,
         traderHelpCenter: traderHelpCenterAr,
         traderWholesaleCategories: traderWholesaleCategoriesAr,
+        traderFAQs: traderFAQsAr,
       },
     },
 

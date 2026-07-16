@@ -19,30 +19,14 @@ export const useUserHelpCenterVideos = (category: string) => {
   });
 };
 
-export const useAdminHelpCenterVideos = () => {
-  return useQuery<HelpVideo[]>({
-    queryKey: ['help-center', 'admin'],
-    queryFn: async () => {
-      const { data } = await api.get('/admin/help-center/video');
-      return data?.data || [];
-    },
-  });
-};
+
 
 export type HelpCenterCategory = {
   id: string;
   name: string;
 };
 
-export const useHelpCenterCategories = () => {
-  return useQuery<HelpCenterCategory[]>({
-    queryKey: ['help-center', 'admin', 'categories'],
-    queryFn: async () => {
-      const { data } = await api.get('/admin/help-center/category');
-      return data?.data || [];
-    },
-  });
-};
+
 
 export const useUserHelpCenterCategories = () => {
   return useQuery<HelpCenterCategory[]>({
