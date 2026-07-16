@@ -18,7 +18,7 @@ import type {
   RetailProductSize,
 } from "../types/retail";
 import type { DetailItem } from "../types/DetailItem";
-
+import { useTranslation } from "react-i18next";
 /** Safely convert a value to a finite number, defaulting to 0. */
 function toNumber(value: string | number | null | undefined): number {
   const n = Number(value);
@@ -72,7 +72,7 @@ export default function RetailProductDetailsPage() {
   const { data: product, isLoading, error } = useRetailProductById(id ?? "");
   const typedProduct = product as RetailProduct | null | undefined;
   const { data: reviews = [] } = useRetailReviews(id);
-
+  const { t } = useTranslation("retailDetailsPage");
   const notify = useRetailNotifyMe(user?.id);
   const addRetailProductToCart = useAddRetailProductToCart();
 
@@ -287,11 +287,11 @@ export default function RetailProductDetailsPage() {
 
         {/* Retail Extra Info */}
         <div className="mt-4 border-t border-stroke pt-8 text-sm text-foreground">
-          <h2 className="text-xl font-bold mb-6">Additional Information</h2>
+          <h2 className="text-xl font-bold mb-6">{t("additionalInformation")}</h2>
           <div className="grid gap-6 md:grid-cols-2">
             {typedProduct.sku && (
               <div>
-                <span className="font-semibold text-gray-text">SKU:</span>{" "}
+                <span className="font-semibold text-gray-text">{t("sku")}</span>{" "}
                 <span className="font-medium">{typedProduct.sku}</span>
               </div>
             )}
@@ -299,7 +299,7 @@ export default function RetailProductDetailsPage() {
               typedProduct.depositAmount !== null && (
                 <div>
                   <span className="font-semibold text-gray-text">
-                    Deposit Amount:
+                    {t("depositAmount")}
                   </span>{" "}
                   <span className="font-medium">
                     {typedProduct.depositAmount} EGP
@@ -310,7 +310,7 @@ export default function RetailProductDetailsPage() {
               typedProduct.securityDeposit !== null && (
                 <div>
                   <span className="font-semibold text-gray-text">
-                    Security Deposit:
+                    {t("securityDeposit")}
                   </span>{" "}
                   <span className="font-medium">
                     {typedProduct.securityDeposit} EGP
@@ -323,7 +323,7 @@ export default function RetailProductDetailsPage() {
             <div className="mt-8 space-y-6">
               {typedProduct.termsAndConditions && (
                 <div>
-                  <h3 className="text-lg font-bold mb-2">Terms & Conditions</h3>
+                  <h3 className="text-lg font-bold mb-2">{t("termsAndConditions")}</h3>
                   <p className="whitespace-pre-wrap text-gray-text leading-relaxed">
                     {typedProduct.termsAndConditions}
                   </p>
@@ -331,7 +331,7 @@ export default function RetailProductDetailsPage() {
               )}
               {typedProduct.privacyPolicy && (
                 <div>
-                  <h3 className="text-lg font-bold mb-2">Privacy Policy</h3>
+                  <h3 className="text-lg font-bold mb-2">{t("privacyPolicy")}</h3>
                   <p className="whitespace-pre-wrap text-gray-text leading-relaxed">
                     {typedProduct.privacyPolicy}
                   </p>

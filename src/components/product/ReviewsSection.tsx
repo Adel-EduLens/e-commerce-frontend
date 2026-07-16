@@ -37,21 +37,28 @@ const SORT_OPTIONS: {
   { label: "lowestRating", value: "lowest" },
 ];
 
-export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps) {
+export function ReviewsSection({
+  productType = "PRODUCT",
+}: ReviewsSectionProps) {
   const { id } = useParams();
   const { user } = useAuthStore();
 
-  const productReviewsQuery = useProductReviews(productType === "PRODUCT" ? id : undefined);
-  const retailReviewsQuery = useRetailReviews(productType === "RETAIL" ? id : undefined);
+  const productReviewsQuery = useProductReviews(
+    productType === "PRODUCT" ? id : undefined,
+  );
+  const retailReviewsQuery = useRetailReviews(
+    productType === "RETAIL" ? id : undefined,
+  );
 
-  const query = productType === "RETAIL" ? retailReviewsQuery : productReviewsQuery;
+  const query =
+    productType === "RETAIL" ? retailReviewsQuery : productReviewsQuery;
   const { data: reviews = [], isPending, isError } = query;
 
   const [filterValue, setFilterValue] = useState<ReviewFilterValue>("all");
   const [sortValue, setSortValue] = useState<ReviewSortValue>("newest");
   const [helpfulReviewIds, setHelpfulReviewIds] = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
-  
+
   // Pagination & Load More states
   const [pageSize, setPageSize] = useState(3);
 
@@ -122,7 +129,7 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
       .slice(0, imageCount)
       .map((imgId) => `https://picsum.photos/id/${imgId}/200/200`);
 
-  return (
+    return (
       <div
         key={review.id}
         className="flex w-full flex-col gap-4 rounded-2xl border border-stroke p-5 bg-card shadow-[0_2px_8px_-2px_rgba(0,0,0,0.04)] font-['Montserrat']"
@@ -149,7 +156,7 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
               setHelpfulReviewIds((current) =>
                 current.includes(review.id)
                   ? current.filter((id) => id !== review.id)
-                  : [...current, review.id]
+                  : [...current, review.id],
               )
             }
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
@@ -159,7 +166,9 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
             }`}
           >
             <ThumbsUp className="h-4 w-4" strokeWidth={2} />
-            <span>Helpful ({helpfulCount})</span>
+            <span>
+              {t("helpful")} {helpfulCount}
+            </span>
           </button>
         </div>
 
@@ -169,7 +178,7 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
             {Array.from({ length: 5 }).map((_, index) => {
               const fill = Math.min(
                 1,
-                Math.max(0, Number(review.rating) - index)
+                Math.max(0, Number(review.rating) - index),
               );
               return <Star key={index} fill={fill} size={14} />;
             })}
@@ -181,15 +190,22 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
 
         {/* Comment */}
         <p className="text-sm text-gray-text leading-relaxed">
-          {review.comment ?? "No comment provided."}
+          {review.comment ?? t("noCommentProvided")}{" "}
         </p>
 
         {/* Review Images */}
         {reviewImages.length > 0 && (
           <div className="flex gap-2 items-center mt-2 flex-wrap">
             {reviewImages.map((src, index) => (
-              <div key={index} className="h-16 w-16 overflow-hidden rounded-lg border border-stroke bg-gray-50 shrink-0">
-                <img src={src} alt="Review attachment" className="h-full w-full object-cover" />
+              <div
+                key={index}
+                className="h-16 w-16 overflow-hidden rounded-lg border border-stroke bg-gray-50 shrink-0"
+              >
+                <img
+                  src={src}
+                  alt={t("reviewAttachment")}
+                  className="h-full w-full object-cover"
+                />
               </div>
             ))}
           </div>
@@ -199,7 +215,11 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
   };
 
   if (isPending) {
-    return <div className="flex justify-center py-10 font-['Montserrat']">{t("loading")}</div>;
+    return (
+      <div className="flex justify-center py-10 font-['Montserrat']">
+        {t("loading")}
+      </div>
+    );
   }
   if (isError) {
     return (
@@ -214,17 +234,24 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-xl font-bold text-foreground">Reviews</h2>
+          <h2 className="text-xl font-bold text-foreground">{t("reviews")}</h2>
           {reviews.length > 0 && (
             <>
-              <span className="text-lg font-bold text-foreground">{averageRating}</span>
+              <span className="text-lg font-bold text-foreground">
+                {averageRating}
+              </span>
               <div className="flex">
                 {Array.from({ length: 5 }).map((_, index) => {
-                  const fill = Math.min(1, Math.max(0, Number(averageRating) - index));
+                  const fill = Math.min(
+                    1,
+                    Math.max(0, Number(averageRating) - index),
+                  );
                   return <Star key={index} fill={fill} size={16} />;
                 })}
               </div>
-              <span className="text-sm text-gray-text">({reviews.length} Reviews)</span>
+              <span className="text-sm text-gray-text">
+                ({reviews.length} {t("reviewsCount")})
+              </span>
             </>
           )}
           {reviews.length === 0 && (
@@ -257,7 +284,10 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
           {/* Filter & Sort row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="text-xs text-gray-text">
-              Showing {paginatedReviews.length} of {visibleReviews.length} reviews
+              {t("showingReviews", {
+                shown: paginatedReviews.length,
+                total: visibleReviews.length,
+              })}
             </div>
             <div className="flex items-center gap-2">
               <select
@@ -304,7 +334,7 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
                 onClick={() => setPageSize((prev) => prev + 3)}
                 className="rounded-md border border-stroke bg-card px-8 py-2.5 text-sm font-bold text-foreground hover:border-gray-text transition"
               >
-                View More
+                {t("viewMore")}
               </button>
             </div>
           )}
@@ -313,4 +343,3 @@ export function ReviewsSection({ productType = "PRODUCT" }: ReviewsSectionProps)
     </section>
   );
 }
-

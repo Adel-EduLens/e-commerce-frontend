@@ -245,10 +245,6 @@ export function ProductInfoPanel({
     }
     
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
-    if (isWholesale && minQty && quantity < minQty) {
-      toast.error(t("wholesaleMinCartQtyError", { totalQty: quantity, minQty }));
-      return;
-    }
 
     if (isWholesale && colorObj) {
       const sizesForSelectedColor = colorObj
@@ -420,6 +416,22 @@ export function ProductInfoPanel({
           </>
         )}
       </div>
+
+      {/* Retail Deposits */}
+      {isRetail && (rawProduct?.depositAmount !== undefined && rawProduct?.depositAmount !== null) && (
+        <div className="flex flex-col gap-1 mb-2 text-sm text-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-gray-text">{t("depositAmount")}</span>
+            <span className="font-bold">{rawProduct.depositAmount} {t("egp")}</span>
+          </div>
+          {rawProduct?.securityDeposit !== undefined && rawProduct?.securityDeposit !== null && (
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-gray-text">{t("securityDeposit")}</span>
+              <span className="font-bold">{rawProduct.securityDeposit} {t("egp")}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Brand */}
       {item.brandName && (

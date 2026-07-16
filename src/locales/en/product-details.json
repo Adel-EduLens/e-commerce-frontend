@@ -50,7 +50,7 @@
 
   "selectColor": "Select {{color}} color",
 
-  "helpful": "Helpful ({{count}})",
+  "helpful": "Helpful",
 
   "noComment": "No comment",
 
@@ -125,5 +125,13 @@
   "viewMore": "View More",
   "pleaseLoginFirst": "Please log in first",
   "addedToCartToast": "Added to cart",
-  "removedFromCartToast": "Removed from cart"
+  "removedFromCartToast": "Removed from cart",
+
+  "securityDeposit": "Security Deposit",
+  "depositAmount": "Deposit Amount",
+
+  "reviewsCount": "Reviews",
+  "showingReviews": "Showing {{shown}} of {{total}} reviews",
+  "noCommentProvided": "No comment provided.",
+  "reviewAttachment": "Review attachment"
 }

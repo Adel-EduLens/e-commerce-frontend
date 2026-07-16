@@ -523,7 +523,7 @@ export default function BagPage() {
             const { data } = await api.get(`/wholesales/${productId}`);
             productDetailsMap[productId] = { type: "WHOLESALE", data: data.data };
           } else if (isRetail) {
-            const { data } = await api.get(`/retail/products/${productId}`);
+            const { data } = await api.get(`/retail-products/${productId}`);
             productDetailsMap[productId] = { type: "RETAIL", data: data.data };
           } else {
             const { data } = await api.get(`/products/${productId}`);

@@ -250,6 +250,16 @@ body {
   min-height: 100vh;
 }
 
+select {
+  background-color: var(--card);
+  color: var(--foreground);
+}
+
+select option {
+  background-color: var(--card);
+  color: var(--foreground);
+}
+
 /* Custom Text Stroke for outline text */
 .text-outline {
   color: transparent;
