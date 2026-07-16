@@ -245,10 +245,6 @@ export function ProductInfoPanel({
     }
     
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
-    if (isWholesale && minQty && quantity < minQty) {
-      toast.error(t("wholesaleMinCartQtyError", { totalQty: quantity, minQty }));
-      return;
-    }
 
     if (isWholesale && colorObj) {
       const sizesForSelectedColor = colorObj
