@@ -596,7 +596,7 @@ export function AddItemModal({
                     0,
                   ) || ""
               }
-              className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
             />
           </div>
 
@@ -1581,7 +1581,7 @@ export function EditItemModal({
                       0,
                     ) || ""
               }
-              className="w-full rounded-xl border border-stroke bg-gray-50 px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
             />
           </div>
 
