@@ -4,7 +4,6 @@ import ProductsSection from "../components/shared/ProductsSection";
 import CategoriesSection from "../components/shared/CategorySection";
 import FaqSection from "../components/shared/FaqSection";
 import { asset } from "../lib/utils";
-
 function HeroOutlineFan() {
   const outlineRects = [
     { w: 'w-[1245.27px]', h: 'h-[1016.09px]', l: 'left-[956.49px]', t: 'top-[-31.55px]' },
@@ -72,7 +71,6 @@ function HeroBanner() {
 
 export default function RetailPage() {
   const [searchParams] = useSearchParams();
-
   const categoryId = searchParams.get("categoryId");
   const filterParam = searchParams.get("filter");
 
@@ -99,7 +97,7 @@ export default function RetailPage() {
     <div className="w-full pt-8 overflow-hidden">
       <HeroBanner />
       <ProductsSection
-        title="Featured Products"
+        title="featuredProducts"
         navigateTo="/retail?filter=featured"
         productType="RETAIL"
         query={{ filter: "featured" }}

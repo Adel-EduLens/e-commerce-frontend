@@ -50,7 +50,7 @@
 
   "selectColor": "اختر اللون {{color}}",
 
-  "helpful": "مفيد ({{count}})",
+  "helpful": "مفيد",
 
   "noComment": "لا يوجد تعليق",
 
@@ -125,5 +125,12 @@
   "viewMore": "عرض المزيد",
   "pleaseLoginFirst": "يرجى تسجيل الدخول أولاً",
   "addedToCartToast": "تمت الإضافة إلى العربة",
-  "removedFromCartToast": "تمت الإزالة من العربة"
+  "removedFromCartToast": "تمت الإزالة من العربة",
+  "securityDeposit": "التأمين",
+  "depositAmount": "قيمة العربون",
+
+  "reviewsCount": "تقييم",
+  "showingReviews": "عرض {{shown}} من أصل {{total}} تقييم",
+  "noCommentProvided": "لا يوجد تعليق.",
+  "reviewAttachment": "مرفق التقييم"
 }
