@@ -504,10 +504,10 @@ export default function ProductCard({
                       useWholesaleCard
                         ? isSelected
                           ? "border-foreground scale-110"
-                          : "border-transparent hover:border-gray-400"
+                          : "border-foreground/10 hover:border-gray-400"
                         : isSelected
                           ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
-                          : "hover:scale-105"
+                          : "hover:scale-105 border-foreground/50 border"
                     }`}
                     style={{
                       backgroundColor: colorToHex(c),
