@@ -112,6 +112,11 @@ const sidebarItems = [
     path: "/dashboard/trader/collections",
   },
   {
+    label: "influencers",
+    icon: "majesticons_users-line.svg",
+    path: "/dashboard/trader/influencers",
+  },
+  {
     label: "designs",
     icon: "vote.svg",
     path: "/dashboard/trader/designs",

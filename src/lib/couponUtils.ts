@@ -4,6 +4,7 @@ export type Coupon = {
   discount: number;
   categoryId?: string | number | null;
   productId?: string | number | null;
+  type?: "trader" | "influencer";
 };
 
 type CartItem = {

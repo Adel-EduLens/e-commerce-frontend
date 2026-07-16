@@ -143,24 +143,31 @@ function OrderSummary({
       );
       const coupon = data?.data;
       if (coupon) {
-        // Check if coupon actually applies to any item in cart
-        const appliesToCart = items.some(item => couponAppliesToItem(coupon, item));
+        // Influencer coupons apply to all items, trader coupons need category/product check
+        if (coupon.type === "influencer") {
+          // Influencer coupon — applies to entire cart, usage tracked at order creation
+          setAppliedCoupon(coupon);
+          toast.success(`Coupon "${coupon.code}" applied!`);
+        } else {
+          // Trader coupon — check if it applies to cart items
+          const appliesToCart = items.some(item => couponAppliesToItem(coupon, item));
 
-        if (!appliesToCart) {
-          setCouponError(
-            "This coupon does not apply to the items in your cart",
-          );
-          toast.error("This coupon does not apply to the items in your cart");
-          setAppliedCoupon(null);
-          return;
+          if (!appliesToCart) {
+            setCouponError(
+              "This coupon does not apply to the items in your cart",
+            );
+            toast.error("This coupon does not apply to the items in your cart");
+            setAppliedCoupon(null);
+            return;
+          }
+
+          // Apply and use the coupon immediately
+          const { data: useData } = await api.post(`/coupons/use/${coupon.code}`);
+          const updatedCoupon = useData?.data || coupon;
+
+          setAppliedCoupon(updatedCoupon);
+          toast.success(`Coupon "${updatedCoupon.code}" applied!`);
         }
-
-        // Apply and use the coupon immediately
-        const { data: useData } = await api.post(`/coupons/use/${coupon.code}`);
-        const updatedCoupon = useData?.data || coupon;
-
-        setAppliedCoupon(updatedCoupon);
-        toast.success(`Coupon "${updatedCoupon.code}" applied!`);
       } else {
         setCouponError("Invalid coupon code");
       }
@@ -771,6 +778,12 @@ export default function CheckoutPage() {
   const discountAmount = useMemo(() => {
     if (!appliedCoupon) return 0;
 
+    // Influencer coupons apply to entire cart
+    if (appliedCoupon.type === "influencer") {
+      return (subtotal * appliedCoupon.discount) / 100;
+    }
+
+    // Trader coupons apply to matching items only
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
     items.forEach((item) => {
@@ -785,7 +798,7 @@ export default function CheckoutPage() {
     }
 
     return (qualifyingSubtotal * appliedCoupon.discount) / 100;
-  }, [appliedCoupon, items]);
+  }, [appliedCoupon, items, subtotal]);
 
   if (isCartLoading || isAddressesLoading) {
     return <LoadingSpinner text="Preparing checkout..." containerClassName="h-[75vh]" className="h-12 w-12" />;

@@ -2,7 +2,7 @@ export interface User {
   id: string
   name?: string
   email?: string
-  role: 'user' | 'trader'
+  role: 'user' | 'trader' | 'influencer'
   avatar?: string
   phone?: string
   address?: string

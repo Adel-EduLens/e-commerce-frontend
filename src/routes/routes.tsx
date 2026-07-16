@@ -66,6 +66,13 @@ import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPa
 import TraderCollectionsPage from "../pages/dashboards/TraderCollectionsPage";
 import TraderBlankProductsPage from "../pages/dashboards/TraderBlankProductsPage";
 import RetailShopPage from "../pages/RetailShopPage";
+
+import InfluencerLoginPage from "../pages/InfluencerLoginPage";
+import InfluencerLayout from "../components/layout/InfluencerLayout";
+import InfluencerDashboard from "../pages/dashboards/InfluencerDashboard";
+import InfluencerCouponUsersPage from "../pages/dashboards/InfluencerCouponUsersPage";
+import InfluencerEarningsPage from "../pages/dashboards/InfluencerEarningsPage";
+import TraderInfluencersPage from "../pages/dashboards/TraderInfluencersPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -334,6 +341,10 @@ export const router = createBrowserRouter([
             element: <TraderCollectionsPage />,
           },
           {
+            path: "influencers",
+            element: <TraderInfluencersPage />,
+          },
+          {
             path: "inventory",
             element: <TraderInventoryPage />,
           },
@@ -376,6 +387,32 @@ export const router = createBrowserRouter([
           {
             path: "designs",
             element: <TraderDesignPage />,
+          },
+        ],
+      },
+      {
+        path: "influencer/login",
+        element: <InfluencerLoginPage />,
+      },
+      {
+        path: "dashboard/influencer",
+        element: (
+          <ProtectedRoute allowedRoles={["influencer"]}>
+            <InfluencerLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <InfluencerDashboard />,
+          },
+          {
+            path: "coupon-users",
+            element: <InfluencerCouponUsersPage />,
+          },
+          {
+            path: "earnings",
+            element: <InfluencerEarningsPage />,
           },
         ],
       },

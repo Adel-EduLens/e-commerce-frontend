@@ -4,10 +4,10 @@ import { useAuthStore } from '../store/useAuthStore'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  allowedRoles?: Array<'user' | 'trader'>
+  allowedRoles?: Array<'user' | 'trader' | 'influencer'>
 }
 
-type roles = 'user' | 'trader'
+type roles = 'user' | 'trader' | 'influencer'
 
 export default function ProtectedRoute({
   children,
