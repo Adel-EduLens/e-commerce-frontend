@@ -96,7 +96,7 @@ function SearchableSelect({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none"
+            className="absolute right-3 text-gray-text hover:text-foreground focus:outline-none"
           >
             <X className="h-4 w-4" />
           </button>
@@ -240,7 +240,7 @@ export default function TraderCouponsPage() {
         <button
           type="button"
           onClick={() => setIsCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer shadow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-['Montserrat'] text-sm font-bold rounded-2xl transition cursor-pointer shadow-sm"
         >
           <Plus className="h-5 w-5" style={{ strokeWidth: 3 }} />
           <span>{t("createCoupon")}</span>
@@ -424,7 +424,7 @@ export default function TraderCouponsPage() {
                   setIsModalOpen(false);
                   setSelectedCouponForModal(null);
                 }}
-                className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition"
+                className="p-2 hover:bg-gray-light rounded-full text-gray-text hover:text-foreground transition"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -564,7 +564,7 @@ export default function TraderCouponsPage() {
                 <button
                   type="submit"
                   disabled={createCouponMutation.isPending}
-                  className="flex-1 h-12 bg-secondary text-white hover:bg-black font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50 cursor-pointer"
+                  className="flex-1 h-12 bg-secondary text-secondary-foreground hover:bg-primary hover:text-primary-foreground font-['Montserrat'] text-sm font-bold rounded-2xl transition disabled:opacity-50 cursor-pointer"
                 >
                   {createCouponMutation.isPending ? t("creating") : t("createCoupon")}
                 </button>
