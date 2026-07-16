@@ -88,7 +88,7 @@ export default function InfluencerLayout() {
                 );
               })}
             </nav>
-            <div className="mt-4 space-y-4 shrink-0">
+            <div className="mt-auto space-y-4 shrink-0">
               <div className="rounded-[24px] bg-gray-50 dark:bg-white/5 p-3">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 ring-2 ring-stroke dark:ring-white/10">
