@@ -21,6 +21,28 @@ interface Influencer {
   } | null;
 }
 
+interface OrderItem {
+  title: string;
+  price: number;
+  quantity: number;
+  size: string | null;
+  color: string | null;
+  imageSrc: string | null;
+}
+
+interface CouponUser {
+  userId: number;
+  userName: string | null;
+  userEmail: string;
+  userPhone: string | null;
+  orderId: string;
+  orderTotal: number;
+  discountAmount: number;
+  commissionAmount: number;
+  orderItems: OrderItem[];
+  usedAt: string;
+}
+
 interface CreateForm {
   name: string;
   email: string;
@@ -58,6 +80,14 @@ export default function TraderInfluencersPage() {
     commissionPercent: "",
     isActive: true,
   });
+
+  // Coupon Users
+  const [couponUsers, setCouponUsers] = useState<CouponUser[]>([]);
+  const [couponUsersLoading, setCouponUsersLoading] = useState(false);
+  const [modalData, setModalData] = useState<CouponUser | null>(null);
+
+  // Detail tab
+  const [detailTab, setDetailTab] = useState<"info" | "coupon-users">("info");
 
   const loadInfluencers = () => {
     api
@@ -104,6 +134,8 @@ export default function TraderInfluencersPage() {
 
   const openDetail = async (id: number) => {
     setSelectedId(id);
+    setDetailTab("info");
+    setCouponUsers([]);
     try {
       const res = await api.get(`/trader/influencers/${id}`);
       setDetailData(res.data.data);
@@ -117,6 +149,25 @@ export default function TraderInfluencersPage() {
       }
     } catch {
       toast.error("Failed to load influencer details");
+    }
+  };
+
+  const loadCouponUsers = async (id: number) => {
+    setCouponUsersLoading(true);
+    try {
+      const res = await api.get(`/trader/influencers/${id}/coupon-users`);
+      setCouponUsers(res.data.data);
+    } catch {
+      toast.error("Failed to load coupon users");
+    } finally {
+      setCouponUsersLoading(false);
+    }
+  };
+
+  const handleTabChange = (tab: "info" | "coupon-users") => {
+    setDetailTab(tab);
+    if (tab === "coupon-users" && selectedId && couponUsers.length === 0) {
+      loadCouponUsers(selectedId);
     }
   };
 
@@ -138,17 +189,6 @@ export default function TraderInfluencersPage() {
     }
   };
 
-  const handleGenerateSettlements = async () => {
-    try {
-      const res = await api.post("/trader/influencers/settlements/generate");
-      toast.success(
-        `Settlements generated: ${res.data.data.settlementsCreated} created`
-      );
-    } catch (error) {
-      handleApiError(error, "Failed to generate settlements");
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -166,154 +206,354 @@ export default function TraderInfluencersPage() {
             setSelectedId(null);
             setDetailData(null);
             setEditCoupon(false);
+            setCouponUsers([]);
           }}
           className="text-sm text-primary hover:underline"
         >
           Back to list
         </button>
 
-        {/* Influencer Info */}
-        <div className="rounded-2xl border border-stroke bg-card p-6">
-          <h2 className="mb-4 font-['Montserrat'] text-lg font-semibold">
-            {detailData.influencer.name}
-          </h2>
-          <div className="grid gap-2 text-sm sm:grid-cols-2">
-            <p>
-              <span className="text-gray-text">Email:</span>{" "}
-              {detailData.influencer.email}
-            </p>
-            <p>
-              <span className="text-gray-text">Phone:</span>{" "}
-              {detailData.influencer.phone || "—"}
-            </p>
-            <p>
-              <span className="text-gray-text">Status:</span>{" "}
-              {detailData.influencer.status}
-            </p>
-          </div>
+        {/* Tabs */}
+        <div className="flex gap-2 border-b border-stroke">
+          <button
+            onClick={() => handleTabChange("info")}
+            className={`px-4 py-2.5 text-sm font-semibold transition border-b-2 ${
+              detailTab === "info"
+                ? "border-primary text-primary"
+                : "border-transparent text-gray-text hover:text-foreground"
+            }`}
+          >
+            Info & Coupon
+          </button>
+          <button
+            onClick={() => handleTabChange("coupon-users")}
+            className={`px-4 py-2.5 text-sm font-semibold transition border-b-2 ${
+              detailTab === "coupon-users"
+                ? "border-primary text-primary"
+                : "border-transparent text-gray-text hover:text-foreground"
+            }`}
+          >
+            Coupon Users
+          </button>
         </div>
 
-        {/* Coupon */}
-        {detailData.coupon && (
-          <div className="rounded-2xl border border-stroke bg-card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-['Montserrat'] text-lg font-semibold">
-                Coupon Settings
+        {detailTab === "info" && (
+          <>
+            {/* Influencer Info */}
+            <div className="rounded-2xl border border-stroke bg-card p-6">
+              <h2 className="mb-4 font-['Montserrat'] text-lg font-semibold">
+                {detailData.influencer.name}
               </h2>
-              <button
-                onClick={() => setEditCoupon(!editCoupon)}
-                className="flex items-center gap-1 text-sm text-primary hover:underline"
-              >
-                <Edit2 size={14} />
-                {editCoupon ? "Cancel" : "Edit"}
-              </button>
-            </div>
-
-            {editCoupon ? (
-              <div className="space-y-3">
-                <input
-                  placeholder="Coupon Code"
-                  value={couponForm.code}
-                  onChange={(e) =>
-                    setCouponForm({ ...couponForm, code: e.target.value })
-                  }
-                  className="w-full rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
-                />
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    type="number"
-                    placeholder="Discount %"
-                    value={couponForm.discountPercent}
-                    onChange={(e) =>
-                      setCouponForm({
-                        ...couponForm,
-                        discountPercent: e.target.value,
-                      })
-                    }
-                    className="rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Commission %"
-                    value={couponForm.commissionPercent}
-                    onChange={(e) =>
-                      setCouponForm({
-                        ...couponForm,
-                        commissionPercent: e.target.value,
-                      })
-                    }
-                    className="rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={couponForm.isActive}
-                    onChange={(e) =>
-                      setCouponForm({
-                        ...couponForm,
-                        isActive: e.target.checked,
-                      })
-                    }
-                  />
-                  Active
-                </label>
-                <button
-                  onClick={handleUpdateCoupon}
-                  className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground"
-                >
-                  Save Changes
-                </button>
-              </div>
-            ) : (
               <div className="grid gap-2 text-sm sm:grid-cols-2">
                 <p>
-                  <span className="text-gray-text">Code:</span>{" "}
-                  <span className="font-bold">{detailData.coupon.code}</span>
+                  <span className="text-gray-text">Email:</span>{" "}
+                  {detailData.influencer.email}
                 </p>
                 <p>
-                  <span className="text-gray-text">Discount:</span>{" "}
-                  {detailData.coupon.discountPercent}%
-                </p>
-                <p>
-                  <span className="text-gray-text">Commission:</span>{" "}
-                  {detailData.coupon.commissionPercent}%
+                  <span className="text-gray-text">Phone:</span>{" "}
+                  {detailData.influencer.phone || "—"}
                 </p>
                 <p>
                   <span className="text-gray-text">Status:</span>{" "}
-                  {detailData.coupon.isActive ? "Active" : "Inactive"}
+                  {detailData.influencer.status}
                 </p>
               </div>
+            </div>
+
+            {/* Coupon */}
+            {detailData.coupon && (
+              <div className="rounded-2xl border border-stroke bg-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-['Montserrat'] text-lg font-semibold">
+                    Coupon Settings
+                  </h2>
+                  <button
+                    onClick={() => setEditCoupon(!editCoupon)}
+                    className="flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    <Edit2 size={14} />
+                    {editCoupon ? "Cancel" : "Edit"}
+                  </button>
+                </div>
+
+                {editCoupon ? (
+                  <div className="space-y-3">
+                    <input
+                      placeholder="Coupon Code"
+                      value={couponForm.code}
+                      onChange={(e) =>
+                        setCouponForm({ ...couponForm, code: e.target.value })
+                      }
+                      className="w-full rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
+                    />
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <input
+                        type="number"
+                        placeholder="Discount %"
+                        value={couponForm.discountPercent}
+                        onChange={(e) =>
+                          setCouponForm({
+                            ...couponForm,
+                            discountPercent: e.target.value,
+                          })
+                        }
+                        className="rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Commission %"
+                        value={couponForm.commissionPercent}
+                        onChange={(e) =>
+                          setCouponForm({
+                            ...couponForm,
+                            commissionPercent: e.target.value,
+                          })
+                        }
+                        className="rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={couponForm.isActive}
+                        onChange={(e) =>
+                          setCouponForm({
+                            ...couponForm,
+                            isActive: e.target.checked,
+                          })
+                        }
+                      />
+                      Active
+                    </label>
+                    <button
+                      onClick={handleUpdateCoupon}
+                      className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid gap-2 text-sm sm:grid-cols-2">
+                    <p>
+                      <span className="text-gray-text">Code:</span>{" "}
+                      <span className="font-bold">{detailData.coupon.code}</span>
+                    </p>
+                    <p>
+                      <span className="text-gray-text">Discount:</span>{" "}
+                      {detailData.coupon.discountPercent}%
+                    </p>
+                    <p>
+                      <span className="text-gray-text">Commission:</span>{" "}
+                      {detailData.coupon.commissionPercent}%
+                    </p>
+                    <p>
+                      <span className="text-gray-text">Status:</span>{" "}
+                      {detailData.coupon.isActive ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
-          </div>
+
+            {/* Earnings Stats */}
+            {detailData.stats && (
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-2xl border border-stroke bg-card p-5">
+                  <p className="text-sm text-gray-text">Total Earnings</p>
+                  <p className="mt-1 text-xl font-bold text-green-600">
+                    EGP {detailData.stats.totalEarnings.toFixed(2)}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-stroke bg-card p-5">
+                  <p className="text-sm text-gray-text">Pending</p>
+                  <p className="mt-1 text-xl font-bold text-yellow-600">
+                    EGP {detailData.stats.pendingEarnings.toFixed(2)}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-stroke bg-card p-5">
+                  <p className="text-sm text-gray-text">Eligible</p>
+                  <p className="mt-1 text-xl font-bold text-blue-600">
+                    EGP {detailData.stats.eligibleEarnings.toFixed(2)}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-stroke bg-card p-5">
+                  <p className="text-sm text-gray-text">Settled</p>
+                  <p className="mt-1 text-xl font-bold text-gray-600">
+                    EGP {detailData.stats.settledEarnings.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        {/* Earnings Stats */}
-        {detailData.stats && (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-2xl border border-stroke bg-card p-5">
-              <p className="text-sm text-gray-text">Total Earnings</p>
-              <p className="mt-1 text-xl font-bold text-green-600">
-                EGP {detailData.stats.totalEarnings.toFixed(2)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stroke bg-card p-5">
-              <p className="text-sm text-gray-text">Pending</p>
-              <p className="mt-1 text-xl font-bold text-yellow-600">
-                EGP {detailData.stats.pendingEarnings.toFixed(2)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stroke bg-card p-5">
-              <p className="text-sm text-gray-text">Eligible</p>
-              <p className="mt-1 text-xl font-bold text-blue-600">
-                EGP {detailData.stats.eligibleEarnings.toFixed(2)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stroke bg-card p-5">
-              <p className="text-sm text-gray-text">Settled</p>
-              <p className="mt-1 text-xl font-bold text-gray-600">
-                EGP {detailData.stats.settledEarnings.toFixed(2)}
-              </p>
+        {detailTab === "coupon-users" && (
+          <>
+            {couponUsersLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              </div>
+            ) : couponUsers.length === 0 ? (
+              <div className="rounded-2xl border border-stroke bg-card p-10 text-center">
+                <p className="text-gray-text">No coupon users yet</p>
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-stroke bg-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm">
+                    <thead className="border-b border-stroke bg-gray-50 dark:bg-white/5">
+                      <tr>
+                        <th className="px-5 py-4 font-semibold text-gray-text">User</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Email</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Phone</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Order Total</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Discount</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Commission</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Date</th>
+                        <th className="px-5 py-4 font-semibold text-gray-text">Items</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {couponUsers.map((u) => (
+                        <tr
+                          key={u.orderId}
+                          className="border-b border-stroke last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition"
+                        >
+                          <td className="px-5 py-4 font-medium text-foreground">
+                            {u.userName || "—"}
+                          </td>
+                          <td className="px-5 py-4 text-gray-text">{u.userEmail}</td>
+                          <td className="px-5 py-4 text-gray-text">{u.userPhone || "—"}</td>
+                          <td className="px-5 py-4 text-foreground">
+                            EGP {u.orderTotal.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-4 text-red-500">
+                            -EGP {u.discountAmount.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-4 font-semibold text-green-600">
+                            +EGP {u.commissionAmount.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-4 text-gray-text">
+                            {new Date(u.usedAt).toLocaleDateString("en-US", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </td>
+                          <td className="px-5 py-4">
+                            <button
+                              onClick={() => setModalData(u)}
+                              className="rounded-lg border border-stroke p-2 transition hover:bg-gray-100 dark:hover:bg-white/5"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Order Items Modal */}
+        {modalData && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            onClick={() => setModalData(null)}
+          >
+            <div
+              className="w-full max-w-lg max-h-[80vh] overflow-y-auto rounded-2xl bg-card p-6 shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-['Montserrat'] text-lg font-semibold text-foreground">
+                  Order Products
+                </h3>
+                <button
+                  onClick={() => setModalData(null)}
+                  className="rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="mb-4 rounded-xl bg-gray-50 dark:bg-white/5 p-4 text-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <p>
+                    <span className="text-gray-text">User:</span>{" "}
+                    <span className="font-medium text-foreground">
+                      {modalData.userName || "—"}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-gray-text">Date:</span>{" "}
+                    <span className="text-foreground">
+                      {new Date(modalData.usedAt).toLocaleDateString("en-US", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-gray-text">Order Total:</span>{" "}
+                    <span className="text-foreground">
+                      EGP {modalData.orderTotal.toFixed(2)}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-gray-text">Discount:</span>{" "}
+                    <span className="text-red-500">
+                      -EGP {modalData.discountAmount.toFixed(2)}
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {modalData.orderItems.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 rounded-xl border border-stroke p-3"
+                  >
+                    {item.imageSrc ? (
+                      <img
+                        src={item.imageSrc}
+                        alt={item.title}
+                        className="h-14 w-14 rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/10">
+                        <span className="text-xs text-gray-text">No img</span>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground truncate">
+                        {item.title}
+                      </p>
+                      <div className="flex gap-3 text-xs text-gray-text mt-0.5">
+                        {item.size && <span>Size: {item.size}</span>}
+                        {item.color && <span>Color: {item.color}</span>}
+                        <span>Qty: {item.quantity}</span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-medium text-foreground">
+                        EGP {item.price.toFixed(2)}
+                      </p>
+                      {item.quantity > 1 && (
+                        <p className="text-xs text-gray-text">
+                          x{item.quantity} = EGP{" "}
+                          {(item.price * item.quantity).toFixed(2)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -328,21 +568,13 @@ export default function TraderInfluencersPage() {
         <h2 className="font-['Montserrat'] text-lg font-semibold text-foreground">
           Influencers
         </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={handleGenerateSettlements}
-            className="rounded-xl border border-stroke px-4 py-2.5 text-sm font-semibold text-foreground transition hover:bg-gray-100 dark:hover:bg-white/5"
-          >
-            Generate Settlements
-          </button>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-          >
-            <Plus size={16} />
-            Add Influencer
-          </button>
-        </div>
+        <button
+          onClick={() => setShowCreate(true)}
+          className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+        >
+          <Plus size={16} />
+          Add Influencer
+        </button>
       </div>
 
       {/* Create Modal */}
