@@ -10,8 +10,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const CreateYourDesignDetailPage = () => {
+  const { t } = useTranslation("createYourDesignDetailsPage");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: blankProduct, isLoading, error } = useBlankProduct(id ?? "");
@@ -89,7 +91,7 @@ const CreateYourDesignDetailPage = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-[80vh] w-full items-center justify-center bg-background text-foreground">
-        Loading designer...
+        {t("loadingDesigner")}
       </div>
     );
   }
@@ -97,12 +99,12 @@ const CreateYourDesignDetailPage = () => {
   if (error || !blankProduct) {
     return (
       <div className="flex min-h-[80vh] w-full flex-col items-center justify-center gap-4 bg-background text-danger">
-        <p>Failed to load the product.</p>
+        <p>{t("failedToLoadProduct")}</p>
         <button
           onClick={() => navigate("/createYourDesign")}
           className="underline"
         >
-          Go Back
+          {t("goBack")}
         </button>
       </div>
     );
@@ -159,7 +161,7 @@ const CreateYourDesignDetailPage = () => {
               >
                 <img
                   src={uploadedImage}
-                  alt="Your Design"
+                  alt={t("yourDesign")}
                   className="pointer-events-none h-full w-full object-contain"
                   draggable={false}
                 />
@@ -176,20 +178,20 @@ const CreateYourDesignDetailPage = () => {
               <ChevronLeft size={20} />
             </button>
             <span className="font-['Montserrat'] text-lg font-medium text-foreground">
-              Hood
+              {t("hood")}
             </span>
             <button className="text-gray-text transition-colors hover:text-foreground">
               <ChevronRight size={20} />
             </button>
             <button className="ml-auto rounded-xl border border-stroke px-4 py-2 text-sm text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
-              Menu
+              {t("menu")}
             </button>
           </div>
 
           {/* Color Section */}
           <div className="flex flex-col gap-4">
             <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
-              Color
+              {t("color")}
             </h3>
             <div className="flex flex-wrap gap-3">
               {blankProduct.colors?.map((colorObj) => (
@@ -212,7 +214,7 @@ const CreateYourDesignDetailPage = () => {
           {blankProduct.materials?.length > 0 && (
             <div className="flex flex-col gap-4">
               <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
-                Material
+                {t("material")}
               </h3>
               <div className="flex flex-wrap gap-3">
                 {blankProduct.materials.map((mat) => (
@@ -241,7 +243,7 @@ const CreateYourDesignDetailPage = () => {
             return (
               <div className="flex flex-col gap-4">
                 <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
-                  View
+                  {t("view")}
                 </h3>
 
                 <div className="flex flex-wrap gap-3">
@@ -265,12 +267,12 @@ const CreateYourDesignDetailPage = () => {
           {/* Print / Upload Section */}
           <div className="flex flex-col gap-4">
             <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
-              Print
+              {t("print")}
             </h3>
             <div className="flex gap-3">
               <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-stroke px-4 py-3 text-sm font-medium text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
                 <Upload size={18} />
-                Upload Your Own
+                {t("uploadYourOwn")}
                 <input
                   type="file"
                   accept="image/png, image/jpeg, image/svg+xml"
@@ -280,7 +282,7 @@ const CreateYourDesignDetailPage = () => {
               </label>
               <button className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-stroke px-4 py-3 text-sm font-medium text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
                 <LayoutGrid size={18} />
-                Browse Library
+                {t("browseLibrary")}
               </button>
             </div>
           </div>
@@ -288,7 +290,7 @@ const CreateYourDesignDetailPage = () => {
           {/* Bottom Actions */}
           <div className="mt-auto flex gap-4 pt-6">
             <button className="flex-1 rounded-xl bg-primary py-4 font-['Montserrat'] text-base font-semibold text-primary-foreground transition-all hover:opacity-90 hover:scale-[1.02]">
-              Done
+              {t("done")}
             </button>
             <button className="flex items-center justify-center rounded-xl border border-stroke px-5 text-gray-text transition-colors hover:bg-gray-light hover:text-foreground">
               <Share size={20} />

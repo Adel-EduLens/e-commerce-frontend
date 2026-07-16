@@ -92,8 +92,18 @@ import traderHelpCenterAr from "./locales/ar/traderHelpCenter.json";
 import traderWholesaleCategoriesEn from "./locales/en/traderWholesaleCategories.json";
 import traderWholesaleCategoriesAr from "./locales/ar/traderWholesaleCategories.json";
 
+
 import traderFAQsEn from "./locales/en/traderFAQs.json";
 import traderFAQsAr from "./locales/ar/traderFAQs.json";
+
+import uiEn from "./locales/en/ui.json";
+import uiAr from "./locales/ar/ui.json";
+
+import retailDetailsEn from "./locales/en/retail-detailspage.json";
+import retailDetailsAR from "./locales/ar/retail-detailspage.json";
+
+import createYourDesignDetailsPageEn from "./locales/en/createYourDesignDetailsPage.json";
+import createYourDesignDetailsPageAr from "./locales/ar/createYourDesignDetailsPage.json";
 
 i18n
   .use(LanguageDetector)
@@ -132,6 +142,9 @@ i18n
         traderHelpCenter: traderHelpCenterEn,
         traderWholesaleCategories: traderWholesaleCategoriesEn,
         traderFAQs: traderFAQsEn,
+        ui: uiEn,
+        retailDetailsPage: retailDetailsEn,
+        createYourDesignDetailsPage: createYourDesignDetailsPageEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -165,6 +178,9 @@ i18n
         traderHelpCenter: traderHelpCenterAr,
         traderWholesaleCategories: traderWholesaleCategoriesAr,
         traderFAQs: traderFAQsAr,
+        ui: uiAr,
+        retailDetailsPage: retailDetailsAR,
+        createYourDesignDetailsPage: createYourDesignDetailsPageAr,
       },
     },
 

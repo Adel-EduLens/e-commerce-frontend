@@ -421,6 +421,22 @@ export function ProductInfoPanel({
         )}
       </div>
 
+      {/* Retail Deposits */}
+      {isRetail && (rawProduct?.depositAmount !== undefined && rawProduct?.depositAmount !== null) && (
+        <div className="flex flex-col gap-1 mb-2 text-sm text-foreground">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-gray-text">{t("depositAmount")}</span>
+            <span className="font-bold">{rawProduct.depositAmount} {t("egp")}</span>
+          </div>
+          {rawProduct?.securityDeposit !== undefined && rawProduct?.securityDeposit !== null && (
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-gray-text">{t("securityDeposit")}</span>
+              <span className="font-bold">{rawProduct.securityDeposit} {t("egp")}</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Brand */}
       {item.brandName && (
         <div className="flex items-center gap-2 py-2 border-t border-b border-stroke">

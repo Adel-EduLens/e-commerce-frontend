@@ -3,7 +3,7 @@ import { useCategories, type Category } from "../../hooks/queries/categoriesQuer
 import { useRetailCategories } from "../../hooks/useRetailCategories";
 import type { RetailCategory } from "../../types/retail";
 import LoadingSpinner from "./LoadingSpinner";
-
+import { useTranslation } from "react-i18next";
 interface CategoriesSectionProps {
   isWholesale?: boolean;
   isRetail?: boolean;
@@ -12,9 +12,9 @@ interface CategoriesSectionProps {
 function CategoriesSection({ isWholesale = false, isRetail = false }: CategoriesSectionProps) {
   const { data: standardCategories = [], isLoading: isStandardLoading } = useCategories(isWholesale, { enabled: !isRetail });
   const { data: retailCategoriesResponse, isLoading: isRetailLoading } = useRetailCategories({ enabled: isRetail });
-
+  const { t } = useTranslation("ui");
   const isCategoriesLoading = isRetail ? isRetailLoading : isStandardLoading;
-  
+
   // Normalize retail categories response which might be wrapped
   let categories: (Category | RetailCategory)[] = standardCategories;
   if (isRetail) {
@@ -24,7 +24,7 @@ function CategoriesSection({ isWholesale = false, isRetail = false }: Categories
   return (
     <div className="mt-16 flex w-full flex-col items-center justify-start gap-10">
       <div className="self-stretch text-center font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        Explore Our Categories
+        {t("categoriesSection.title")}
       </div>
       <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {isCategoriesLoading && (
