@@ -15,6 +15,7 @@ import { api } from "../../lib/axios";
 import ImageCropModal, {
   validateImageDimensions,
 } from "../../components/trader/ImageCropModal";
+import type { AxiosError } from "axios";
 
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -166,7 +167,11 @@ export function RetailCategoryFormModal({
               onClick={handleSaveClick}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? t("uploading") : isSubmitting ? t("saving") : t("save")}
+              {uploading
+                ? t("uploading")
+                : isSubmitting
+                  ? t("saving")
+                  : t("save")}
             </button>
           </div>
         </div>
@@ -561,7 +566,9 @@ export function RetailCategoryTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">{t("of")} {filtered.length}</span>
+              <span className="text-gray-text">
+                {t("of")} {filtered.length}
+              </span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -652,9 +659,7 @@ export default function TraderRetailCategoriesPage() {
               toast.success(t("categoryCreated"));
             } catch (error) {
               toast.error(
-                error instanceof Error
-                  ? error.message
-                  : t("failedCreate"),
+                error instanceof Error ? error.message : t("failedCreate"),
               );
             }
           }}
@@ -674,9 +679,7 @@ export default function TraderRetailCategoriesPage() {
               toast.success(t("categoryUpdated"));
             } catch (error) {
               toast.error(
-                error instanceof Error
-                  ? error.message
-                  : t("failedUpdate"),
+                error instanceof Error ? error.message : t("failedUpdate"),
               );
             }
           }}
@@ -691,7 +694,10 @@ export default function TraderRetailCategoriesPage() {
         onDelete={(id) => {
           deleteCategory.mutate(id, {
             onSuccess: () => toast.success(t("categoryDeleted")),
-            onError: () => toast.error(t("failedDelete")),
+            onError: (error) => {
+              const err = error as AxiosError<{ message: string }>;
+              toast.error(err.response?.data?.message ?? err.message);
+            },
           });
         }}
       />

@@ -16,21 +16,21 @@ const sidebarItems = [
     icon: "fluent_building-retail-20-regular.svg",
     path: "/dashboard/trader/retail",
   },
-  {
-    label: "dropshipping",
-    icon: "streamline-flex_shipping-box-2.svg",
-    path: "/dashboard/trader/dropshipping",
-  },
+  // {
+  //   label: "dropshipping",
+  //   icon: "streamline-flex_shipping-box-2.svg",
+  //   path: "/dashboard/trader/dropshipping",
+  // },
   {
     label: "wholesale",
     icon: "system-uicons_boxes.svg",
     path: "/dashboard/trader/wholesale",
   },
-  {
-    label: "brandPartners",
-    icon: "mdi_partnership-outline.svg",
-    path: "/dashboard/trader/brand-partners",
-  },
+  // {
+  //   label: "brandPartners",
+  //   icon: "mdi_partnership-outline.svg",
+  //   path: "/dashboard/trader/brand-partners",
+  // },
   {
     label: "categories",
     icon: "carbon_category-2.svg",
@@ -42,25 +42,15 @@ const sidebarItems = [
     path: "/dashboard/trader/products",
   },
   {
-    label: "blankProduct",
-    icon: "streamline-ultimate_products-gifts.svg",
-    path: "/dashboard/trader/blank-products",
-  },
-  {
-    label: "Retail Products",
-    icon: "streamline-ultimate_products-gifts.svg",
-    path: "/dashboard/trader/retailProducts",
-  },
-  {
     label: "orders",
     icon: "carbon_follow-up-work-order.svg",
     path: "/dashboard/trader/orders",
   },
-  {
-    label: "inventory",
-    icon: "material-symbols_inventory.svg",
-    path: "/dashboard/trader/inventory",
-  },
+  // {
+  //   label: "inventory",
+  //   icon: "material-symbols_inventory.svg",
+  //   path: "/dashboard/trader/inventory",
+  // },
   {
     label: "customers",
     icon: "carbon_customer.svg",
