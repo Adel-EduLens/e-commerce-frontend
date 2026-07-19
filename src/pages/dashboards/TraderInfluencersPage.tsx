@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, X, Eye, Edit2 } from "lucide-react";
 import { api } from "../../lib/axios";
@@ -64,6 +65,7 @@ const emptyForm: CreateForm = {
 };
 
 export default function TraderInfluencersPage() {
+  const { t, i18n } = useTranslation("traderInfluencersPage");
   const [influencers, setInfluencers] = useState<Influencer[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -93,7 +95,7 @@ export default function TraderInfluencersPage() {
     api
       .get("/trader/influencers")
       .then((res) => setInfluencers(res.data.data))
-      .catch(() => toast.error("Failed to load influencers"))
+      .catch(() => toast.error(t("toast.loadError", "Failed to load influencers")))
       .finally(() => setLoading(false));
   };
 
@@ -110,12 +112,12 @@ export default function TraderInfluencersPage() {
         discountPercent: Number(form.discountPercent),
         commissionPercent: Number(form.commissionPercent),
       });
-      toast.success("Influencer created!");
+      toast.success(t("toast.created", "Influencer created!"));
       setShowCreate(false);
       setForm(emptyForm);
       loadInfluencers();
     } catch (error) {
-      handleApiError(error, "Failed to create influencer");
+      handleApiError(error, t("toast.createError", "Failed to create influencer"));
     } finally {
       setSubmitting(false);
     }
@@ -125,10 +127,17 @@ export default function TraderInfluencersPage() {
     const newStatus = inf.status === "active" ? "suspended" : "active";
     try {
       await api.patch(`/trader/influencers/${inf.id}`, { status: newStatus });
-      toast.success(`Influencer ${newStatus}`);
+      toast.success(
+        t("toast.statusUpdated", `Influencer ${newStatus}`, {
+          status:
+            newStatus === "active"
+              ? t("status.Active", "Active")
+              : t("status.Inactive", "Inactive"),
+        })
+      );
       loadInfluencers();
     } catch (error) {
-      handleApiError(error, "Failed to update status");
+      handleApiError(error, t("toast.updateStatusError", "Failed to update status"));
     }
   };
 
@@ -148,7 +157,7 @@ export default function TraderInfluencersPage() {
         });
       }
     } catch {
-      toast.error("Failed to load influencer details");
+      toast.error(t("toast.loadDetailsError", "Failed to load influencer details"));
     }
   };
 
@@ -158,7 +167,7 @@ export default function TraderInfluencersPage() {
       const res = await api.get(`/trader/influencers/${id}/coupon-users`);
       setCouponUsers(res.data.data);
     } catch {
-      toast.error("Failed to load coupon users");
+      toast.error(t("toast.loadCouponUsersError", "Failed to load coupon users"));
     } finally {
       setCouponUsersLoading(false);
     }
@@ -180,12 +189,12 @@ export default function TraderInfluencersPage() {
         commissionPercent: Number(couponForm.commissionPercent),
         isActive: couponForm.isActive,
       });
-      toast.success("Coupon updated!");
+      toast.success(t("toast.couponUpdated", "Coupon updated!"));
       setEditCoupon(false);
       openDetail(selectedId);
       loadInfluencers();
     } catch (error) {
-      handleApiError(error, "Failed to update coupon");
+      handleApiError(error, t("toast.updateCouponError", "Failed to update coupon"));
     }
   };
 
@@ -210,7 +219,7 @@ export default function TraderInfluencersPage() {
           }}
           className="text-sm text-primary hover:underline"
         >
-          Back to list
+          {t("backToList", "Back to list")}
         </button>
 
         {/* Tabs */}
@@ -223,7 +232,7 @@ export default function TraderInfluencersPage() {
                 : "border-transparent text-gray-text hover:text-foreground"
             }`}
           >
-            Info & Coupon
+            {t("tabs.info", "Info & Coupon")}
           </button>
           <button
             onClick={() => handleTabChange("coupon-users")}
@@ -233,7 +242,7 @@ export default function TraderInfluencersPage() {
                 : "border-transparent text-gray-text hover:text-foreground"
             }`}
           >
-            Coupon Users
+            {t("tabs.couponUsers", "Coupon Users")}
           </button>
         </div>
 
@@ -246,16 +255,16 @@ export default function TraderInfluencersPage() {
               </h2>
               <div className="grid gap-2 text-sm sm:grid-cols-2">
                 <p>
-                  <span className="text-gray-text">Email:</span>{" "}
+                  <span className="text-gray-text">{t("info.email", "Email:")}</span>{" "}
                   {detailData.influencer.email}
                 </p>
                 <p>
-                  <span className="text-gray-text">Phone:</span>{" "}
+                  <span className="text-gray-text">{t("info.phone", "Phone:")}</span>{" "}
                   {detailData.influencer.phone || "—"}
                 </p>
                 <p>
-                  <span className="text-gray-text">Status:</span>{" "}
-                  {detailData.influencer.status}
+                  <span className="text-gray-text">{t("info.status", "Status:")}</span>{" "}
+                  {t(`status.${detailData.influencer.status}` as any, detailData.influencer.status) as string}
                 </p>
               </div>
             </div>
@@ -265,21 +274,21 @@ export default function TraderInfluencersPage() {
               <div className="rounded-2xl border border-stroke bg-card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="font-['Montserrat'] text-lg font-semibold">
-                    Coupon Settings
+                    {t("coupon.title", "Coupon Settings")}
                   </h2>
                   <button
                     onClick={() => setEditCoupon(!editCoupon)}
                     className="flex items-center gap-1 text-sm text-primary hover:underline"
                   >
                     <Edit2 size={14} />
-                    {editCoupon ? "Cancel" : "Edit"}
+                    {editCoupon ? t("coupon.cancel", "Cancel") : t("coupon.edit", "Edit")}
                   </button>
                 </div>
 
                 {editCoupon ? (
                   <div className="space-y-3">
                     <input
-                      placeholder="Coupon Code"
+                      placeholder={t("coupon.placeholderCode", "Coupon Code")}
                       value={couponForm.code}
                       onChange={(e) =>
                         setCouponForm({ ...couponForm, code: e.target.value })
@@ -289,7 +298,7 @@ export default function TraderInfluencersPage() {
                     <div className="grid gap-3 sm:grid-cols-2">
                       <input
                         type="number"
-                        placeholder="Discount %"
+                        placeholder={t("coupon.placeholderDiscount", "Discount %")}
                         value={couponForm.discountPercent}
                         onChange={(e) =>
                           setCouponForm({
@@ -301,7 +310,7 @@ export default function TraderInfluencersPage() {
                       />
                       <input
                         type="number"
-                        placeholder="Commission %"
+                        placeholder={t("coupon.placeholderCommission", "Commission %")}
                         value={couponForm.commissionPercent}
                         onChange={(e) =>
                           setCouponForm({
@@ -323,32 +332,34 @@ export default function TraderInfluencersPage() {
                           })
                         }
                       />
-                      Active
+                      {t("coupon.active", "Active")}
                     </label>
                     <button
                       onClick={handleUpdateCoupon}
                       className="rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground"
                     >
-                      Save Changes
+                      {t("coupon.saveChanges", "Save Changes")}
                     </button>
                   </div>
                 ) : (
                   <div className="grid gap-2 text-sm sm:grid-cols-2">
                     <p>
-                      <span className="text-gray-text">Code:</span>{" "}
+                      <span className="text-gray-text">{t("info.code", "Code:")}</span>{" "}
                       <span className="font-bold">{detailData.coupon.code}</span>
                     </p>
                     <p>
-                      <span className="text-gray-text">Discount:</span>{" "}
+                      <span className="text-gray-text">{t("info.discount", "Discount:")}</span>{" "}
                       {detailData.coupon.discountPercent}%
                     </p>
                     <p>
-                      <span className="text-gray-text">Commission:</span>{" "}
+                      <span className="text-gray-text">{t("info.commission", "Commission:")}</span>{" "}
                       {detailData.coupon.commissionPercent}%
                     </p>
                     <p>
-                      <span className="text-gray-text">Status:</span>{" "}
-                      {detailData.coupon.isActive ? "Active" : "Inactive"}
+                      <span className="text-gray-text">{t("info.status", "Status:")}</span>{" "}
+                      {detailData.coupon.isActive
+                        ? (t("status.Active", "Active") as string)
+                        : (t("status.Inactive", "Inactive") as string)}
                     </p>
                   </div>
                 )}
@@ -359,25 +370,25 @@ export default function TraderInfluencersPage() {
             {detailData.stats && (
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-2xl border border-stroke bg-card p-5">
-                  <p className="text-sm text-gray-text">Total Earnings</p>
+                  <p className="text-sm text-gray-text">{t("stats.totalEarnings", "Total Earnings")}</p>
                   <p className="mt-1 text-xl font-bold text-green-600">
                     EGP {detailData.stats.totalEarnings.toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
-                  <p className="text-sm text-gray-text">Pending</p>
+                  <p className="text-sm text-gray-text">{t("stats.pending", "Pending")}</p>
                   <p className="mt-1 text-xl font-bold text-yellow-600">
                     EGP {detailData.stats.pendingEarnings.toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
-                  <p className="text-sm text-gray-text">Eligible</p>
+                  <p className="text-sm text-gray-text">{t("stats.eligible", "Eligible")}</p>
                   <p className="mt-1 text-xl font-bold text-blue-600">
                     EGP {detailData.stats.eligibleEarnings.toFixed(2)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
-                  <p className="text-sm text-gray-text">Settled</p>
+                  <p className="text-sm text-gray-text">{t("stats.settled", "Settled")}</p>
                   <p className="mt-1 text-xl font-bold text-gray-600">
                     EGP {detailData.stats.settledEarnings.toFixed(2)}
                   </p>
@@ -395,7 +406,7 @@ export default function TraderInfluencersPage() {
               </div>
             ) : couponUsers.length === 0 ? (
               <div className="rounded-2xl border border-stroke bg-card p-10 text-center">
-                <p className="text-gray-text">No coupon users yet</p>
+                <p className="text-gray-text">{t("couponUsers.noUsers", "No coupon users yet")}</p>
               </div>
             ) : (
               <div className="rounded-2xl border border-stroke bg-card overflow-hidden">
@@ -403,14 +414,14 @@ export default function TraderInfluencersPage() {
                   <table className="w-full text-left text-sm">
                     <thead>
                       <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
-                        <th className="px-5 py-4">User</th>
-                        <th className="px-5 py-4">Email</th>
-                        <th className="px-5 py-4">Phone</th>
-                        <th className="px-5 py-4">Order Total</th>
-                        <th className="px-5 py-4">Discount</th>
-                        <th className="px-5 py-4">Commission</th>
-                        <th className="px-5 py-4">Date</th>
-                        <th className="px-5 py-4">Items</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.user", "User")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.email", "Email")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.phone", "Phone")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.orderTotal", "Order Total")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.discount", "Discount")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.commission", "Commission")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.date", "Date")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.items", "Items")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -434,11 +445,14 @@ export default function TraderInfluencersPage() {
                             +EGP {u.commissionAmount.toFixed(2)}
                           </td>
                           <td className="px-5 py-4 text-gray-text">
-                            {new Date(u.usedAt).toLocaleDateString("en-US", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {new Date(u.usedAt).toLocaleDateString(
+                              i18n.language === "ar" ? "ar-EG" : "en-US",
+                              {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }
+                            )}
                           </td>
                           <td className="px-5 py-4">
                             <button
@@ -470,7 +484,7 @@ export default function TraderInfluencersPage() {
             >
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-['Montserrat'] text-lg font-semibold text-foreground">
-                  Order Products
+                  {t("modal.title", "Order Products")}
                 </h3>
                 <button
                   onClick={() => setModalData(null)}
@@ -483,29 +497,32 @@ export default function TraderInfluencersPage() {
               <div className="mb-4 rounded-xl bg-gray-50 dark:bg-white/5 p-4 text-sm">
                 <div className="grid grid-cols-2 gap-2">
                   <p>
-                    <span className="text-gray-text">User:</span>{" "}
+                    <span className="text-gray-text">{t("modal.user", "User:")}</span>{" "}
                     <span className="font-medium text-foreground">
                       {modalData.userName || "—"}
                     </span>
                   </p>
                   <p>
-                    <span className="text-gray-text">Date:</span>{" "}
+                    <span className="text-gray-text">{t("modal.date", "Date:")}</span>{" "}
                     <span className="text-foreground">
-                      {new Date(modalData.usedAt).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {new Date(modalData.usedAt).toLocaleDateString(
+                        i18n.language === "ar" ? "ar-EG" : "en-US",
+                        {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        }
+                      )}
                     </span>
                   </p>
                   <p>
-                    <span className="text-gray-text">Order Total:</span>{" "}
+                    <span className="text-gray-text">{t("modal.orderTotal", "Order Total:")}</span>{" "}
                     <span className="text-foreground">
                       EGP {modalData.orderTotal.toFixed(2)}
                     </span>
                   </p>
                   <p>
-                    <span className="text-gray-text">Discount:</span>{" "}
+                    <span className="text-gray-text">{t("modal.discount", "Discount:")}</span>{" "}
                     <span className="text-red-500">
                       -EGP {modalData.discountAmount.toFixed(2)}
                     </span>
@@ -527,7 +544,7 @@ export default function TraderInfluencersPage() {
                       />
                     ) : (
                       <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/10">
-                        <span className="text-xs text-gray-text">No img</span>
+                        <span className="text-xs text-gray-text">{t("modal.noImg", "No img")}</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
@@ -535,9 +552,9 @@ export default function TraderInfluencersPage() {
                         {item.title}
                       </p>
                       <div className="flex gap-3 text-xs text-gray-text mt-0.5">
-                        {item.size && <span>Size: {item.size}</span>}
-                        {item.color && <span>Color: {item.color}</span>}
-                        <span>Qty: {item.quantity}</span>
+                        {item.size && <span>{t("modal.size", "Size:")} {item.size}</span>}
+                        {item.color && <span>{t("modal.color", "Color:")} {item.color}</span>}
+                        <span>{t("modal.qty", "Qty:")} {item.quantity}</span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -566,14 +583,14 @@ export default function TraderInfluencersPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-['Montserrat'] text-lg font-semibold text-foreground">
-          Influencers
+          {t("title", "Influencers")}
         </h2>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
         >
           <Plus size={16} />
-          Add Influencer
+          {t("addBtn", "Add Influencer")}
         </button>
       </div>
 
@@ -583,7 +600,7 @@ export default function TraderInfluencersPage() {
           <div className="w-full max-w-md rounded-2xl bg-card p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-['Montserrat'] text-lg font-semibold">
-                Create Influencer
+                {t("create.title", "Create Influencer")}
               </h3>
               <button onClick={() => setShowCreate(false)}>
                 <X size={20} />
@@ -591,7 +608,7 @@ export default function TraderInfluencersPage() {
             </div>
             <form onSubmit={handleCreate} className="space-y-3">
               <input
-                placeholder="Name"
+                placeholder={t("create.name", "Name")}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
@@ -599,7 +616,7 @@ export default function TraderInfluencersPage() {
               />
               <input
                 type="email"
-                placeholder="Email"
+                placeholder={t("create.email", "Email")}
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 required
@@ -607,7 +624,7 @@ export default function TraderInfluencersPage() {
               />
               <input
                 type="password"
-                placeholder="Password"
+                placeholder={t("create.password", "Password")}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required
@@ -615,13 +632,13 @@ export default function TraderInfluencersPage() {
                 className="w-full rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
               />
               <input
-                placeholder="Phone (optional)"
+                placeholder={t("create.phone", "Phone (optional)")}
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 className="w-full rounded-xl border border-stroke bg-gray-light px-4 py-3 text-sm outline-none focus:border-primary"
               />
               <input
-                placeholder="Coupon Code (e.g. AHMED20)"
+                placeholder={t("create.couponCode", "Coupon Code (e.g. AHMED20)")}
                 value={form.couponCode}
                 onChange={(e) =>
                   setForm({ ...form, couponCode: e.target.value.toUpperCase() })
@@ -632,7 +649,7 @@ export default function TraderInfluencersPage() {
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="number"
-                  placeholder="Discount % (for users)"
+                  placeholder={t("create.discountPercent", "Discount % (for users)")}
                   value={form.discountPercent}
                   onChange={(e) =>
                     setForm({ ...form, discountPercent: e.target.value })
@@ -644,7 +661,7 @@ export default function TraderInfluencersPage() {
                 />
                 <input
                   type="number"
-                  placeholder="Commission % (for influencer)"
+                  placeholder={t("create.commissionPercent", "Commission % (for influencer)")}
                   value={form.commissionPercent}
                   onChange={(e) =>
                     setForm({ ...form, commissionPercent: e.target.value })
@@ -660,7 +677,9 @@ export default function TraderInfluencersPage() {
                 disabled={submitting}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
               >
-                {submitting ? "Creating..." : "Create Influencer"}
+                {submitting
+                  ? t("create.submitting", "Creating...")
+                  : t("create.submit", "Create Influencer")}
               </button>
             </form>
           </div>
@@ -671,37 +690,21 @@ export default function TraderInfluencersPage() {
       <div className="rounded-2xl border border-stroke bg-card overflow-hidden">
         {influencers.length === 0 ? (
           <div className="p-10 text-center text-gray-text">
-            No influencers yet
+            {t("noInfluencers", "No influencers yet")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
-                  <th className="px-5 py-4">
-                    Name
-                  </th>
-                  <th className="px-5 py-4">
-                    Email
-                  </th>
-                  <th className="px-5 py-4">
-                    Coupon
-                  </th>
-                  <th className="px-5 py-4">
-                    Discount
-                  </th>
-                  <th className="px-5 py-4">
-                    Commission
-                  </th>
-                  <th className="px-5 py-4">
-                    Uses
-                  </th>
-                  <th className="px-5 py-4">
-                    Status
-                  </th>
-                  <th className="px-5 py-4">
-                    Actions
-                  </th>
+                  <th className="px-5 py-4">{t("table.name", "Name")}</th>
+                  <th className="px-5 py-4">{t("table.email", "Email")}</th>
+                  <th className="px-5 py-4">{t("table.coupon", "Coupon")}</th>
+                  <th className="px-5 py-4">{t("table.discount", "Discount")}</th>
+                  <th className="px-5 py-4">{t("table.commission", "Commission")}</th>
+                  <th className="px-5 py-4">{t("table.uses", "Uses")}</th>
+                  <th className="px-5 py-4">{t("table.status", "Status")}</th>
+                  <th className="px-5 py-4">{t("table.actions", "Actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -735,7 +738,7 @@ export default function TraderInfluencersPage() {
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {inf.status}
+                        {t(`status.${inf.status}` as any, inf.status) as string}
                       </button>
                     </td>
                     <td className="px-5 py-4">

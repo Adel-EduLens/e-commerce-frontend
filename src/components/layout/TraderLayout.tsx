@@ -140,7 +140,8 @@ const sidebarItems = [
     label: "storeSettings",
     icon: "solar_settings-linear.svg",
     path: "/dashboard/trader/settings",
-  },
+  }
+
 ] as const;
 
 export default function TraderLayout() {
@@ -163,9 +164,9 @@ export default function TraderLayout() {
     .find((item) =>
       item.path === "/dashboard/trader"
         ? location.pathname === "/dashboard/trader" ||
-          location.pathname === "/dashboard/trader/"
+        location.pathname === "/dashboard/trader/"
         : location.pathname === item.path ||
-          location.pathname.startsWith(item.path + "/"),
+        location.pathname.startsWith(item.path + "/"),
     );
 
   const title = currentItem ? t(currentItem.label) : t("dashboard");
@@ -192,11 +193,10 @@ export default function TraderLayout() {
                     key={item.label}
                     type="button"
                     onClick={() => item.path && navigate(item.path)}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
-                      isActive
-                        ? "bg-primary text-primary-foreground"
-                        : "text-gray-text hover:bg-gray-100 dark:hover:bg-white/5 hover:text-foreground"
-                    }`}
+                    className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-text hover:bg-gray-100 dark:hover:bg-white/5 hover:text-foreground"
+                      }`}
                   >
                     <div
                       className="h-6 w-6 shrink-0"

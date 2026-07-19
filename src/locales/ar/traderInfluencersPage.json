@@ -1,0 +1,98 @@
+{
+  "title": "المؤثرون",
+  "addBtn": "إضافة مؤثر",
+  "backToList": "العودة إلى القائمة",
+  "loading": "جاري التحميل...",
+  "noInfluencers": "لا يوجد مؤثرون بعد",
+  "tabs": {
+    "info": "المعلومات والكوبون",
+    "couponUsers": "مستخدمو الكوبون"
+  },
+  "info": {
+    "email": "البريد الإلكتروني:",
+    "phone": "رقم الهاتف:",
+    "status": "الحالة:",
+    "code": "الكود:",
+    "discount": "الخصم:",
+    "commission": "العمولة:"
+  },
+  "status": {
+    "active": "نشط",
+    "suspended": "معلق",
+    "Active": "نشط",
+    "Inactive": "غير نشط"
+  },
+  "coupon": {
+    "title": "إعدادات الكوبون",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "placeholderCode": "كود الكوبون",
+    "placeholderDiscount": "نسبة الخصم %",
+    "placeholderCommission": "نسبة العمولة %",
+    "active": "نشط",
+    "saveChanges": "حفظ التغييرات"
+  },
+  "stats": {
+    "totalEarnings": "إجمالي الأرباح",
+    "pending": "قيد الانتظار",
+    "eligible": "متاح للسحب",
+    "settled": "تمت تسويته"
+  },
+  "couponUsers": {
+    "noUsers": "لا يوجد مستخدمون للكوبون بعد",
+    "table": {
+      "user": "المستخدم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "orderTotal": "إجمالي الطلب",
+      "discount": "الخصم",
+      "commission": "العمولة",
+      "date": "التاريخ",
+      "items": "المنتجات"
+    }
+  },
+  "modal": {
+    "title": "منتجات الطلب",
+    "user": "المستخدم:",
+    "date": "التاريخ:",
+    "orderTotal": "إجمالي الطلب:",
+    "discount": "الخصم:",
+    "noImg": "بدون صورة",
+    "size": "المقاس:",
+    "color": "اللون:",
+    "qty": "الكمية:"
+  },
+  "create": {
+    "title": "إنشاء حساب مؤثر",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "phone": "رقم الهاتف (اختياري)",
+    "couponCode": "كود الكوبون (مثال: AHMED20)",
+    "discountPercent": "نسبة الخصم % (للمستخدمين)",
+    "commissionPercent": "نسبة العمولة % (للمؤثر)",
+    "submit": "إنشاء المؤثر",
+    "submitting": "جاري الإنشاء..."
+  },
+  "table": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "coupon": "الكوبون",
+    "discount": "الخصم",
+    "commission": "العمولة",
+    "uses": "الاستخدامات",
+    "status": "الحالة",
+    "actions": "الإجراءات"
+  },
+  "toast": {
+    "loadError": "فشل في تحميل المؤثرين",
+    "created": "تم إنشاء المؤثر بنجاح!",
+    "createError": "فشل في إنشاء المؤثر",
+    "statusUpdated": "تم تغيير حالة المؤثر إلى {{status}}",
+    "updateStatusError": "فشل في تحديث الحالة",
+    "loadDetailsError": "فشل في تحميل تفاصيل المؤثر",
+    "loadCouponUsersError": "فشل في تحميل مستخدمي الكوبون",
+    "couponUpdated": "تم تحديث الكوبون بنجاح!",
+    "updateCouponError": "فشل في تحديث الكوبون"
+  }
+}

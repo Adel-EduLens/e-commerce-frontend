@@ -1,0 +1,98 @@
+{
+  "title": "Influencers",
+  "addBtn": "Add Influencer",
+  "backToList": "Back to list",
+  "loading": "Loading...",
+  "noInfluencers": "No influencers yet",
+  "tabs": {
+    "info": "Info & Coupon",
+    "couponUsers": "Coupon Users"
+  },
+  "info": {
+    "email": "Email:",
+    "phone": "Phone:",
+    "status": "Status:",
+    "code": "Code:",
+    "discount": "Discount:",
+    "commission": "Commission:"
+  },
+  "status": {
+    "active": "active",
+    "suspended": "suspended",
+    "Active": "Active",
+    "Inactive": "Inactive"
+  },
+  "coupon": {
+    "title": "Coupon Settings",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "placeholderCode": "Coupon Code",
+    "placeholderDiscount": "Discount %",
+    "placeholderCommission": "Commission %",
+    "active": "Active",
+    "saveChanges": "Save Changes"
+  },
+  "stats": {
+    "totalEarnings": "Total Earnings",
+    "pending": "Pending",
+    "eligible": "Eligible",
+    "settled": "Settled"
+  },
+  "couponUsers": {
+    "noUsers": "No coupon users yet",
+    "table": {
+      "user": "User",
+      "email": "Email",
+      "phone": "Phone",
+      "orderTotal": "Order Total",
+      "discount": "Discount",
+      "commission": "Commission",
+      "date": "Date",
+      "items": "Items"
+    }
+  },
+  "modal": {
+    "title": "Order Products",
+    "user": "User:",
+    "date": "Date:",
+    "orderTotal": "Order Total:",
+    "discount": "Discount:",
+    "noImg": "No img",
+    "size": "Size:",
+    "color": "Color:",
+    "qty": "Qty:"
+  },
+  "create": {
+    "title": "Create Influencer",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone (optional)",
+    "couponCode": "Coupon Code (e.g. AHMED20)",
+    "discountPercent": "Discount % (for users)",
+    "commissionPercent": "Commission % (for influencer)",
+    "submit": "Create Influencer",
+    "submitting": "Creating..."
+  },
+  "table": {
+    "name": "Name",
+    "email": "Email",
+    "coupon": "Coupon",
+    "discount": "Discount",
+    "commission": "Commission",
+    "uses": "Uses",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "toast": {
+    "loadError": "Failed to load influencers",
+    "created": "Influencer created!",
+    "createError": "Failed to create influencer",
+    "statusUpdated": "Influencer {{status}}",
+    "updateStatusError": "Failed to update status",
+    "loadDetailsError": "Failed to load influencer details",
+    "loadCouponUsersError": "Failed to load coupon users",
+    "couponUpdated": "Coupon updated!",
+    "updateCouponError": "Failed to update coupon"
+  }
+}
