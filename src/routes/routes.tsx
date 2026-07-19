@@ -6,11 +6,14 @@ import HomePage from "../pages/HomePage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import MenCollectionPage from "../pages/MenCollectionPage";
 import BagPage from "../pages/BagPage";
+import WholesaleBagPage from "../pages/WholesaleBagPage";
 import ContactDetailsPage from "../pages/ContactDetailsPage";
 import NotificationsPage from "../pages/NotificationsPage";
 import NotifyMeListPage from "../pages/NotifyMeListPage";
 import SettingsPage from "../pages/SettingsPage";
 import AuthPage from "../pages/AuthPage";
+import WholesaleCheckoutPage from "../pages/WholesaleCheckoutPage";
+
 
 import TraderDashboard from "../pages/dashboards/TraderDashboard";
 import TraderProductsPage from "../pages/dashboards/TraderProductsPage";
@@ -176,6 +179,14 @@ export const router = createBrowserRouter([
         element: (
           <UserLayout>
             <BagPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "wholesale-bag",
+        element: (
+          <UserLayout>
+            <WholesaleBagPage />
           </UserLayout>
         ),
       },
@@ -427,6 +438,16 @@ export const router = createBrowserRouter([
           <ProtectedRoute>
             <UserLayout>
               <CheckoutPage />
+            </UserLayout>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "wholesale-checkout",
+        element: (
+          <ProtectedRoute>
+            <UserLayout>
+              <WholesaleCheckoutPage />
             </UserLayout>
           </ProtectedRoute>
         ),

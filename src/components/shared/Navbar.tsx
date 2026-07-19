@@ -1,8 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bell, Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
+import { Bell, Heart, Menu, Package, Search, ShoppingBag, User, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useCartStore } from "../../store/useCartStore";
+import { useWholesaleCartCount } from "../../store/useWholesaleCartStore";
 import { useTranslation } from "react-i18next";
 import { asset } from "../../lib/utils";
 import { Scale } from "lucide-react";
@@ -180,6 +181,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const items = useCartStore((state) => state.items);
   const itemCount = items.length;
+  const wholesaleCartCount = useWholesaleCartCount();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Fetch/sync cart when user is authenticated
@@ -288,6 +290,22 @@ export default function Navbar() {
               {itemCount > 0 && (
                 <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
                   {itemCount}
+                </span>
+              )}
+            </Link>
+
+            <Link
+              to="/wholesale-bag"
+              title="Wholesale Cart"
+              className="relative flex shrink-0 items-center justify-center mr-2.5 md:mr-0"
+            >
+              <Package
+                className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors"
+                strokeWidth={1.5}
+              />
+              {wholesaleCartCount > 0 && (
+                <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-primary text-[10px] font-bold text-white">
+                  {wholesaleCartCount}
                 </span>
               )}
             </Link>

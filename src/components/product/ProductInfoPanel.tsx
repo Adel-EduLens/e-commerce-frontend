@@ -7,6 +7,7 @@ import { BsBag } from "react-icons/bs";
 import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/useCartStore";
+import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
@@ -61,6 +62,7 @@ export function ProductInfoPanel({
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
+  const addWholesaleItem = useWholesaleCartStore((state) => state.addItem);
   const queryClient = useQueryClient();
 
   const { data: wishlistStatus } = useWishlistStatus(productType, item.id);
@@ -253,7 +255,7 @@ export function ProductInfoPanel({
 
       const cartItemId = `${item.id}-${selectedColor.toLowerCase()}-wholesale`;
 
-      addItem({
+      addWholesaleItem({
         id: cartItemId,
         productId: String(item.id),
         categoryId: item.category?.id ? String(item.category.id) : undefined,
@@ -270,10 +272,10 @@ export function ProductInfoPanel({
         quantity,
         minOrder: minQty,
         productType: "WHOLESALE",
-      }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ["wholesale"] });
-        queryClient.invalidateQueries({ queryKey: ["wholesales"] });
       });
+
+      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
 
       toast.success(
         t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
@@ -335,10 +337,14 @@ export function ProductInfoPanel({
       return;
     }
 
-    // Calculate total quantity of this product in the cart after adding this item
-    const currentCartQty = useCartStore.getState().items
-      .filter((cartItem) => cartItem.productId === item.id)
-      .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+    // Calculate total quantity of this product in the wholesale cart after adding this item
+    const currentCartQty = isWholesale
+      ? useWholesaleCartStore.getState().items
+          .filter((cartItem) => cartItem.productId === String(item.id))
+          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
+      : useCartStore.getState().items
+          .filter((cartItem) => cartItem.productId === String(item.id))
+          .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
     const newTotalQty = currentCartQty + quantity;
 
     if (isWholesale && newTotalQty < minQty) {
@@ -348,7 +354,7 @@ export function ProductInfoPanel({
     }
 
     handleAddToCart();
-    navigate("/checkout");
+    navigate(isWholesale ? "/wholesale-bag" : "/checkout");
   };
 
   const handleCompare = () => {

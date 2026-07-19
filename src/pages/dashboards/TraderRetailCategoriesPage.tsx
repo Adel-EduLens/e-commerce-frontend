@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { asset } from "../../components/trader/inventoryUtils";
 import { LoadingSpinner } from "../../components/shared";
+import { Toggle } from "../../components/ui/toggle";
 import { toast } from "sonner";
 import {
   useRetailCategories,
@@ -23,7 +25,6 @@ const uploadImageFile = async (file: File): Promise<string> => {
   return data.data.url;
 };
 
-
 // --- Retail Category Modal ---
 export function RetailCategoryFormModal({
   category,
@@ -32,12 +33,17 @@ export function RetailCategoryFormModal({
 }: {
   category?: RetailCategory;
   onClose: () => void;
-  onSave: (data: Partial<RetailCategory> | FormData | Record<string, unknown>) => Promise<void>;
+  onSave: (
+    data: Partial<RetailCategory> | FormData | Record<string, unknown>,
+  ) => Promise<void>;
 }) {
+  const { t } = useTranslation("traderRetailCategories");
   const [name, setName] = useState(category?.name || "");
   const [image, setImage] = useState(category?.image || "");
-  const [appearOnHome, setAppearOnHome] = useState(category?.appearOnHome ?? false);
-  
+  const [appearOnHome, setAppearOnHome] = useState(
+    category?.appearOnHome ?? false,
+  );
+
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,8 +68,8 @@ export function RetailCategoryFormModal({
       const url = await uploadImageFile(file);
       setImage(url);
     } catch (err) {
-
-      alert("Failed to upload image");
+      toast.error("Failed to upload image");
+      console.error("Failed to upload image", err);
     } finally {
       setUploading(false);
       setCropSrc(null);
@@ -84,7 +90,7 @@ export function RetailCategoryFormModal({
       <div className="w-full max-w-md rounded-2xl bg-card shadow-xl max-h-[90vh] flex flex-col border border-stroke">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {category ? "Edit Retail Category" : "Add Retail Category"}
+            {category ? t("editRetailCategory") : t("addRetailCategory")}
           </h2>
           <button
             type="button"
@@ -98,10 +104,10 @@ export function RetailCategoryFormModal({
         <div className="flex flex-col gap-4 p-5 overflow-y-auto">
           <div>
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground mb-1">
-              Category Name *
+              {t("categoryNameRequired")}
             </label>
             <input
-              placeholder="Enter category name"
+              placeholder={t("enterCategoryName")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background"
@@ -110,27 +116,23 @@ export function RetailCategoryFormModal({
 
           <div className="flex justify-between items-center">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Appear on Home
+              {t("appearOnHome")}
             </label>
-            <button
-              type="button"
-              onClick={() => setAppearOnHome(!appearOnHome)}
-              aria-label={appearOnHome ? `disable appear on home` : `enable appear on home`}
-              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                appearOnHome ? "bg-primary" : "bg-stroke"
-              }`}
-            >
-              <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                  appearOnHome ? "translate-x-5" : "translate-x-0.5"
-                }`}
-              />
-            </button>
+            <Toggle
+              size="sm"
+              checked={appearOnHome}
+              onChange={setAppearOnHome}
+              aria-label={
+                appearOnHome
+                  ? `disable appear on home`
+                  : `enable appear on home`
+              }
+            />
           </div>
 
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Category Image
+              {t("categoryImage")}
             </label>
             <input
               type="file"
@@ -156,7 +158,7 @@ export function RetailCategoryFormModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background bg-card"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button"
@@ -164,7 +166,7 @@ export function RetailCategoryFormModal({
               onClick={handleSaveClick}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : isSubmitting ? "Saving..." : "Save"}
+              {uploading ? t("uploading") : isSubmitting ? t("saving") : t("save")}
             </button>
           </div>
         </div>
@@ -198,6 +200,7 @@ export function RetailCategoryTablePanel({
   onEdit,
   onDelete,
 }: RetailCategoryTablePanelProps) {
+  const { t } = useTranslation("traderRetailCategories");
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [page, setPage] = useState(1);
@@ -243,7 +246,7 @@ export function RetailCategoryTablePanel({
           />
           <input
             type="text"
-            placeholder="Search Categories"
+            placeholder={t("search")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -258,7 +261,7 @@ export function RetailCategoryTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Category
+          {t("addRetailCategory")}
         </button>
       </div>
 
@@ -266,7 +269,7 @@ export function RetailCategoryTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Retail Categories Table
+              {t("retailCategoriesTable")}
             </h2>
 
             <div className="relative">
@@ -282,20 +285,22 @@ export function RetailCategoryTablePanel({
                     : "border-stroke bg-card text-foreground hover:bg-background"
                 }`}
               >
-                Sort by
+                {t("sortBy")}
                 <img
                   className={`h-4 w-4 transition-transform ${openFilter === "sort" ? "-rotate-90" : "rotate-90"}`}
                   src={asset("weui_arrow-outlined.svg")}
                   alt=""
-                  style={{ filter: sortBy !== "none" ? "brightness(0) invert(1)" : "" }}
+                  style={{
+                    filter: sortBy !== "none" ? "brightness(0) invert(1)" : "",
+                  }}
                 />
               </button>
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-card shadow-lg py-1">
                   {[
-                    { value: "none", label: "No sort" },
-                    { value: "name-asc", label: "Name: A → Z" },
-                    { value: "name-desc", label: "Name: Z → A" },
+                    { value: "none", label: t("none") },
+                    { value: "name-asc", label: t("nameAsc") },
+                    { value: "name-desc", label: t("nameDesc") },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -306,7 +311,9 @@ export function RetailCategoryTablePanel({
                         setPage(1);
                       }}
                       className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium transition hover:bg-background ${
-                        sortBy === opt.value ? "text-primary" : "text-foreground"
+                        sortBy === opt.value
+                          ? "text-primary"
+                          : "text-foreground"
                       }`}
                     >
                       {opt.label}
@@ -336,7 +343,7 @@ export function RetailCategoryTablePanel({
                     viewMode === "table" ? "text-foreground" : "text-gray-text"
                   }`}
                 >
-                  Tables
+                  {t("tables")}
                 </span>
               </button>
               <button
@@ -356,7 +363,7 @@ export function RetailCategoryTablePanel({
                     viewMode === "cards" ? "text-foreground" : "text-gray-text"
                   }`}
                 >
-                  Cards
+                  {t("cards")}
                 </span>
               </button>
             </div>
@@ -364,11 +371,15 @@ export function RetailCategoryTablePanel({
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading categories..." containerClassName="py-20" className="h-8 w-8" />
+          <LoadingSpinner
+            text={t("loadingCategories")}
+            containerClassName="py-20"
+            className="h-8 w-8"
+          />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              No retail categories found.
+              {t("noCategoriesFound")}
             </p>
           </div>
         ) : viewMode === "cards" ? (
@@ -386,7 +397,9 @@ export function RetailCategoryTablePanel({
                       alt=""
                     />
                   ) : (
-                    <div className="h-full w-full bg-background flex items-center justify-center text-gray-text">No Image</div>
+                    <div className="h-full w-full bg-background flex items-center justify-center text-gray-text">
+                      {t("noImage")}
+                    </div>
                   )}
                 </div>
                 <div className="flex flex-col gap-2 p-3">
@@ -395,7 +408,7 @@ export function RetailCategoryTablePanel({
                   </p>
                   {c.appearOnHome && (
                     <p className="font-['Montserrat'] text-xs text-primary mb-2">
-                      Appears on Home
+                      {t("appearOnHome")}
                     </p>
                   )}
                   <div className="flex items-center justify-between pt-2 border-t border-stroke">
@@ -405,14 +418,22 @@ export function RetailCategoryTablePanel({
                         onClick={() => onEdit(c)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-card transition hover:bg-background"
                       >
-                        <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="" />
+                        <img
+                          className="h-4 w-4"
+                          src={asset("mynaui_edit.svg")}
+                          alt=""
+                        />
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeleteId(c.id)}
                         className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke bg-card transition hover:bg-background hover:text-error"
                       >
-                        <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="" />
+                        <img
+                          className="h-4 w-4"
+                          src={asset("material-symbols_delete-outline.svg")}
+                          alt=""
+                        />
                       </button>
                     </div>
                   </div>
@@ -426,16 +447,16 @@ export function RetailCategoryTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Image
+                    {t("image")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Name
+                    {t("name")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Home
+                    {t("appearOnHome")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -460,7 +481,7 @@ export function RetailCategoryTablePanel({
                       {c.name}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                      {c.appearOnHome ? "Yes" : "No"}
+                      {c.appearOnHome ? t("yes") : t("no")}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-1.5">
@@ -469,14 +490,22 @@ export function RetailCategoryTablePanel({
                           onClick={() => onEdit(c)}
                           className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-card transition hover:bg-background"
                         >
-                          <img className="h-4 w-4" src={asset("mynaui_edit.svg")} alt="" />
+                          <img
+                            className="h-4 w-4"
+                            src={asset("mynaui_edit.svg")}
+                            alt=""
+                          />
                         </button>
                         <button
                           type="button"
                           onClick={() => setDeleteId(c.id)}
                           className="flex h-7 w-7 items-center justify-center rounded-full border border-stroke bg-card transition hover:bg-background text-error"
                         >
-                          <img className="h-4 w-4" src={asset("material-symbols_delete-outline.svg")} alt="" />
+                          <img
+                            className="h-4 w-4"
+                            src={asset("material-symbols_delete-outline.svg")}
+                            alt=""
+                          />
                         </button>
                       </div>
                     </td>
@@ -497,7 +526,7 @@ export function RetailCategoryTablePanel({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
+              {t("perPage", { count: itemsPerPage })}
               <img
                 className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
                 src={asset("weui_arrow-outlined.svg")}
@@ -519,7 +548,7 @@ export function RetailCategoryTablePanel({
                       itemsPerPage === size ? "text-primary" : "text-foreground"
                     }`}
                   >
-                    {size} per page
+                    {t("perPage", { count: size })}
                   </button>
                 ))}
               </div>
@@ -532,7 +561,7 @@ export function RetailCategoryTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              <span className="text-gray-text">{t("of")} {filtered.length}</span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -541,7 +570,11 @@ export function RetailCategoryTablePanel({
               disabled={safePage === 1}
               className="flex h-5 w-5 items-center justify-center disabled:opacity-40"
             >
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="" />
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt=""
+              />
             </button>
             <button
               type="button"
@@ -549,7 +582,11 @@ export function RetailCategoryTablePanel({
               disabled={safePage === totalPages}
               className="flex h-5 w-5 rotate-180 items-center justify-center disabled:opacity-40"
             >
-              <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Next" />
+              <img
+                className="h-3 w-2"
+                src={asset("weui_arrow-filled.svg")}
+                alt="Next"
+              />
             </button>
           </div>
         </div>
@@ -559,10 +596,10 @@ export function RetailCategoryTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-card p-6 space-y-4 shadow-xl border border-stroke">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Category
+              {t("deleteCategory")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Are you sure you want to delete this category? This action cannot be undone.
+              {t("deleteConfirmation")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -570,7 +607,7 @@ export function RetailCategoryTablePanel({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-card hover:bg-background transition"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -580,7 +617,7 @@ export function RetailCategoryTablePanel({
                 }}
                 className="flex-1 rounded-xl bg-error py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:opacity-90"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>
@@ -592,6 +629,7 @@ export function RetailCategoryTablePanel({
 
 // --- Main Page Component ---
 export default function TraderRetailCategoriesPage() {
+  const { t } = useTranslation("traderRetailCategories");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editCategory, setEditCategory] = useState<RetailCategory | null>(null);
 
@@ -611,10 +649,12 @@ export default function TraderRetailCategoriesPage() {
             try {
               await createCategory.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Retail category created successfully");
+              toast.success(t("categoryCreated"));
             } catch (error) {
               toast.error(
-                error instanceof Error ? error.message : "Failed to create category",
+                error instanceof Error
+                  ? error.message
+                  : t("failedCreate"),
               );
             }
           }}
@@ -631,10 +671,12 @@ export default function TraderRetailCategoriesPage() {
                 data: formData,
               });
               setEditCategory(null);
-              toast.success("Retail category updated successfully");
+              toast.success(t("categoryUpdated"));
             } catch (error) {
               toast.error(
-                error instanceof Error ? error.message : "Failed to update category",
+                error instanceof Error
+                  ? error.message
+                  : t("failedUpdate"),
               );
             }
           }}
@@ -648,8 +690,8 @@ export default function TraderRetailCategoriesPage() {
         onEdit={setEditCategory}
         onDelete={(id) => {
           deleteCategory.mutate(id, {
-            onSuccess: () => toast.success("Category deleted"),
-            onError: () => toast.error("Failed to delete category")
+            onSuccess: () => toast.success(t("categoryDeleted")),
+            onError: () => toast.error(t("failedDelete")),
           });
         }}
       />

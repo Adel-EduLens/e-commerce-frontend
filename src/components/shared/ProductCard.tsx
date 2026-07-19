@@ -14,6 +14,8 @@ import {
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useCartStore } from "../../store/useCartStore";
+import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
+
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
@@ -75,6 +77,7 @@ export type ProductCardProps = {
   wholesaleSizes?: string[];
   minOrder?: number;
   wholesaleCard?: boolean;
+  hideAddToCart?: boolean;
 };
 
 function useCountdown(endsAt?: string) {
@@ -137,6 +140,7 @@ export default function ProductCard({
   wholesaleSizes = [],
   minOrder,
   wholesaleCard = false,
+  hideAddToCart = false,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)
@@ -167,19 +171,29 @@ export default function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
 
+  const wholesaleCartItems = useWholesaleCartStore((s) => s.items);
+  const addWholesaleItem = useWholesaleCartStore((s) => s.addItem);
+  const removeWholesaleItem = useWholesaleCartStore((s) => s.removeItem);
+
   const isWholesale = productType === "WHOLESALE";
   const useWholesaleCard = isWholesale && wholesaleCard;
   const compareType: CompareProductType = productType ?? "SHOP";
-  const existingCartItem = cartItems.find((item) => {
-    const matchId =
-      String(item.productId) === String(actualProductId) ||
-      String(item.retailProductId) === String(actualProductId) ||
-      String(item.wholesaleProductId) === String(actualProductId);
-    const matchWholesale = isWholesale
-      ? item.id.endsWith("-wholesale")
-      : !item.id.endsWith("-wholesale");
-    return matchId && matchWholesale;
-  });
+
+  const selectedColor = safeColors[activeColorIdx] ?? "Default";
+
+  const existingCartItem = isWholesale
+    ? wholesaleCartItems.find((item) =>
+        String(item.productId) === String(actualProductId) &&
+        (useWholesaleCard ? item.color.toLowerCase() === selectedColor.toLowerCase() : true)
+      )
+    : cartItems.find((item) => {
+        const matchId =
+          String(item.productId) === String(actualProductId) ||
+          String(item.retailProductId) === String(actualProductId) ||
+          String(item.wholesaleProductId) === String(actualProductId);
+        return matchId;
+      });
+
   const isInCart = Boolean(existingCartItem);
 
   useEffect(() => {
@@ -229,7 +243,11 @@ export default function ProductCard({
     e.stopPropagation();
 
     if (existingCartItem) {
-      removeItem(existingCartItem.id);
+      if (isWholesale) {
+        removeWholesaleItem(existingCartItem.id);
+      } else {
+        removeItem(existingCartItem.id);
+      }
       toast.success(t("removedFromCartToast"));
     } else {
       const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
@@ -238,17 +256,14 @@ export default function ProductCard({
         const allColorsStr = safeColors.join(", ") || "All Colors";
         const allSizesStr =
           wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
-        const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
-        addItem({
-          id: `${actualProductId}-wholesale`,
+        addWholesaleItem({
+          id: `${actualProductId}-${selectedColor.toLowerCase()}-wholesale`,
           productId: actualProductId,
           title,
           unitPrice: numPrice,
           currency: "EGP",
-          size: useWholesaleCard
-            ? (wholesaleSizes[0] ?? sizeLabel ?? "Default")
-            : allSizesStr,
+          size: allSizesStr, // Use all sizes as requested ("add the color selected an there sizes")
           color: useWholesaleCard ? selectedColor : allColorsStr,
           colorHex: useWholesaleCard ? colorToHex(selectedColor) : "",
           imageSrc: useWholesaleCard ? activeImage : imageSrc,
@@ -259,10 +274,10 @@ export default function ProductCard({
       } else {
         const firstSize = sizeLabel
           ? sizeLabel.includes("-")
-            ? sizeLabel.split("-")[0].trim()
-            : sizeLabel.includes(",")
-              ? sizeLabel.split(",")[0].trim()
-              : sizeLabel.trim()
+          ? sizeLabel.split("-")[0].trim()
+          : sizeLabel.includes(",")
+            ? sizeLabel.split(",")[0].trim()
+            : sizeLabel.trim()
           : "Default";
         const firstColor = safeColors.length > 0 ? safeColors[0] : "Default";
         const firstColorHex =
@@ -568,12 +583,14 @@ export default function ProductCard({
         </div>
 
         {/* Add to cart button */}
-        <button
-          onClick={handleToggleCart}
-          className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
-        >
-          {isInCart ? t("removeFromCart") : t("addToCart")}
-        </button>
+        {!hideAddToCart && (
+          <button
+            onClick={handleToggleCart}
+            className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
+          >
+            {isInCart ? t("removeFromCart") : t("addToCart")}
+          </button>
+        )}
       </div>
     </div>
   );

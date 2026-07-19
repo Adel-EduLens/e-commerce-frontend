@@ -51,6 +51,7 @@ const CreateYourDesignPage = () => {
               colors={product.colors?.map(c => c.color)}
               to={`/createYourDesign/${product.id}`}
               productType="SHOP"
+              hideAddToCart={true}
             />
           ))}
           
