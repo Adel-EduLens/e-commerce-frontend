@@ -224,7 +224,7 @@ export default function Navbar() {
       ? location.pathname === "/"
       : item.label === "shop"
         ? location.pathname.startsWith(item.path) ||
-          location.pathname.startsWith("/collections/")
+        location.pathname.startsWith("/collections/")
         : location.pathname.startsWith(item.path);
 
   return (
@@ -288,7 +288,7 @@ export default function Navbar() {
                 strokeWidth={1.5}
               />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-primary text-[10px] font-bold text-white">
                   {itemCount}
                 </span>
               )}

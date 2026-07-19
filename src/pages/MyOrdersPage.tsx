@@ -43,6 +43,7 @@ type Order = {
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
+  isWholesaleOrder?: boolean;
 };
 
 const formatDate = (dateStr: string) => {
@@ -133,7 +134,7 @@ function OrderHeader({ order }: { order: Order }) {
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl bg-card p-5 shadow-sm border border-stroke">
       <div className="flex flex-col gap-1.5">
         <span className="font-['Montserrat'] text-lg font-bold text-secondary">
-          {t("Order")} #{order.id.slice(-8).toUpperCase()}
+          {order.isWholesaleOrder ? `[${t("Wholesale", "Wholesale")}] ` : ""}{t("Order")} #{order.id.slice(-8).toUpperCase()}
         </span>
         <div className="flex items-center gap-3 text-sm text-gray-text font-medium">
           <span className="flex items-center gap-1">
@@ -337,8 +338,16 @@ export default function MyOrdersPage() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/orders");
-        setOrders(res.data?.data || []);
+        const [ordersRes, wholesaleRes] = await Promise.all([
+          api.get("/orders"),
+          api.get("/wholesale-orders")
+        ]);
+        const stdOrders = ordersRes.data?.data || [];
+        const whOrders = wholesaleRes.data?.data || [];
+        const merged = [...stdOrders, ...whOrders].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setOrders(merged);
       } catch (err: any) {
         console.error("Failed to fetch orders:", err);
         toast.error(t("couldNotLoadOrders"));
@@ -423,7 +432,7 @@ export default function MyOrdersPage() {
                 >
                   <div className="space-y-1 min-w-0">
                     <div className={`font-['Montserrat'] text-sm font-bold truncate ${isSelected ? "text-secondary-foreground" : "text-foreground"}`}>
-                      {t("Order")} #{order.id.slice(-8).toUpperCase()}
+                      {order.isWholesaleOrder ? `[${t("Wholesale", "Wholesale")}] ` : ""}{t("Order")} #{order.id.slice(-8).toUpperCase()}
                     </div>
                     <div className={`font-['Montserrat'] text-xs ${isSelected ? "text-secondary-foreground/75" : "text-gray-text"}`}>
                       {date} • {order.items.length} {order.items.length === 1 ? t("item") : t("items")}

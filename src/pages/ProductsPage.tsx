@@ -177,6 +177,7 @@ export default function ProductsPage() {
             showTypeBadge={!!filters.search}
             to={`/product-details/${product.id}`}
             subtitle={product.description}
+            stock={product.stock}
           />,
         );
       });
@@ -219,6 +220,7 @@ export default function ProductsPage() {
             }
             minOrder={wholesale.minOrder}
             wholesaleCard
+            stock={(wholesale as any).stock}
           />,
         );
       });

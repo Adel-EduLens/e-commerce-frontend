@@ -31,7 +31,6 @@ import TraderPreferencesPage from "../pages/dashboards/TraderPreferencesPage";
 import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
 import TraderLayout from "../components/layout/TraderLayout";
 import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
-import TraderHelpCenterPage from "../pages/dashboards/TraderHelpCenterPage";
 import UserDashboard from "../pages/dashboards/UserDashboard";
 import RecentlyViewedPage from "../pages/RecentlyViewedPage";
 import MyOrdersPage from "../pages/MyOrdersPage";
@@ -57,13 +56,11 @@ import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
 import ComparePage from "../pages/ComparePage";
 
 import TraderCategoriesPage from "../pages/dashboards/TraderCategoriesPage";
-import TraderFAQsPage from "../pages/dashboards/TraderFAQsPage";
+import TraderWebsiteSettingsPage from "../pages/dashboards/TraderWebsiteSettingsPage";
 
 import CreateYourDesignPage from "../pages/CreateYourDesignPage";
 import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
 
-import TraderShopBannerPage from "../pages/dashboards/TraderShopBannerPage";
-import TraderHomeBannerPage from "../pages/dashboards/TraderHomeBannerPage";
 import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
 import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
 import TraderCollectionsPage from "../pages/dashboards/TraderCollectionsPage";
@@ -312,7 +309,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "faqs",
-            element: <TraderFAQsPage />,
+            element: <TraderWebsiteSettingsPage defaultTab="faqs" />,
           },
           {
             path: "retailCategories",
@@ -337,11 +334,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "shop-banner",
-            element: <TraderShopBannerPage />,
+            element: <TraderWebsiteSettingsPage defaultTab="shop-banners" />,
           },
           {
             path: "home-banner",
-            element: <TraderHomeBannerPage />,
+            element: <TraderWebsiteSettingsPage defaultTab="home-banners" />,
           },
           {
             path: "orders",
@@ -389,7 +386,11 @@ export const router = createBrowserRouter([
           },
           {
             path: "help-center",
-            element: <TraderHelpCenterPage />,
+            element: <TraderWebsiteSettingsPage defaultTab="help-center" />,
+          },
+          {
+            path: "website-settings",
+            element: <TraderWebsiteSettingsPage />,
           },
           {
             path: "preferences",

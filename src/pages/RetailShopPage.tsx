@@ -199,6 +199,7 @@ export default function RetailShopPage() {
           showTypeBadge={!!filters.search}
           to={`/retail/shop/${product.id}`}
           subtitle={product.description}
+          stock={(product as any).stock}
         />
       );
     });

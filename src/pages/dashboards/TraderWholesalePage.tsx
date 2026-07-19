@@ -1,55 +1,27 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { asset } from "../../components/trader/inventoryUtils";
 import {
-  type InventoryItem,
-  getStatus,
-  asset,
-} from "../../components/trader/inventoryUtils";
+  useTraderWholesaleOrders,
+  useUpdateWholesaleOrderStatus,
+  useDeleteWholesaleOrder,
+  type WholesaleOrder,
+} from "../../hooks/queries/wholesaleOrderQuery";
 import {
-  InventoryTablePanel,
-  AddItemModal,
-  EditItemModal,
-} from "../../components/trader/InventoryShared";
-import {
-  useTraderWholesales,
-  useDeleteWholesale,
-} from "../../hooks/queries/wholesaleQuery";
+  Loader2,
+  ArrowLeft,
+  Calendar,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  ShoppingBag,
+  Trash2,
+  Search,
+} from "lucide-react";
+import { toast } from "sonner";
 
 // ─── Static data ───────────────────────────────────────────────────────────────
-const statCards = [
-  {
-    label: "totalOrders",
-    value: "1,245 Orders",
-    valueKey: "statOrdersValue",
-    trend: "8.5%",
-    trendUp: true,
-    sub: "upFromYesterday",
-  },
-  {
-    label: "totalRevenue",
-    value: "$87,250",
-    trend: "8.5%",
-    trendUp: true,
-    sub: "upFromYesterday",
-  },
-  {
-    label: "totalUnitsSold",
-    value: "18,320 pcs",
-    valueKey: "statUnitsValue",
-    trend: "8.5%",
-    trendUp: false,
-    sub: "downFromYesterday",
-  },
-  {
-    label: "activeClients",
-    value: "126 Clients",
-    valueKey: "statClientsValue",
-    trend: "8.5%",
-    trendUp: true,
-    sub: "upFromYesterday",
-  },
-];
-
 const earningsData = [
   { month: "Jan", value: 45000 },
   { month: "Feb", value: 62000 },
@@ -61,58 +33,6 @@ const earningsData = [
   { month: "Aug", value: 87250 },
 ];
 
-const topClients = [
-  {
-    name: "Alpha Retail Co.",
-    order: "#WS-1021",
-    spent: "$12,400",
-    last: "Oct 10, 2025",
-    status: "Active",
-  },
-  {
-    name: "Beta Goods Ltd.",
-    order: "#WS-1022",
-    spent: "$9,870",
-    last: "Oct 8, 2025",
-    status: "Pending",
-  },
-  {
-    name: "Gamma Supplies",
-    order: "#WS-1023",
-    spent: "$7,500",
-    last: "Sep 29, 2025",
-    status: "Active",
-  },
-  {
-    name: "Delta Traders",
-    order: "#WS-1024",
-    spent: "$5,200",
-    last: "Sep 15, 2025",
-    status: "Inactive",
-  },
-];
-
-const recentAlerts = [
-  {
-    title: "lowStockAlert",
-    desc: "Product SKU #P-0421 has only 12 units remaining.",
-    time: "2 hrs ago",
-    color: "bg-amber-400",
-  },
-  {
-    title: "newWholesaleOrder",
-    desc: "Alpha Retail Co. placed an order of 500 units.",
-    time: "5 hrs ago",
-    color: "bg-emerald-400",
-  },
-  {
-    title: "paymentOverdue",
-    desc: "Delta Traders payment of $5,200 is 3 days overdue.",
-    time: "1 day ago",
-    color: "bg-rose-400",
-  },
-];
-
 const categorySegments = [
   { label: "men", value: 35, color: "#A81324" },
   { label: "women", value: 25, color: "#FCD34D" },
@@ -121,11 +41,32 @@ const categorySegments = [
 ];
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
-function pillStyle(status: string) {
-  const s = status.toLowerCase();
-  if (s === "active") return { bg: "bg-emerald-50", text: "text-emerald-700" };
-  if (s === "pending") return { bg: "bg-amber-100", text: "text-amber-800" };
-  return { bg: "bg-red-100", text: "text-red-700" };
+function statusPill(status: string) {
+  const norm = status.toUpperCase();
+  if (norm === "COMPLETED" || norm === "DELIVERED") {
+    return { bg: "bg-emerald-50", text: "text-emerald-700", ring: "outline-emerald-700" };
+  }
+  if (norm === "SHIPPED") {
+    return { bg: "bg-blue-50", text: "text-blue-700", ring: "outline-blue-700" };
+  }
+  if (norm === "PROCESSING") {
+    return { bg: "bg-amber-50", text: "text-amber-700", ring: "outline-amber-700" };
+  }
+  if (norm === "PENDING") {
+    return { bg: "bg-purple-50", text: "text-purple-700", ring: "outline-purple-700" };
+  }
+  return { bg: "bg-rose-50", text: "text-rose-700", ring: "outline-rose-700" };
+}
+
+function getLocalizedStatus(status: string, t: any) {
+  const norm = status.toUpperCase();
+  if (norm === "COMPLETED") return t("statusCompleted", "Completed");
+  if (norm === "DELIVERED") return t("statusDelivered", "Delivered");
+  if (norm === "SHIPPED") return t("statusShipped", "Shipped");
+  if (norm === "PROCESSING") return t("statusProcessing", "Processing");
+  if (norm === "PENDING") return t("statusPending", "Pending");
+  if (norm === "CANCELLED") return t("statusCancelled", "Cancelled");
+  return status;
 }
 
 // ─── Charts ────────────────────────────────────────────────────────────────────
@@ -253,7 +194,7 @@ function CategoryDonut() {
           fontSize="8"
           fill="#6B7280"
         >
-          {t("totalUnits")}
+          {t("totalUnits", "Total Units")}
         </text>
       </svg>
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full">
@@ -264,7 +205,7 @@ function CategoryDonut() {
               style={{ background: seg.color }}
             />
             <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
-              {t(seg.label)} {seg.value}%
+              {t(seg.label, seg.label)} {seg.value}%
             </span>
           </div>
         ))}
@@ -273,333 +214,528 @@ function CategoryDonut() {
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
-export default function TraderWholesalePage() {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+/* ─── Order Detail View ──────────────────────────────────────────────────── */
+interface OrderDetailProps {
+  order: WholesaleOrder;
+  onBack: () => void;
+  onUpdateStatus: (id: string, status: string) => Promise<void>;
+  onDeleteOrder: (id: string) => Promise<void>;
+}
+
+function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder }: OrderDetailProps) {
   const { t } = useTranslation("traderWholesale");
+  const pill = statusPill(order.status);
+  const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const {
-    data: traderWholesales = [],
-    isLoading,
-    isError,
-    error: errorMsg,
-  } = useTraderWholesales();
-  const deleteWholesale = useDeleteWholesale();
+  const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setUpdating(true);
+    try {
+      await onUpdateStatus(order.id, e.target.value);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-  const items: InventoryItem[] = traderWholesales.map((w) => ({
-    id: w.id,
-    image: w.images[0]?.url ?? "",
-    imagesByColor: w.images.map((img) => ({
-      url: img.url,
-      color: img.color ?? undefined,
-    })),
-    product: w.name,
-    category: w.category?.name ?? "",
-    categoryId: w.categoryId,
-    brandId: "",
-    stock: w.stock ?? 0,
-    sku: w.sku ?? "",
-    price: `$${w.price}`,
-    priceNum: w.price,
-    date: new Date(w.createdAt).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-    createdAtRaw: new Date(w.createdAt).getTime(),
-    status: getStatus(w.stock ?? 0),
-    type: "wholesale" as const,
-    description: w.description ?? "",
-    sizes: Array.from(new Set(w.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])),
-    colors: w.wholesaleColors?.map(wc => wc.color) || [],
-    minOrder: w.minOrder ?? 1,
-    isMustHave: false,
-    isFlashDeals: false,
-    flashDealPrice: null,
-    flashDealEndsAt: null,
-    isBestDeal: w.isBestDeal ?? false,
-    isMostPopular: w.isMostPopular ?? false,
-    isPremiumCollection: w.isPremiumCollection ?? false,
-  }));
+  const handleDelete = async () => {
+    if (window.confirm(t("deleteConfirm", "Are you sure you want to delete this wholesale order?"))) {
+      setDeleting(true);
+      try {
+        await onDeleteOrder(order.id);
+      } finally {
+        setDeleting(false);
+      }
+    }
+  };
 
-  const topSellingProducts = traderWholesales.slice(0, 3).map((w, idx) => ({
-    name: w.name,
-    sku: `SKU-${String(idx + 1).padStart(3, "0")}`,
-    units: t("pcsMin", { count: w.minOrder, defaultValue: `${w.minOrder} pcs min` }),
-    revenue: `$${w.price}`,
-  }));
-
-  const errorMessages = isError
-    ? [
-      (
-        errorMsg as {
-          response?: { data?: { message?: string } };
-          message?: string;
-        }
-      )?.response?.data?.message ?? "Failed to load wholesales",
-    ]
-    : [];
-
-  const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-background");
+  const timelineSteps = [
+    { label: t("timelineOrderPlaced", "Order Placed"), time: `${order.date} ${order.time}`, done: true },
+    { label: t("timelineProcessing", "Processing"), time: ["PROCESSING", "SHIPPED", "COMPLETED"].includes(order.status) ? t("timelineInProgress", "In Progress") : t("timelinePending", "Pending"), done: ["PROCESSING", "SHIPPED", "COMPLETED"].includes(order.status) },
+    { label: t("timelineShipped", "Shipped"), time: ["SHIPPED", "COMPLETED"].includes(order.status) ? t("timelineShipped", "Shipped") : t("timelinePending", "Pending"), done: ["SHIPPED", "COMPLETED"].includes(order.status) },
+    { label: t("timelineDelivered", "Delivered"), time: order.status === "COMPLETED" ? t("timelineDelivered", "Delivered") : t("timelinePending", "Pending"), done: order.status === "COMPLETED" },
+  ];
 
   return (
-    <>
-      {showAddModal && (
-        <AddItemModal
-          onClose={() => setShowAddModal(false)}
-          lockedType="wholesale"
-        />
-      )}
-      {editItem && (
-        <EditItemModal item={editItem} onClose={() => setEditItem(null)} />
-      )}
+    <div className="space-y-6">
+      {/* Header buttons */}
+      <div className="flex justify-between items-center">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("backToOrders", "Back to Orders")}
+        </button>
 
-      <div className="space-y-4">
-        {/* Stat cards */}
-        <div className="flex gap-4 overflow-x-auto pb-1">
-          {statCards.map((card) => (
-            <div
-              key={card.label}
-              className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
-            >
-              <div className="absolute left-4 top-4 flex flex-col gap-2">
-                <p className="font-['Montserrat'] text-base font-medium text-gray-text">
-                  {t(card.label)}
-                </p>
-                <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">
-                  {(card as any).valueKey ? t((card as any).valueKey, card.value) : card.value}
-                </p>
-              </div>
-              <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
-                  <rect
-                    x="3"
-                    y="3"
-                    width="18"
-                    height="18"
-                    rx="2"
-                    stroke="#111827"
-                    strokeWidth="1.5"
-                  />
-                  <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <div className="absolute bottom-4 left-4 flex items-center gap-1">
-                <span
-                  className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}
-                >
-                  {card.trendUp ? "+" : "-"}
-                  {card.trend}
-                </span>
-                <span className="font-['Montserrat'] text-sm font-medium text-gray-text">
-                  {t(card.sub)}
-                </span>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer disabled:opacity-50"
+        >
+          {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+          {t("deleteOrder", "Delete Order")}
+        </button>
+      </div>
+
+      {/* Info grids */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Order Details */}
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+            {t("orderDetails", "Order Details")}
+          </h3>
+          <div className="flex flex-col gap-3 font-['Montserrat'] text-sm">
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">{t("orderIdLabel", "Order ID")}</span>
+              <span className="font-bold text-foreground">{order.orderId}</span>
+            </div>
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">{t("dateTimeLabel", "Date & Time")}</span>
+              <span className="font-semibold text-foreground">{order.date} — {order.time}</span>
+            </div>
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">{t("statusLabel", "Status")}</span>
+              <div className="flex items-center gap-2">
+                {updating ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-secondary" />
+                ) : (
+                  <select
+                    value={order.status}
+                    onChange={handleStatusChange}
+                    className={`inline-flex rounded-xl px-2 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring} bg-card cursor-pointer focus:outline-none`}
+                  >
+                    <option value="PENDING">{t("statusPending", "Pending")}</option>
+                    <option value="PROCESSING">{t("statusProcessing", "Processing")}</option>
+                    <option value="SHIPPED">{t("statusShipped", "Shipped")}</option>
+                    <option value="COMPLETED">{t("statusCompleted", "Completed")}</option>
+                    <option value="CANCELLED">{t("statusCancelled", "Cancelled")}</option>
+                  </select>
+                )}
               </div>
             </div>
-          ))}
+            <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+              <span className="text-gray-text font-medium">{t("paymentTypeLabel", "Payment Method")}</span>
+              <span className="font-semibold text-foreground">{order.payment}</span>
+            </div>
+          </div>
         </div>
 
-        {/* Earnings Over Time */}
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              {t("earningsOverTime")}
-            </h2>
-            <button
-              type="button"
-              className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-            >
-              {t("partner")}
-              <img
-                className="h-5 w-5 rotate-90"
-                src={asset("weui_arrow-outlined.svg")}
-                alt=""
-              />
-            </button>
+        {/* Customer Information */}
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("customerInformation", "Customer Information")}</h3>
+          <div className="flex flex-col gap-3">
+            {[
+              { icon: <User className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custName", "Customer Name"), value: order.customer },
+              { icon: <Mail className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custEmail", "Email Address"), value: order.customerEmail },
+              { icon: <Phone className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custPhone", "Phone Number"), value: order.customerPhone },
+              { icon: <MapPin className="h-4 w-4 text-gray-text shrink-0 mt-0.5" />, label: t("custAddress", "Shipping Address"), value: order.address },
+            ].map((row, idx) => (
+              <div key={idx} className="flex items-start gap-2.5">
+                {row.icon}
+                <div className="min-w-0">
+                  <span className="font-['Montserrat'] text-xs font-semibold text-gray-text block">{row.label}</span>
+                  <span className="font-['Montserrat'] text-sm font-semibold text-foreground break-words">{row.value}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <EarningsChart />
         </div>
 
-        {/* Top Clients */}
-        <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
-            <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              {t("topClients")}
-            </h2>
-            <button
-              type="button"
-              className="flex items-center gap-2 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-            >
-              {t("export")}
-            </button>
+        {/* Timeline */}
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderTimeline", "Order Timeline")}</h3>
+          <div className="flex flex-col gap-0">
+            {timelineSteps.map((step, i) => (
+              <div key={step.label} className="flex items-start gap-3">
+                <div className="flex flex-col items-center">
+                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${step.done ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"}`}>
+                    {step.done && (
+                      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
+                        <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  {i < timelineSteps.length - 1 && (
+                    <div className={`w-0.5 ${step.done ? "bg-secondary" : "bg-stroke"}`} style={{ height: 28 }} />
+                  )}
+                </div>
+                <div className="pb-4">
+                  <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">{step.label} </span>
+                  <span className="font-['Montserrat'] text-sm font-medium text-foreground block text-xs">{step.time}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-0">
-              <thead>
-                <tr className="bg-secondary">
-                  <th className="px-4 py-3">
-                    <div className="h-5 w-5 rounded-md border border-primary bg-secondary" />
+        </div>
+      </div>
+
+      {/* Ordered Items Table */}
+      <div className="rounded-2xl border border-stroke bg-card shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
+          <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderedItems", "Ordered Items")}</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-separate border-spacing-0">
+            <thead>
+              <tr className="bg-secondary border-b border-stroke">
+                {[t("colImage", "Image"), t("colProductDetails", "Product Details"), t("colQuantity", "Quantity"), t("colPrice", "Price"), t("colSubtotal", "Subtotal")].map((col, cIdx) => (
+                  <th key={cIdx} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider whitespace-nowrap">
+                    {col}
                   </th>
-                  {[
-                    t("client"),
-                    t("order"),
-                    t("totalSpent"),
-                    t("lastOrder"),
-                    t("status"),
-                    t("actions"),
-                  ].map((col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {topClients.map((row, idx) => {
-                  const pill = pillStyle(row.status);
-                  return (
-                    <tr key={idx} className={rowBg(idx)}>
-                      <td className="px-4 py-3">
-                        <div className="h-5 w-5 rounded-md border border-stroke bg-white" />
-                      </td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
-                        {row.name}
-                      </td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
-                        {row.order}
-                      </td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
-                        {row.spent}
-                      </td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
-                        {row.last}
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
-                        >
-                          {t(row.status.toLowerCase(), row.status)}
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {order.items.map((item, idx) => (
+                <tr key={item.id} className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
+                  <td className="px-4 py-4 text-center">
+                    <div className="h-12 w-12 rounded-lg bg-background border border-stroke overflow-hidden flex items-center justify-center mx-auto">
+                      {item.image ? (
+                        <img className="h-full w-full object-cover" src={item.image} alt={item.product} />
+                      ) : (
+                        <ShoppingBag className="h-5 w-5 text-gray-text" />
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    <div className="font-['Montserrat'] text-sm font-bold text-foreground">
+                      {item.product}
+                    </div>
+                    <div className="flex justify-center gap-2 mt-1">
+                      {item.size && (
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
+                          Size: {item.size}
                         </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          className="flex h-4 w-4 flex-col items-center justify-center gap-0.5"
-                        >
-                          <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
-                          <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
-                          <span className="h-0.5 w-0.5 rounded-full bg-gray-text" />
-                        </button>
+                      )}
+                      {item.color && (
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
+                          Color: {item.color}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+                    {item.quantity}
+                  </td>
+                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+                    {item.price}
+                  </td>
+                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground">
+                    {item.subtotal}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Grand Total */}
+        <div className="flex flex-col items-end gap-2 border-t border-stroke px-6 py-5 bg-background">
+          <div className="w-64 space-y-2 font-['Montserrat'] text-xs font-medium">
+            <div className="flex justify-between">
+              <span className="text-gray-text">{t("traderSubtotal", "Subtotal")}</span>
+              <span className="text-foreground font-bold">{order.subtotal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-text">{t("totalShipping", "Shipping")}</span>
+              <span className="text-foreground">{order.shipping}</span>
+            </div>
+            <div className="flex justify-between text-sm font-bold pt-2 border-t border-stroke text-foreground">
+              <span>{t("orderGrandTotal", "Total")}</span>
+              <span>{order.total}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+export default function TraderWholesalePage() {
+  const { t } = useTranslation("traderWholesale");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<WholesaleOrder | null>(null);
+
+  const { data: orders = [], isLoading, isError, error } = useTraderWholesaleOrders();
+  const updateStatusMutation = useUpdateWholesaleOrderStatus();
+  const deleteOrderMutation = useDeleteWholesaleOrder();
+
+  const handleUpdateStatus = async (orderId: string, status: string) => {
+    try {
+      await updateStatusMutation.mutateAsync({ orderId, status });
+      toast.success(t("statusUpdateSuccess", "Order status updated successfully"));
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder((prev) => prev ? { ...prev, status } : null);
+      }
+    } catch (err) {
+      toast.error(t("statusUpdateError", "Failed to update order status"));
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      await deleteOrderMutation.mutateAsync(orderId);
+      toast.success(t("deleteSuccess", "Order deleted successfully"));
+      setSelectedOrder(null);
+    } catch (err) {
+      toast.error(t("deleteError", "Failed to delete order"));
+    }
+  };
+
+  const totalOrdersCount = orders.length;
+  const activeCount = orders.filter(o => ["PENDING", "PROCESSING", "SHIPPED"].includes(o.status.toUpperCase())).length;
+  const completedCount = orders.filter(o => ["COMPLETED", "DELIVERED"].includes(o.status.toUpperCase())).length;
+  const totalRevenue = orders.reduce((sum, o) => {
+    const val = Number(o.total.replace(/[^0-9.-]+/g, "")) || 0;
+    return sum + val;
+  }, 0);
+
+  const statCards = [
+    {
+      label: "totalWholesaleOrders",
+      value: `${totalOrdersCount} Orders`,
+      trend: "100%",
+      trendUp: true,
+      sub: "allTimeReceived",
+    },
+    {
+      label: "totalWholesaleRevenue",
+      value: `EGP ${totalRevenue.toLocaleString()}`,
+      trend: "100%",
+      trendUp: true,
+      sub: "fromAllOrders",
+    },
+    {
+      label: "activeWholesaleOrders",
+      value: String(activeCount),
+      trend: "100%",
+      trendUp: activeCount > 0,
+      sub: "pendingOrProcessing",
+    },
+    {
+      label: "completedWholesaleOrders",
+      value: String(completedCount),
+      trend: "100%",
+      trendUp: true,
+      sub: "deliveredToClients",
+    },
+  ];
+
+  const filtered = orders.filter((o) => {
+    const matchesSearch =
+      o.orderId.toLowerCase().includes(search.toLowerCase()) ||
+      o.customer.toLowerCase().includes(search.toLowerCase()) ||
+      o.status.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus = !statusFilter || o.status.toUpperCase() === statusFilter.toUpperCase();
+
+    return matchesSearch && matchesStatus;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="py-20 text-center text-rose-500 font-medium">
+        {error instanceof Error ? error.message : "Failed to load wholesale orders"}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {selectedOrder ? (
+        <OrderDetail
+          order={selectedOrder}
+          onBack={() => setSelectedOrder(null)}
+          onUpdateStatus={handleUpdateStatus}
+          onDeleteOrder={handleDeleteOrder}
+        />
+      ) : (
+        <>
+          {/* Stat cards */}
+          <div className="flex gap-4 overflow-x-auto pb-1">
+            {statCards.map((card) => (
+              <div
+                key={card.label}
+                className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+              >
+                <div className="absolute left-4 top-4 flex flex-col gap-2">
+                  <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">
+                    {t(card.label, card.label)}
+                  </p>
+                  <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
+                    {card.value}
+                  </p>
+                </div>
+                <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
+                  <ShoppingBag className="h-5 w-5 text-white" />
+                </div>
+                <div className="absolute bottom-4 left-4 flex items-center gap-1">
+                  <span className="font-['Montserrat'] text-xs font-semibold text-gray-text">
+                    {t(card.sub, card.sub)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts container */}
+          <div className="grid gap-4 lg:grid-cols-3">
+            {/* Earnings Over Time */}
+            <div className="lg:col-span-2 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
+                  {t("earningsOverTime", "Earnings Over Time")}
+                </h2>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+                >
+                  {t("partner", "Partner")}
+                  <img
+                    className="h-5 w-5 rotate-90"
+                    src={asset("weui_arrow-outlined.svg")}
+                    alt=""
+                  />
+                </button>
+              </div>
+              <EarningsChart />
+            </div>
+
+            {/* Category Donut */}
+            <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
+                {t("productCategory", "Product Category")}
+              </h2>
+              <CategoryDonut />
+            </div>
+          </div>
+
+          {/* Search & Filters */}
+          <div className="flex flex-wrap items-center justify-start gap-4 bg-card p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[280px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text pointer-events-none" />
+              <input
+                type="text"
+                placeholder={t("searchPlaceholder", "Search wholesale orders...")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-background py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div className="relative min-w-[160px]">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+              >
+                <option value="">{t("allStatuses", "All Statuses")}</option>
+                <option value="PENDING">{t("statusPending", "Pending")}</option>
+                <option value="PROCESSING">{t("statusProcessing", "Processing")}</option>
+                <option value="SHIPPED">{t("statusShipped", "Shipped")}</option>
+                <option value="COMPLETED">{t("statusCompleted", "Completed")}</option>
+                <option value="CANCELLED">{t("statusCancelled", "Cancelled")}</option>
+              </select>
+            </div>
+
+            {/* Reset Button */}
+            {(search || statusFilter) && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("");
+                }}
+                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
+              >
+                {t("resetFilters", "Reset Filters")}
+              </button>
+            )}
+          </div>
+
+          {/* Wholesale Orders History Table */}
+          <section className="rounded-2xl border border-stroke bg-card shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
+            <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
+              <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("wholesaleOrdersHistory", "Wholesale Orders History")}</h2>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-separate border-spacing-0">
+                <thead>
+                  <tr className="bg-secondary border-b border-stroke">
+                    {[t("colOrderId", "Order ID"), t("colCustomerName", "Customer"), t("colDateTime", "Date & Time"), t("colPayment", "Payment"), t("colTraderSubtotal", "Subtotal"), t("colOrderTotal", "Total"), t("colStatus", "Status")].map((col, cIdx) => (
+                      <th
+                        key={cIdx}
+                        className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider whitespace-nowrap"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-gray-text font-medium font-['Montserrat']">
+                        {t("noWholesaleOrdersFound", "No wholesale orders found")}
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* 3-column bottom panels */}
-        <div className="grid gap-4 lg:grid-cols-3">
-          {/* Recent Alerts */}
-          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
-              {t("recentAlerts")}
-            </h2>
-            <div className="space-y-3">
-              {recentAlerts.map((alert, idx) => (
-                <div
-                  key={idx}
-                  className="flex gap-3 rounded-xl border border-stroke p-3"
-                >
-                  <div
-                    className={`mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full ${alert.color}`}
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                      {t(alert.title)}
-                    </p>
-                    <p className="mt-0.5 font-['Montserrat'] text-xs text-gray-text">
-                      {alert.desc}
-                    </p>
-                    <p className="mt-1 font-['Montserrat'] text-xs font-medium text-gray-text">
-                      {alert.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                  ) : (
+                    filtered.map((order, idx) => {
+                      const pill = statusPill(order.status);
+                      return (
+                        <tr
+                          key={order.id}
+                          className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground whitespace-nowrap">
+                            {order.orderId}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-semibold text-foreground whitespace-nowrap">
+                            {order.customer}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-gray-text whitespace-nowrap">
+                            {order.date} — {order.time}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                            {order.payment}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-secondary whitespace-nowrap">
+                            {order.subtotal}
+                          </td>
+                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                            {order.total}
+                          </td>
+                          <td className="px-4 py-4 text-center whitespace-nowrap">
+                            <span className={`inline-flex rounded-xl px-2.5 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
+                              {getLocalizedStatus(order.status, t)}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
-          </div>
-
-          {/* Top-Selling Products */}
-          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
-              {t("topSellingProducts")}
-            </h2>
-            <div className="space-y-3">
-              {topSellingProducts.length > 0 ? (
-                topSellingProducts.map((prod, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-3 rounded-xl border border-stroke p-3"
-                  >
-                    <div className="h-10 w-10 shrink-0 rounded-lg bg-gray-light flex items-center justify-center">
-                      <span className="font-['Montserrat'] text-xs font-bold text-gray-text">
-                        {idx + 1}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                        {prod.name}
-                      </p>
-                      <p className="font-['Montserrat'] text-xs text-gray-text">
-                        {prod.sku}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                        {prod.revenue}
-                      </p>
-                      <p className="font-['Montserrat'] text-xs text-gray-text">
-                        {prod.units}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="font-['Montserrat'] text-sm text-gray-text">
-                  {t("noProductsYet")}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Category Donut */}
-          <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
-              {t("productCategory")}
-            </h2>
-            <CategoryDonut />
-          </div>
-        </div>
-
-        {/* Wholesale Products Table — shared panel */}
-        <InventoryTablePanel
-          items={items}
-          isLoading={isLoading}
-          errorMessages={errorMessages}
-          onAdd={() => setShowAddModal(true)}
-          onEdit={setEditItem}
-          onDelete={(item) => deleteWholesale.mutate(item.id)}
-          showTypeFilter={false}
-          title={t("wholesaleProducts")}
-          addLabel={t("addWholesale")}
-        />
-      </div>
-    </>
+          </section>
+        </>
+      )}
+    </div>
   );
 }

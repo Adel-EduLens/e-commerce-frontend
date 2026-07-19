@@ -87,16 +87,6 @@ const sidebarItems = [
     path: "/dashboard/trader/analytics",
   },
   {
-    label: "Shop Banner",
-    icon: "banner.svg",
-    path: "/dashboard/trader/shop-banner",
-  },
-  {
-    label: "Home Page Banner",
-    icon: "banner.svg",
-    path: "/dashboard/trader/home-banner",
-  },
-  {
     label: "Collections",
     icon: "carbon_category-2.svg",
     path: "/dashboard/trader/collections",
@@ -112,14 +102,9 @@ const sidebarItems = [
     path: "/dashboard/trader/designs",
   },
   {
-    label: "helpCenter",
-    icon: "help-circle.svg",
-    path: "/dashboard/trader/help-center",
-  },
-  {
-    label: "faqs",
-    icon: "help-circle.svg",
-    path: "/dashboard/trader/faqs",
+    label: "Website Settings",
+    icon: "solar_settings-linear.svg",
+    path: "/dashboard/trader/website-settings",
   },
   {
     label: "preferences",

@@ -267,6 +267,7 @@ export default function ProductsSection({
                 flashDealPrice={product.flashDealPrice}
                 flashDealEndsAt={product.flashDealEndsAt}
                 rating={product.rating}
+                stock={product.stock}
                 to={
                   isRetail
                     ? `/retail/shop/${product.id}`

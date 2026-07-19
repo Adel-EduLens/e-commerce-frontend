@@ -295,6 +295,7 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
                     sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
                     minOrder={item.minOrder}
                     wholesaleCard
+                    stock={(item as any).stock}
                   />
                 ))
               ) : (
@@ -401,6 +402,7 @@ function WholesaleFilterSection({
         sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap((wc) => wc.sizes.map((s) => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
         minOrder={item.minOrder}
         wholesaleCard
+        stock={(item as any).stock}
       />
     ))
   }, [filteredProducts])

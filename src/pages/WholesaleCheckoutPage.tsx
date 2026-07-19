@@ -527,7 +527,7 @@ export default function WholesaleCheckoutPage() {
         })),
       };
 
-      await api.post("/orders", orderPayload);
+      await api.post("/wholesale-orders", orderPayload);
 
       clearCart();
       queryClient.invalidateQueries({ queryKey: ["orders"] });

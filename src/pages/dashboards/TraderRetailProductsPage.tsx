@@ -169,7 +169,7 @@ export function RetailProductFormModal({
         name,
         price: Number(price),
         stock: totalStock,
-        categoryId: Number(categoryId),
+        categoryId,
         depositAmount: Number(depositAmount),
         securityDeposit: Number(securityDeposit),
         sku: sku || undefined,

@@ -237,12 +237,27 @@ export function ProductInfoPanel({
     );
   };
   const handleAddToCart = () => {
-    if (externalAddToCart) {
-      externalAddToCart();
-      return;
-    }
+
     if (availableStock <= 0) {
       toast.error(t("outOfStockOption"));
+      return;
+    }
+    
+    const currentCartQty = isWholesale
+      ? useWholesaleCartStore.getState().items
+          .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
+          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
+      : useCartStore.getState().items
+          .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
+          .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+
+    if (currentCartQty + quantity > availableStock) {
+      toast.error(t("cannotCheckoutStock", { count: availableStock }));
+      return;
+    }
+
+    if (externalAddToCart) {
+      externalAddToCart();
       return;
     }
     
@@ -318,10 +333,7 @@ export function ProductInfoPanel({
   };
 
   const handleBuyNow = () => {
-    if (externalBuyNow) {
-      externalBuyNow();
-      return;
-    }
+
     if (availableStock <= 0) {
       toast.error(t("outOfStockOption"));
       return;
@@ -334,6 +346,11 @@ export function ProductInfoPanel({
     
     if (isWholesale && quantity < minQty) {
       toast.error(t("lessThanMinOrder", { quantity, minQty }));
+      return;
+    }
+
+    if (externalBuyNow) {
+      externalBuyNow();
       return;
     }
 

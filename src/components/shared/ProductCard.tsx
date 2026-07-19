@@ -79,6 +79,7 @@ export type ProductCardProps = {
   wholesaleCard?: boolean;
   hideAddToCart?: boolean;
   hideQuickActions?: boolean;
+  stock?: number;
 };
 
 function useCountdown(endsAt?: string) {
@@ -143,6 +144,7 @@ export default function ProductCard({
   wholesaleCard = false,
   hideAddToCart = false,
   hideQuickActions = false,
+  stock,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)
@@ -252,6 +254,11 @@ export default function ProductCard({
       }
       toast.success(t("removedFromCartToast"));
     } else {
+      if (stock !== undefined && stock <= 0) {
+        toast.error(t("outOfStock", "Out of stock"));
+        return;
+      }
+
       const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
 
       if (isWholesale) {
@@ -368,6 +375,11 @@ export default function ProductCard({
                 />
               </svg>
               {countdownLabel}
+            </div>
+          )}
+          {stock !== undefined && stock <= 0 && (
+            <div className="flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm bg-gray-500">
+              {t("outOfStock", "Out of stock")}
             </div>
           )}
         </div>
@@ -593,9 +605,10 @@ export default function ProductCard({
         {!hideAddToCart && (
           <button
             onClick={handleToggleCart}
-            className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
+            disabled={stock !== undefined && stock <= 0 && !isInCart}
+            className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl ${stock !== undefined && stock <= 0 && !isInCart ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "btn-cart-gradient"} py-3 text-center transition-colors`}
           >
-            {isInCart ? t("removeFromCart") : t("addToCart")}
+            {isInCart ? t("removeFromCart") : stock !== undefined && stock <= 0 ? t("outOfStock", "Out of stock") : t("addToCart")}
           </button>
         )}
       </div>
