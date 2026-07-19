@@ -52,6 +52,7 @@ const CreateYourDesignPage = () => {
               to={`/createYourDesign/${product.id}`}
               productType="SHOP"
               hideAddToCart={true}
+              hideQuickActions={true}
             />
           ))}
           
