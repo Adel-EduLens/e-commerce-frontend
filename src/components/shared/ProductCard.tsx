@@ -78,6 +78,7 @@ export type ProductCardProps = {
   minOrder?: number;
   wholesaleCard?: boolean;
   hideAddToCart?: boolean;
+  hideQuickActions?: boolean;
 };
 
 function useCountdown(endsAt?: string) {
@@ -141,6 +142,7 @@ export default function ProductCard({
   minOrder,
   wholesaleCard = false,
   hideAddToCart = false,
+  hideQuickActions = false,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)
@@ -370,46 +372,51 @@ export default function ProductCard({
           )}
         </div>
 
-        {/* Heart icon */}
-        <button
-          type="button"
-          onClick={handleToggleWishlist}
-          disabled={toggleWishlist.isPending}
-          className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${
-            useWholesaleCard
-              ? "bg-white shadow-md"
-              : "bg-black/60 backdrop-blur-sm"
-          }`}
-        >
-          <Heart
-            size={useWholesaleCard ? 18 : 20}
-            strokeWidth={useWholesaleCard ? 2 : 1.8}
-            className={`transition-colors ${
-              useWholesaleCard
-                ? isWishlisted
-                  ? "text-primary"
-                  : "text-[#555]"
-                : isWishlisted
-                  ? "text-primary"
-                  : "text-gray-300"
-            }`}
-            fill={isWishlisted ? "currentColor" : "none"}
-          />
-        </button>
+        {/* Quick Actions (Wishlist & Compare) */}
+        {!hideQuickActions && (
+          <>
+            {/* Heart icon */}
+            <button
+              type="button"
+              onClick={handleToggleWishlist}
+              disabled={toggleWishlist.isPending}
+              className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${
+                useWholesaleCard
+                  ? "bg-white shadow-md"
+                  : "bg-black/60 backdrop-blur-sm"
+              }`}
+            >
+              <Heart
+                size={useWholesaleCard ? 18 : 20}
+                strokeWidth={useWholesaleCard ? 2 : 1.8}
+                className={`transition-colors ${
+                  useWholesaleCard
+                    ? isWishlisted
+                      ? "text-primary"
+                      : "text-[#555]"
+                    : isWishlisted
+                      ? "text-primary"
+                      : "text-gray-300"
+                }`}
+                fill={isWishlisted ? "currentColor" : "none"}
+              />
+            </button>
 
-        {/* Compare button (optional, moved to top right below heart) */}
-        {!useWholesaleCard && (
-          <button
-            onClick={handleCompare}
-            aria-label={isCompared ? "Remove from compare" : "Add to compare"}
-            className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
-              isCompared
-                ? "bg-primary text-primary-foreground"
-                : "bg-black/60 text-gray-300 hover:text-white"
-            }`}
-          >
-            <MdCompare size={18} />
-          </button>
+            {/* Compare button (optional, moved to top right below heart) */}
+            {!useWholesaleCard && (
+              <button
+                onClick={handleCompare}
+                aria-label={isCompared ? "Remove from compare" : "Add to compare"}
+                className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
+                  isCompared
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-black/60 text-gray-300 hover:text-white"
+                }`}
+              >
+                <MdCompare size={18} />
+              </button>
+            )}
+          </>
         )}
 
         {/* Carousel indicators (mock) */}
