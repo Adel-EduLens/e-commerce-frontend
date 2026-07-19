@@ -37,11 +37,6 @@ const sidebarItems = [
     path: "/dashboard/trader/categories",
   },
   {
-    label: "wholesaleCategories",
-    icon: "carbon_category-2.svg",
-    path: "/dashboard/trader/wholesale-categories",
-  },
-  {
     label: "products",
     icon: "streamline-ultimate_products-gifts.svg",
     path: "/dashboard/trader/products",
@@ -50,11 +45,6 @@ const sidebarItems = [
     label: "blankProduct",
     icon: "streamline-ultimate_products-gifts.svg",
     path: "/dashboard/trader/blank-products",
-  },
-  {
-    label: "Retail Categories",
-    icon: "carbon_category-2.svg",
-    path: "/dashboard/trader/retailCategories",
   },
   {
     label: "Retail Products",

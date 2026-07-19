@@ -13,15 +13,22 @@ export interface Category {
   updatedAt: string;
 }
 
-const getCategories = async (isWholesale?: boolean): Promise<Category[]> => {
+export type CategoryFilter = boolean | "all" | undefined;
+
+const getCategories = async (isWholesale?: CategoryFilter): Promise<Category[]> => {
   const { data } = await api.get("/categories", {
-    params: isWholesale !== undefined ? { isWholesale } : undefined,
+    params:
+      isWholesale === "all"
+        ? { all: true }
+        : isWholesale !== undefined
+          ? { isWholesale }
+          : undefined,
   });
   return data.data;
 };
 
 export const useCategories = (
-  isWholesale?: boolean,
+  isWholesale?: CategoryFilter,
   options?: Omit<UseQueryOptions<Category[], Error, Category[], (string | boolean | undefined)[]>, "queryKey" | "queryFn">
 ): UseQueryResult<Category[], Error> => {
   return useQuery({

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { asset } from "../../components/trader/inventoryUtils";
 import { CategoryFormModal } from "../../components/trader/CategoryFormModal";
+import { RetailCategoryFormModal } from "./TraderRetailCategoriesPage";
 import { LoadingSpinner } from "../../components/shared";
 import {
   type Category,
@@ -9,15 +10,25 @@ import {
   useUpdateCategory,
   useDeleteCategory,
 } from "../../hooks/queries/categoriesQuery";
+import {
+  useRetailCategories,
+  useCreateRetailCategory,
+  useUpdateRetailCategory,
+  useDeleteRetailCategory,
+} from "../../hooks/useRetailCategories";
+import type { RetailCategory } from "../../types/retail";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
+type CategoryType = "product" | "wholesale" | "retail";
+type DashboardCategory = Category & { categoryType: CategoryType; sourceId: string | number };
+
 interface CategoryTablePanelProps {
-  categories: Category[];
+  categories: DashboardCategory[];
   loading: boolean;
-  onAdd: () => void;
-  onEdit: (category: Category) => void;
-  onDelete: (id: string) => void;
+  onAdd: (type: CategoryType) => void;
+  onEdit: (category: DashboardCategory) => void;
+  onDelete: (category: DashboardCategory) => void;
 }
 
 export function CategoryTablePanel({
@@ -31,6 +42,7 @@ export function CategoryTablePanel({
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [categoryFilter, setCategoryFilter] = useState<CategoryType>("product");
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("date-desc");
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -43,6 +55,9 @@ export function CategoryTablePanel({
   }, [openFilter]);
 
   const filtered = categories
+    .filter((c) => {
+      return c.categoryType === categoryFilter;
+    })
     .filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
       switch (sortBy) {
@@ -72,6 +87,26 @@ export function CategoryTablePanel({
 
   return (
     <div className="space-y-4">
+
+      <div className="flex w-fit items-center gap-1 rounded-xl border border-stroke bg-white p-1">
+        {[
+          { value: "product" as const, label: t("productCategories") },
+          { value: "wholesale" as const, label: t("wholesaleCategories") },
+          { value: "retail" as const, label: t("retailCategories") },
+        ].map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => {
+              setCategoryFilter(tab.value);
+              setPage(1);
+            }}
+            className={`rounded-lg px-3 py-2 font-['Montserrat'] text-sm font-medium transition ${categoryFilter === tab.value ? "bg-primary text-white shadow-sm" : "text-gray-text hover:bg-background hover:text-foreground"}`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
       <div className="flex flex-wrap items-center justify-start gap-3">
         <label className="relative flex min-w-70 items-center">
           <img
@@ -92,13 +127,14 @@ export function CategoryTablePanel({
         </label>
         <button
           type="button"
-          onClick={onAdd}
+          onClick={() => onAdd(categoryFilter)}
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
           {t("addCategory")}
         </button>
       </div>
+
 
       <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
@@ -434,7 +470,8 @@ export function CategoryTablePanel({
               <button
                 type="button"
                 onClick={() => {
-                  onDelete(deleteId);
+                  const category = categories.find((c) => c.id === deleteId);
+                  if (category) onDelete(category);
                   setDeleteId(null);
                 }}
                 className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
@@ -450,24 +487,54 @@ export function CategoryTablePanel({
 }
 
 export default function TraderCategoriesPage() {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editCategory, setEditCategory] = useState<Category | null>(null);
+  const [addCategoryType, setAddCategoryType] = useState<CategoryType | null>(null);
+  const [editCategory, setEditCategory] = useState<DashboardCategory | null>(null);
 
-  const { data: categories = [], isLoading } = useCategories();
+  const { data: standardCategories = [], isLoading: isLoadingStandard } = useCategories("all");
+  const { data: retailCategoriesResponse, isLoading: isLoadingRetail } = useRetailCategories();
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const createRetailCategory = useCreateRetailCategory();
+  const updateRetailCategory = useUpdateRetailCategory();
+  const deleteRetailCategory = useDeleteRetailCategory();
   const { t } = useTranslation("traderCategoriesPage");
+  const categories: DashboardCategory[] = [
+    ...standardCategories.map((category) => ({
+      ...category,
+      categoryType: category.isWholesale ? "wholesale" as const : "product" as const,
+      sourceId: category.id,
+    })),
+    ...(retailCategoriesResponse?.data ?? []).map((category) => {
+      const retailCategory = category as RetailCategory & {
+        createdAt?: string;
+        updatedAt?: string;
+      };
+
+      return {
+        ...retailCategory,
+        id: String(category.id),
+        isWholesale: false,
+        categoryType: "retail" as const,
+        sourceId: category.id,
+        createdAt: retailCategory.createdAt ?? new Date(0).toISOString(),
+        updatedAt: retailCategory.updatedAt ?? new Date(0).toISOString(),
+      };
+    }),
+  ];
 
   return (
     <>
-      {showAddModal && (
+      {addCategoryType && addCategoryType !== "retail" && (
         <CategoryFormModal
-          onClose={() => setShowAddModal(false)}
+          onClose={() => setAddCategoryType(null)}
           onSave={async (data) => {
             try {
-              await createCategory.mutateAsync(data);
-              setShowAddModal(false);
+              await createCategory.mutateAsync({
+                ...data,
+                isWholesale: addCategoryType === "wholesale",
+              });
+              setAddCategoryType(null);
               toast.success(t("categoryCreated"));
             } catch (error) {
               toast.error(
@@ -479,30 +546,57 @@ export default function TraderCategoriesPage() {
           }}
         />
       )}
-      {editCategory && (
-        <CategoryFormModal
-          category={editCategory}
-          onClose={() => setEditCategory(null)}
-          onSave={async (formData) => {
-            await updateCategory.mutateAsync({
-              id: editCategory.id,
-              data: {
-                name: formData.name,
-                image: formData.image,
-                appearOnHome: formData.appearOnHome,
-              },
-            });
-            setEditCategory(null);
+      {addCategoryType === "retail" && (
+        <RetailCategoryFormModal
+          onClose={() => setAddCategoryType(null)}
+          onSave={async (data) => {
+            await createRetailCategory.mutateAsync(data);
+            setAddCategoryType(null);
           }}
         />
+      )}
+      {editCategory && (
+        editCategory.categoryType === "retail" ? (
+          <RetailCategoryFormModal
+            category={editCategory as RetailCategory}
+            onClose={() => setEditCategory(null)}
+            onSave={async (data) => {
+              await updateRetailCategory.mutateAsync({ id: editCategory.sourceId, data });
+              setEditCategory(null);
+            }}
+          />
+        ) : (
+          <CategoryFormModal
+            category={editCategory}
+            onClose={() => setEditCategory(null)}
+            onSave={async (formData) => {
+              await updateCategory.mutateAsync({
+                id: String(editCategory.sourceId),
+                data: {
+                  name: formData.name,
+                  image: formData.image,
+                  appearOnHome: formData.appearOnHome,
+                  isWholesale: editCategory.categoryType === "wholesale",
+                },
+              });
+              setEditCategory(null);
+            }}
+          />
+        )
       )}
 
       <CategoryTablePanel
         categories={categories}
-        loading={isLoading}
-        onAdd={() => setShowAddModal(true)}
+        loading={isLoadingStandard || isLoadingRetail}
+        onAdd={setAddCategoryType}
         onEdit={setEditCategory}
-        onDelete={(id) => deleteCategory.mutate(id)}
+        onDelete={(category) => {
+          if (category.categoryType === "retail") {
+            deleteRetailCategory.mutate(category.sourceId);
+          } else {
+            deleteCategory.mutate(String(category.sourceId));
+          }
+        }}
       />
     </>
   );

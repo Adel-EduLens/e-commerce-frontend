@@ -151,7 +151,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path:"retail/shop",
+        path: "retail/shop",
         element: (
           <UserLayout>
             <RetailShopPage />
@@ -304,8 +304,8 @@ export const router = createBrowserRouter([
             element: <TraderRetailPage />,
           },
           {
-            path:"blank-products",
-            element:<TraderBlankProductsPage />
+            path: "blank-products",
+            element: <TraderBlankProductsPage />
           },
           {
             path: "categories",
