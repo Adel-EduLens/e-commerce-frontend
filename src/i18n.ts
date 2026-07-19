@@ -50,6 +50,9 @@ import helpCenterAr from "./locales/ar/help-center.json";
 import bagEn from "./locales/en/bag.json";
 import bagAr from "./locales/ar/bag.json";
 
+import voteEn from "./locales/en/vote.json";
+import voteAr from "./locales/ar/vote.json";
+
 import productDetailsEn from "./locales/en/product-details.json";
 import productDetailsAr from "./locales/ar/product-details.json";
 
@@ -127,6 +130,7 @@ i18n
         notify: notifyEn,
         helpCenter: helpCenterEn,
         bag: bagEn,
+        vote: voteEn,
         productDetails: productDetailsEn,
         reviewForm: reviewFormEn,
         compare: compareEn,
@@ -163,6 +167,7 @@ i18n
         notify: notifyAr,
         helpCenter: helpCenterAr,
         bag: bagAr,
+        vote: voteAr,
         productDetails: productDetailsAr,
         reviewForm: reviewFormAr,
         compare: compareAr,

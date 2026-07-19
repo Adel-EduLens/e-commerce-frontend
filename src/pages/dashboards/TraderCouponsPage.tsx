@@ -10,6 +10,8 @@ import type { Coupon } from "../../hooks/queries/couponsQuery";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useProducts } from "../../hooks/queries/productsQuery";
 import { handleApiError } from '../../lib/utils';
+import { useRetailCategories } from "../../hooks/useRetailCategories";
+import { useRetailProducts } from "../../hooks/useRetailProducts";
 
 interface Category {
   id: string;
@@ -146,8 +148,24 @@ export default function TraderCouponsPage() {
   const { data: coupons = [], isLoading: isLoadingCoupons } = useCoupons();
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 100 });
+  const { data: retailCategoriesData, isLoading: isLoadingRetailCategories } = useRetailCategories();
+  const { data: retailProductsData, isLoading: isLoadingRetailProducts } = useRetailProducts({ limit: 100 });
+
   const products = productsData?.products || [];
-  const loading = isLoadingCoupons || isLoadingCategories || isLoadingProducts;
+  const retailProducts = retailProductsData?.data?.products || [];
+  const retailCategories = retailCategoriesData?.data || [];
+
+  const categoryOptions = [
+    ...categories.map(c => ({ id: c.id, name: c.name })),
+    ...retailCategories.map(c => ({ id: `retail-${c.id}`, name: `${c.name} (${t("retail", "Retail")})` }))
+  ];
+
+  const productOptions = [
+    ...products.map(p => ({ id: p.id, name: p.name })),
+    ...retailProducts.map(p => ({ id: `retail-${p.id}`, name: `${p.name} (${t("retail", "Retail")})` }))
+  ];
+
+  const loading = isLoadingCoupons || isLoadingCategories || isLoadingProducts || isLoadingRetailCategories || isLoadingRetailProducts;
 
   // Form State
   const [code, setCode] = useState("");
@@ -213,12 +231,17 @@ export default function TraderCouponsPage() {
       return;
     }
 
+    const isRetailCategory = selectedCategory.startsWith("retail-");
+    const isRetailProduct = selectedProduct.startsWith("retail-");
+
     const payload = {
       code: code.trim().toUpperCase(),
       discount: Number(discount),
       validUntil: new Date(validUntil).toISOString(),
-      categoryId: selectedCategory || null,
-      productId: selectedProduct || null,
+      categoryId: isRetailCategory ? null : (selectedCategory || null),
+      productId: isRetailProduct ? null : (selectedProduct || null),
+      retailCategoryId: isRetailCategory ? Number(selectedCategory.replace("retail-", "")) : null,
+      retailProductId: isRetailProduct ? Number(selectedProduct.replace("retail-", "")) : null,
       usageLimit: usageLimit ? Number(usageLimit) : null,
     };
 
@@ -328,10 +351,20 @@ export default function TraderCouponsPage() {
                             <ShoppingBag className="h-3 w-3" />
                             {coupon.product.name}
                           </span>
+                        ) : coupon.retailProduct ? (
+                          <span className="inline-flex items-center gap-1 rounded-xl bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs text-blue-600 font-medium">
+                            <ShoppingBag className="h-3 w-3" />
+                            {coupon.retailProduct.name} (Retail)
+                          </span>
                         ) : coupon.category ? (
                           <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
                             <Tag className="h-3 w-3" />
                             {coupon.category.name}
+                          </span>
+                        ) : coupon.retailCategory ? (
+                          <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
+                            <Tag className="h-3 w-3" />
+                            {coupon.retailCategory.name} (Retail)
                           </span>
                         ) : (
                           <span className="text-gray-text text-xs">{t("globalCoupon")}</span>
@@ -538,7 +571,7 @@ export default function TraderCouponsPage() {
               <SearchableSelect
                 label={t("categoryRestrictionLabel")}
                 placeholder={t("searchCategoryPlaceholder")}
-                options={categories}
+                options={categoryOptions}
                 value={selectedCategory}
                 onChange={setSelectedCategory}
                 emptyLabel={t("noRestrictionLabel")}
@@ -547,7 +580,7 @@ export default function TraderCouponsPage() {
               <SearchableSelect
                 label={t("productRestrictionLabel")}
                 placeholder={t("searchProductPlaceholder")}
-                options={products}
+                options={productOptions}
                 value={selectedProduct}
                 onChange={setSelectedProduct}
                 emptyLabel={t("noRestrictionLabel")}

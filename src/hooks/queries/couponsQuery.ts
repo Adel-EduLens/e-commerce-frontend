@@ -21,8 +21,12 @@ export interface Coupon {
   validUntil: string;
   categoryId: string | null;
   productId: string | null;
+  retailCategoryId: number | null;
+  retailProductId: number | null;
   category?: { id: string; name: string } | null;
   product?: { id: string; name: string } | null;
+  retailCategory?: { id: number; name: string } | null;
+  retailProduct?: { id: number; name: string } | null;
   usageLimit: number | null;
   usedCount: number;
   usages?: CouponUsage[];

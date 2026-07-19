@@ -30,6 +30,7 @@
 
   "Please complete the address label and value": "يرجى إدخال اسم العنوان والعنوان بالكامل",
   "Address updated": "تم تحديث العنوان",
-  "Address removed": "تم حذف العنوان"
+  "Address removed": "تم حذف العنوان",
+  "No addresses found": "لم تقم بإضافة أي عناوين بعد."
 
 }

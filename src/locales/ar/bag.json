@@ -1,8 +1,12 @@
 {
   "page": {
     "title": "سلة التسوق",
+    "itemCount_zero": "(لا توجد منتجات)",
     "itemCount_one": "(منتج واحد)",
-    "itemCount_other": "({{count}} منتجات)",
+    "itemCount_two": "(منتجان)",
+    "itemCount_few": "({{count}} منتجات)",
+    "itemCount_many": "({{count}} منتجًا)",
+    "itemCount_other": "({{count}} منتج)",
     "addItems": "إضافة منتجات"
   },
   "summary": {

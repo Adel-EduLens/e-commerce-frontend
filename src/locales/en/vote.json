@@ -1,0 +1,9 @@
+{
+  "title": "Vote for next design",
+  "noDesigns": "No designs to vote on yet.",
+  "untitled": "Untitled design",
+  "votes": "Votes",
+  "voteButton": "Vote",
+  "successMessage": "Your vote has been counted!",
+  "errorMessage": "Failed to submit vote"
+}

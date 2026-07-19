@@ -44,6 +44,7 @@ function DetailField({
   onChange,
   type = "text",
   options,
+  disabled = false,
 }: {
   label: string;
   value: string;
@@ -51,6 +52,7 @@ function DetailField({
   onChange?: (value: string) => void;
   type?: "text" | "email" | "tel";
   options?: string[];
+  disabled?: boolean;
 }) {
   return (
     <div className="flex self-stretch flex-col items-start justify-start gap-4">
@@ -61,8 +63,9 @@ function DetailField({
           options ? (
             <select
               value={value}
+              disabled={disabled}
               onChange={(event) => onChange?.(event.target.value)}
-              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none"
+              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none disabled:cursor-not-allowed disabled:text-gray-text"
             >
               <option value="" disabled>
                 Select {label}
@@ -78,8 +81,9 @@ function DetailField({
             <input
               type={type}
               value={value}
+              disabled={disabled}
               onChange={(event) => onChange?.(event.target.value)}
-              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none placeholder:text-gray-text"
+              className="w-full border-none bg-transparent font-['Montserrat'] text-xl font-medium text-foreground outline-none placeholder:text-gray-text disabled:cursor-not-allowed disabled:text-gray-text"
             />
           )
         ) : (
@@ -514,6 +518,7 @@ export default function ContactDetailsPage() {
           value={contactDraft.email}
           type="email"
           isEditing
+          disabled
           onChange={(value) =>
             setContactDraft((current) => ({ ...current, email: value }))
           }
@@ -577,7 +582,9 @@ export default function ContactDetailsPage() {
         <div className="p-10 text-center">{t("loadding")}</div>
       )}
       {!isAddressesLoading && addresses && addresses.length === 0 && (
-        <div className="p-10 text-center">{t("noAddredddddsses")}</div>
+        <div className="p-10 text-center text-gray-text font-['Montserrat'] text-base">
+          {t("No addresses found", "No addresses added yet.")}
+        </div>
       )}
 
       {addresses && addresses.length > 0 && (

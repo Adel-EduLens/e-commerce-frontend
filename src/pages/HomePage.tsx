@@ -1,7 +1,6 @@
-
-
 import { useState, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 import { Link } from 'react-router-dom'
 
@@ -184,6 +183,7 @@ function VoteSection() {
   const { data: designs = [] } = useDesigns();
   const [currentIndex, setCurrentIndex] = useState(0)
   const [voting, setVoting] = useState(false)
+  const { t } = useTranslation("vote")
 
   const current = designs[currentIndex]
 
@@ -207,7 +207,7 @@ function VoteSection() {
     try {
       const res = await api.put(`/trader/designs/vote/${current.id}`)
       if (res.status === 200) {
-        toast.success('Your vote has been counted!')
+        toast.success(t('successMessage', 'Your vote has been counted!'))
         queryClient.setQueryData(['designs'], (prev: VoteDesign[] | undefined) =>
           prev?.map((design) =>
             design.id === current.id
@@ -217,7 +217,7 @@ function VoteSection() {
         )
       }
     } catch (error) {
-      handleApiError(error, 'Failed to submit vote');
+      handleApiError(error, t('errorMessage', 'Failed to submit vote'));
     } finally {
       setVoting(false)
     }
@@ -226,7 +226,7 @@ function VoteSection() {
   return (
     <div className="mt-10 sm:mt-16 w-full">
       <div className="w-full font-['Montserrat'] text-4xl sm:text-6xl lg:text-8xl font-bold text-foreground">
-        Vote for next design
+        {t('title', 'Vote for next design')}
       </div>
 
       {/* Mobile/Tablet layout */}
@@ -246,16 +246,16 @@ function VoteSection() {
         <div className="rounded-3xl bg-primary p-6 flex flex-col gap-4">
           {!current ? (
             <div className="font-['Montserrat'] text-xl font-medium text-primary-foreground">
-              No designs to vote on yet.
+              {t('noDesigns', 'No designs to vote on yet.')}
             </div>
           ) : (
             <>
               <div className="font-['Montserrat'] text-2xl sm:text-3xl font-semibold text-primary-foreground break-words">
-                {current.title?.trim() || 'Untitled design'}
+                {current.title?.trim() || t('untitled', 'Untitled design')}
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-['Montserrat'] text-xl font-semibold text-primary-foreground">Votes</div>
+                  <div className="font-['Montserrat'] text-xl font-semibold text-primary-foreground">{t('votes', 'Votes')}</div>
                   <div className="font-['Montserrat'] text-xl font-normal text-primary-foreground">{(current.votes ?? 0).toLocaleString()}</div>
                 </div>
                 <button
@@ -269,7 +269,7 @@ function VoteSection() {
                   ) : (
                     <div className="font-['Montserrat'] text-xl font-medium text-foreground flex gap-1">
                       <AssetImage file="lucide_vote.svg" className="h-6 w-6" />
-                      Vote
+                      {t('voteButton', 'Vote')}
                     </div>
                   )}
                 </button>
@@ -313,16 +313,16 @@ function VoteSection() {
           <VoteRings />
           {!current ? (
             <div className="absolute left-[714px] top-[330px] w-[539px] font-['Montserrat'] text-3xl font-medium text-primary-foreground">
-              No designs to vote on yet.
+              {t('noDesigns', 'No designs to vote on yet.')}
             </div>
           ) : (
             <>
               <div className="absolute left-[714px] top-[196px] w-[539px] break-words font-['Montserrat'] text-5xl font-semibold text-primary-foreground">
-                {current.title?.trim() || 'Untitled design'}
+                {current.title?.trim() || t('untitled', 'Untitled design')}
               </div>
               <div className="absolute left-[714px] top-[350px] inline-flex flex-col items-start justify-start gap-4">
                 <div className="self-stretch font-['Montserrat'] text-4xl font-semibold text-primary-foreground">
-                  Votes
+                  {t('votes', 'Votes')}
                 </div>
                 <div className="self-stretch font-['Montserrat'] text-4xl font-normal text-primary-foreground">
                   {(current.votes ?? 0).toLocaleString()}
@@ -339,7 +339,7 @@ function VoteSection() {
                 ) : (
                   <div className="font-['Montserrat'] text-3xl font-medium text-foreground flex gap-1">
                     <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
-                    Vote
+                    {t('voteButton', 'Vote')}
                   </div>
                 )}
               </button>
