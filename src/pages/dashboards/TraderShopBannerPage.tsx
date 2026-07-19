@@ -10,6 +10,7 @@ import {
   useDeleteShopBanner,
 } from "../../hooks/queries/shopBannerQuery";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface ShopBannerTablePanelProps {
   banners: ShopBanner[];
@@ -33,6 +34,7 @@ export function ShopBannerTablePanel({
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("date-desc");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const { t } = useTranslation("traderShopBannerPage");
 
   useEffect(() => {
     const handleClickOutside = () => setOpenFilter(null);
@@ -81,7 +83,7 @@ export function ShopBannerTablePanel({
           />
           <input
             type="text"
-            placeholder="Search Banners"
+            placeholder={t("searchBanners")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -96,7 +98,7 @@ export function ShopBannerTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Shop Banner
+          {t("addShopBanner")}
         </button>
       </div>
 
@@ -104,7 +106,7 @@ export function ShopBannerTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Shop Banners
+              {t("shopBanners")}
             </h2>
 
             <div className="relative">
@@ -116,7 +118,7 @@ export function ShopBannerTablePanel({
                 }}
                 className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 font-['Montserrat'] text-xs font-medium transition ${sortBy !== "date-desc" && sortBy !== "none" ? "border-primary bg-primary text-foreground" : "border-stroke bg-white text-foreground hover:bg-background"}`}
               >
-                Sort by
+                {t("sortBy")}
                 <img
                   className={`h-4 w-4 transition-transform ${openFilter === "sort" ? "-rotate-90" : "rotate-90"}`}
                   src={asset("weui_arrow-outlined.svg")}
@@ -126,12 +128,12 @@ export function ShopBannerTablePanel({
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-white shadow-lg py-1">
                   {[
-                    { value: "none", label: "No sort" },
-                    { value: "date-desc", label: "Newest first" },
-                    { value: "date-asc", label: "Oldest first" },
-                    { value: "name-asc", label: "Title: A → Z" },
-                    { value: "name-desc", label: "Title: Z → A" },
-                    { value: "order-asc", label: "Order" },
+                    { value: "none", label: t("noSort") },
+                    { value: "date-desc", label: t("newestFirst") },
+                    { value: "date-asc", label: t("oldestFirst") },
+                    { value: "name-asc", label: t("titleAsc") },
+                    { value: "name-desc", label: t("titleDesc") },
+                    { value: "order-asc", label: t("order") },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -166,7 +168,7 @@ export function ShopBannerTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Tables
+                  {t("tables")}
                 </span>
               </button>
               <button
@@ -182,7 +184,7 @@ export function ShopBannerTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Cards
+                  {t("cards")}
                 </span>
               </button>
             </div>
@@ -190,11 +192,11 @@ export function ShopBannerTablePanel({
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading banners..." containerClassName="py-20" className="h-8 w-8" />
+          <LoadingSpinner text={t("loadingBanners")} containerClassName="py-20" className="h-8 w-8" />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              No banners found.
+              {t("noBannersFound")}
             </p>
           </div>
         ) : viewMode === "cards" ? (
@@ -220,7 +222,7 @@ export function ShopBannerTablePanel({
                     {b.title}
                   </p>
                   <p className="truncate font-['Montserrat'] text-xs text-gray-text">
-                    Order: {b.order} | Active: {b.isActive ? "Yes" : "No"}
+                    {t("orderLabel")} {b.order} | {t("activeLabel")} {b.isActive ? t("yes") : t("no")}
                   </p>
                   <div className="flex items-center justify-between pt-2 border-t border-stroke">
                     <div className="flex items-center gap-2">
@@ -265,19 +267,19 @@ export function ShopBannerTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Image
+                    {t("image")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Title
+                    {t("title")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Active
+                    {t("active")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Order
+                    {t("orderHeader")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -304,7 +306,7 @@ export function ShopBannerTablePanel({
                       {b.title}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                      {b.isActive ? "Yes" : "No"}
+                      {b.isActive ? t("yes") : t("no")}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
                       {b.order}
@@ -352,7 +354,7 @@ export function ShopBannerTablePanel({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
+              {itemsPerPage} {t("perPage")}
               <img
                 className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
                 src={asset("weui_arrow-outlined.svg")}
@@ -372,7 +374,7 @@ export function ShopBannerTablePanel({
                     }}
                     className={`w-full px-3 py-2 text-left font-['Inter'] text-sm font-medium transition hover:bg-background ${itemsPerPage === size ? "text-primary" : "text-foreground"}`}
                   >
-                    {size} per page
+                    {size} {t("perPage")}
                   </button>
                 ))}
               </div>
@@ -385,7 +387,7 @@ export function ShopBannerTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              <span className="text-gray-text">{t("of")} {filtered.length}</span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -420,11 +422,10 @@ export function ShopBannerTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Shop Banner
+              {t("deleteShopBanner")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Are you sure you want to delete this banner? This action cannot
-              be undone.
+              {t("deleteConfirmation")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -432,7 +433,7 @@ export function ShopBannerTablePanel({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-white"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -442,7 +443,7 @@ export function ShopBannerTablePanel({
                 }}
                 className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>
@@ -460,6 +461,7 @@ export default function TraderShopBannerPage() {
   const createBanner = useCreateShopBanner();
   const updateBanner = useUpdateShopBanner();
   const deleteBanner = useDeleteShopBanner();
+  const { t } = useTranslation("traderShopBannerPage");
 
   return (
     <>
@@ -470,12 +472,12 @@ export default function TraderShopBannerPage() {
             try {
               await createBanner.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Banner created successfully");
+              toast.success(t("bannerCreated"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to create banner",
+                  : t("failedCreate"),
               );
             }
           }}
@@ -492,12 +494,12 @@ export default function TraderShopBannerPage() {
                 data: formData,
               });
               setEditBanner(null);
-              toast.success("Banner updated successfully");
+              toast.success(t("bannerUpdated"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to update banner",
+                  : t("failedUpdate"),
               );
             }
           }}

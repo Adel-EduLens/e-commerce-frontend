@@ -108,6 +108,18 @@ import retailDetailsAR from "./locales/ar/retail-detailspage.json";
 import createYourDesignDetailsPageEn from "./locales/en/createYourDesignDetailsPage.json";
 import createYourDesignDetailsPageAr from "./locales/ar/createYourDesignDetailsPage.json";
 
+import sidebarFilterEn from "./locales/en/sidebarFilter.json";
+import sidebarFilterAr from "./locales/ar/sidebarFilter.json";
+
+import traderInventorySharedEn from "./locales/en/traderInventoryShared.json";
+import traderInventorySharedAr from "./locales/ar/traderInventoryShared.json";
+
+import traderCategoriesPageEn from "./locales/en/traderCategoriesPage.json";
+import traderCategoriesPageAr from "./locales/ar/traderCategoriesPage.json";
+
+import traderShopBannerPageEn from "./locales/en/traderShopBannerPage.json";
+import traderShopBannerPageAr from "./locales/ar/traderShopBannerPage.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -149,6 +161,10 @@ i18n
         ui: uiEn,
         retailDetailsPage: retailDetailsEn,
         createYourDesignDetailsPage: createYourDesignDetailsPageEn,
+        sidebarFilter: sidebarFilterEn,
+        traderInventoryShared: traderInventorySharedEn,
+        traderCategoriesPage: traderCategoriesPageEn,
+        traderShopBannerPage: traderShopBannerPageEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -186,6 +202,10 @@ i18n
         ui: uiAr,
         retailDetailsPage: retailDetailsAR,
         createYourDesignDetailsPage: createYourDesignDetailsPageAr,
+        sidebarFilter: sidebarFilterAr,
+        traderInventoryShared: traderInventorySharedAr,
+        traderCategoriesPage: traderCategoriesPageAr,
+        traderShopBannerPage: traderShopBannerPageAr,
       },
     },
 

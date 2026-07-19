@@ -10,6 +10,7 @@ import {
   useDeleteCategory,
 } from "../../hooks/queries/categoriesQuery";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface CategoryTablePanelProps {
   categories: Category[];
@@ -33,6 +34,7 @@ export function CategoryTablePanel({
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("date-desc");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const { t } = useTranslation("traderCategoriesPage");
 
   useEffect(() => {
     const handleClickOutside = () => setOpenFilter(null);
@@ -79,7 +81,7 @@ export function CategoryTablePanel({
           />
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t("search")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -94,7 +96,7 @@ export function CategoryTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Category
+          {t("addCategory")}
         </button>
       </div>
 
@@ -102,7 +104,7 @@ export function CategoryTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Categories Table
+              {t("categoriesTable")}
             </h2>
 
             <div className="relative">
@@ -114,7 +116,7 @@ export function CategoryTablePanel({
                 }}
                 className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 font-['Montserrat'] text-xs font-medium transition ${sortBy !== "date-desc" && sortBy !== "none" ? "border-primary bg-primary text-foreground" : "border-stroke bg-white text-foreground hover:bg-background"}`}
               >
-                Sort by
+                {t("sortBy")}
                 <img
                   className={`h-4 w-4 transition-transform ${openFilter === "sort" ? "-rotate-90" : "rotate-90"}`}
                   src={asset("weui_arrow-outlined.svg")}
@@ -124,11 +126,11 @@ export function CategoryTablePanel({
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-white shadow-lg py-1">
                   {[
-                    { value: "none", label: "No sort" },
-                    { value: "date-desc", label: "Newest first" },
-                    { value: "date-asc", label: "Oldest first" },
-                    { value: "name-asc", label: "Name: A → Z" },
-                    { value: "name-desc", label: "Name: Z → A" },
+                    { value: "none", label: t("noSort") },
+                    { value: "date-desc", label: t("newestFirst") },
+                    { value: "date-asc", label: t("oldestFirst") },
+                    { value: "name-asc", label: t("nameAsc") },
+                    { value: "name-desc", label: t("nameDesc") },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -163,7 +165,7 @@ export function CategoryTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Tables
+                  {t("tables")}
                 </span>
               </button>
               <button
@@ -179,7 +181,7 @@ export function CategoryTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Cards
+                  {t("cards")}
                 </span>
               </button>
             </div>
@@ -187,11 +189,11 @@ export function CategoryTablePanel({
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading categories..." containerClassName="py-20" className="h-8 w-8" />
+          <LoadingSpinner text={t("loadingCategories")} containerClassName="py-20" className="h-8 w-8" />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              No categories found.
+              {t("noCategoriesFound")}
             </p>
           </div>
         ) : viewMode === "cards" ? (
@@ -259,19 +261,19 @@ export function CategoryTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Image
+                    {t("image")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Name
+                    {t("name")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Appear on Home
+                    {t("appearOnHome")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Date
+                    {t("date")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Actions
+                    {t("actions")}
                   </th>
                 </tr>
               </thead>
@@ -296,7 +298,7 @@ export function CategoryTablePanel({
                       {c.name}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                      {c.appearOnHome ? "Yes" : "No"}
+                      {c.appearOnHome ? t("yes") : t("no")}
                     </td>
                     <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
                       {new Date(c.createdAt).toLocaleDateString("en-US", {
@@ -348,7 +350,7 @@ export function CategoryTablePanel({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
+              {itemsPerPage} {t("perPage")}
               <img
                 className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
                 src={asset("weui_arrow-outlined.svg")}
@@ -368,7 +370,7 @@ export function CategoryTablePanel({
                     }}
                     className={`w-full px-3 py-2 text-left font-['Inter'] text-sm font-medium transition hover:bg-background ${itemsPerPage === size ? "text-primary" : "text-foreground"}`}
                   >
-                    {size} per page
+                    {size} {t("perPage")}
                   </button>
                 ))}
               </div>
@@ -381,7 +383,7 @@ export function CategoryTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              <span className="text-gray-text">{t("of")} {filtered.length}</span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -416,11 +418,10 @@ export function CategoryTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Category
+              {t("deleteCategory")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Are you sure you want to delete this category? This action cannot
-              be undone.
+              {t("deleteConfirmation")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -428,7 +429,7 @@ export function CategoryTablePanel({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-white"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -438,7 +439,7 @@ export function CategoryTablePanel({
                 }}
                 className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>
@@ -456,6 +457,7 @@ export default function TraderCategoriesPage() {
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const { t } = useTranslation("traderCategoriesPage");
 
   return (
     <>
@@ -466,12 +468,12 @@ export default function TraderCategoriesPage() {
             try {
               await createCategory.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Category created successfully");
+              toast.success(t("categoryCreated"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to create category",
+                  : t("failedCreate"),
               );
             }
           }}

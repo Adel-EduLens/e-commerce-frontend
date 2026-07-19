@@ -26,10 +26,10 @@ export function Toggle({
   // Color variants for active/inactive states
   const activeColorClasses = {
     primary: "bg-primary",
-    success: "bg-green-500",
+    success: "bg-success",
   };
 
-  const inactiveColorClass = "bg-stroke dark:bg-stroke/40";
+  const inactiveColorClass = "bg-stroke";
 
   // Knob sizes and translations
   const knobSizeClasses = {
@@ -67,7 +67,7 @@ export function Toggle({
     >
       <span
         className={cn(
-          "pointer-events-none inline-block transform rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ease-in-out",
+          "pointer-events-none inline-block transform rounded-full bg-primary-foreground shadow-md ring-0 transition-transform duration-300 ease-in-out",
           knobSizeClasses[size],
           knobTransformClasses[size]
         )}

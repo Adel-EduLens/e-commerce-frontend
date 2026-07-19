@@ -11,8 +11,6 @@ import { useHomeFilters } from "../hooks/utils/HomeFilters";
 import { useWholesales } from "../hooks/queries/wholesaleQuery";
 import { useTranslation } from "react-i18next";
 
-
-
 export default function ProductsPage() {
   const { t } = useTranslation("productSection");
 
@@ -27,7 +25,7 @@ export default function ProductsPage() {
 
   const [filters, setFilters] = useState<FilterValues>({
     search: urlSearch,
-    category: null,
+    category: urlCategoryName || null,
     brand: null,
     size: null,
     color: null,
@@ -35,14 +33,17 @@ export default function ProductsPage() {
     priceMax: null,
   });
 
-  const effectiveCategoryName = filters.category ?? urlCategoryName;
+  const effectiveCategoryName = filters.category;
 
   const [page, setPage] = useState(1);
 
   const { data: rawCategories = [] } = useCategories(false);
   const categories = useMemo(() => {
     return rawCategories.filter(
-      (c) => !c.isWholesale && (c as any).type !== "WHOLESALE" && (c as any).type !== "RETAIL"
+      (c) =>
+        !c.isWholesale &&
+        (c as any).type !== "WHOLESALE" &&
+        (c as any).type !== "RETAIL",
     );
   }, [rawCategories]);
   const { data: brands = [] } = useBrands();
@@ -88,10 +89,11 @@ export default function ProductsPage() {
       setFilters((prev) => ({
         ...prev,
         search: urlSearch,
+        category: urlCategoryName || prev.category,
       }));
     };
     func();
-  }, [urlSearch]);
+  }, [urlSearch, urlCategoryName]);
 
   useEffect(() => {
     const func = () => {
@@ -113,8 +115,6 @@ export default function ProductsPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
-
-
 
   const availableSizes = useMemo(() => {
     const sizes = new Set<string>();
@@ -145,7 +145,6 @@ export default function ProductsPage() {
   }, [data, wholesales]);
 
   const combinedProducts = useMemo(() => {
-
     const items: React.ReactNode[] = [];
     if (data?.products) {
       data.products.forEach((product) => {
@@ -199,9 +198,25 @@ export default function ProductsPage() {
             to={`/wholesale/${wholesale.id}`}
             brand={wholesale.brand}
             category={wholesale.category?.name}
-            colors={wholesale.wholesaleColors?.map(wc => wc.color) || []}
-            wholesaleSizes={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || []))}
-            sizeLabel={Array.from(new Set(wholesale.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+            colors={wholesale.wholesaleColors?.map((wc) => wc.color) || []}
+            wholesaleSizes={Array.from(
+              new Set(
+                wholesale.wholesaleColors?.flatMap((wc) =>
+                  wc.sizes.map((s) => s.size),
+                ) || [],
+              ),
+            )}
+            sizeLabel={
+              Array.from(
+                new Set(
+                  wholesale.wholesaleColors?.flatMap((wc) =>
+                    wc.sizes.map((s) => s.size),
+                  ) || [],
+                ),
+              )
+                .slice(0, 4)
+                .join("-") || "All Sizes"
+            }
             minOrder={wholesale.minOrder}
             wholesaleCard
           />,
@@ -220,7 +235,6 @@ export default function ProductsPage() {
   }
 
   return (
-
     <div className="w-full bg-background min-h-screen text-foreground transition-colors">
       <ShopBanner />
       <FilterCategory

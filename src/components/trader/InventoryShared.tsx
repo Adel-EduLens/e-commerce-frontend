@@ -293,6 +293,7 @@ export function AddItemModal({
   const createWholesale = useCreateWholesale();
   const isSaving = createProduct.isPending || createWholesale.isPending;
   const { t } = useTranslation("traderProduct");
+  const { t: tShared } = useTranslation("traderInventoryShared");
   const handleColorsChange = (colors: string[]) => {
     setSelectedColors(colors);
     setProductColors((prev) => {
@@ -501,7 +502,7 @@ export function AddItemModal({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            Add Item
+            {tShared("addItem")}
           </h2>
           <button
             type="button"
@@ -531,7 +532,7 @@ export function AddItemModal({
           )}
 
           <input
-            placeholder="Name *"
+            placeholder={tShared("namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
@@ -542,7 +543,7 @@ export function AddItemModal({
             onChange={(e) => setCategoryId(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
           >
-            <option value="">Select category *</option>
+            <option value="">{tShared("selectCategory")}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -556,7 +557,7 @@ export function AddItemModal({
               onChange={(e) => setBrandId(e.target.value)}
               className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
             >
-              <option value="">Select brand (optional)</option>
+              <option value="">{tShared("selectBrand")}</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -566,7 +567,7 @@ export function AddItemModal({
           )}
 
           <textarea
-            placeholder="Description"
+            placeholder={tShared("descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
@@ -575,7 +576,7 @@ export function AddItemModal({
 
           <div className="grid grid-cols-2 gap-2">
             <input
-              placeholder="Price *"
+              placeholder={tShared("pricePlaceholder")}
               type="number"
               min="0"
               value={price}
@@ -583,7 +584,7 @@ export function AddItemModal({
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
             />
             <input
-              placeholder="Stock (Calculated)"
+              placeholder={tShared("stockPlaceholder")}
               type="text"
               readOnly
               disabled
@@ -601,7 +602,7 @@ export function AddItemModal({
           </div>
 
           <input
-            placeholder="SKU (optional)"
+            placeholder={tShared("skuPlaceholder")}
             value={sku}
             onChange={(e) => setSku(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
@@ -610,12 +611,12 @@ export function AddItemModal({
           {type === "product" && (
             <div className="flex flex-col gap-3 rounded-xl border border-stroke p-3">
               <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                Product Attributes
+                {tShared("productAttributes")}
               </p>
               {/* Must Have toggle */}
               <div className="flex items-center justify-between">
                 <span className="font-['Montserrat'] text-sm text-foreground">
-                  Must Have
+                  {tShared("mustHave")}
                 </span>
                 <Toggle
                   checked={isMustHave}
@@ -626,7 +627,7 @@ export function AddItemModal({
               {/* Flash Deal toggle */}
               <div className="flex items-center justify-between">
                 <span className="font-['Montserrat'] text-sm text-foreground">
-                  Flash Deal
+                  {tShared("flashDeal")}
                 </span>
                 <Toggle
                   checked={isFlashDeals}
@@ -638,7 +639,7 @@ export function AddItemModal({
               {isFlashDeals && (
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <input
-                    placeholder="Deal price *"
+                    placeholder={tShared("dealPricePlaceholder")}
                     type="number"
                     min="0"
                     value={flashDealPrice}
@@ -658,7 +659,7 @@ export function AddItemModal({
           {type === "product" && (
             <>
               <MultiSelect
-                label="Select colors *"
+                label={tShared("selectColors")}
                 options={COLOR_OPTIONS}
                 selected={selectedColors}
                 onChange={handleColorsChange}
@@ -667,7 +668,7 @@ export function AddItemModal({
               {productColors.map((pc, colorIdx) => (
                 <div
                   key={pc.color}
-                  className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+                  className="rounded-xl border border-stroke p-4 space-y-3 bg-background"
                 >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
@@ -684,16 +685,16 @@ export function AddItemModal({
                           selectedColors.filter((c) => c !== pc.color),
                         )
                       }
-                      className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
+                      className="text-error hover:opacity-80 text-xs font-semibold font-['Montserrat']"
                     >
-                      Remove Color
+                      {tShared("removeColor")}
                     </button>
                   </div>
 
                   {/* Multiple Image Upload */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Upload Images *
+                      {tShared("uploadImages")}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {pc.images.map((imgFile, imgIdx) => {
@@ -727,16 +728,16 @@ export function AddItemModal({
                               }}
                               className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
                             >
-                              Delete
+                              {tShared("delete")}
                             </button>
                           </div>
                         );
                       })}
                       {/* Upload Button */}
-                      <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
+                      <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-card">
                         <span className="text-xl font-bold">+</span>
                         <span className="text-[9px] font-['Montserrat']">
-                          Add
+                          {tShared("add")}
                         </span>
                         <input
                           type="file"
@@ -763,7 +764,7 @@ export function AddItemModal({
                       </label>
                     </div>
                     {pc.images.length === 0 && (
-                      <p className="text-red-500 font-['Montserrat'] text-[10px]">
+                      <p className="text-error font-['Montserrat'] text-[10px]">
                         * At least one image is required
                       </p>
                     )}
@@ -772,20 +773,20 @@ export function AddItemModal({
                   {/* Variant Table (Sizes & Stock) */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      {t("sizesQuantities")}
+                      {tShared("sizesQuantities")}
                     </p>
                     {pc.variants.length > 0 && (
                       <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
                         <thead>
                           <tr className="bg-secondary text-primary font-bold">
                             <th className="p-2 border-b border-stroke">
-                              {t("size")}
+                              {tShared("size")}
                             </th>
                             <th className="p-2 border-b border-stroke">
-                              {t("quantity")}
+                              {tShared("quantity")}
                             </th>
                             <th className="p-2 border-b border-stroke text-right">
-                              {t("action")}
+                              {tShared("action")}
                             </th>
                           </tr>
                         </thead>
@@ -793,7 +794,7 @@ export function AddItemModal({
                           {pc.variants.map((v, vIdx) => (
                             <tr
                               key={vIdx}
-                              className="bg-white border-b border-stroke last:border-none"
+                              className="bg-card border-b border-stroke last:border-none"
                             >
                               <td className="p-2 font-semibold">{v.size}</td>
                               <td className="p-2">
@@ -842,9 +843,9 @@ export function AddItemModal({
                                       ),
                                     );
                                   }}
-                                  className="text-red-500 hover:text-red-700"
+                                  className="text-error hover:opacity-80"
                                 >
-                                  Delete
+                                  {tShared("delete")}
                                 </button>
                               </td>
                             </tr>
@@ -853,7 +854,7 @@ export function AddItemModal({
                       </table>
                     )}
                     {pc.variants.length === 0 && (
-                      <p className="text-red-500 font-['Montserrat'] text-[10px]">
+                      <p className="text-error font-['Montserrat'] text-[10px]">
                         * At least one size variant is required
                       </p>
                     )}
@@ -862,9 +863,9 @@ export function AddItemModal({
                     <div className="flex gap-2 items-center pt-2">
                       <select
                         id={`add-size-select-${pc.color}`}
-                        className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
+                        className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-card outline-none focus:border-primary"
                       >
-                        <option value="">{t("size")}</option>
+                        <option value="">{tShared("size")}</option>
                         {SIZE_OPTIONS.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -875,7 +876,7 @@ export function AddItemModal({
                         type="number"
                         min="0"
                         id={`add-size-qty-${pc.color}`}
-                        placeholder={t("qty")}
+                        placeholder={tShared("qty")}
                         defaultValue="10"
                         className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
                       />
@@ -922,9 +923,9 @@ export function AddItemModal({
                           );
                           sizeSel.value = "";
                         }}
-                        className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-white"
+                        className="rounded-xl border border-stroke hover:bg-background px-3 py-1.5 text-xs font-semibold font-['Montserrat'] transition shrink-0 bg-card"
                       >
-                        {t("addSize")}
+                        {tShared("addSize")}
                       </button>
                     </div>
                   </div>
@@ -937,10 +938,10 @@ export function AddItemModal({
             <>
               <div className="flex flex-col gap-1.5">
                 <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Shared Sizes for All Packages *
+                  {tShared("sharedSizes")}
                 </label>
                 <MultiSelect
-                  label="Select shared sizes"
+                  label={tShared("selectSharedSizes")}
                   options={SIZE_OPTIONS}
                   selected={sharedSizes}
                   onChange={handleSharedSizesChange}
@@ -949,14 +950,14 @@ export function AddItemModal({
 
               <div className="flex justify-between items-center pt-2">
                 <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                  Packages
+                  {tShared("packages")}
                 </p>
                 <button
                   type="button"
                   onClick={handleAddPackage}
                   className="rounded-xl bg-primary px-3 py-1.5 font-['Montserrat'] text-xs font-bold text-foreground transition hover:opacity-90"
                 >
-                  + Add Package
+                  + {tShared("addPackage")}
                 </button>
               </div>
 
@@ -967,21 +968,21 @@ export function AddItemModal({
                 >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground">
-                      Package #{colorIdx + 1} {pc.color ? `(${pc.color})` : ""}
+                      {tShared("package")} #{colorIdx + 1} {pc.color ? `(${pc.color})` : ""}
                     </h4>
                     <button
                       type="button"
                       onClick={() => handleRemovePackage(colorIdx)}
                       className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
                     >
-                      Remove Package
+                      {tShared("removePackage")}
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 pt-1">
                     <div className="flex flex-col gap-1">
                       <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        Color *
+                        {tShared("color")}
                       </label>
                       {(() => {
                         const chosenColors = productColors
@@ -1001,7 +1002,7 @@ export function AddItemModal({
                             }}
                             className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
                           >
-                            <option value="">Select Color</option>
+                            <option value="">{tShared("selectColor")}</option>
                             {availableColorOptions.map((c) => (
                               <option key={c} value={c}>
                                 {c}
@@ -1014,7 +1015,7 @@ export function AddItemModal({
 
                     <div className="flex flex-col gap-1">
                       <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        Stock *
+                        {tShared("stock")}
                       </label>
                       <input
                         type="number"
@@ -1036,7 +1037,7 @@ export function AddItemModal({
                   {/* Multiple Image Upload */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Upload Images *
+                      {tShared("uploadImages")}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {pc.images.map((imgFile, imgIdx) => {
@@ -1070,7 +1071,7 @@ export function AddItemModal({
                               }}
                               className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
                             >
-                              Delete
+                              {tShared("delete")}
                             </button>
                           </div>
                         );
@@ -1079,7 +1080,7 @@ export function AddItemModal({
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
                         <span className="text-[9px] font-['Montserrat']">
-                          Add
+                          {tShared("add")}
                         </span>
                         <input
                           type="file"
@@ -1115,7 +1116,7 @@ export function AddItemModal({
                   {sharedSizes.length > 0 && (
                     <div className="pt-1.5 flex items-center gap-1.5">
                       <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
-                        Sizes:
+                        {tShared("sizes")}:
                       </span>
                       <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
                         {sharedSizes.join(", ")}
@@ -1131,7 +1132,7 @@ export function AddItemModal({
 
               <div className="flex flex-col gap-1">
                 <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Min Order Quantity *
+                  {tShared("minOrderQuantity")}
                 </label>
                 <input
                   placeholder="Min order quantity"
@@ -1197,10 +1198,10 @@ export function AddItemModal({
             className="rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
           >
             {uploading
-              ? "Uploading images..."
+              ? tShared("uploadingImages")
               : isSaving
-                ? "Saving..."
-                : "Add Item"}
+                ? tShared("saving")
+                : tShared("addItem")}
           </button>
         </form>
       </div>
@@ -1225,6 +1226,7 @@ export function EditItemModal({
   onClose: () => void;
 }) {
   const { t } = useTranslation("traderProduct");
+  const { t: tShared } = useTranslation("traderInventoryShared");
   const isProductType = item.type === "product";
 
   const [name, setName] = useState(item.product);
@@ -1712,7 +1714,7 @@ export function EditItemModal({
                   {/* Color Images List */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Color Images
+                      {tShared("uploadImages")}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {color.images?.map((img) => (
@@ -1750,7 +1752,7 @@ export function EditItemModal({
                             }}
                             className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold disabled:opacity-50"
                           >
-                            Delete
+                            {tShared("delete")}
                           </button>
                         </div>
                       ))}
@@ -1799,18 +1801,18 @@ export function EditItemModal({
                   {/* Size Variants Table */}
                   <div className="space-y-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Sizes & Quantities
+                      {tShared("sizesQuantities")}
                     </p>
                     {color.variants && color.variants.length > 0 && (
                       <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
                         <thead>
                           <tr className="bg-secondary text-primary font-bold">
-                            <th className="p-2 border-b border-stroke">Size</th>
+                            <th className="p-2 border-b border-stroke">{tShared("size")}</th>
                             <th className="p-2 border-b border-stroke">
-                              Quantity
+                              {tShared("quantity")}
                             </th>
                             <th className="p-2 border-b border-stroke text-right">
-                              Action
+                              {tShared("action")}
                             </th>
                           </tr>
                         </thead>
@@ -1893,7 +1895,7 @@ export function EditItemModal({
                         id={`edit-add-size-${color.id}`}
                         className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
                       >
-                        <option value="">Select Size</option>
+                        <option value="">{tShared("selectSize")}</option>
                         {SIZE_OPTIONS.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -1904,7 +1906,7 @@ export function EditItemModal({
                         type="number"
                         min="0"
                         id={`edit-add-qty-${color.id}`}
-                        placeholder="Qty"
+                        placeholder={tShared("qty")}
                         defaultValue="10"
                         className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
                       />
@@ -2018,7 +2020,7 @@ export function EditItemModal({
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
                         <span className="text-[9px] font-['Montserrat']">
-                          Add
+                          {tShared("add")}
                         </span>
                         <input
                           type="file"
@@ -2080,7 +2082,7 @@ export function EditItemModal({
                         id="new-color-size-sel"
                         className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-white outline-none focus:border-primary"
                       >
-                        <option value="">Select Size</option>
+                        <option value="">{tShared("selectSize")}</option>
                         {SIZE_OPTIONS.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
@@ -2091,7 +2093,7 @@ export function EditItemModal({
                         type="number"
                         min="0"
                         id="new-color-qty-input"
-                        placeholder="Qty"
+                        placeholder={tShared("qty")}
                         defaultValue="10"
                         className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
                       />
@@ -2194,10 +2196,10 @@ export function EditItemModal({
             <>
               <div className="flex flex-col gap-1.5">
                 <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Shared Sizes for All Packages *
+                  {tShared("sharedSizes")}
                 </label>
                 <MultiSelect
-                  label="Select shared sizes"
+                  label={tShared("selectSharedSizes")}
                   options={SIZE_OPTIONS}
                   selected={sharedSizes}
                   onChange={handleSharedSizesChangeEdit}
@@ -2206,14 +2208,14 @@ export function EditItemModal({
 
               <div className="flex justify-between items-center pt-2">
                 <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
-                  Packages
+                  {tShared("packages")}
                 </p>
                 <button
                   type="button"
                   onClick={handleAddPackageEdit}
                   className="rounded-xl bg-primary px-3 py-1.5 font-['Montserrat'] text-xs font-bold text-foreground transition hover:opacity-90"
                 >
-                  + Add Package
+                  + {tShared("addPackage")}
                 </button>
               </div>
 
@@ -2224,7 +2226,7 @@ export function EditItemModal({
                 >
                   <div className="flex items-center justify-between border-b border-stroke pb-2">
                     <h4 className="font-['Montserrat'] text-sm font-bold text-foreground">
-                      Package #{colorIdx + 1} {wc.color ? `(${wc.color})` : ""}
+                      {tShared("package")} #{colorIdx + 1} {wc.color ? `(${wc.color})` : ""}
                     </h4>
                     <button
                       type="button"
@@ -2235,14 +2237,14 @@ export function EditItemModal({
                       }}
                       className="text-red-500 hover:text-red-700 text-xs font-semibold font-['Montserrat']"
                     >
-                      Remove Package
+                      {tShared("removePackage")}
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 pt-1">
                     <div className="flex flex-col gap-1">
                       <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        Color *
+                        {tShared("color")}
                       </label>
                       {(() => {
                         const chosenColors = wholesaleColorsState
@@ -2262,7 +2264,7 @@ export function EditItemModal({
                             }}
                             className="w-full border border-stroke rounded-xl px-3 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary bg-white"
                           >
-                            <option value="">Select Color</option>
+                            <option value="">{tShared("selectColor")}</option>
                             {availableColorOptions.map((c) => (
                               <option key={c} value={c}>
                                 {c}
@@ -2275,7 +2277,7 @@ export function EditItemModal({
 
                     <div className="flex flex-col gap-1">
                       <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                        Stock *
+                        {tShared("stock")}
                       </label>
                       <input
                         type="number"
@@ -2296,7 +2298,7 @@ export function EditItemModal({
 
                   <div className="space-y-2 pt-2">
                     <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Upload Images *
+                      {tShared("uploadImages")}
                     </p>
                     <div className="flex flex-wrap gap-2 items-center">
                       {wc.images.map((img, imgIdx) => {
@@ -2337,7 +2339,7 @@ export function EditItemModal({
                       })}
                       <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
                         <span className="text-xl font-bold">+</span>
-                        <span className="text-[9px] font-['Montserrat']">Add</span>
+                        <span className="text-[9px] font-['Montserrat']">{tShared("add")}</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -2371,7 +2373,7 @@ export function EditItemModal({
                   {sharedSizes.length > 0 && (
                     <div className="pt-1.5 flex items-center gap-1.5">
                       <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
-                        Sizes:
+                        {tShared("sizes")}:
                       </span>
                       <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
                         {sharedSizes.join(", ")}
@@ -2383,7 +2385,7 @@ export function EditItemModal({
 
               <div className="flex flex-col gap-1">
                 <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  Min Order Quantity *
+                  {tShared("minOrderQuantity")}
                 </label>
                 <input
                   placeholder="Min order quantity"
