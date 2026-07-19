@@ -217,6 +217,7 @@ export function RetailProductFormModal({
           }}
         />
       )}
+
       <div className="w-full max-w-md rounded-2xl bg-card shadow-xl max-h-[90vh] flex flex-col border border-stroke">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
@@ -268,12 +269,11 @@ export function RetailProductFormModal({
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             />
             <select
-              required
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground"
             >
-              <option value="">{t("selectBrand")}</option>
+              <option value="">{t("selectBrandOptional")}</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -481,6 +481,7 @@ export function RetailProductFormModal({
                     </thead>
                     <tbody>
                       {pc.variants.map((v, vIdx) => (
+
                          <tr key={vIdx} className="bg-card border-b border-stroke last:border-none">
                           <td className="p-2 font-semibold">{v.size}</td>
                           <td className="p-2">
@@ -588,7 +589,6 @@ export function RetailProductFormModal({
                 !name ||
                 !price ||
                 !categoryId ||
-                !brandId ||
                 productColors.length === 0
               }
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
@@ -618,6 +618,7 @@ const FALLBACK_DATE_STR = new Date(FALLBACK_DATE_RAW).toLocaleDateString(
 export default function TraderRetailProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editProduct, setEditProduct] = useState<RetailProduct | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const { t } = useTranslation("traderProduct");
 
   const {
@@ -773,17 +774,47 @@ export default function TraderRetailProductsPage() {
           );
           if (raw) setEditProduct(raw);
         }}
-        onDelete={(item) => {
-          deleteProduct.mutate(item.id, {
-            onSuccess: () => toast.success(t("productDeletedSuccess")),
-            onError: () => toast.error(t("failedToDeleteProduct")),
-          });
-        }}
+        onDelete={(item) => setDeleteId(item.id)}
         showTypeFilter={false}
         showRetailColumns={true}
         title="Retail Products"
         addLabel="Add Retail Product"
       />
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 space-y-4 shadow-xl">
+            <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+              {t("deleteProduct")}
+            </h3>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              {t("deleteConfirmation")}
+            </p>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-card hover:bg-background transition"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteProduct.mutate(deleteId, {
+                    onSuccess: () => toast.success(t("productDeletedSuccess")),
+                    onError: () => toast.error(t("failedToDeleteProduct")),
+                  });
+                  setDeleteId(null);
+                }}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

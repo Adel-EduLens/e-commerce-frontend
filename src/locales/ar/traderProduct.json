@@ -147,6 +147,8 @@
   "failedToCreateProduct": "فشل في إنشاء المنتج",
   "retailProductUpdatedSuccess": "تم تحديث منتج التجزئة بنجاح",
   "failedToUpdateProduct": "فشل في تحديث المنتج",
-  "productDeletedSuccess": "تم حذف المنتج",
-  "failedToDeleteProduct": "فشل في حذف المنتج"
+  "productDeletedSuccess": "تم حذف المنتج بنجاح",
+  "failedToDeleteProduct": "فشل في حذف المنتج",
+  "deleteProduct": "حذف المنتج",
+  "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء."
 }

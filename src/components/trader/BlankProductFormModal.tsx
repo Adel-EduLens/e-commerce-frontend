@@ -8,10 +8,11 @@ import {
 import ImageCropModal, {
   validateImageDimensions,
 } from "../../components/trader/ImageCropModal";
-import { Toggle } from "../ui";
 import { toast } from "sonner";
 import { COLOR_OPTIONS } from "./inventoryUtils";
 import { MultiSelect } from "./InventoryShared";
+import { useTranslation } from "react-i18next";
+import { Toggle } from "../ui";
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);
@@ -32,6 +33,7 @@ export function BlankProductFormModal({
   onSave,
   onClose,
 }: BlankProductFormModalProps) {
+  const { t } = useTranslation("traderBlankProducts");
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product?.price?.toString() ?? "");
@@ -104,7 +106,7 @@ export function BlankProductFormModal({
       setColors(newColors);
     } catch (err) {
       console.log(err);
-      toast.error("Failed to upload image")
+      toast.error(t("failedUploadImage"))
     } finally {
       setUploading(false);
       setCropSrc(null);
@@ -114,17 +116,17 @@ export function BlankProductFormModal({
 
   const handleSave = () => {
     // Validate
-    if (!name.trim()) return alert("Name is required");
-    if (colors.length === 0) return alert("At least one color is required");
+    if (!name.trim()) return alert(t("nameRequired"));
+    if (colors.length === 0) return alert(t("oneColorRequired"));
     for (const c of colors) {
       if (!c.color.trim())
-        return alert("Color name is required for all colors");
+        return alert(t("colorNameRequired"));
       if (c.images.length === 0)
-        return alert(`At least one image is required for color: ${c.color}`);
+        return alert(`${t("oneImageRequiredColor")} ${c.color}`);
       for (const img of c.images) {
         if (!img.direction)
           return alert(
-            `Direction is required for all images in color: ${c.color}`,
+            `${t("directionRequiredColor")} ${c.color}`,
           );
       }
     }
@@ -150,7 +152,7 @@ export function BlankProductFormModal({
       <div className="w-full max-w-2xl rounded-2xl bg-card shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {product ? "Edit Blank Product" : "Add Blank Product"}
+            {product ? t("editBlankProduct") : t("addBlankProduct")}
           </h2>
           <button
             type="button"
@@ -165,21 +167,21 @@ export function BlankProductFormModal({
           {/* Basic Info */}
           <div className="grid grid-cols-2 gap-4">
             <input
-              placeholder="Product name *"
+              placeholder={t("productName")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
             />
             <input
               type="number"
-              placeholder="Price"
+              placeholder={t("price")}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
             />
           </div>
           <textarea
-            placeholder="Description"
+            placeholder={t("description")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -188,7 +190,7 @@ export function BlankProductFormModal({
 
           <div className="flex justify-between items-center bg-background p-3 rounded-xl">
             <label className="block font-['Montserrat'] text-sm font-semibold text-foreground">
-              Is Active
+              {t("isActive")}
             </label>
             <Toggle
               checked={isActive}
@@ -201,11 +203,11 @@ export function BlankProductFormModal({
           {/* Materials */}
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-sm font-semibold text-foreground">
-              Materials
+              {t("materials")}
             </label>
             <div className="flex gap-2">
               <input
-                placeholder="Add a material (e.g. Cotton)"
+                placeholder={t("addMaterialPlaceholder")}
                 value={materialInput}
                 onChange={(e) => setMaterialInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -227,9 +229,9 @@ export function BlankProductFormModal({
                     setMaterialInput("");
                   }
                 }}
-                className="text-primary-foreground rounded-xl bg-secondary px-4 py-2 font-['Montserrat'] text-sm font-semibold transition hover:opacity-90"
+                className="rounded-xl bg-primary px-4 py-2 font-['Montserrat'] text-sm font-semibold text-primary-foreground transition hover:opacity-90"
               >
-                Add
+                {t("add")}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -257,10 +259,10 @@ export function BlankProductFormModal({
           <div className="space-y-4 mt-2 border-t border-stroke pt-4">
             <div className="space-y-2">
               <label className="block font-['Montserrat'] text-sm font-semibold text-foreground">
-                Colors & Images
+                {t("colorsAndImages")}
               </label>
               <MultiSelect
-                label="Select colors *"
+                label={t("selectColors")}
                 options={COLOR_OPTIONS}
                 selected={colors.map(c => c.color)}
                 onChange={handleColorsChange}
@@ -285,7 +287,7 @@ export function BlankProductFormModal({
                     onClick={() => handleColorsChange(colors.map(x => x.color).filter(col => col !== c.color))}
                     className="text-danger text-xs font-semibold font-['Montserrat'] hover:underline"
                   >
-                    Remove Color
+                    {t("removeColor")}
                   </button>
                 </div>
 
@@ -311,15 +313,15 @@ export function BlankProductFormModal({
                         className="flex-1 rounded-xl border border-stroke px-3 py-2 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
                       >
                         <option value="" disabled>
-                          Select Direction *
+                          {t("selectDirection")}
                         </option>
                         {[
-                          { value: "FRONT", label: "Front" },
-                          { value: "BACK", label: "Back" },
-                          { value: "LEFT", label: "Left" },
-                          { value: "RIGHT", label: "Right" },
-                          { value: "TOP", label: "Top" },
-                          { value: "BOTTOM", label: "Bottom" },
+                          { value: "FRONT", label: t("front") },
+                          { value: "BACK", label: t("back") },
+                          { value: "LEFT", label: t("left") },
+                          { value: "RIGHT", label: t("right") },
+                          { value: "TOP", label: t("top") },
+                          { value: "BOTTOM", label: t("bottom") },
                         ].map((dir) => {
                           const isUsed = c.images.some(
                             (otherImg, otherIdx) =>
@@ -327,7 +329,7 @@ export function BlankProductFormModal({
                           );
                           return (
                             <option key={dir.value} value={dir.value} disabled={isUsed}>
-                              {dir.label} {isUsed ? "(Already Selected)" : ""}
+                              {dir.label} {isUsed ? t("alreadySelected") : ""}
                             </option>
                           );
                         })}
@@ -350,7 +352,7 @@ export function BlankProductFormModal({
 
                   <div className="pt-2">
                     <label className="cursor-pointer inline-flex items-center justify-center rounded-lg border border-dashed border-stroke px-4 py-2 font-['Montserrat'] text-xs font-semibold text-gray-text hover:bg-card hover:text-foreground transition bg-card w-full">
-                      + Add Image
+                      {t("addImage")}
                       <input
                         type="file"
                         accept="image/*"
@@ -371,7 +373,7 @@ export function BlankProductFormModal({
             onClick={onClose}
             className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
           >
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"
@@ -379,7 +381,7 @@ export function BlankProductFormModal({
             onClick={handleSave}
             className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
           >
-            {uploading ? "Uploading..." : "Save Blank Product"}
+            {uploading ? t("uploading") : t("saveBlankProduct")}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { asset } from "../../components/trader/inventoryUtils";
 import { BlankProductFormModal } from "../../components/trader/BlankProductFormModal";
 import { LoadingSpinner } from "../../components/shared";
@@ -26,6 +27,7 @@ export function BlankProductTablePanel({
   onEdit,
   onDelete,
 }: BlankProductTablePanelProps) {
+  const { t } = useTranslation("traderBlankProducts");
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [page, setPage] = useState(1);
@@ -79,7 +81,7 @@ export function BlankProductTablePanel({
           />
           <input
             type="text"
-            placeholder="Search Blank Products"
+            placeholder={t("searchBlankProducts")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -94,7 +96,7 @@ export function BlankProductTablePanel({
           className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          Add Blank Product
+          {t("addBlankProduct")}
         </button>
       </div>
 
@@ -102,7 +104,7 @@ export function BlankProductTablePanel({
         <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
-              Blank Products Table
+              {t("blankProductsTable")}
             </h2>
 
             <div className="relative">
@@ -114,7 +116,7 @@ export function BlankProductTablePanel({
                 }}
                 className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 font-['Montserrat'] text-xs font-medium transition ${sortBy !== "date-desc" && sortBy !== "none" ? "border-primary bg-primary text-foreground" : "border-stroke bg-card text-foreground hover:bg-background"}`}
               >
-                Sort by
+                {t("sortBy")}
                 <img
                   className={`h-4 w-4 transition-transform ${openFilter === "sort" ? "-rotate-90" : "rotate-90"}`}
                   src={asset("weui_arrow-outlined.svg")}
@@ -124,11 +126,11 @@ export function BlankProductTablePanel({
               {openFilter === "sort" && (
                 <div className="absolute left-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-stroke bg-card shadow-lg py-1">
                   {[
-                    { value: "none", label: "No sort" },
-                    { value: "date-desc", label: "Newest first" },
-                    { value: "date-asc", label: "Oldest first" },
-                    { value: "name-asc", label: "Name: A → Z" },
-                    { value: "name-desc", label: "Name: Z → A" },
+                    { value: "none", label: t("none") },
+                    { value: "date-desc", label: t("newestFirst") },
+                    { value: "date-asc", label: t("oldestFirst") },
+                    { value: "name-asc", label: t("nameAsc") },
+                    { value: "name-desc", label: t("nameDesc") },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -163,7 +165,7 @@ export function BlankProductTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "table" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Tables
+                  {t("tables")}
                 </span>
               </button>
               <button
@@ -179,7 +181,7 @@ export function BlankProductTablePanel({
                 <span
                   className={`font-['Montserrat'] text-xs font-medium ${viewMode === "cards" ? "text-foreground" : "text-gray-text"}`}
                 >
-                  Cards
+                  {t("cards")}
                 </span>
               </button>
             </div>
@@ -187,11 +189,11 @@ export function BlankProductTablePanel({
         </div>
 
         {loading ? (
-          <LoadingSpinner text="Loading blank products..." containerClassName="py-20" className="h-8 w-8" />
+          <LoadingSpinner text={t("loadingBlankProducts")} containerClassName="py-20" className="h-8 w-8" />
         ) : paginated.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              No blank products found.
+              {t("noBlankProductsFound")}
             </p>
           </div>
         ) : viewMode === "cards" ? (
@@ -267,22 +269,22 @@ export function BlankProductTablePanel({
               <thead>
                 <tr className="bg-secondary">
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Image
+                    {t("image", { ns: "traderRetailCategories" })}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Name
+                    {t("name", { ns: "traderRetailCategories" })}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Price
+                    {t("price")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Active
+                    {t("isActive")}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Date
+                    {t("date", { ns: "traderRetailCategories" })}
                   </th>
                   <th className="px-4 py-3 text-center font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">
-                    Actions
+                    {t("actions", { ns: "traderRetailCategories" })}
                   </th>
                 </tr>
               </thead>
@@ -312,7 +314,7 @@ export function BlankProductTablePanel({
                         ${p.price ?? 0}
                       </td>
                       <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                        {p.isActive ? "Yes" : "No"}
+                        {p.isActive ? t("yes", { ns: "traderRetailCategories" }) : t("no", { ns: "traderRetailCategories" })}
                       </td>
                       <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
                         {new Date(p.createdAt).toLocaleDateString("en-US", {
@@ -365,7 +367,7 @@ export function BlankProductTablePanel({
               }}
               className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-2.5 font-['Inter'] text-sm font-medium text-foreground transition hover:bg-background"
             >
-              {itemsPerPage} per page
+              {t("perPage", { count: itemsPerPage })}
               <img
                 className={`h-4 w-4 transition-transform ${openFilter === "pagesize" ? "rotate-180" : ""}`}
                 src={asset("weui_arrow-outlined.svg")}
@@ -385,7 +387,7 @@ export function BlankProductTablePanel({
                     }}
                     className={`w-full px-3 py-2 text-left font-['Inter'] text-sm font-medium transition hover:bg-background ${itemsPerPage === size ? "text-primary" : "text-foreground"}`}
                   >
-                    {size} per page
+                    {t("perPage", { count: size })}
                   </button>
                 ))}
               </div>
@@ -398,7 +400,7 @@ export function BlankProductTablePanel({
                 ? "0"
                 : Math.min((safePage - 1) * itemsPerPage + 1, filtered.length)}
               –{Math.min(safePage * itemsPerPage, filtered.length)}{" "}
-              <span className="text-gray-text">of {filtered.length}</span>
+              <span className="text-gray-text">{t("of")} {filtered.length}</span>
             </span>
             <span className="mx-1 h-5 border-l border-stroke" />
             <button
@@ -433,11 +435,10 @@ export function BlankProductTablePanel({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-card p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              Delete Blank Product
+              {t("deleteProduct")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              Are you sure you want to delete this blank product? This action cannot
-              be undone.
+              {t("deleteConfirmation")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -445,7 +446,7 @@ export function BlankProductTablePanel({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-card"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 type="button"
@@ -455,7 +456,7 @@ export function BlankProductTablePanel({
                 }}
                 className="flex-1 rounded-xl bg-danger py-2.5 font-['Montserrat'] text-sm font-bold text-primary-foreground transition hover:opacity-90"
               >
-                Delete
+                {t("delete")}
               </button>
             </div>
           </div>
@@ -466,6 +467,7 @@ export function BlankProductTablePanel({
 }
 
 export default function TraderBlankProductsPage() {
+  const { t } = useTranslation("traderBlankProducts");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editProduct, setEditProduct] = useState<BlankProduct | null>(null);
 
@@ -483,12 +485,12 @@ export default function TraderBlankProductsPage() {
             try {
               await createProduct.mutateAsync(data);
               setShowAddModal(false);
-              toast.success("Blank product created successfully");
+              toast.success(t("productCreated"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to create blank product",
+                  : t("failedCreate"),
               );
             }
           }}
@@ -505,12 +507,12 @@ export default function TraderBlankProductsPage() {
                 data: formData,
               });
               setEditProduct(null);
-              toast.success("Blank product updated successfully");
+              toast.success(t("productUpdated"));
             } catch (error) {
               toast.error(
                 error instanceof Error
                   ? error.message
-                  : "Failed to update blank product",
+                  : t("failedUpdate"),
               );
             }
           }}

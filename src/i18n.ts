@@ -120,6 +120,12 @@ import traderCategoriesPageAr from "./locales/ar/traderCategoriesPage.json";
 import traderShopBannerPageEn from "./locales/en/traderShopBannerPage.json";
 import traderShopBannerPageAr from "./locales/ar/traderShopBannerPage.json";
 
+import traderRetailCategoriesEn from "./locales/en/traderRetailCategories.json";
+import traderRetailCategoriesAr from "./locales/ar/traderRetailCategories.json";
+
+import traderBlankProductsEn from "./locales/en/traderBlankProducts.json";
+import traderBlankProductsAr from "./locales/ar/traderBlankProducts.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -165,6 +171,8 @@ i18n
         traderInventoryShared: traderInventorySharedEn,
         traderCategoriesPage: traderCategoriesPageEn,
         traderShopBannerPage: traderShopBannerPageEn,
+        traderRetailCategories: traderRetailCategoriesEn,
+        traderBlankProducts: traderBlankProductsEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -206,6 +214,8 @@ i18n
         traderInventoryShared: traderInventorySharedAr,
         traderCategoriesPage: traderCategoriesPageAr,
         traderShopBannerPage: traderShopBannerPageAr,
+        traderRetailCategories: traderRetailCategoriesAr,
+        traderBlankProducts: traderBlankProductsAr,
       },
     },
 

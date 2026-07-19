@@ -75,6 +75,7 @@ export type ProductCardProps = {
   wholesaleSizes?: string[];
   minOrder?: number;
   wholesaleCard?: boolean;
+  hideAddToCart?: boolean;
 };
 
 function useCountdown(endsAt?: string) {
@@ -137,6 +138,7 @@ export default function ProductCard({
   wholesaleSizes = [],
   minOrder,
   wholesaleCard = false,
+  hideAddToCart = false,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)
@@ -568,12 +570,14 @@ export default function ProductCard({
         </div>
 
         {/* Add to cart button */}
-        <button
-          onClick={handleToggleCart}
-          className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
-        >
-          {isInCart ? t("removeFromCart") : t("addToCart")}
-        </button>
+        {!hideAddToCart && (
+          <button
+            onClick={handleToggleCart}
+            className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl btn-cart-gradient py-3 text-center transition-colors`}
+          >
+            {isInCart ? t("removeFromCart") : t("addToCart")}
+          </button>
+        )}
       </div>
     </div>
   );

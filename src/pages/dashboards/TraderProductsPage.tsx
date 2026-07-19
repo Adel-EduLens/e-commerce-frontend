@@ -2,10 +2,13 @@ import { useState } from "react";
 import { type InventoryItem, getStatus } from "../../components/trader/inventoryUtils";
 import { InventoryTablePanel, AddItemModal, EditItemModal } from "../../components/trader/InventoryShared";
 import { useTraderProducts, useDeleteProduct } from "../../hooks/queries/productsQuery";
+import { useTranslation } from "react-i18next";
 
 export default function TraderProductsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const { t } = useTranslation("traderProduct");
 
   const {
     data: traderProducts = [],
@@ -81,11 +84,43 @@ export default function TraderProductsPage() {
         errorMessages={errorMessages}
         onAdd={() => setShowAddModal(true)}
         onEdit={setEditItem}
-        onDelete={(item) => deleteProduct.mutate(item.id)}
+        onDelete={(item) => setDeleteId(item.id)}
         showTypeFilter={false}
         title="productsTable"
         addLabel="addProduct"
       />
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 space-y-4 shadow-xl">
+            <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+              {t("deleteProduct")}
+            </h3>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              {t("deleteConfirmation")}
+            </p>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-card hover:bg-background transition"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  deleteProduct.mutate(deleteId);
+                  setDeleteId(null);
+                }}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

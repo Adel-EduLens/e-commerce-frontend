@@ -83,7 +83,7 @@ export const retailApi = {
   },
 
   async updateRetailProduct({ id, data }: { id: string | number; data: Partial<RetailProduct> | FormData | Record<string, unknown> }) {
-    const response = await api.put(`${API_PREFIX}/${id}`, data);
+    const response = await api.patch(`${API_PREFIX}/${id}`, data);
     return response.data;
   },
 
