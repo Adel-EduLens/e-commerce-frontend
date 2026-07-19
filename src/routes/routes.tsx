@@ -76,6 +76,7 @@ import InfluencerDashboard from "../pages/dashboards/InfluencerDashboard";
 import InfluencerCouponUsersPage from "../pages/dashboards/InfluencerCouponUsersPage";
 import InfluencerEarningsPage from "../pages/dashboards/InfluencerEarningsPage";
 import TraderInfluencersPage from "../pages/dashboards/TraderInfluencersPage";
+import TraderShopPage from "../pages/dashboards/TraderShopPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -324,7 +325,8 @@ export const router = createBrowserRouter([
           },
           {
             path: "products",
-            element: <TraderProductsPage />,
+            element: <TraderShopPage />
+            // element: <TraderProductsPage />,
           },
           {
             path: "coupons",
