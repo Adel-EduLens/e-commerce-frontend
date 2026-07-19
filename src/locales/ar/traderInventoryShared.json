@@ -41,5 +41,19 @@
   "noVariantsFound": "لم يتم العثور على متغيرات.",
   "sizes": "المقاسات",
   "uploadingImages": "جاري رفع الصور...",
-  "saving": "جاري الحفظ..."
+  "saving": "جاري الحفظ...",
+  "atLeastOneSizeRequired": "* مطلوب متغير مقاس واحد على الأقل",
+  "atLeastOneImageRequired": "* مطلوب صورة واحدة على الأقل",
+  "atLeastOneImageVariant": "يجب أن يحتوي المتغير اللوني على صورة واحدة على الأقل.",
+  "pleaseSelectSizeFirst": "يرجى تحديد المقاس أولاً.",
+  "quantityNegative": "لا يمكن أن تكون الكمية سالبة.",
+  "sizeExists": "المقاس {{size}} موجود بالفعل للون {{color}}.",
+  "minOrderQuantityError": "يجب أن يكون الحد الأدنى لكمية الطلب 1 على الأقل.",
+  "addAtLeastOnePackage": "يرجى إضافة حزمة واحدة على الأقل.",
+  "selectColorForPackage": "يرجى تحديد لون للحزمة رقم {{index}}.",
+  "duplicateColor": "تم تحديد لون مكرر: {{color}} مستخدم في حزم متعددة.",
+  "uploadAtLeastOneImageForPackage": "يرجى رفع صورة واحدة على الأقل للحزمة رقم {{index}} ({{color}}).",
+  "stockNegative": "لا يمكن أن يكون المخزون للحزمة رقم {{index}} ({{color}}) سالباً.",
+  "selectAtLeastOneSharedSize": "يرجى تحديد مقاس مشترك واحد على الأقل.",
+  "failedToAddImage": "فشل في إضافة الصورة."
 }

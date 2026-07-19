@@ -41,5 +41,19 @@
   "noVariantsFound": "No variants found.",
   "sizes": "Sizes",
   "uploadingImages": "Uploading images...",
-  "saving": "Saving..."
+  "saving": "Saving...",
+  "atLeastOneSizeRequired": "* At least one size variant is required",
+  "atLeastOneImageRequired": "* At least one image is required",
+  "atLeastOneImageVariant": "A color variant must have at least one image.",
+  "pleaseSelectSizeFirst": "Please select a size first.",
+  "quantityNegative": "Quantity cannot be negative.",
+  "sizeExists": "Size {{size}} already exists for {{color}}.",
+  "minOrderQuantityError": "Min order quantity must be at least 1.",
+  "addAtLeastOnePackage": "Please add at least one package.",
+  "selectColorForPackage": "Please select a color for Package #{{index}}.",
+  "duplicateColor": "Duplicate color selected: {{color}} is used in multiple packages.",
+  "uploadAtLeastOneImageForPackage": "Please upload at least one image for Package #{{index}} ({{color}}).",
+  "stockNegative": "Stock for Package #{{index}} ({{color}}) cannot be negative.",
+  "selectAtLeastOneSharedSize": "Please select at least one shared size.",
+  "failedToAddImage": "Failed to add image."
 }

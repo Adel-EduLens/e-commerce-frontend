@@ -765,7 +765,7 @@ export function AddItemModal({
                     </div>
                     {pc.images.length === 0 && (
                       <p className="text-error font-['Montserrat'] text-[10px]">
-                        * At least one image is required
+                        {tShared("atLeastOneImageRequired")}
                       </p>
                     )}
                   </div>
@@ -855,7 +855,7 @@ export function AddItemModal({
                     )}
                     {pc.variants.length === 0 && (
                       <p className="text-error font-['Montserrat'] text-[10px]">
-                        * At least one size variant is required
+                        {tShared("atLeastOneSizeRequired")}
                       </p>
                     )}
 
@@ -893,16 +893,16 @@ export function AddItemModal({
                           const qtyVal = Number(qtySel?.value || 0);
 
                           if (!sizeVal) {
-                            setError("Please select a size first.");
+                            setError(tShared("pleaseSelectSizeFirst"));
                             return;
                           }
                           if (qtyVal < 0) {
-                            setError("Quantity cannot be negative.");
+                            setError(tShared("quantityNegative"));
                             return;
                           }
                           if (pc.variants.some((v) => v.size === sizeVal)) {
                             setError(
-                              `Size ${sizeVal} already exists for ${pc.color}.`,
+                              tShared("sizeExists", { size: sizeVal, color: pc.color }),
                             );
                             return;
                           }
@@ -1108,7 +1108,7 @@ export function AddItemModal({
                     </div>
                     {pc.images.length === 0 && (
                       <p className="text-red-500 font-['Montserrat'] text-[10px]">
-                        * At least one image is required
+                        {tShared("atLeastOneImageRequired")}
                       </p>
                     )}
                   </div>
@@ -1374,41 +1374,41 @@ export function EditItemModal({
         });
       } else {
         if ((Number(minOrder) || 0) < 1) {
-          setError("Min order quantity must be at least 1.");
+          setError(tShared("minOrderQuantityError"));
           setUploading(false);
           return;
         }
         if (wholesaleColorsState.length === 0) {
-          setError("Please add at least one package.");
+          setError(tShared("addAtLeastOnePackage"));
           setUploading(false);
           return;
         }
         for (let i = 0; i < wholesaleColorsState.length; i++) {
           const wc = wholesaleColorsState[i];
           if (!wc.color) {
-            setError(`Please select a color for Package #${i + 1}.`);
+            setError(tShared("selectColorForPackage", { index: i + 1 }));
             setUploading(false);
             return;
           }
           const isDuplicate = wholesaleColorsState.some((p, idx) => p.color === wc.color && idx !== i);
           if (isDuplicate) {
-            setError(`Duplicate color selected: ${wc.color} is used in multiple packages.`);
+            setError(tShared("duplicateColor", { color: wc.color }));
             setUploading(false);
             return;
           }
           if (wc.images.length === 0) {
-            setError(`Please upload at least one image for Package #${i + 1} (${wc.color}).`);
+            setError(tShared("uploadAtLeastOneImageForPackage", { index: i + 1, color: wc.color }));
             setUploading(false);
             return;
           }
           if (wc.stock < 0) {
-            setError(`Stock for Package #${i + 1} (${wc.color}) cannot be negative.`);
+            setError(tShared("stockNegative", { index: i + 1, color: wc.color }));
             setUploading(false);
             return;
           }
         }
         if (sharedSizes.length === 0) {
-          setError("Please select at least one shared size.");
+          setError(tShared("selectAtLeastOneSharedSize"));
           setUploading(false);
           return;
         }
@@ -1733,7 +1733,7 @@ export function EditItemModal({
                             onClick={async () => {
                               if (color.images.length <= 1) {
                                 setError(
-                                  "A color variant must have at least one image.",
+                                  tShared("atLeastOneImageVariant"),
                                 );
                                 return;
                               }
@@ -1787,7 +1787,7 @@ export function EditItemModal({
                                 setError(
                                   err?.response?.data?.message ??
                                   err?.message ??
-                                  "Failed to add image.",
+                                  tShared("failedToAddImage"),
                                 );
                               }
                             }
