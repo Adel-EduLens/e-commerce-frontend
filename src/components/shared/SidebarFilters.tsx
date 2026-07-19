@@ -27,7 +27,7 @@ export default function SidebarFilters({
   categories: propCategories,
   brands: propBrands,
 }: SidebarFiltersProps) {
-  const { t } = useTranslation("filters");
+  const { t } = useTranslation("sidebarFilter");
   const { data: defaultCategories = [] } = useCategories(isWholesale);
   const { data: defaultBrands = [] } = useBrands();
 

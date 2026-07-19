@@ -4,6 +4,9 @@ import { type Category } from "../../hooks/queries/categoriesQuery";
 import ImageCropModal, {
   validateImageDimensions,
 } from "../../components/trader/ImageCropModal";
+import { toast } from "sonner";
+import { Toggle } from "../ui/toggle";
+import { useTranslation } from "react-i18next";
 
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -36,6 +39,7 @@ export function CategoryFormModal({
   );
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { t } = useTranslation("traderCategoriesPage");
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,8 +61,8 @@ export function CategoryFormModal({
       const url = await uploadImageFile(file);
       setImage(url);
     } catch (err) {
-
-      alert("Failed to upload image");
+      toast.error(t("failedUploadImage"));
+      console.log(err);
     } finally {
       setUploading(false);
       setCropSrc(null);
@@ -70,7 +74,7 @@ export function CategoryFormModal({
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {category ? "Edit Category" : "Add Category"}
+            {category ? t("editCategory") : t("addCategory")}
           </h2>
           <button
             type="button"
@@ -83,41 +87,31 @@ export function CategoryFormModal({
 
         <div className="flex flex-col gap-4 p-5 overflow-y-auto">
           <input
-            placeholder="Category name *"
+            placeholder={t("categoryNamePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
           />
           <div className="flex justify-between">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Appear on Home
+              {t("appearOnHome")}
             </label>
 
-            <button
-              type="button"
-              onClick={() =>
-                appearOnHome ? setAppearOnHome(false) : setAppearOnHome(true)
-              }
+            <Toggle
+              checked={appearOnHome}
+              onChange={setAppearOnHome}
+              size="sm"
               aria-label={
                 appearOnHome
-                  ? `disable appear on home`
-                  : `enable appear on home`
+                  ? t("disableAppearOnHome")
+                  : t("enableAppearOnHome")
               }
-              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                appearOnHome ? "bg-primary" : "bg-stroke"
-              }`}
-            >
-              <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                  appearOnHome ? "translate-x-4" : "translate-x-0.5"
-                }`}
-              />
-            </button>
+            />
           </div>
 
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Category Image
+              {t("categoryImage")}
             </label>
             <input
               type="file"
@@ -143,7 +137,7 @@ export function CategoryFormModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button"
@@ -151,7 +145,7 @@ export function CategoryFormModal({
               onClick={() => onSave({ name, image, appearOnHome })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : "Save"}
+              {uploading ? t("uploading") : t("save")}
             </button>
           </div>
         </div>

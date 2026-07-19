@@ -4,6 +4,9 @@ import { type ShopBanner } from "../../hooks/queries/shopBannerQuery";
 import ImageCropModal, {
   validateImageDimensions,
 } from "../../components/trader/ImageCropModal";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
+import { Toggle } from "../ui/toggle";
 
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
@@ -48,6 +51,7 @@ export function ShopBannerFormModal({
   const [type] = useState(banner?.type ?? defaultType);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { t } = useTranslation("traderShopBannerPage");
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -69,8 +73,8 @@ export function ShopBannerFormModal({
       const url = await uploadImageFile(file);
       setImage(url);
     } catch (err) {
-
-      alert("Failed to upload image");
+      toast.error(t("failedUploadImage"));
+      console.log(err);
     } finally {
       setUploading(false);
       setCropSrc(null);
@@ -83,8 +87,8 @@ export function ShopBannerFormModal({
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
             {banner
-              ? (type === "home" ? "Edit Home Page Banner" : "Edit Shop Banner")
-              : (type === "home" ? "Add Home Page Banner" : "Add Shop Banner")}
+              ? (type === "home" ? t("editHomePageBanner") : t("editShopBanner"))
+              : (type === "home" ? t("addHomePageBanner") : t("addShopBannerModal"))}
           </h2>
           <button
             type="button"
@@ -97,13 +101,13 @@ export function ShopBannerFormModal({
 
         <div className="flex flex-col gap-4 p-5 overflow-y-auto">
           <input
-            placeholder="Banner title *"
+            placeholder={t("bannerTitlePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
           />
           <textarea
-            placeholder="Description *"
+            placeholder={t("descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
@@ -112,13 +116,13 @@ export function ShopBannerFormModal({
           
           <div className="grid grid-cols-2 gap-4">
             <input
-              placeholder="Button Text"
+              placeholder={t("buttonTextPlaceholder")}
               value={buttonText}
               onChange={(e) => setButtonText(e.target.value)}
               className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
             />
             <input
-              placeholder="Button Link"
+              placeholder={t("buttonLinkPlaceholder")}
               value={buttonLink}
               onChange={(e) => setButtonLink(e.target.value)}
               className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
@@ -128,7 +132,7 @@ export function ShopBannerFormModal({
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <label className="block mb-1 font-['Montserrat'] text-xs font-semibold text-foreground">
-                Background Color
+                {t("backgroundColor")}
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -148,7 +152,7 @@ export function ShopBannerFormModal({
             
             <div className="flex-1">
               <label className="block mb-1 font-['Montserrat'] text-xs font-semibold text-foreground">
-                Order
+                {t("orderModal")}
               </label>
               <input
                 type="number"
@@ -161,26 +165,18 @@ export function ShopBannerFormModal({
 
           <div className="flex justify-between items-center">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Is Active
+              {t("isActive")}
             </label>
-            <button
-              type="button"
-              onClick={() => setIsActive(!isActive)}
-              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                isActive ? "bg-primary" : "bg-stroke"
-              }`}
-            >
-              <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                  isActive ? "translate-x-4" : "translate-x-0.5"
-                }`}
-              />
-            </button>
+            <Toggle
+              checked={isActive}
+              onChange={setIsActive}
+              size="sm"
+            />
           </div>
 
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              Banner Image
+              {t("bannerImage")}
             </label>
             <input
               type="file"
@@ -206,7 +202,7 @@ export function ShopBannerFormModal({
               onClick={onClose}
               className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               type="button"
@@ -214,7 +210,7 @@ export function ShopBannerFormModal({
               onClick={() => onSave({ title, description, buttonText, buttonLink, image, backgroundColor, isActive, order, type })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
-              {uploading ? "Uploading..." : "Save"}
+              {uploading ? t("uploading") : t("save")}
             </button>
           </div>
         </div>
