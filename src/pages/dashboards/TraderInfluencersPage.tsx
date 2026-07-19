@@ -401,16 +401,16 @@ export default function TraderInfluencersPage() {
               <div className="rounded-2xl border border-stroke bg-card overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
-                    <thead className="border-b border-stroke bg-gray-50 dark:bg-white/5">
-                      <tr>
-                        <th className="px-5 py-4 font-semibold text-gray-text">User</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Email</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Phone</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Order Total</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Discount</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Commission</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Date</th>
-                        <th className="px-5 py-4 font-semibold text-gray-text">Items</th>
+                    <thead>
+                      <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                        <th className="px-5 py-4">User</th>
+                        <th className="px-5 py-4">Email</th>
+                        <th className="px-5 py-4">Phone</th>
+                        <th className="px-5 py-4">Order Total</th>
+                        <th className="px-5 py-4">Discount</th>
+                        <th className="px-5 py-4">Commission</th>
+                        <th className="px-5 py-4">Date</th>
+                        <th className="px-5 py-4">Items</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -676,30 +676,30 @@ export default function TraderInfluencersPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-stroke bg-gray-50 dark:bg-white/5">
-                <tr>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+              <thead>
+                <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                  <th className="px-5 py-4">
                     Name
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Email
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Coupon
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Discount
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Commission
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Uses
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Status
                   </th>
-                  <th className="px-5 py-4 font-semibold text-gray-text">
+                  <th className="px-5 py-4">
                     Actions
                   </th>
                 </tr>

@@ -120,27 +120,27 @@ export default function InfluencerEarningsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-stroke bg-gray-50 dark:bg-white/5">
-                  <tr>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                <thead>
+                  <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                    <th className="px-5 py-4">
                       Order ID
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Order Total
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Commission %
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Amount
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Status
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Eligible At
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Date
                     </th>
                   </tr>
@@ -197,21 +197,21 @@ export default function InfluencerEarningsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-stroke bg-gray-50 dark:bg-white/5">
-                  <tr>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                <thead>
+                  <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                    <th className="px-5 py-4">
                       Period
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Total Amount
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Orders
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Status
                     </th>
-                    <th className="px-5 py-4 font-semibold text-gray-text">
+                    <th className="px-5 py-4">
                       Paid Date
                     </th>
                   </tr>

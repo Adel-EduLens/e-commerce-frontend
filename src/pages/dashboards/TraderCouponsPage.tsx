@@ -323,15 +323,15 @@ export default function TraderCouponsPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
-                  <th className="py-3 pr-4">{t("colCode")}</th>
+                <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                  <th className="py-3 px-4">{t("colCode")}</th>
                   <th className="py-3 px-4">{t("colDiscount")}</th>
                   <th className="py-3 px-4">{t("colRestrictions")}</th>
                   <th className="py-3 px-4">{t("colUsesLimit")}</th>
                   <th className="py-3 px-4">{t("colExpiry")}</th>
                   <th className="py-3 px-4">{t("colStatus")}</th>
                   <th className="py-3 px-4">{t("colUsedBy")}</th>
-                  <th className="py-3 pl-4 text-right">{t("colActions")}</th>
+                  <th className="py-3 px-4 text-right">{t("colActions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -471,11 +471,11 @@ export default function TraderCouponsPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-stroke text-xs font-bold text-gray-text uppercase tracking-wider">
-                        <th className="py-2.5 pr-4">{t("colUserName")}</th>
-                        <th className="py-2.5 px-4">{t("colEmail")}</th>
-                        <th className="py-2.5 px-4">{t("colPhone")}</th>
-                        <th className="py-2.5 pl-4 text-right">{t("colUsedAt")}</th>
+                      <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                        <th className="py-3 px-4">{t("colUserName")}</th>
+                        <th className="py-3 px-4">{t("colEmail")}</th>
+                        <th className="py-3 px-4">{t("colPhone")}</th>
+                        <th className="py-3 px-4 text-right">{t("colUsedAt")}</th>
                       </tr>
                     </thead>
                     <tbody>

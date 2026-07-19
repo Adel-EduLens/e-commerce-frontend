@@ -123,7 +123,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
       <button
         type="button"
         onClick={onBack}
-        className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
+        className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
       >
         <ArrowLeft className="h-4 w-4" />
         {t("backToOrders")}
@@ -132,7 +132,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
       {/* Three info cards */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Order Info */}
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
             {t("orderDetails")}
           </h3>
@@ -154,7 +154,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                   <select
                     value={order.status}
                     onChange={handleStatusChange}
-                    className={`inline-flex rounded-xl px-2 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring} bg-white cursor-pointer focus:outline-none`}
+                    className={`inline-flex rounded-xl px-2 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring} bg-card cursor-pointer focus:outline-none`}
                   >
                     <option value="PENDING">{t("statusPending")}</option>
                     <option value="PROCESSING">{t("statusProcessing")}</option>
@@ -173,7 +173,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         </div>
 
         {/* Customer Information */}
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("customerInformation")}</h3>
           <div className="flex flex-col gap-3">
             {[
@@ -194,13 +194,13 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         </div>
 
         {/* Order Timeline */}
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] space-y-4">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderTimeline")}</h3>
           <div className="flex flex-col gap-0">
             {timelineSteps.map((step, i) => (
               <div key={step.label} className="flex items-start gap-3">
                 <div className="flex flex-col items-center">
-                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${step.done ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"}`}>
+                  <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${step.done ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"}`}>
                     {step.done && (
                       <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
                         <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -222,7 +222,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
       </div>
 
       {/* Ordered Items Table */}
-      <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+      <div className="rounded-2xl border border-stroke bg-card shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderedItems")}</h3>
         </div>
@@ -230,21 +230,31 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-0">
             <thead>
-              <tr className="bg-zinc-50 border-b border-stroke">
+              <tr className="bg-secondary border-b border-stroke">
                 <th className="px-5 py-3.5 text-left w-12">
                   <div
-                    className="h-5 w-5 cursor-pointer rounded border border-stroke bg-white flex items-center justify-center"
+                    className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
                     onClick={toggleAllItems}
                   >
                     {allItemsSelected && (
-                      <div className="h-3.5 w-3.5 bg-secondary rounded-sm flex items-center justify-center text-secondary-foreground">
-                        ✓
-                      </div>
+                      <svg
+                        className="h-3 w-3 text-primary"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M2 6l3 3 5-5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                     )}
                   </div>
                 </th>
                 {[t("colImage"), t("colProductDetails"), t("colQuantity"), t("colPrice"), t("colSubtotal")].map((col, cIdx) => (
-                  <th key={cIdx} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider">
+                  <th key={cIdx} className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider">
                     {col}
                   </th>
                 ))}
@@ -254,11 +264,11 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
               {order.items.map((item, idx) => {
                 const isChecked = itemSelected.has(item.id);
                 return (
-                  <tr key={item.id} className={`transition hover:bg-zinc-50/50 ${idx % 2 === 0 ? "bg-white" : "bg-zinc-50/30"}`}>
+                  <tr key={item.id} className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
                     <td className="px-5 py-4">
                       <div
                         className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
-                          isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"
+                          isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
                         }`}
                         onClick={() => toggleItem(item.id)}
                       >
@@ -266,7 +276,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center">
-                      <div className="h-12 w-12 rounded-lg bg-zinc-100 border border-stroke overflow-hidden flex items-center justify-center mx-auto">
+                      <div className="h-12 w-12 rounded-lg bg-background border border-stroke overflow-hidden flex items-center justify-center mx-auto">
                         {item.image ? (
                           <img
                             className="h-full w-full object-cover"
@@ -274,7 +284,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                             alt={item.product}
                           />
                         ) : (
-                          <ShoppingBag className="h-5 w-5 text-zinc-400" />
+                          <ShoppingBag className="h-5 w-5 text-gray-text" />
                         )}
                       </div>
                     </td>
@@ -284,12 +294,12 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                       </div>
                       <div className="flex justify-center gap-2 mt-1">
                         {item.size && (
-                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
                             {t("sizeLabel")}: {item.size}
                           </span>
                         )}
                         {item.color && (
-                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-zinc-100 text-zinc-600 rounded border border-stroke">
+                          <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
                             {t("colorLabel")}: {item.color}
                           </span>
                         )}
@@ -312,7 +322,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
         </div>
 
         {/* Summary totals */}
-        <div className="flex flex-col items-end gap-2 border-t border-stroke px-6 py-5 bg-zinc-50/50">
+        <div className="flex flex-col items-end gap-2 border-t border-stroke px-6 py-5 bg-background">
           <div className="w-64 space-y-2 font-['Montserrat'] text-xs font-medium">
             <div className="flex justify-between">
               <span className="text-gray-text">{t("traderSubtotal")}</span>
@@ -457,14 +467,14 @@ export default function TraderOrdersPage() {
             {summaryCards.map((card, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col justify-between"
+                className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col justify-between"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
                     <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">{card.label}</p>
                     <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-50 border border-stroke text-secondary">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background border border-stroke text-secondary">
                     <ShoppingBag className="h-5 w-5" />
                   </div>
                 </div>
@@ -476,7 +486,7 @@ export default function TraderOrdersPage() {
           </div>
 
           {/* Search & Filters */}
-          <div className="flex flex-wrap items-center justify-start gap-4 bg-white p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div className="flex flex-wrap items-center justify-start gap-4 bg-card p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
             {/* Search Input */}
             <div className="relative flex-1 min-w-[280px]">
               <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -488,7 +498,7 @@ export default function TraderOrdersPage() {
                 placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-zinc-50 py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+                className="w-full rounded-xl border border-stroke bg-background py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
               />
             </div>
 
@@ -497,7 +507,7 @@ export default function TraderOrdersPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
               >
                 <option value="">{t("allStatuses")}</option>
                 <option value="PENDING">{t("statusPending")}</option>
@@ -513,7 +523,7 @@ export default function TraderOrdersPage() {
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
               >
                 <option value="">{t("allPayments")}</option>
                 <option value="Cash">{t("paymentCash")}</option>
@@ -527,7 +537,7 @@ export default function TraderOrdersPage() {
                 type="date"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-zinc-50 px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-white focus:ring-1 focus:ring-secondary"
+                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
               />
             </div>
 
@@ -549,7 +559,7 @@ export default function TraderOrdersPage() {
           </div>
 
           {/* Orders Table Panel */}
-          <section className="rounded-2xl border border-stroke bg-white shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
+          <section className="rounded-2xl border border-stroke bg-card shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
             {/* Panel header */}
             <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
               <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("ordersHistoryTable")}</h2>
@@ -559,23 +569,33 @@ export default function TraderOrdersPage() {
             <div className="overflow-x-auto">
               <table className="min-w-full border-separate border-spacing-0">
                 <thead>
-                  <tr className="bg-zinc-50 border-b border-stroke">
+                  <tr className="bg-secondary border-b border-stroke">
                     <th className="px-5 py-3.5 text-left w-12">
                       <div
-                        className="h-5 w-5 cursor-pointer rounded border border-stroke bg-white flex items-center justify-center"
+                        className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
                         onClick={toggleAll}
                       >
                         {allSelected && (
-                          <div className="h-3.5 w-3.5 bg-secondary rounded-sm flex items-center justify-center text-secondary-foreground">
-                            ✓
-                          </div>
+                          <svg
+                            className="h-3 w-3 text-primary"
+                            viewBox="0 0 12 12"
+                            fill="none"
+                          >
+                            <path
+                              d="M2 6l3 3 5-5"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
                         )}
                       </div>
                     </th>
                     {[t("colOrderId"), t("colCustomerName"), t("colDateTime"), t("colPayment"), t("colTraderSubtotal"), t("colOrderTotal"), t("colStatus")].map((col, cIdx) => (
                       <th
                         key={cIdx}
-                        className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider whitespace-nowrap"
+                        className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider whitespace-nowrap"
                       >
                         {col}
                       </th>
@@ -596,13 +616,13 @@ export default function TraderOrdersPage() {
                       return (
                         <tr
                           key={order.id}
-                          className={`cursor-pointer transition hover:bg-zinc-50/50 ${idx % 2 === 0 ? "bg-white" : "bg-zinc-50/30"}`}
+                          className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
                           onClick={() => setSelectedOrder(order)}
                         >
                           <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                             <div
                               className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
-                                isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-white"
+                                isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
                               }`}
                               onClick={() => toggleRow(order.id)}
                             >

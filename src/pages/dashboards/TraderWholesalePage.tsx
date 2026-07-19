@@ -332,13 +332,13 @@ export default function TraderWholesalePage() {
 
   const errorMessages = isError
     ? [
-        (
-          errorMsg as {
-            response?: { data?: { message?: string } };
-            message?: string;
-          }
-        )?.response?.data?.message ?? "Failed to load wholesales",
-      ]
+      (
+        errorMsg as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        }
+      )?.response?.data?.message ?? "Failed to load wholesales",
+    ]
     : [];
 
   const rowBg = (idx: number) => (idx % 2 === 0 ? "bg-white" : "bg-background");

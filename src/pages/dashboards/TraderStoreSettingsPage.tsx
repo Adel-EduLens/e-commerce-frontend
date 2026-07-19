@@ -307,19 +307,19 @@ function TeamMembersTab() {
         <div className="w-full overflow-x-auto px-4">
           <table className="w-full text-left font-['Montserrat']">
             <thead>
-              <tr className="bg-primary-tint text-xs font-medium text-primary">
-                <th className="px-4 py-3 rounded-l-lg w-12 text-center">
-                  <div className="mx-auto h-5 w-5 rounded border border-primary bg-primary-tint flex items-center justify-center">
-                    <svg className="h-3.5 w-3.5 text-primary" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              <tr className="bg-secondary text-xs font-bold text-primary uppercase tracking-wider">
+                <th className="px-4 py-3.5 rounded-l-lg w-12 text-center">
+                  <div className="mx-auto h-5 w-5 rounded-md border border-primary bg-secondary flex items-center justify-center">
+                    <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                 </th>
-                <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Payment Status</th>
-                <th className="px-4 py-3 rounded-r-lg text-center">Actions</th>
+                <th className="px-4 py-3.5">Name</th>
+                <th className="px-4 py-3.5">Role</th>
+                <th className="px-4 py-3.5">Email</th>
+                <th className="px-4 py-3.5">Payment Status</th>
+                <th className="px-4 py-3.5 rounded-r-lg text-center">Actions</th>
               </tr>
             </thead>
             <tbody>

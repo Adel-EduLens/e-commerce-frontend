@@ -217,7 +217,7 @@ export function RetailProductFormModal({
           }}
         />
       )}
-      <div className="w-full max-w-md rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
+      <div className="w-full max-w-md rounded-2xl bg-card shadow-xl max-h-[90vh] flex flex-col border border-stroke">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
             {product ? t("editRetailProduct") : t("addRetailProduct")}
@@ -350,7 +350,7 @@ export function RetailProductFormModal({
           {productColors.map((pc) => (
             <div
               key={pc.color}
-              className="rounded-xl border border-stroke p-4 space-y-3 bg-gray-50"
+              className="rounded-xl border border-stroke p-4 space-y-3 bg-background"
             >
               <div className="flex items-center justify-between border-b border-stroke pb-2">
                 <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
@@ -436,7 +436,7 @@ export function RetailProductFormModal({
                       </div>
                     );
                   })}
-                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-white">
+                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-card">
                     <span className="text-xl font-bold">+</span>
                     <span className="text-[9px] font-['Montserrat']">{t("add")}</span>
                     <input
@@ -481,7 +481,7 @@ export function RetailProductFormModal({
                     </thead>
                     <tbody>
                       {pc.variants.map((v, vIdx) => (
-                        <tr key={vIdx} className="bg-white border-b border-stroke last:border-none">
+                         <tr key={vIdx} className="bg-card border-b border-stroke last:border-none">
                           <td className="p-2 font-semibold">{v.size}</td>
                           <td className="p-2">
                             <input
@@ -576,7 +576,7 @@ export function RetailProductFormModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-gray-50"
+              className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
             >
               {t("cancel")}
             </button>
