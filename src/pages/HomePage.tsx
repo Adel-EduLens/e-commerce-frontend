@@ -160,7 +160,7 @@ function VoteRings() {
       {rings.map(([size, position]) => (
         <div
           key={`${size}-${position}`}
-          className={`absolute ${position} ${size} rounded-full outline outline-2 outline-offset-[-1px] outline-stroke/50`}
+          className={`absolute ${position} ${size} rounded-full outline outline-2 outline-offset-[-1px] outline-primary-foreground/15`}
         />
       ))}
     </>
@@ -262,13 +262,16 @@ function VoteSection() {
                   type="button"
                   onClick={handleVote}
                   disabled={voting}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-card px-6 py-3 disabled:opacity-60 text-foreground"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-card px-6 py-3 font-['Montserrat'] text-xl font-medium text-foreground shadow-sm hover:bg-card/90 transition disabled:opacity-60 cursor-pointer"
                 >
                   {voting ? (
-                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
+                    <span className="h-6 w-6 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground" />
                   ) : (
-                    <div className="font-['Montserrat'] text-xl font-medium text-foreground flex gap-1">
-                      <AssetImage file="lucide_vote.svg" className="h-6 w-6" />
+                    <div className="flex items-center gap-2">
+                      <svg width="24" height="24" viewBox="0 0 32 32" fill="none" className="text-foreground">
+                        <path d="M12 15.9997L14.6667 18.6663L20 13.333" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M29.3334 25.3332H2.66675M6.66675 9.33317C6.66675 7.8665 7.86675 6.6665 9.33341 6.6665H22.6667C23.374 6.6665 24.0523 6.94746 24.5524 7.44755C25.0525 7.94765 25.3334 8.62593 25.3334 9.33317V25.3332H6.66675V9.33317Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                       {t('voteButton', 'Vote')}
                     </div>
                   )}
@@ -279,9 +282,11 @@ function VoteSection() {
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center cursor-pointer hover:opacity-95 transition"
+                  className="h-10 w-10 rounded-full bg-card text-foreground shadow-sm flex items-center justify-center cursor-pointer hover:bg-card/90 transition"
                 >
-                  <AssetImage file="weui_arrow-filled-2.svg" className="h-6 w-3" />
+                  <svg width="12" height="24" viewBox="0 0 16 32" fill="none" className="text-foreground">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M2.45738 15.052L10 7.50931L11.8854 9.39465L5.28538 15.9946L11.8854 22.5946L10 24.48L2.45738 16.9373C2.20742 16.6873 2.06699 16.3482 2.06699 15.9946C2.06699 15.6411 2.20742 15.302 2.45738 15.052Z" fill="currentColor"/>
+                  </svg>
                 </button>
                 <div className="flex items-center gap-1">
                   {designs.map((design, index) => (
@@ -289,7 +294,7 @@ function VoteSection() {
                       key={design.id}
                       type="button"
                       onClick={() => setCurrentIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-gray-pressed'}`}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-primary-foreground' : 'bg-primary-foreground/30 hover:bg-primary-foreground/50'}`}
                     />
                   ))}
                 </div>
@@ -297,9 +302,11 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center cursor-pointer hover:opacity-95 transition"
+                  className="h-10 w-10 rounded-full bg-card text-foreground shadow-sm flex items-center justify-center cursor-pointer hover:bg-card/90 transition"
                 >
-                  <AssetImage file="weui_arrow-filled.svg" className="h-6 w-3" />
+                  <svg width="12" height="24" viewBox="0 0 16 32" fill="none" className="text-foreground">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M13.5426 16.948L5.99996 24.4907L4.11462 22.6054L10.7146 16.0054L4.11462 9.40535L5.99996 7.52002L13.5426 15.0627C13.7926 15.3127 13.933 15.6518 13.933 16.0054C13.933 16.3589 13.7926 16.698 13.5426 16.948Z" fill="currentColor"/>
+                  </svg>
                 </button>
               </div>
             </>
@@ -332,13 +339,16 @@ function VoteSection() {
                 type="button"
                 onClick={handleVote}
                 disabled={voting}
-                className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-card p-4 disabled:opacity-60 text-foreground"
+                className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-card p-4 font-['Montserrat'] text-3xl font-medium text-foreground shadow-lg hover:bg-card/90 transition disabled:opacity-60 cursor-pointer"
               >
                 {voting ? (
-                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-secondary/20 border-t-foreground" />
+                  <span className="h-8 w-8 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground" />
                 ) : (
-                  <div className="font-['Montserrat'] text-3xl font-medium text-foreground flex gap-1">
-                    <AssetImage file="lucide_vote.svg" className="h-8 w-8" />
+                  <div className="flex items-center gap-2">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-foreground">
+                      <path d="M12 15.9997L14.6667 18.6663L20 13.333" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M29.3334 25.3332H2.66675M6.66675 9.33317C6.66675 7.8665 7.86675 6.6665 9.33341 6.6665H22.6667C23.374 6.6665 24.0523 6.94746 24.5524 7.44755C25.0525 7.94765 25.3334 8.62593 25.3334 9.33317V25.3332H6.66675V9.33317Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                     {t('voteButton', 'Vote')}
                   </div>
                 )}
@@ -346,18 +356,17 @@ function VoteSection() {
             </>
           )}
           {current && (
-            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-card flex items-center justify-center shadow-md">
+            <div className="absolute left-[604px] top-[672px] z-10 h-16 w-52 rounded-2xl bg-card flex items-center justify-center shadow-lg">
               <div className="flex items-center justify-start gap-4">
                 <button
                   type="button"
                   onClick={goToPrevious}
                   aria-label="Previous design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary cursor-pointer hover:opacity-95 transition"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary text-secondary-foreground flex items-center justify-center cursor-pointer hover:opacity-90 transition"
                 >
-                  <AssetImage
-                    file="weui_arrow-filled-2.svg"
-                    className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
-                  />
+                  <svg width="16" height="32" viewBox="0 0 16 32" fill="none" className="text-secondary-foreground">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M2.45738 15.052L10 7.50931L11.8854 9.39465L5.28538 15.9946L11.8854 22.5946L10 24.48L2.45738 16.9373C2.20742 16.6873 2.06699 16.3482 2.06699 15.9946C2.06699 15.6411 2.20742 15.302 2.45738 15.052Z" fill="currentColor"/>
+                  </svg>
                 </button>
                 <div className="flex items-center justify-start gap-1">
                   {designs.map((design, index) => (
@@ -365,8 +374,7 @@ function VoteSection() {
                       key={design.id}
                       type="button"
                       onClick={() => setCurrentIndex(index)}
-                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-gray-pressed'
-                        }`}
+                      className={`h-2.5 w-2.5 rounded-full transition cursor-pointer ${index === currentIndex ? 'bg-secondary' : 'bg-stroke hover:bg-gray-pressed'}`}
                     />
                   ))}
                 </div>
@@ -374,12 +382,11 @@ function VoteSection() {
                   type="button"
                   onClick={goToNext}
                   aria-label="Next design"
-                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary cursor-pointer hover:opacity-95 transition"
+                  className="relative z-10 h-12 w-12 overflow-hidden rounded-full bg-secondary text-secondary-foreground flex items-center justify-center cursor-pointer hover:opacity-90 transition"
                 >
-                  <AssetImage
-                    file="weui_arrow-filled.svg"
-                    className="pointer-events-none absolute left-[16px] top-[8px] h-8 w-4"
-                  />
+                  <svg width="16" height="32" viewBox="0 0 16 32" fill="none" className="text-secondary-foreground">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M13.5426 16.948L5.99996 24.4907L4.11462 22.6054L10.7146 16.0054L4.11462 9.40535L5.99996 7.52002L13.5426 15.0627C13.7926 15.3127 13.933 15.6518 13.933 16.0054C13.933 16.3589 13.7926 16.698 13.5426 16.948Z" fill="currentColor"/>
+                  </svg>
                 </button>
               </div>
             </div>
