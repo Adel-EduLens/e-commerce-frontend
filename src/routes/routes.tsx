@@ -57,7 +57,6 @@ import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
 import ComparePage from "../pages/ComparePage";
 
 import TraderCategoriesPage from "../pages/dashboards/TraderCategoriesPage";
-import TraderWholesaleCategoriesPage from "../pages/dashboards/TraderWholesaleCategoriesPage";
 import TraderFAQsPage from "../pages/dashboards/TraderFAQsPage";
 
 import CreateYourDesignPage from "../pages/CreateYourDesignPage";
@@ -314,10 +313,6 @@ export const router = createBrowserRouter([
           {
             path: "faqs",
             element: <TraderFAQsPage />,
-          },
-          {
-            path: "wholesale-categories",
-            element: <TraderWholesaleCategoriesPage />,
           },
           {
             path: "retailCategories",
