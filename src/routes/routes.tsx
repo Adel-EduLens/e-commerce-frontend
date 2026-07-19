@@ -16,7 +16,6 @@ import WholesaleCheckoutPage from "../pages/WholesaleCheckoutPage";
 
 
 import TraderDashboard from "../pages/dashboards/TraderDashboard";
-import TraderProductsPage from "../pages/dashboards/TraderProductsPage";
 import TraderCustomersPage from "../pages/dashboards/TraderCustomersPage";
 import TraderOrdersPage from "../pages/dashboards/TraderOrdersPage";
 import TraderInventoryPage from "../pages/dashboards/TraderInventoryPage";
@@ -326,7 +325,6 @@ export const router = createBrowserRouter([
           {
             path: "products",
             element: <TraderShopPage />
-            // element: <TraderProductsPage />,
           },
           {
             path: "coupons",
