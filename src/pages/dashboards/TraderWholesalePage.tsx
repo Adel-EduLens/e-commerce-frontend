@@ -194,11 +194,10 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
               setActiveMetric("revenue");
               setHoveredIndex(null);
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
-              activeMetric === "revenue"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${activeMetric === "revenue"
                 ? "bg-secondary text-secondary-foreground shadow-sm"
                 : "text-gray-text hover:text-foreground"
-            }`}
+              }`}
           >
             <BarChart3 className="h-3.5 w-3.5" />
             {t("metricRevenue", "Revenue (EGP)")}
@@ -209,11 +208,10 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
               setActiveMetric("orders");
               setHoveredIndex(null);
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
-              activeMetric === "orders"
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${activeMetric === "orders"
                 ? "bg-secondary text-secondary-foreground shadow-sm"
                 : "text-gray-text hover:text-foreground"
-            }`}
+              }`}
           >
             <ShoppingBag className="h-3.5 w-3.5" />
             {t("metricOrders", "Orders Volume")}
@@ -231,11 +229,10 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
                 setHoveredIndex(null);
                 setPinnedIndex(null);
               }}
-              className={`px-3 py-1 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
-                period === tab
+              className={`px-3 py-1 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${period === tab
                   ? "bg-primary text-white shadow-sm"
                   : "text-gray-text hover:text-foreground"
-              }`}
+                }`}
             >
               {tab === "6M" ? t("tab6Months", "6 Months") : tab === "1Y" ? t("tab1Year", "1 Year") : t("tabAllTime", "All Time")}
             </button>
@@ -657,17 +654,15 @@ function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder
               onClick={() => setSelectedCategory((prev) => (prev === seg.label ? null : seg.label))}
               onMouseEnter={() => setHoveredCategory(seg.label)}
               onMouseLeave={() => setHoveredCategory(null)}
-              className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-left font-['Montserrat'] transition-all cursor-pointer ${
-                isActive
+              className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-left font-['Montserrat'] transition-all cursor-pointer ${isActive
                   ? "bg-secondary/15 border-secondary shadow-sm scale-[1.02]"
                   : "bg-background border-stroke hover:border-gray-300 hover:bg-card"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2 min-w-0">
                 <div
-                  className={`h-3 w-3 shrink-0 rounded transition-transform ${
-                    isActive ? "scale-125" : ""
-                  }`}
+                  className={`h-3 w-3 shrink-0 rounded transition-transform ${isActive ? "scale-125" : ""
+                    }`}
                   style={{ background: seg.color }}
                 />
                 <span className={`text-xs capitalize truncate ${isActive ? "font-bold text-foreground" : "font-semibold text-gray-text"}`}>
@@ -715,6 +710,18 @@ interface EditableOrderItemRowProps {
 }
 
 function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onDelete, onAddColorRow }: EditableOrderItemRowProps) {
+  const { data: product } = useWholesale(item.productId);
+
+  const selectedColorObj = product?.wholesaleColors?.find(
+    (c) => item.color && c.color.toLowerCase() === item.color.toLowerCase()
+  );
+  const currentWarehouseStock = selectedColorObj !== undefined
+    ? selectedColorObj.stock
+    : (product?.stock !== undefined ? product.stock : Infinity);
+  const maxStock = currentWarehouseStock !== Infinity
+    ? currentWarehouseStock + item.quantity
+    : Infinity;
+
   return (
     <tr className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
       <td className="px-4 py-4 text-center">
@@ -742,18 +749,9 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
             </span>
           )}
         </div>
-        
+
         {isEditing && (
           <div className="flex justify-center gap-2.5 mt-2">
-            {onAddColorRow && (
-              <button
-                type="button"
-                onClick={onAddColorRow}
-                className="inline-flex items-center gap-1 text-[10px] font-bold text-secondary hover:underline cursor-pointer"
-              >
-                <Plus className="h-3 w-3" /> Add Color
-              </button>
-            )}
             <button
               type="button"
               onClick={onDelete}
@@ -766,12 +764,29 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
       </td>
       <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
         {isEditing ? (
-          <input
-            type="number"
-            value={currentEdit.quantity}
-            onChange={(e) => onChange({ quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-            className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
-          />
+          <div>
+            <input
+              type="number"
+              min={1}
+              max={maxStock !== Infinity ? maxStock : undefined}
+              value={currentEdit.quantity}
+              onChange={(e) => {
+                const rawVal = parseInt(e.target.value) || 1;
+                let validQty = Math.max(1, rawVal);
+                if (maxStock !== Infinity && validQty > maxStock) {
+                  toast.error(`Quantity cannot exceed total available stock (${maxStock}) for ${item.product} ${item.color ? `(${item.color})` : ""}`);
+                  validQty = maxStock;
+                }
+                onChange({ quantity: validQty });
+              }}
+              className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
+            />
+            {maxStock !== Infinity && (
+              <div className="text-[10px] font-semibold text-gray-text mt-1">
+                Stock: {currentWarehouseStock}
+              </div>
+            )}
+          </div>
         ) : (
           item.quantity
         )}
@@ -812,14 +827,30 @@ interface NewOrderItemRowProps {
     quantity: number;
     price: number;
     color: string | null;
+    size?: string | null;
     image: string;
   };
-  onChange: (updates: Partial<{ quantity: number; price: number; color: string | null }>) => void;
+  usedColors: Set<string>;
+  onChange: (updates: Partial<{ quantity: number; price: number; color: string | null; size: string | null }>) => void;
   onRemove: () => void;
 }
 
-function NewOrderItemRow({ item, onChange, onRemove }: NewOrderItemRowProps) {
+function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemRowProps) {
   const { data: product } = useWholesale(item.productId);
+
+  const availableColors = useMemo(() => {
+    return product?.wholesaleColors?.filter((c) => {
+      if (item.color && c.color.toLowerCase() === item.color.toLowerCase()) {
+        return true;
+      }
+      return !usedColors.has(c.color.toLowerCase());
+    }) || [];
+  }, [product?.wholesaleColors, item.color, usedColors]);
+
+  const selectedColorObj = product?.wholesaleColors?.find(
+    (c) => item.color && c.color.toLowerCase() === item.color.toLowerCase()
+  );
+  const maxStock = selectedColorObj !== undefined ? selectedColorObj.stock : (product?.stock !== undefined ? product.stock : Infinity);
 
   return (
     <tr className="bg-amber-50/10 border-b border-stroke">
@@ -836,21 +867,55 @@ function NewOrderItemRow({ item, onChange, onRemove }: NewOrderItemRowProps) {
         <div className="font-bold text-foreground text-sm">
           {item.product} <span className="text-xs font-semibold text-secondary">(New Color Row)</span>
         </div>
-        
-        <div className="mt-2 max-w-[160px] mx-auto text-left">
-          <label className="text-[9px] font-bold text-gray-text block uppercase mb-1">Select Color</label>
-          <select
-            value={item.color || ""}
-            onChange={(e) => onChange({ color: e.target.value || null })}
-            className="w-full text-xs rounded border border-stroke bg-background p-1 text-foreground focus:outline-none cursor-pointer"
-          >
-            <option value="">Select Color</option>
-            {product?.wholesaleColors?.map((c) => (
-              <option key={c.id} value={c.color}>
-                {c.color}
-              </option>
-            ))}
-          </select>
+
+        <div className="mt-2 max-w-[160px] mx-auto text-left space-y-2">
+          <div>
+            <label className="text-[9px] font-bold text-gray-text block uppercase mb-1">Select Color</label>
+            <select
+              value={item.color || ""}
+              onChange={(e) => {
+                const chosenColor = e.target.value || null;
+                const colorObj = product?.wholesaleColors?.find(c => c.color.toLowerCase() === (chosenColor || "").toLowerCase());
+                const colorMaxStock = colorObj ? colorObj.stock : Infinity;
+                let newQty = item.quantity;
+                if (chosenColor && colorObj && newQty > colorMaxStock) {
+                  toast.error(`Quantity adjusted to available stock (${colorMaxStock}) for color ${chosenColor}`);
+                  newQty = Math.max(1, colorMaxStock);
+                }
+                const defaultSize = null;
+                onChange({ color: chosenColor, quantity: newQty, size: defaultSize });
+              }}
+              className="w-full text-xs rounded border border-stroke bg-background p-1 text-foreground focus:outline-none cursor-pointer"
+            >
+              <option value="">Select Color</option>
+              {availableColors.map((c) => (
+                <option key={c.id} value={c.color} disabled={c.stock <= 0}>
+                  {c.color} {c.stock <= 0 ? "(Out of stock)" : `(Stock: ${c.stock})`}
+                </option>
+              ))}
+            </select>
+            {availableColors.length === 0 && (
+              <span className="text-[10px] font-semibold text-rose-500 block mt-1">
+                No more available colors for this product
+              </span>
+            )}
+          </div>
+
+          {selectedColorObj?.sizes && selectedColorObj.sizes.length > 0 && (
+            <div className="mt-1">
+              <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">Available Sizes:</span>
+              <div className="flex flex-wrap gap-1">
+                {selectedColorObj.sizes.map((s) => (
+                  <span
+                    key={s.id}
+                    className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-foreground rounded border border-stroke"
+                  >
+                    {s.size}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-center mt-2.5">
@@ -866,10 +931,25 @@ function NewOrderItemRow({ item, onChange, onRemove }: NewOrderItemRowProps) {
       <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
         <input
           type="number"
+          min={1}
+          max={maxStock !== Infinity ? maxStock : undefined}
           value={item.quantity}
-          onChange={(e) => onChange({ quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+          onChange={(e) => {
+            const rawVal = parseInt(e.target.value) || 1;
+            let validQty = Math.max(1, rawVal);
+            if (maxStock !== Infinity && validQty > maxStock) {
+              toast.error(`Quantity cannot exceed available stock (${maxStock}) for ${item.color || "this item"}`);
+              validQty = maxStock;
+            }
+            onChange({ quantity: validQty });
+          }}
           className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
         />
+        {maxStock !== Infinity && (
+          <div className={`text-[10px] font-semibold mt-1 ${maxStock === 0 ? "text-rose-600" : "text-gray-text"}`}>
+            Stock: {maxStock}
+          </div>
+        )}
       </td>
       <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
         <div className="flex items-center justify-center gap-1 font-['Montserrat']">
@@ -920,7 +1000,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
   const [isEditingItems, setIsEditingItems] = useState(false);
   const [isSavingItems, setIsSavingItems] = useState(false);
   const [editedItems, setEditedItems] = useState<Record<string, { quantity: number; price: number }>>({});
-  const [newItems, setNewItems] = useState<{ tempId: string; productId: string; product: string; quantity: number; price: number; color: string | null; image: string }[]>([]);
+  const [newItems, setNewItems] = useState<{ tempId: string; productId: string; product: string; quantity: number; price: number; color: string | null; size?: string | null; image: string }[]>([]);
   const [deletedItemIds, setDeletedItemIds] = useState<string[]>([]);
 
   const handleAddColorRow = (originalItemOrEvent?: WholesaleOrder["items"][number] | React.MouseEvent) => {
@@ -937,6 +1017,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
         quantity: 1,
         price: numericPrice,
         color: "",
+        size: null,
         image: targetItem.image,
       }
     ]);
@@ -963,6 +1044,13 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
   };
 
   const handleSaveItems = async () => {
+    for (const newItem of newItems) {
+      if (!newItem.color) {
+        toast.error(t("selectColorRequired", "Please select a color for all newly added items before saving"));
+        return;
+      }
+    }
+
     setIsSavingItems(true);
     try {
       const itemsPayload = [
@@ -978,7 +1066,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
           quantity: val.quantity,
           price: val.price,
           color: val.color,
-          size: null,
+          size: val.size || null,
         }))
       ];
       await onUpdateOrderItems(order.id, itemsPayload, deletedItemIds);
@@ -1209,20 +1297,35 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
               })}
 
               {/* Render newly added color rows */}
-              {newItems.map((item) => (
-                <NewOrderItemRow
-                  key={item.tempId}
-                  item={item}
-                  onChange={(updates) => {
-                    setNewItems((prev) =>
-                      prev.map((it) => (it.tempId === item.tempId ? { ...it, ...updates } : it))
-                    );
-                  }}
-                  onRemove={() => {
-                    setNewItems((prev) => prev.filter((it) => it.tempId !== item.tempId));
-                  }}
-                />
-              ))}
+              {newItems.map((item) => {
+                const usedColors = new Set<string>();
+                order.items
+                  .filter((it) => !deletedItemIds.includes(it.id) && String(it.productId) === String(item.productId))
+                  .forEach((it) => {
+                    if (it.color) usedColors.add(it.color.toLowerCase());
+                  });
+                newItems
+                  .filter((it) => it.tempId !== item.tempId && String(it.productId) === String(item.productId))
+                  .forEach((it) => {
+                    if (it.color) usedColors.add(it.color.toLowerCase());
+                  });
+
+                return (
+                  <NewOrderItemRow
+                    key={item.tempId}
+                    item={item}
+                    usedColors={usedColors}
+                    onChange={(updates) => {
+                      setNewItems((prev) =>
+                        prev.map((it) => (it.tempId === item.tempId ? { ...it, ...updates } : it))
+                      );
+                    }}
+                    onRemove={() => {
+                      setNewItems((prev) => prev.filter((it) => it.tempId !== item.tempId));
+                    }}
+                  />
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -66,6 +66,9 @@ export const useDeleteWholesaleOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trader-wholesale-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
     },
   });
 };
@@ -79,6 +82,9 @@ export const useUpdateWholesaleOrder = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trader-wholesale-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
     },
   });
 };
