@@ -156,3 +156,20 @@ export const useDeleteWholesale = () => {
     },
   });
 };
+
+const addWholesaleColor = async ({ wholesaleId, ...body }: { wholesaleId: string; color: string; stock: number; minOrder: number; sizes?: string[] }) => {
+  const { data } = await api.post(`/wholesales/${wholesaleId}/colors`, body);
+  return data.data;
+};
+
+export const useAddWholesaleColor = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addWholesaleColor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
+    },
+  });
+};

@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { asset } from "../../components/trader/inventoryUtils";
 import {
   useTraderWholesaleOrders,
   useUpdateWholesaleOrderStatus,
   useDeleteWholesaleOrder,
+  useUpdateWholesaleOrder,
   type WholesaleOrder,
 } from "../../hooks/queries/wholesaleOrderQuery";
+import { useAddWholesaleColor, useWholesale } from "../../hooks/queries/wholesaleQuery";
 import {
   Loader2,
   ArrowLeft,
-  Calendar,
   User,
   Mail,
   Phone,
@@ -18,6 +19,7 @@ import {
   ShoppingBag,
   Trash2,
   Search,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -214,19 +216,232 @@ function CategoryDonut() {
   );
 }
 
+/* ─── Editable Order Item Row Component ──────────────────────────────────── */
+interface EditableOrderItemRowProps {
+  item: WholesaleOrder["items"][number];
+  idx: number;
+  isEditing: boolean;
+  currentEdit: { quantity: number; price: number };
+  onChange: (updates: Partial<{ quantity: number; price: number }>) => void;
+  onDelete: () => void;
+}
+
+function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onDelete }: EditableOrderItemRowProps) {
+  return (
+    <tr className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
+      <td className="px-4 py-4 text-center">
+        <div className="h-12 w-12 rounded-lg bg-background border border-stroke overflow-hidden flex items-center justify-center mx-auto">
+          {item.image ? (
+            <img className="h-full w-full object-cover" src={item.image} alt={item.product} />
+          ) : (
+            <ShoppingBag className="h-5 w-5 text-gray-text" />
+          )}
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat']">
+        <div className="font-bold text-foreground text-sm">
+          {item.product}
+        </div>
+        <div className="flex justify-center gap-2 mt-1">
+          {item.size && (
+            <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
+              Size: {item.size}
+            </span>
+          )}
+          {item.color && (
+            <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
+              Color: {item.color}
+            </span>
+          )}
+        </div>
+        
+        {isEditing && (
+          <div className="flex justify-center gap-2.5 mt-2">
+            <button
+              type="button"
+              onClick={onDelete}
+              className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 hover:underline cursor-pointer"
+            >
+              <Trash2 className="h-3 w-3" /> Delete Color
+            </button>
+          </div>
+        )}
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+        {isEditing ? (
+          <input
+            type="number"
+            value={currentEdit.quantity}
+            onChange={(e) => onChange({ quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+            className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
+          />
+        ) : (
+          item.quantity
+        )}
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+        {isEditing ? (
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-xs text-gray-text">EGP</span>
+            <input
+              type="number"
+              step="0.01"
+              value={currentEdit.price}
+              onChange={(e) => onChange({ price: Math.max(0, parseFloat(e.target.value) || 0) })}
+              className="w-20 rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
+            />
+          </div>
+        ) : (
+          item.price
+        )}
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground">
+        {isEditing ? (
+          `EGP ${(currentEdit.price * currentEdit.quantity).toFixed(2)}`
+        ) : (
+          item.subtotal
+        )}
+      </td>
+    </tr>
+  );
+}
+
+/* ─── New Order Item Row Component ───────────────────────────────────────── */
+interface NewOrderItemRowProps {
+  item: {
+    tempId: string;
+    productId: string;
+    product: string;
+    quantity: number;
+    price: number;
+    color: string | null;
+    image: string;
+  };
+  onChange: (updates: Partial<{ quantity: number; price: number; color: string | null }>) => void;
+  onRemove: () => void;
+}
+
+function NewOrderItemRow({ item, onChange, onRemove }: NewOrderItemRowProps) {
+  const { data: product } = useWholesale(item.productId);
+
+  return (
+    <tr className="bg-amber-50/10 border-b border-stroke">
+      <td className="px-4 py-4 text-center">
+        <div className="h-12 w-12 rounded-lg bg-background border border-stroke overflow-hidden flex items-center justify-center mx-auto">
+          {item.image ? (
+            <img className="h-full w-full object-cover" src={item.image} alt="" />
+          ) : (
+            <ShoppingBag className="h-5 w-5 text-gray-text" />
+          )}
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat']">
+        <div className="font-bold text-foreground text-sm">
+          {item.product} <span className="text-xs font-semibold text-secondary">(New Color Row)</span>
+        </div>
+        
+        <div className="mt-2 max-w-[160px] mx-auto text-left">
+          <label className="text-[9px] font-bold text-gray-text block uppercase mb-1">Select Color</label>
+          <select
+            value={item.color || ""}
+            onChange={(e) => onChange({ color: e.target.value || null })}
+            className="w-full text-xs rounded border border-stroke bg-background p-1 text-foreground focus:outline-none cursor-pointer"
+          >
+            <option value="">Select Color</option>
+            {product?.wholesaleColors?.map((c) => (
+              <option key={c.id} value={c.color}>
+                {c.color}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex justify-center mt-2.5">
+          <button
+            type="button"
+            onClick={onRemove}
+            className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 hover:underline cursor-pointer"
+          >
+            <Trash2 className="h-3 w-3" /> Remove
+          </button>
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+        <input
+          type="number"
+          value={item.quantity}
+          onChange={(e) => onChange({ quantity: Math.max(1, parseInt(e.target.value) || 1) })}
+          className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
+        />
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
+        <div className="flex items-center justify-center gap-1 font-['Montserrat']">
+          <span className="text-xs text-gray-text">EGP</span>
+          <input
+            type="number"
+            step="0.01"
+            value={item.price}
+            onChange={(e) => onChange({ price: Math.max(0, parseFloat(e.target.value) || 0) })}
+            className="w-20 rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
+          />
+        </div>
+      </td>
+      <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground">
+        EGP {(item.price * item.quantity).toFixed(2)}
+      </td>
+    </tr>
+  );
+}
+
 /* ─── Order Detail View ──────────────────────────────────────────────────── */
 interface OrderDetailProps {
   order: WholesaleOrder;
   onBack: () => void;
   onUpdateStatus: (id: string, status: string) => Promise<void>;
   onDeleteOrder: (id: string) => Promise<void>;
+  onUpdateOrderItems: (
+    id: string,
+    items: {
+      id?: string;
+      productId?: string;
+      quantity: number;
+      price: number;
+      color?: string | null;
+      size?: string | null;
+    }[]
+  ) => Promise<void>;
 }
 
-function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder }: OrderDetailProps) {
+function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrderItems }: OrderDetailProps) {
   const { t } = useTranslation("traderWholesale");
   const pill = statusPill(order.status);
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Editable items state
+  const [isEditingItems, setIsEditingItems] = useState(false);
+  const [isSavingItems, setIsSavingItems] = useState(false);
+  const [editedItems, setEditedItems] = useState<Record<string, { quantity: number; price: number }>>({});
+  const [newItems, setNewItems] = useState<{ tempId: string; productId: string; product: string; quantity: number; price: number; color: string | null; image: string }[]>([]);
+  const [deletedItemIds, setDeletedItemIds] = useState<string[]>([]);
+
+  const handleAddColorRow = () => {
+    const originalItem = order.items[0];
+    if (!originalItem) return;
+    const numericPrice = parseFloat(originalItem.price.replace(/[^0-9.-]+/g, "")) || 0;
+    setNewItems((prev) => [
+      ...prev,
+      {
+        tempId: Math.random().toString(36).slice(2, 9),
+        productId: originalItem.productId,
+        product: originalItem.product,
+        quantity: 1,
+        price: numericPrice,
+        color: "",
+        image: originalItem.image,
+      }
+    ]);
+  };
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     setUpdating(true);
@@ -245,6 +460,34 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder }: OrderDeta
       } finally {
         setDeleting(false);
       }
+    }
+  };
+
+  const handleSaveItems = async () => {
+    setIsSavingItems(true);
+    try {
+      const itemsPayload = [
+        ...Object.entries(editedItems)
+          .filter(([id]) => !deletedItemIds.includes(id))
+          .map(([id, val]) => ({
+            id,
+            quantity: val.quantity,
+            price: val.price,
+          })),
+        ...newItems.map((val) => ({
+          productId: val.productId,
+          quantity: val.quantity,
+          price: val.price,
+          color: val.color,
+          size: null,
+        }))
+      ];
+      await onUpdateOrderItems(order.id, itemsPayload, deletedItemIds);
+      setIsEditingItems(false);
+      setNewItems([]);
+      setDeletedItemIds([]);
+    } finally {
+      setIsSavingItems(false);
     }
   };
 
@@ -375,6 +618,58 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder }: OrderDeta
       <div className="rounded-2xl border border-stroke bg-card shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
           <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("orderedItems", "Ordered Items")}</h3>
+          <div className="flex gap-2">
+            {isEditingItems ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleAddColorRow}
+                  className="rounded-xl border border-secondary bg-secondary/15 px-4 py-2 font-['Montserrat'] text-xs font-bold text-secondary transition hover:bg-secondary/25 cursor-pointer"
+                >
+                  <Plus className="h-3 w-3 inline mr-1" /> Add Color Row
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveItems}
+                  disabled={isSavingItems}
+                  className="rounded-xl bg-secondary px-4 py-2 font-['Montserrat'] text-xs font-bold text-secondary-foreground transition hover:bg-secondary/90 cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingItems ? t("saving", "Saving...") : t("saveChanges", "Save Changes")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditingItems(false);
+                    setEditedItems({});
+                    setNewItems([]);
+                    setDeletedItemIds([]);
+                  }}
+                  className="rounded-xl border border-stroke bg-card px-4 py-2 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background cursor-pointer"
+                >
+                  {t("cancel", "Cancel")}
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditingItems(true);
+                  const initial: Record<string, { quantity: number; price: number }> = {};
+                  order.items.forEach(item => {
+                    const numericPrice = parseFloat(item.price.replace(/[^0-9.-]+/g, "")) || 0;
+                    initial[item.id] = {
+                      quantity: item.quantity,
+                      price: numericPrice,
+                    };
+                  });
+                  setEditedItems(initial);
+                }}
+                className="rounded-xl border border-stroke bg-card px-4 py-2 font-['Montserrat'] text-xs font-medium text-foreground transition hover:bg-background cursor-pointer"
+              >
+                {t("editItems", "Edit Items")}
+              </button>
+            )}
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-separate border-spacing-0">
@@ -388,44 +683,46 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder }: OrderDeta
               </tr>
             </thead>
             <tbody>
-              {order.items.map((item, idx) => (
-                <tr key={item.id} className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
-                  <td className="px-4 py-4 text-center">
-                    <div className="h-12 w-12 rounded-lg bg-background border border-stroke overflow-hidden flex items-center justify-center mx-auto">
-                      {item.image ? (
-                        <img className="h-full w-full object-cover" src={item.image} alt={item.product} />
-                      ) : (
-                        <ShoppingBag className="h-5 w-5 text-gray-text" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-center">
-                    <div className="font-['Montserrat'] text-sm font-bold text-foreground">
-                      {item.product}
-                    </div>
-                    <div className="flex justify-center gap-2 mt-1">
-                      {item.size && (
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
-                          Size: {item.size}
-                        </span>
-                      )}
-                      {item.color && (
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
-                          Color: {item.color}
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                    {item.quantity}
-                  </td>
-                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                    {item.price}
-                  </td>
-                  <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground">
-                    {item.subtotal}
-                  </td>
-                </tr>
+              {order.items.filter(item => !deletedItemIds.includes(item.id)).map((item, idx) => {
+                const isEditing = isEditingItems;
+                const currentEdit = editedItems[item.id] || {
+                  quantity: item.quantity,
+                  price: parseFloat(item.price.replace(/[^0-9.-]+/g, "")) || 0,
+                };
+
+                return (
+                  <EditableOrderItemRow
+                    key={item.id}
+                    item={item}
+                    idx={idx}
+                    isEditing={isEditing}
+                    currentEdit={currentEdit}
+                    onAddColorRow={() => handleAddColorRow(item)}
+                    onDelete={() => setDeletedItemIds(prev => [...prev, item.id])}
+                    onChange={(updates) => {
+                      setEditedItems(prev => ({
+                        ...prev,
+                        [item.id]: { ...prev[item.id], ...updates }
+                      }));
+                    }}
+                  />
+                );
+              })}
+
+              {/* Render newly added color rows */}
+              {newItems.map((item, nIdx) => (
+                <NewOrderItemRow
+                  key={item.tempId}
+                  item={item}
+                  onChange={(updates) => {
+                    setNewItems((prev) =>
+                      prev.map((it) => (it.tempId === item.tempId ? { ...it, ...updates } : it))
+                    );
+                  }}
+                  onRemove={() => {
+                    setNewItems((prev) => prev.filter((it) => it.tempId !== item.tempId));
+                  }}
+                />
               ))}
             </tbody>
           </table>
@@ -463,6 +760,7 @@ export default function TraderWholesalePage() {
   const { data: orders = [], isLoading, isError, error } = useTraderWholesaleOrders();
   const updateStatusMutation = useUpdateWholesaleOrderStatus();
   const deleteOrderMutation = useDeleteWholesaleOrder();
+  const updateOrderMutation = useUpdateWholesaleOrder();
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     try {
@@ -473,6 +771,27 @@ export default function TraderWholesalePage() {
       }
     } catch (err) {
       toast.error(t("statusUpdateError", "Failed to update order status"));
+    }
+  };
+
+  const handleUpdateOrderItems = async (
+    orderId: string,
+    items: {
+      id?: string;
+      productId?: string;
+      quantity: number;
+      price: number;
+      color?: string | null;
+      size?: string | null;
+    }[],
+    deletedItemIds?: string[]
+  ) => {
+    try {
+      const updated = await updateOrderMutation.mutateAsync({ orderId, items, deletedItemIds });
+      toast.success(t("orderUpdateSuccess", "Order items updated successfully"));
+      setSelectedOrder(updated);
+    } catch (err) {
+      toast.error(t("orderUpdateError", "Failed to update order items"));
     }
   };
 
@@ -560,6 +879,7 @@ export default function TraderWholesalePage() {
           onBack={() => setSelectedOrder(null)}
           onUpdateStatus={handleUpdateStatus}
           onDeleteOrder={handleDeleteOrder}
+          onUpdateOrderItems={handleUpdateOrderItems}
         />
       ) : (
         <>

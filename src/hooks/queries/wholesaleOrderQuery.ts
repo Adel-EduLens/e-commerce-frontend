@@ -69,3 +69,16 @@ export const useDeleteWholesaleOrder = () => {
     },
   });
 };
+
+export const useUpdateWholesaleOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, status, items, deletedItemIds }: { orderId: string; status?: string; items?: { id?: string; productId?: string; quantity: number; price: number; color?: string | null; size?: string | null }[]; deletedItemIds?: string[] }) => {
+      const { data } = await api.patch(`/wholesale-orders/trader/${orderId}`, { status, items, deletedItemIds });
+      return data?.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["trader-wholesale-orders"] });
+    },
+  });
+};
