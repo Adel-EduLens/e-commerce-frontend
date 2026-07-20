@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { asset } from "../../components/trader/inventoryUtils";
 import {
   useTraderWholesaleOrders,
   useUpdateWholesaleOrderStatus,
@@ -8,7 +7,7 @@ import {
   useUpdateWholesaleOrder,
   type WholesaleOrder,
 } from "../../hooks/queries/wholesaleOrderQuery";
-import { useAddWholesaleColor, useWholesale } from "../../hooks/queries/wholesaleQuery";
+import { useTraderWholesales, useWholesale, type Wholesale } from "../../hooks/queries/wholesaleQuery";
 import {
   Loader2,
   ArrowLeft,
@@ -20,27 +19,13 @@ import {
   Trash2,
   Search,
   Plus,
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  Calendar,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
-
-// ─── Static data ───────────────────────────────────────────────────────────────
-const earningsData = [
-  { month: "Jan", value: 45000 },
-  { month: "Feb", value: 62000 },
-  { month: "Mar", value: 48000 },
-  { month: "Apr", value: 71000 },
-  { month: "May", value: 55000 },
-  { month: "Jun", value: 80000 },
-  { month: "Jul", value: 67000 },
-  { month: "Aug", value: 87250 },
-];
-
-const categorySegments = [
-  { label: "men", value: 35, color: "#A81324" },
-  { label: "women", value: 25, color: "#FCD34D" },
-  { label: "kids", value: 30, color: "#7DD3FC" },
-  { label: "craft", value: 10, color: "#C084FC" },
-];
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 function statusPill(status: string) {
@@ -60,7 +45,7 @@ function statusPill(status: string) {
   return { bg: "bg-rose-50", text: "text-rose-700", ring: "outline-rose-700" };
 }
 
-function getLocalizedStatus(status: string, t: any) {
+function getLocalizedStatus(status: string, t: ReturnType<typeof useTranslation>["t"]) {
   const norm = status.toUpperCase();
   if (norm === "COMPLETED") return t("statusCompleted", "Completed");
   if (norm === "DELIVERED") return t("statusDelivered", "Delivered");
@@ -71,146 +56,648 @@ function getLocalizedStatus(status: string, t: any) {
   return status;
 }
 
-// ─── Charts ────────────────────────────────────────────────────────────────────
-function EarningsChart() {
-  const max = Math.max(...earningsData.map((d) => d.value));
+// ─── Interactive Charts ────────────────────────────────────────────────────────
+function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
+  const { t } = useTranslation("traderWholesale");
+  const [period, setPeriod] = useState<"6M" | "1Y" | "All">("6M");
+  const [activeMetric, setActiveMetric] = useState<"revenue" | "orders">("revenue");
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [pinnedIndex, setPinnedIndex] = useState<number | null>(null);
+
+  const earningsDataByPeriod = useMemo(() => {
+    const now = new Date();
+    const getMonthsData = (numMonths: number) => {
+      const monthsList: { month: string; year: number; monthIdx: number; value: number; orders: number }[] = [];
+      for (let i = numMonths - 1; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        monthsList.push({
+          month: d.toLocaleDateString("en-US", { month: "short" }) + (numMonths > 6 ? ` '${String(d.getFullYear()).slice(-2)}` : ""),
+          year: d.getFullYear(),
+          monthIdx: d.getMonth(),
+          value: 0,
+          orders: 0,
+        });
+      }
+      return monthsList;
+    };
+
+    const sixMonths = getMonthsData(6);
+    const twelveMonths = getMonthsData(12);
+    const allTimeMap = new Map<string, { month: string; sortKey: number; value: number; orders: number }>();
+
+    orders.forEach((o) => {
+      const d = new Date(o.date || "");
+      const validDate = !isNaN(d.getTime()) ? d : now;
+      const val = Number(String(o.total || "").replace(/[^0-9.-]+/g, "")) || 0;
+
+      sixMonths.forEach((m) => {
+        if (validDate.getFullYear() === m.year && validDate.getMonth() === m.monthIdx) {
+          m.value += val;
+          m.orders += 1;
+        }
+      });
+
+      twelveMonths.forEach((m) => {
+        if (validDate.getFullYear() === m.year && validDate.getMonth() === m.monthIdx) {
+          m.value += val;
+          m.orders += 1;
+        }
+      });
+
+      const monthKey = `${validDate.getFullYear()}-${validDate.getMonth()}`;
+      const monthLabel = validDate.toLocaleDateString("en-US", { month: "short" }) + ` '${String(validDate.getFullYear()).slice(-2)}`;
+      if (!allTimeMap.has(monthKey)) {
+        allTimeMap.set(monthKey, {
+          month: monthLabel,
+          sortKey: validDate.getFullYear() * 12 + validDate.getMonth(),
+          value: 0,
+          orders: 0,
+        });
+      }
+      const entry = allTimeMap.get(monthKey)!;
+      entry.value += val;
+      entry.orders += 1;
+    });
+
+    let allTimeList = Array.from(allTimeMap.values())
+      .sort((a, b) => a.sortKey - b.sortKey)
+      .map(({ month, value, orders: ordCount }) => ({ month, value, orders: ordCount }));
+
+    if (allTimeList.length === 0) {
+      allTimeList = [
+        { month: "Q1", value: 0, orders: 0 },
+        { month: "Q2", value: 0, orders: 0 },
+        { month: "Q3", value: 0, orders: 0 },
+        { month: "Q4", value: 0, orders: 0 },
+      ];
+    }
+
+    return {
+      "6M": sixMonths.map(({ month, value, orders: ordCount }) => ({ month, value, orders: ordCount })),
+      "1Y": twelveMonths.map(({ month, value, orders: ordCount }) => ({ month, value, orders: ordCount })),
+      "All": allTimeList,
+    };
+  }, [orders]);
+
+  const currentData = earningsDataByPeriod[period] || earningsDataByPeriod["6M"];
+  const maxVal = Math.max(...currentData.map((d) => (activeMetric === "revenue" ? d.value : d.orders)), 1);
+
   const w = 600,
-    h = 200,
-    padL = 40,
+    h = 220,
+    padL = 45,
     padR = 20,
-    padT = 20,
-    padB = 30;
+    padT = 25,
+    padB = 35;
   const chartW = w - padL - padR,
     chartH = h - padT - padB;
-  const pts = earningsData.map((d, i) => ({
-    x: padL + (i / (earningsData.length - 1)) * chartW,
-    y: padT + (1 - d.value / max) * chartH,
-    ...d,
-  }));
+
+  const pts = currentData.map((d, i) => {
+    const val = activeMetric === "revenue" ? d.value : d.orders;
+    const xRatio = currentData.length > 1 ? i / (currentData.length - 1) : 0.5;
+    return {
+      x: padL + xRatio * chartW,
+      y: padT + (1 - val / maxVal) * chartH,
+      ...d,
+      currentVal: val,
+    };
+  });
+
   const linePath = pts
     .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
     .join(" ");
   const areaPath = `${linePath} L ${pts[pts.length - 1].x} ${padT + chartH} L ${pts[0].x} ${padT + chartH} Z`;
+
+  const activeIndex = pinnedIndex ?? hoveredIndex;
+  const activePoint = activeIndex !== null ? pts[activeIndex] : null;
+
+  // Growth calc vs previous point
+  let growth: number | null = null;
+  if (activeIndex !== null && activeIndex > 0) {
+    const prevVal = pts[activeIndex - 1].currentVal;
+    if (prevVal > 0) {
+      growth = ((pts[activeIndex].currentVal - prevVal) / prevVal) * 100;
+    }
+  }
+
+  const totalPeriodValue = currentData.reduce((acc, d) => acc + (activeMetric === "revenue" ? d.value : d.orders), 0);
+  const peakPoint = [...pts].sort((a, b) => b.currentVal - a.currentVal)[0];
+
   return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="w-full"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <linearGradient id="wh-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FFAE4C" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#FFAE4C" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-        <line
-          key={t}
-          x1={padL}
-          x2={w - padR}
-          y1={padT + t * chartH}
-          y2={padT + t * chartH}
-          stroke="#E5E7EB"
-          strokeWidth="1"
-        />
-      ))}
-      <path d={areaPath} fill="url(#wh-grad)" />
-      <path
-        d={linePath}
-        fill="none"
-        stroke="#FFAE4C"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {pts.map((p) => (
-        <circle
-          key={p.month}
-          cx={p.x}
-          cy={p.y}
-          r={4}
-          fill="white"
-          stroke="#FFAE4C"
-          strokeWidth="2"
-        />
-      ))}
-      {pts.map((p) => (
-        <text
-          key={p.month + "l"}
-          x={p.x}
-          y={h - 6}
-          textAnchor="middle"
-          fontSize="9"
-          fill="#6B7280"
+    <div className="flex flex-col gap-4">
+      {/* Interactive Controls Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-stroke/60">
+        {/* Metric Selector */}
+        <div className="flex items-center gap-1 rounded-xl bg-background p-1 border border-stroke">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMetric("revenue");
+              setHoveredIndex(null);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
+              activeMetric === "revenue"
+                ? "bg-secondary text-secondary-foreground shadow-sm"
+                : "text-gray-text hover:text-foreground"
+            }`}
+          >
+            <BarChart3 className="h-3.5 w-3.5" />
+            {t("metricRevenue", "Revenue (EGP)")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveMetric("orders");
+              setHoveredIndex(null);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
+              activeMetric === "orders"
+                ? "bg-secondary text-secondary-foreground shadow-sm"
+                : "text-gray-text hover:text-foreground"
+            }`}
+          >
+            <ShoppingBag className="h-3.5 w-3.5" />
+            {t("metricOrders", "Orders Volume")}
+          </button>
+        </div>
+
+        {/* Time Period Tabs */}
+        <div className="flex items-center gap-1 rounded-xl bg-background p-1 border border-stroke">
+          {(["6M", "1Y", "All"] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => {
+                setPeriod(tab);
+                setHoveredIndex(null);
+                setPinnedIndex(null);
+              }}
+              className={`px-3 py-1 rounded-lg font-['Montserrat'] text-xs font-bold transition cursor-pointer ${
+                period === tab
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-gray-text hover:text-foreground"
+              }`}
+            >
+              {tab === "6M" ? t("tab6Months", "6 Months") : tab === "1Y" ? t("tab1Year", "1 Year") : t("tabAllTime", "All Time")}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Chart Canvas with Interactive Tooltip */}
+      <div className="relative w-full overflow-visible select-none py-1">
+        <svg
+          viewBox={`0 0 ${w} ${h}`}
+          className="w-full overflow-visible cursor-crosshair"
+          preserveAspectRatio="none"
+          onMouseLeave={() => setHoveredIndex(null)}
+          onClick={(e) => {
+            // If clicking empty background, unpin
+            if (e.target === e.currentTarget) setPinnedIndex(null);
+          }}
         >
-          {p.month}
-        </text>
-      ))}
-    </svg>
+          <defs>
+            <linearGradient id="wh-grad-interactive" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"} stopOpacity="0.35" />
+              <stop offset="100%" stopColor={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"} stopOpacity="0" />
+            </linearGradient>
+            <filter id="point-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"} floodOpacity="0.5" />
+            </filter>
+          </defs>
+
+          {/* Grid lines */}
+          {[0, 0.25, 0.5, 0.75, 1].map((tVal) => (
+            <line
+              key={tVal}
+              x1={padL}
+              x2={w - padR}
+              y1={padT + tVal * chartH}
+              y2={padT + tVal * chartH}
+              stroke="#F3F4F6"
+              strokeWidth="1.5"
+            />
+          ))}
+
+          {/* Y Axis Labels */}
+          {[0, 0.5, 1].map((tVal) => {
+            const valAtLine = Math.round(maxVal * (1 - tVal));
+            const formatted = activeMetric === "revenue"
+              ? valAtLine >= 1000 ? `${(valAtLine / 1000).toFixed(0)}k` : `${valAtLine}`
+              : `${valAtLine}`;
+            return (
+              <text
+                key={tVal}
+                x={padL - 8}
+                y={padT + tVal * chartH + 3}
+                textAnchor="end"
+                fontSize="9"
+                fontWeight="600"
+                fill="#9CA3AF"
+                className="font-['Montserrat']"
+              >
+                {formatted}
+              </text>
+            );
+          })}
+
+          {/* Area & Line */}
+          <path d={areaPath} fill="url(#wh-grad-interactive)" className="transition-all duration-300" />
+          <path
+            d={linePath}
+            fill="none"
+            stroke={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"}
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition-all duration-300"
+          />
+
+          {/* Active Vertical Guideline */}
+          {activePoint && (
+            <line
+              x1={activePoint.x}
+              x2={activePoint.x}
+              y1={padT}
+              y2={padT + chartH}
+              stroke={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"}
+              strokeWidth="1.5"
+              strokeDasharray="4 4"
+            />
+          )}
+
+          {/* Invisible hover columns for smooth tracking across entire X axis */}
+          {pts.map((p, i) => {
+            const stepW = chartW / Math.max(pts.length - 1, 1);
+            const leftX = i === 0 ? padL : p.x - stepW / 2;
+            const widthX = i === 0 || i === pts.length - 1 ? stepW / 2 : stepW;
+            return (
+              <rect
+                key={p.month + "rect"}
+                x={leftX}
+                y={padT}
+                width={widthX}
+                height={chartH}
+                fill="transparent"
+                onMouseEnter={() => setHoveredIndex(i)}
+                onClick={() => setPinnedIndex(prev => prev === i ? null : i)}
+                className="cursor-pointer"
+              />
+            );
+          })}
+
+          {/* Data Points */}
+          {pts.map((p, i) => {
+            const isActive = activeIndex === i;
+            return (
+              <g key={p.month} className="pointer-events-none transition-all duration-150">
+                {isActive && (
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={10}
+                    fill={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"}
+                    fillOpacity="0.25"
+                  />
+                )}
+                <circle
+                  cx={p.x}
+                  cy={p.y}
+                  r={isActive ? 6 : 4}
+                  fill="white"
+                  stroke={activeMetric === "revenue" ? "#FFAE4C" : "#A81324"}
+                  strokeWidth={isActive ? 3 : 2}
+                  filter={isActive ? "url(#point-glow)" : undefined}
+                />
+              </g>
+            );
+          })}
+
+          {/* X Axis Labels */}
+          {pts.map((p, i) => (
+            <text
+              key={p.month + "l"}
+              x={p.x}
+              y={h - 8}
+              textAnchor="middle"
+              fontSize={activeIndex === i ? "10" : "9"}
+              fontWeight={activeIndex === i ? "700" : "500"}
+              fill={activeIndex === i ? "#111827" : "#6B7280"}
+              className="font-['Montserrat'] transition-all"
+            >
+              {p.month}
+            </text>
+          ))}
+        </svg>
+
+        {/* Floating HTML Tooltip */}
+        {activePoint && (
+          <div
+            className="absolute z-30 pointer-events-none transition-all duration-150 rounded-xl border border-stroke bg-white p-3 shadow-xl min-w-[155px] font-['Montserrat']"
+            style={{
+              left: `${(activePoint.x / w) * 100}%`,
+              top: `${(activePoint.y / h) * 100}%`,
+              transform: activePoint.x > w * 0.6 ? "translate(-105%, -110%)" : "translate(5%, -110%)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-2 border-b border-stroke pb-1.5 mb-1.5">
+              <span className="text-xs font-bold text-foreground flex items-center gap-1">
+                <Calendar className="h-3 w-3 text-gray-text" />
+                {activePoint.month}
+              </span>
+              {pinnedIndex === activeIndex && (
+                <span className="text-[10px] bg-secondary/20 text-secondary px-1.5 py-0.5 rounded font-bold">
+                  Pinned
+                </span>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="text-[11px] font-semibold text-gray-text">
+                  {activeMetric === "revenue" ? t("revenueLabel", "Revenue") : t("ordersLabel", "Orders")}:
+                </span>
+                <span className="text-sm font-bold text-foreground">
+                  {activeMetric === "revenue" ? `EGP ${activePoint.value.toLocaleString()}` : `${activePoint.orders}`}
+                </span>
+              </div>
+              {activeMetric === "revenue" && (
+                <div className="flex items-baseline justify-between gap-3 text-xs">
+                  <span className="text-[11px] text-gray-text">{t("ordersCount", "Orders")}:</span>
+                  <span className="font-semibold text-foreground">{activePoint.orders}</span>
+                </div>
+              )}
+              {growth !== null && (
+                <div className="flex items-center gap-1 mt-1 pt-1 border-t border-stroke/60 text-xs font-bold">
+                  {growth >= 0 ? (
+                    <>
+                      <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+                      <span className="text-emerald-600">+{growth.toFixed(1)}%</span>
+                    </>
+                  ) : (
+                    <>
+                      <TrendingDown className="h-3.5 w-3.5 text-rose-600" />
+                      <span className="text-rose-600">{growth.toFixed(1)}%</span>
+                    </>
+                  )}
+                  <span className="text-[10px] font-normal text-gray-text">{t("vsPrevMonth", "vs prev month")}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Interactive Summary Strip Below Chart */}
+      <div className="grid grid-cols-3 gap-3 rounded-xl bg-background/80 p-3.5 border border-stroke font-['Montserrat']">
+        <div className="flex flex-col">
+          <span className="text-[11px] font-semibold text-gray-text uppercase tracking-wider">
+            {t("totalPeriodVal", activeMetric === "revenue" ? "Total Revenue" : "Total Volume")}
+          </span>
+          <span className="text-sm sm:text-base font-bold text-foreground mt-0.5">
+            {activeMetric === "revenue" ? `EGP ${totalPeriodValue.toLocaleString()}` : `${totalPeriodValue.toLocaleString()} Orders`}
+          </span>
+        </div>
+        <div className="flex flex-col border-l border-stroke pl-3">
+          <span className="text-[11px] font-semibold text-gray-text uppercase tracking-wider">
+            {t("peakPeriod", "Peak Month")}
+          </span>
+          <span className="text-sm sm:text-base font-bold text-foreground mt-0.5 flex items-center gap-1.5">
+            {peakPoint.month}
+            <span className="text-xs font-semibold text-secondary">
+              ({activeMetric === "revenue" ? `EGP ${peakPoint.value.toLocaleString()}` : `${peakPoint.orders}`})
+            </span>
+          </span>
+        </div>
+        <div className="flex flex-col border-l border-stroke pl-3 justify-center">
+          <span className="text-xs font-medium text-gray-text flex items-center gap-1.5">
+            <Info className="h-3.5 w-3.5 text-secondary shrink-0" />
+            {pinnedIndex !== null ? (
+              <button
+                type="button"
+                onClick={() => setPinnedIndex(null)}
+                className="text-secondary font-bold underline hover:opacity-80 cursor-pointer"
+              >
+                {t("unpinPoint", "Unpin point")}
+              </button>
+            ) : (
+              <span>{t("chartHint", "Hover to inspect • Click to pin")}</span>
+            )}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function CategoryDonut() {
-  const cx = 80,
-    cy = 80,
-    r = 65,
-    innerR = 40;
-  let startAngle = -Math.PI / 2;
-  const paths = categorySegments.map((seg) => {
-    const angle = (seg.value / 100) * 2 * Math.PI;
-    const endAngle = startAngle + angle;
-    const x1 = cx + r * Math.cos(startAngle),
-      y1 = cy + r * Math.sin(startAngle);
-    const x2 = cx + r * Math.cos(endAngle),
-      y2 = cy + r * Math.sin(endAngle);
-    const xi1 = cx + innerR * Math.cos(startAngle),
-      yi1 = cy + innerR * Math.sin(startAngle);
-    const xi2 = cx + innerR * Math.cos(endAngle),
-      yi2 = cy + innerR * Math.sin(endAngle);
-    const large = angle > Math.PI ? 1 : 0;
-    const d = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${xi2} ${yi2} A ${innerR} ${innerR} 0 ${large} 0 ${xi1} ${yi1} Z`;
-    startAngle = endAngle;
-    return { ...seg, d };
-  });
+function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder[]; products?: Wholesale[] }) {
   const { t } = useTranslation("traderWholesale");
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const categorySegments = useMemo(() => {
+    const productToCategoryMap = new Map<string, string>();
+    products.forEach((p) => {
+      if (p.category?.name) {
+        productToCategoryMap.set(String(p.id), p.category.name);
+      }
+    });
+
+    const categoryStats: Record<string, { units: number; value: number }> = {};
+    let totalUnitsCount = 0;
+
+    orders.forEach((order) => {
+      (order.items || []).forEach((item) => {
+        let catName = productToCategoryMap.get(String(item.productId));
+        if (!catName) {
+          const titleLower = (item.product || "").toLowerCase();
+          if (titleLower.includes("men") && !titleLower.includes("women")) catName = "Men";
+          else if (titleLower.includes("women") || titleLower.includes("dress")) catName = "Women";
+          else if (titleLower.includes("kid") || titleLower.includes("child") || titleLower.includes("toy")) catName = "Kids";
+          else if (titleLower.includes("craft") || titleLower.includes("art")) catName = "Craft";
+          else catName = "General";
+        }
+        const qty = Number(item.quantity) || 1;
+        const price = Number(String(item.price).replace(/[^0-9.-]+/g, "")) || 0;
+        if (!categoryStats[catName]) {
+          categoryStats[catName] = { units: 0, value: 0 };
+        }
+        categoryStats[catName].units += qty;
+        categoryStats[catName].value += qty * price;
+        totalUnitsCount += qty;
+      });
+    });
+
+    if (totalUnitsCount === 0 && products.length > 0) {
+      products.forEach((p) => {
+        const catName = p.category?.name || "General";
+        if (!categoryStats[catName]) categoryStats[catName] = { units: 0, value: 0 };
+        categoryStats[catName].units += 1;
+        totalUnitsCount += 1;
+      });
+    }
+
+    if (totalUnitsCount === 0) {
+      return [{ label: "No Items", value: 100, units: 0, color: "#E5E7EB" }];
+    }
+
+    const palette = ["#A81324", "#FBBF24", "#38BDF8", "#C084FC", "#34D399", "#F87171", "#60A5FA", "#A78BFA", "#F472B6"];
+    return Object.entries(categoryStats)
+      .map(([catName, stats], idx) => ({
+        label: catName,
+        value: Math.round((stats.units / totalUnitsCount) * 100),
+        units: stats.units,
+        color: palette[idx % palette.length],
+      }))
+      .sort((a, b) => b.units - a.units);
+  }, [orders, products]);
+
+  const activeCategory = selectedCategory ?? hoveredCategory;
+  const activeSeg = categorySegments.find((s) => s.label === activeCategory) || null;
+  const totalUnits = categorySegments.reduce((acc, s) => acc + s.units, 0);
+
+  const cx = 90,
+    cy = 90,
+    baseR = 70,
+    baseInnerR = 44;
+  const { paths } = categorySegments.reduce(
+    (acc, seg) => {
+      const exactFraction = totalUnits > 0 ? seg.units / totalUnits : seg.value / 100;
+      const angle = exactFraction * 2 * Math.PI;
+      const startAngle = acc.currentAngle;
+      const endAngle = startAngle + angle;
+      const isActive = activeCategory === seg.label;
+
+      const r = isActive ? baseR + 5 : baseR;
+      const innerR = isActive ? baseInnerR - 2 : baseInnerR;
+
+      const x1 = cx + r * Math.cos(startAngle),
+        y1 = cy + r * Math.sin(startAngle);
+      const x2 = cx + r * Math.cos(endAngle),
+        y2 = cy + r * Math.sin(endAngle);
+      const xi1 = cx + innerR * Math.cos(startAngle),
+        yi1 = cy + innerR * Math.sin(startAngle);
+      const xi2 = cx + innerR * Math.cos(endAngle),
+        yi2 = cy + innerR * Math.sin(endAngle);
+
+      const large = angle > Math.PI ? 1 : 0;
+      const d = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${xi2} ${yi2} A ${innerR} ${innerR} 0 ${large} 0 ${xi1} ${yi1} Z`;
+      acc.paths.push({ ...seg, d, isActive });
+      acc.currentAngle = endAngle;
+      return acc;
+    },
+    { currentAngle: -Math.PI / 2, paths: [] as Array<(typeof categorySegments)[0] & { d: string; isActive: boolean }> }
+  );
+
   return (
-    <div className="flex flex-col items-center gap-3">
-      <svg width="160" height="160" viewBox="0 0 160 160">
-        {paths.map((seg) => (
-          <path key={seg.label} d={seg.d} fill={seg.color} />
-        ))}
-        <text
-          x={cx}
-          y={cy - 4}
-          textAnchor="middle"
-          fontSize="13"
-          fontWeight="700"
-          fill="#111827"
+    <div className="flex flex-col items-center gap-4 w-full">
+      {/* Donut SVG */}
+      <div className="relative flex items-center justify-center">
+        <svg
+          width="180"
+          height="180"
+          viewBox="0 0 180 180"
+          className="overflow-visible select-none"
         >
-          18,320
-        </text>
-        <text
-          x={cx}
-          y={cy + 12}
-          textAnchor="middle"
-          fontSize="8"
-          fill="#6B7280"
-        >
-          {t("totalUnits", "Total Units")}
-        </text>
-      </svg>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full">
-        {categorySegments.map((seg) => (
-          <div key={seg.label} className="flex items-center gap-1.5">
-            <div
-              className="h-3 w-3 shrink-0 rounded"
-              style={{ background: seg.color }}
+          <defs>
+            <filter id="donut-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#000000" floodOpacity="0.15" />
+            </filter>
+          </defs>
+
+          {paths.map((seg) => (
+            <path
+              key={seg.label}
+              d={seg.d}
+              fill={seg.color}
+              filter={seg.isActive ? "url(#donut-glow)" : undefined}
+              onMouseEnter={() => setHoveredCategory(seg.label)}
+              onMouseLeave={() => setHoveredCategory(null)}
+              onClick={() => setSelectedCategory((prev) => (prev === seg.label ? null : seg.label))}
+              style={{
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                cursor: "pointer",
+                opacity: activeCategory && !seg.isActive ? 0.45 : 1,
+              }}
             />
-            <span className="font-['Montserrat'] text-xs font-semibold text-foreground">
-              {t(seg.label, seg.label)} {seg.value}%
-            </span>
-          </div>
-        ))}
+          ))}
+
+          {/* Center Dynamic Label */}
+          <text
+            x={cx}
+            y={cy - 4}
+            textAnchor="middle"
+            fontSize="16"
+            fontWeight="800"
+            fill="#111827"
+            className="font-['Montserrat'] transition-all"
+          >
+            {activeSeg ? activeSeg.units.toLocaleString() : totalUnits.toLocaleString()}
+          </text>
+          <text
+            x={cx}
+            y={cy + 14}
+            textAnchor="middle"
+            fontSize={activeSeg ? "10" : "9"}
+            fontWeight="700"
+            fill={activeSeg ? activeSeg.color : "#6B7280"}
+            className="font-['Montserrat'] transition-all uppercase tracking-wider"
+          >
+            {activeSeg ? `${t(activeSeg.label, activeSeg.label)} (${activeSeg.value}%)` : t("totalUnits", "Total Units")}
+          </text>
+        </svg>
+      </div>
+
+      {/* Interactive Legend Grid */}
+      <div className="grid grid-cols-2 gap-2.5 w-full mt-1">
+        {categorySegments.map((seg) => {
+          const isActive = activeCategory === seg.label;
+          return (
+            <button
+              key={seg.label}
+              type="button"
+              onClick={() => setSelectedCategory((prev) => (prev === seg.label ? null : seg.label))}
+              onMouseEnter={() => setHoveredCategory(seg.label)}
+              onMouseLeave={() => setHoveredCategory(null)}
+              className={`flex items-center justify-between gap-2 p-2 rounded-xl border text-left font-['Montserrat'] transition-all cursor-pointer ${
+                isActive
+                  ? "bg-secondary/15 border-secondary shadow-sm scale-[1.02]"
+                  : "bg-background border-stroke hover:border-gray-300 hover:bg-card"
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className={`h-3 w-3 shrink-0 rounded transition-transform ${
+                    isActive ? "scale-125" : ""
+                  }`}
+                  style={{ background: seg.color }}
+                />
+                <span className={`text-xs capitalize truncate ${isActive ? "font-bold text-foreground" : "font-semibold text-gray-text"}`}>
+                  {t(seg.label, seg.label)}
+                </span>
+              </div>
+              <div className="flex flex-col items-end shrink-0">
+                <span className="text-xs font-bold text-foreground">{seg.value}%</span>
+                <span className="text-[10px] text-gray-text">{seg.units.toLocaleString()}</span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Helper Footer */}
+      <div className="w-full text-center">
+        {selectedCategory ? (
+          <button
+            type="button"
+            onClick={() => setSelectedCategory(null)}
+            className="text-xs font-bold font-['Montserrat'] text-secondary underline hover:opacity-80 cursor-pointer"
+          >
+            {t("clearSelection", "Clear category filter")}
+          </button>
+        ) : (
+          <p className="text-[11px] font-medium text-gray-text font-['Montserrat']">
+            💡 {t("donutHint", "Click any category slice or card to lock focus")}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -224,9 +711,10 @@ interface EditableOrderItemRowProps {
   currentEdit: { quantity: number; price: number };
   onChange: (updates: Partial<{ quantity: number; price: number }>) => void;
   onDelete: () => void;
+  onAddColorRow?: () => void;
 }
 
-function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onDelete }: EditableOrderItemRowProps) {
+function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onDelete, onAddColorRow }: EditableOrderItemRowProps) {
   return (
     <tr className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
       <td className="px-4 py-4 text-center">
@@ -257,6 +745,15 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
         
         {isEditing && (
           <div className="flex justify-center gap-2.5 mt-2">
+            {onAddColorRow && (
+              <button
+                type="button"
+                onClick={onAddColorRow}
+                className="inline-flex items-center gap-1 text-[10px] font-bold text-secondary hover:underline cursor-pointer"
+              >
+                <Plus className="h-3 w-3" /> Add Color
+              </button>
+            )}
             <button
               type="button"
               onClick={onDelete}
@@ -408,7 +905,8 @@ interface OrderDetailProps {
       price: number;
       color?: string | null;
       size?: string | null;
-    }[]
+    }[],
+    deletedItemIds?: string[]
   ) => Promise<void>;
 }
 
@@ -425,20 +923,21 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
   const [newItems, setNewItems] = useState<{ tempId: string; productId: string; product: string; quantity: number; price: number; color: string | null; image: string }[]>([]);
   const [deletedItemIds, setDeletedItemIds] = useState<string[]>([]);
 
-  const handleAddColorRow = () => {
-    const originalItem = order.items[0];
-    if (!originalItem) return;
-    const numericPrice = parseFloat(originalItem.price.replace(/[^0-9.-]+/g, "")) || 0;
+  const handleAddColorRow = (originalItemOrEvent?: WholesaleOrder["items"][number] | React.MouseEvent) => {
+    const isItem = originalItemOrEvent && "productId" in originalItemOrEvent;
+    const targetItem = isItem ? originalItemOrEvent : order.items[0];
+    if (!targetItem) return;
+    const numericPrice = parseFloat(targetItem.price.replace(/[^0-9.-]+/g, "")) || 0;
     setNewItems((prev) => [
       ...prev,
       {
         tempId: Math.random().toString(36).slice(2, 9),
-        productId: originalItem.productId,
-        product: originalItem.product,
+        productId: targetItem.productId,
+        product: targetItem.product,
         quantity: 1,
         price: numericPrice,
         color: "",
-        image: originalItem.image,
+        image: targetItem.image,
       }
     ]);
   };
@@ -623,7 +1122,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
               <>
                 <button
                   type="button"
-                  onClick={handleAddColorRow}
+                  onClick={() => handleAddColorRow()}
                   className="rounded-xl border border-secondary bg-secondary/15 px-4 py-2 font-['Montserrat'] text-xs font-bold text-secondary transition hover:bg-secondary/25 cursor-pointer"
                 >
                   <Plus className="h-3 w-3 inline mr-1" /> Add Color Row
@@ -710,7 +1209,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
               })}
 
               {/* Render newly added color rows */}
-              {newItems.map((item, nIdx) => (
+              {newItems.map((item) => (
                 <NewOrderItemRow
                   key={item.tempId}
                   item={item}
@@ -758,6 +1257,7 @@ export default function TraderWholesalePage() {
   const [selectedOrder, setSelectedOrder] = useState<WholesaleOrder | null>(null);
 
   const { data: orders = [], isLoading, isError, error } = useTraderWholesaleOrders();
+  const { data: products = [] } = useTraderWholesales();
   const updateStatusMutation = useUpdateWholesaleOrderStatus();
   const deleteOrderMutation = useDeleteWholesaleOrder();
   const updateOrderMutation = useUpdateWholesaleOrder();
@@ -769,7 +1269,7 @@ export default function TraderWholesalePage() {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder((prev) => prev ? { ...prev, status } : null);
       }
-    } catch (err) {
+    } catch {
       toast.error(t("statusUpdateError", "Failed to update order status"));
     }
   };
@@ -790,7 +1290,7 @@ export default function TraderWholesalePage() {
       const updated = await updateOrderMutation.mutateAsync({ orderId, items, deletedItemIds });
       toast.success(t("orderUpdateSuccess", "Order items updated successfully"));
       setSelectedOrder(updated);
-    } catch (err) {
+    } catch {
       toast.error(t("orderUpdateError", "Failed to update order items"));
     }
   };
@@ -800,7 +1300,7 @@ export default function TraderWholesalePage() {
       await deleteOrderMutation.mutateAsync(orderId);
       toast.success(t("deleteSuccess", "Order deleted successfully"));
       setSelectedOrder(null);
-    } catch (err) {
+    } catch {
       toast.error(t("deleteError", "Failed to delete order"));
     }
   };
@@ -914,23 +1414,12 @@ export default function TraderWholesalePage() {
           <div className="grid gap-4 lg:grid-cols-3">
             {/* Earnings Over Time */}
             <div className="lg:col-span-2 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-3 flex items-center justify-between">
                 <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">
                   {t("earningsOverTime", "Earnings Over Time")}
                 </h2>
-                <button
-                  type="button"
-                  className="flex items-center gap-1 rounded-lg border border-stroke bg-white px-3 py-2 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-                >
-                  {t("partner", "Partner")}
-                  <img
-                    className="h-5 w-5 rotate-90"
-                    src={asset("weui_arrow-outlined.svg")}
-                    alt=""
-                  />
-                </button>
               </div>
-              <EarningsChart />
+              <EarningsChart orders={orders} />
             </div>
 
             {/* Category Donut */}
@@ -938,7 +1427,7 @@ export default function TraderWholesalePage() {
               <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">
                 {t("productCategory", "Product Category")}
               </h2>
-              <CategoryDonut />
+              <CategoryDonut orders={orders} products={products} />
             </div>
           </div>
 
