@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCartStore } from "../../store/useCartStore";
+import { useCartStore, type CartItem } from "../../store/useCartStore";
 import { useCart } from "../../hooks/useCart";
 import GoogleMapPicker from "../../components/shared/GoogleMap";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 import {
   MapPin,
   CheckCircle2,
@@ -13,15 +14,91 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useMyAddresses } from "../../hooks/queries/addressQuery";
-import type { Address } from "../../hooks/queries/addressQuery";
+import { useMyAddresses, type Address } from "../../hooks/queries/addressQuery";
+import {
+  useShippingCountries,
+  useShippingCities,
+  type ShippingCountry,
+  type ShippingCity,
+} from "../../hooks/queries/shippingQuery";
 import { LoadingSpinner } from "../../components/shared";
 import { couponAppliesToItem, type Coupon } from "../../lib/couponUtils";
+
+// =======================================================
+// TYPES & PROPS (STRICT - NO ANY)
+// =======================================================
+
 type SavedAddressesSectionProps = {
   addresses: Address[];
   selectedAddressId: string | null;
   onSelect: (address: Address) => void;
 };
+
+type OrderSummaryProps = {
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  discountAmount: number;
+  total: number;
+  couponCode: string;
+  setCouponCode: (val: string) => void;
+  appliedCoupon: Coupon | null;
+  setAppliedCoupon: (val: Coupon | null) => void;
+  couponError: string;
+  setCouponError: (val: string) => void;
+};
+
+type SelectOption = { label: string; value: string } | string;
+
+type FormSelectProps = {
+  placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options?: SelectOption[];
+  className?: string;
+  disabled?: boolean;
+};
+
+type FormInputProps = {
+  placeholder: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+};
+
+type CheckoutFormData = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  country: string;
+  city: string;
+  area: string;
+  streetAddress: string;
+  apartment: string;
+  mapAddress?: string;
+  latitude?: string;
+  longitude?: string;
+};
+
+type DeliverySectionProps = {
+  data: CheckoutFormData;
+  onChange: (field: keyof CheckoutFormData, value: string) => void;
+  onCountryChange: (countryName: string) => void;
+  addresses: Address[];
+  isAddressesLoading?: boolean;
+  selectedAddressId: string | null;
+  onSelectAddress: (address: Address) => void;
+  countries: ShippingCountry[];
+  availableCities: ShippingCity[];
+  isCountriesLoading: boolean;
+  isCitiesLoading: boolean;
+};
+
+// =======================================================
+// SUB-COMPONENTS
+// =======================================================
+
 function SavedAddressesSection({
   addresses,
   selectedAddressId,
@@ -38,7 +115,6 @@ function SavedAddressesSection({
       >
         <div>
           <h3 className="font-semibold text-foreground">Saved Addresses</h3>
-
           <p className="text-sm text-gray-text">
             {addresses.length} saved address
             {addresses.length !== 1 && "es"}
@@ -59,36 +135,25 @@ function SavedAddressesSection({
                   key={address.id}
                   type="button"
                   onClick={() => onSelect(address)}
-                  className={`
-          rounded-xl
-          border
-          p-4
-          text-left
-          transition-all
-          duration-300
-
-          ${active
+                  className={`rounded-xl border p-4 text-left transition-all duration-300 ${
+                    active
                       ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
                       : "border-stroke bg-card hover:border-primary/40"
-                    }
-        `}
+                  }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
                       <h4 className="font-semibold text-foreground">
                         {address.area}
                       </h4>
-
                       <p className="mt-1 text-sm text-gray-text">
                         {address.streetAddress}
                       </p>
-
                       {address.apartment && (
                         <p className="text-sm text-gray-text">
                           Apt {address.apartment}
                         </p>
                       )}
-
                       <p className="mt-2 text-xs text-gray-text">
                         {address.city}, {address.country}
                       </p>
@@ -118,19 +183,7 @@ function OrderSummary({
   setAppliedCoupon,
   couponError,
   setCouponError,
-}: {
-  items: any[];
-  subtotal: number;
-  shipping: number;
-  discountAmount: number;
-  total: number;
-  couponCode: string;
-  setCouponCode: (val: string) => void;
-  appliedCoupon: any;
-  setAppliedCoupon: (val: any) => void;
-  couponError: string;
-  setCouponError: (val: string) => void;
-}) {
+}: OrderSummaryProps) {
   const [isValidating, setIsValidating] = useState(false);
 
   const handleApplyCoupon = async () => {
@@ -138,31 +191,31 @@ function OrderSummary({
     setIsValidating(true);
     setCouponError("");
     try {
-      const { data } = await api.get(
-        `/coupons/validate/${couponCode.trim().toUpperCase()}`,
+      const { data } = await api.get<{ data: Coupon }>(
+        `/coupons/validate/${couponCode.trim().toUpperCase()}`
       );
       const coupon = data?.data;
       if (coupon) {
-        // Influencer coupons apply to all items, trader coupons need category/product check
         if (coupon.type === "influencer") {
-          // Influencer coupon — applies to entire cart, usage tracked at order creation
           setAppliedCoupon(coupon);
           toast.success(`Coupon "${coupon.code}" applied!`);
         } else {
-          // Trader coupon — check if it applies to cart items
-          const appliesToCart = items.some(item => couponAppliesToItem(coupon, item));
+          const appliesToCart = items.some((item) =>
+            couponAppliesToItem(coupon, item)
+          );
 
           if (!appliesToCart) {
             setCouponError(
-              "This coupon does not apply to the items in your cart",
+              "This coupon does not apply to the items in your cart"
             );
             toast.error("This coupon does not apply to the items in your cart");
             setAppliedCoupon(null);
             return;
           }
 
-          // Apply and use the coupon immediately
-          const { data: useData } = await api.post(`/coupons/use/${coupon.code}`);
+          const { data: useData } = await api.post<{ data: Coupon }>(
+            `/coupons/use/${coupon.code}`
+          );
           const updatedCoupon = useData?.data || coupon;
 
           setAppliedCoupon(updatedCoupon);
@@ -171,8 +224,9 @@ function OrderSummary({
       } else {
         setCouponError("Invalid coupon code");
       }
-    } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to validate coupon";
+    } catch (err) {
+      const error = err as AxiosError<{ message?: string }>;
+      const msg = error.response?.data?.message || "Failed to validate coupon";
       setCouponError(msg);
       toast.error(msg);
       setAppliedCoupon(null);
@@ -188,7 +242,7 @@ function OrderSummary({
       <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
         {items.map((item) => (
           <div
-            key={`${item.productId}-${item.size || 'none'}-${item.color || 'none'}`}
+            key={`${item.productId}-${item.size || "none"}-${item.color || "none"}`}
             className="relative flex items-start gap-4 rounded-lg bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
           >
             <div className="relative shrink-0">
@@ -327,12 +381,7 @@ function FormInput({
   value,
   onChange,
   className = "",
-}: {
-  placeholder: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
-}) {
+}: FormInputProps) {
   return (
     <div
       className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
@@ -354,33 +403,36 @@ function FormSelect({
   onChange,
   options = [],
   className = "",
-}: {
-  placeholder: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options?: string[];
-  className?: string;
-}) {
+  disabled = false,
+}: FormSelectProps) {
   return (
     <div
-      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${
+        disabled ? "opacity-60 cursor-not-allowed" : ""
+      } ${className}`}
     >
       <select
         value={value}
         onChange={onChange}
-        className="w-full h-full px-4 appearance-none bg-transparent font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10"
+        disabled={disabled}
+        className="w-full h-full px-4 appearance-none bg-transparent font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10 disabled:cursor-not-allowed"
       >
         <option value="" disabled className="text-gray-text">
           {placeholder}
         </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-        {value && !options.includes(value) && (
-          <option value={value}>{value}</option>
-        )}
+        {options.map((opt) => {
+          const val = typeof opt === "string" ? opt : opt.value;
+          const lbl = typeof opt === "string" ? opt : opt.label;
+          return (
+            <option key={val} value={val}>
+              {lbl}
+            </option>
+          );
+        })}
+        {value &&
+          !options.some(
+            (opt) => (typeof opt === "string" ? opt : opt.value) === value
+          ) && <option value={value}>{value}</option>}
       </select>
       <div className="absolute right-4 z-0 pointer-events-none">
         <DropdownArrow />
@@ -389,38 +441,33 @@ function FormSelect({
   );
 }
 
-type CheckoutFormData = {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  country: string;
-  city: string;
-  area: string;
-  streetAddress: string;
-  apartment: string;
-  mapAddress?: string;
-  latitude?: string;
-  longitude?: string;
-  isAddressesLoading?: boolean;
-};
-
 function DeliverySection({
   data,
   onChange,
+  onCountryChange,
   addresses,
   selectedAddressId,
   isAddressesLoading,
   onSelectAddress,
-}: {
-  data: CheckoutFormData;
-  onChange: (field: keyof CheckoutFormData, value: string) => void;
+  countries,
+  availableCities,
+  isCountriesLoading,
+  isCitiesLoading,
+}: DeliverySectionProps) {
+  const countryOptions = useMemo(() => {
+    return countries.map((c) => ({
+      label: c.code ? `${c.name} (${c.code})` : c.name,
+      value: c.name,
+    }));
+  }, [countries]);
 
-  addresses: Address[];
-  isAddressesLoading?: boolean;
-  selectedAddressId: string | null;
-  onSelectAddress: (address: Address) => void;
-}) {
+  const cityOptions = useMemo(() => {
+    return availableCities.map((c) => ({
+      label: `${c.name} (${c.shippingCost} EGP)`,
+      value: c.name,
+    }));
+  }, [availableCities]);
+
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
       <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">
@@ -449,8 +496,11 @@ function DeliverySection({
           value={data.email}
           onChange={(e) => onChange("email", e.target.value)}
         />
+
         {isAddressesLoading && (
-          <div className="p-10 text-center">Saved Addresses are loading...</div>
+          <div className="p-6 text-center text-sm text-gray-text">
+            Saved Addresses are loading...
+          </div>
         )}
         {!isAddressesLoading && addresses && addresses.length > 0 && (
           <SavedAddressesSection
@@ -459,20 +509,37 @@ function DeliverySection({
             onSelect={onSelectAddress}
           />
         )}
+
+        {/* Dynamic Country & City Select Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <FormSelect
-            placeholder="Country"
+            placeholder={
+              isCountriesLoading ? "Loading countries..." : "Select Country"
+            }
             value={data.country}
-            onChange={(e) => onChange("country", e.target.value)}
-            options={["Egypt", "Saudi Arabia", "UAE"]}
+            onChange={(e) => onCountryChange(e.target.value)}
+            options={countryOptions}
+            disabled={isCountriesLoading || countryOptions.length === 0}
           />
           <FormSelect
-            placeholder="City"
+            placeholder={
+              !data.country
+                ? "Select Country first"
+                : isCitiesLoading
+                ? "Loading cities..."
+                : cityOptions.length === 0
+                ? "No cities available"
+                : "Select City"
+            }
             value={data.city}
             onChange={(e) => onChange("city", e.target.value)}
-            options={["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"]}
+            options={cityOptions}
+            disabled={
+              !data.country || isCitiesLoading || cityOptions.length === 0
+            }
           />
         </div>
+
         <FormInput
           placeholder="Area"
           value={data.area}
@@ -547,7 +614,6 @@ function DeliverySection({
           </div>
           <GoogleMapPicker
             onLocationPick={(loc) => {
-              // Set the confirmed address field and coordinates
               const fullAddr =
                 loc.displayAddress ||
                 [loc.streetAddress, loc.area, loc.city]
@@ -708,22 +774,29 @@ function RememberMeSection({
   );
 }
 
+// =======================================================
+// MAIN CHECKOUT PAGE COMPONENT
+// =======================================================
+
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const initialCoupon = location.state?.appliedCoupon || null;
+  const initialCoupon = (location.state?.appliedCoupon as Coupon | null) || null;
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Dynamic Shipping Queries
+  const { data: countries = [], isLoading: isCountriesLoading } = useShippingCountries();
+  const { data: cities = [], isLoading: isCitiesLoading } = useShippingCities();
 
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
     phone: "",
     email: "",
-    country: "Egypt",
+    country: "",
     city: "",
     area: "",
     streetAddress: "",
@@ -734,56 +807,105 @@ export default function CheckoutPage() {
   });
 
   const { isLoading: isCartLoading } = useCart();
-  const { data: addresses = [], isLoading: isAddressesLoading } =
-    useMyAddresses();
+  const { data: addresses = [], isLoading: isAddressesLoading } = useMyAddresses();
 
-  // Redirect back to bag if any wholesale item doesn't meet its minimum order
+  // Auto-set initial country once countries load if none selected yet
+  useEffect(() => {
+    if (countries.length > 0 && !formData.country) {
+      const defaultCountry = countries[0];
+      const defaultCountryCities = cities.filter((c) => c.countryId === defaultCountry.id);
+      setFormData((prev) => ({
+        ...prev,
+        country: defaultCountry.name,
+        city: defaultCountryCities.length > 0 ? defaultCountryCities[0].name : "",
+      }));
+    }
+  }, [countries, cities, formData.country]);
+
+  // Match selected country object
+  const selectedCountryObj = useMemo(() => {
+    if (!formData.country) return undefined;
+    return countries.find(
+      (c) =>
+        c.name.toLowerCase() === formData.country.trim().toLowerCase() ||
+        (c.code && c.code.toLowerCase() === formData.country.trim().toLowerCase())
+    );
+  }, [countries, formData.country]);
+
+  // Available cities for currently selected country
+  const availableCities = useMemo(() => {
+    if (!selectedCountryObj) return [];
+    return cities.filter((c) => c.countryId === selectedCountryObj.id);
+  }, [cities, selectedCountryObj]);
+
+  // Match selected city object for dynamic shipping cost
+  const selectedCityObj = useMemo(() => {
+    if (!formData.city) return undefined;
+    return availableCities.find(
+      (c) => c.name.toLowerCase() === formData.city.trim().toLowerCase()
+    );
+  }, [availableCities, formData.city]);
+
+  // Calculate dynamic shipping cost based on selected city
+  const shipping = useMemo(() => {
+    if (selectedCityObj && typeof selectedCityObj.shippingCost === "number") {
+      return selectedCityObj.shippingCost;
+    }
+    return 50; // Fallback shipping cost
+  }, [selectedCityObj]);
+
+  // Redirect back to bag if any wholesale item doesn't meet minimum order
   useEffect(() => {
     if (isCartLoading) return;
     if (items.length === 0) return;
 
-    const wholesaleItems = items.filter((item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale"));
-    const groupedWholesale = wholesaleItems.reduce((acc, item) => {
-      if (!acc[item.productId]) {
-        acc[item.productId] = { sum: 0, minOrder: item.minOrder || 1, title: item.title };
-      }
-      acc[item.productId].sum += item.quantity;
-      return acc;
-    }, {} as Record<string, { sum: number; minOrder: number; title: string }>);
+    const wholesaleItems = items.filter(
+      (item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale")
+    );
+    const groupedWholesale = wholesaleItems.reduce(
+      (acc, item) => {
+        if (!acc[item.productId]) {
+          acc[item.productId] = {
+            sum: 0,
+            minOrder: item.minOrder || 1,
+            title: item.title,
+          };
+        }
+        acc[item.productId].sum += item.quantity;
+        return acc;
+      },
+      {} as Record<string, { sum: number; minOrder: number; title: string }>
+    );
 
     for (const productId in groupedWholesale) {
       const { sum, minOrder, title } = groupedWholesale[productId];
       if (sum < minOrder) {
-        toast.error(`Cannot access checkout. The total packages for wholesale product "${title}" in your cart (${sum}) is less than the minimum order requirement (${minOrder}).`);
+        toast.error(
+          `Cannot access checkout. The total packages for wholesale product "${title}" in your cart (${sum}) is less than the minimum order requirement (${minOrder}).`
+        );
         navigate("/bag");
         return;
       }
     }
   }, [items, isCartLoading, navigate]);
 
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null,
-  );
-
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(initialCoupon);
   const [couponError, setCouponError] = useState("");
 
   const subtotal = useMemo(
-    () =>
-      items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
-    [items],
+    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+    [items]
   );
 
   const discountAmount = useMemo(() => {
     if (!appliedCoupon) return 0;
 
-    // Influencer coupons apply to entire cart
     if (appliedCoupon.type === "influencer") {
       return (subtotal * appliedCoupon.discount) / 100;
     }
 
-    // Trader coupons apply to matching items only
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
     items.forEach((item) => {
@@ -801,14 +923,36 @@ export default function CheckoutPage() {
   }, [appliedCoupon, items, subtotal]);
 
   if (isCartLoading || isAddressesLoading) {
-    return <LoadingSpinner text="Preparing checkout..." containerClassName="h-[75vh]" className="h-12 w-12" />;
+    return (
+      <LoadingSpinner
+        text="Preparing checkout..."
+        containerClassName="h-[75vh]"
+        className="h-12 w-12"
+      />
+    );
   }
 
-  const shipping = 50; // Flat shipping rate
   const total = Math.max(0, subtotal - discountAmount + shipping);
 
   const handleChange = (field: keyof CheckoutFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCountryChange = (newCountryName: string) => {
+    const matchingCountry = countries.find(
+      (c) => c.name.toLowerCase() === newCountryName.toLowerCase()
+    );
+    const countryCities = matchingCountry
+      ? cities.filter((c) => c.countryId === matchingCountry.id)
+      : [];
+
+    const defaultCity = countryCities.length > 0 ? countryCities[0].name : "";
+
+    setFormData((prev) => ({
+      ...prev,
+      country: newCountryName,
+      city: defaultCity,
+    }));
   };
 
   const handleCheckout = async () => {
@@ -832,9 +976,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!formData.mapAddress) {
-      toast.error(
-        "Please select and confirm your delivery location on the map",
-      );
+      toast.error("Please select and confirm your delivery location on the map");
       return;
     }
 
@@ -847,7 +989,7 @@ export default function CheckoutPage() {
         shipping,
         total,
         couponCode: appliedCoupon?.code || null,
-        paymentMethod: "COD", // Defaulting to Cash on Delivery for this checkout flow
+        paymentMethod: "COD",
         items: items.map((item) => ({
           productId: item.productId,
           title: item.title,
@@ -866,10 +1008,11 @@ export default function CheckoutPage() {
 
       toast.success("Order placed successfully! Your cart has been cleared.");
       navigate("/my-orders");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Order creation failed:", err);
+      const error = err as AxiosError<{ message?: string }>;
       const errMsg =
-        err.response?.data?.message || "An error occurred during checkout";
+        error.response?.data?.message || "An error occurred during checkout";
       toast.error(errMsg);
     } finally {
       setIsSubmitting(false);
@@ -883,7 +1026,9 @@ export default function CheckoutPage() {
           <DeliverySection
             data={formData}
             onChange={handleChange}
+            onCountryChange={handleCountryChange}
             addresses={addresses}
+            isAddressesLoading={isAddressesLoading}
             selectedAddressId={selectedAddressId}
             onSelectAddress={(address) => {
               setSelectedAddressId(address.id);
@@ -897,6 +1042,10 @@ export default function CheckoutPage() {
                 apartment: address.apartment ?? "",
               }));
             }}
+            countries={countries}
+            availableCities={availableCities}
+            isCountriesLoading={isCountriesLoading}
+            isCitiesLoading={isCitiesLoading}
           />
           <PaymentMethodSection />
           <RememberMeSection onPay={handleCheckout} loading={isSubmitting} />

@@ -129,8 +129,12 @@ import traderBlankProductsAr from "./locales/ar/traderBlankProducts.json";
 import traderShopPageEn from "./locales/en/traderShopPage.json";
 import traderShopPageAr from "./locales/ar/traderShopPage.json";
 
+
 import traderAnalyticsEn from "./locales/en/traderAnalytics.json";
 import traderAnalyticsAr from "./locales/ar/traderAnalytics.json";
+
+import traderShippingEn from "./locales/en/traderShipping.json";
+import traderShippingAr from "./locales/ar/traderShipping.json";
 
 i18n
   .use(LanguageDetector)
@@ -181,6 +185,7 @@ i18n
         traderBlankProducts: traderBlankProductsEn,
         traderShopPage: traderShopPageEn,
         traderAnalytics: traderAnalyticsEn,
+        traderShipping: traderShippingEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -226,6 +231,7 @@ i18n
         traderBlankProducts: traderBlankProductsAr,
         traderShopPage: traderShopPageAr,
         traderAnalytics: traderAnalyticsAr,
+        traderShipping: traderShippingAr,
       },
     },
 
