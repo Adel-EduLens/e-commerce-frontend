@@ -46,5 +46,9 @@
   "isActive": "نشط",
   "bannerImage": "صورة اللافتة",
   "uploading": "جاري الرفع...",
-  "save": "حفظ"
+  "save": "حفظ",
+  "homePageBanners": "بنرات الرئيسية",
+  "deleteHomePageBanner": "حذف لافتة الصفحة الرئيسية",
+  "homePageBannerCreated": "تم إنشاء لافتة الصفحة الرئيسية بنجاح",
+  "homePageBannerUpdated": "تم تحديث لافتة الصفحة الرئيسية بنجاح"
 }

@@ -46,5 +46,9 @@
   "isActive": "Is Active",
   "bannerImage": "Banner Image",
   "uploading": "Uploading...",
-  "save": "Save"
+  "save": "Save",
+  "homePageBanners": "Homepage Banners",
+  "deleteHomePageBanner": "Delete Homepage Banner",
+  "homePageBannerCreated": "Home page banner created successfully",
+  "homePageBannerUpdated": "Home page banner updated successfully"
 }

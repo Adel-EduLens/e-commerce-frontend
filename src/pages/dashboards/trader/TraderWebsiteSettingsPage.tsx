@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import TraderShopBannerPage from "./TraderShopBannerPage";
 import TraderHomeBannerPage from "./TraderHomeBannerPage";
@@ -30,6 +30,15 @@ export default function TraderWebsiteSettingsPage({
     { id: "help-center", label: t("tabs.helpCenter") },
     { id: "shipping", label: t("tabs.shipping") },
   ];
+
+  useEffect(() => {
+    const currentTab = tabs.find((tab) => tab.id === activeTab);
+    if (currentTab) {
+      document.title = `${t("websiteSettings")} | ${currentTab.label}`;
+    } else {
+      document.title = t("websiteSettings");
+    }
+  }, [activeTab, t]);
 
   return (
     <section>
