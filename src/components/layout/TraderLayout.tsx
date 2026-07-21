@@ -101,11 +101,11 @@ const sidebarItems = [
     icon: "solar_settings-linear.svg",
     path: "/dashboard/trader/preferences",
   },
-  {
-    label: "storeSettings",
-    icon: "solar_settings-linear.svg",
-    path: "/dashboard/trader/settings",
-  }
+  // {
+  //   label: "storeSettings",
+  //   icon: "solar_settings-linear.svg",
+  //   path: "/dashboard/trader/settings",
+  // }
 
 ] as const;
 

@@ -4,6 +4,12 @@ import { toast } from "sonner";
 import { Plus, X, Eye, Edit2 } from "lucide-react";
 import { api } from "../../../lib/axios";
 import { handleApiError } from "../../../lib/utils";
+import {
+  formatEgp,
+  getItemDiscount,
+  getItemTotalAfterDiscount,
+  getOriginalOrderTotal,
+} from "../../../lib/influencerOrderTotals";
 
 interface Influencer {
   id: number;
@@ -372,25 +378,25 @@ export default function TraderInfluencersPage() {
                 <div className="rounded-2xl border border-stroke bg-card p-5">
                   <p className="text-sm text-gray-text">{t("stats.totalEarnings", "Total Earnings")}</p>
                   <p className="mt-1 text-xl font-bold text-green-600">
-                    EGP {detailData.stats.totalEarnings.toFixed(2)}
+                    {formatEgp(detailData.stats.totalEarnings)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
                   <p className="text-sm text-gray-text">{t("stats.pending", "Pending")}</p>
                   <p className="mt-1 text-xl font-bold text-yellow-600">
-                    EGP {detailData.stats.pendingEarnings.toFixed(2)}
+                    {formatEgp(detailData.stats.pendingEarnings)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
                   <p className="text-sm text-gray-text">{t("stats.eligible", "Eligible")}</p>
                   <p className="mt-1 text-xl font-bold text-blue-600">
-                    EGP {detailData.stats.eligibleEarnings.toFixed(2)}
+                    {formatEgp(detailData.stats.eligibleEarnings)}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-stroke bg-card p-5">
                   <p className="text-sm text-gray-text">{t("stats.settled", "Settled")}</p>
                   <p className="mt-1 text-xl font-bold text-gray-600">
-                    EGP {detailData.stats.settledEarnings.toFixed(2)}
+                    {formatEgp(detailData.stats.settledEarnings)}
                   </p>
                 </div>
               </div>
@@ -417,6 +423,7 @@ export default function TraderInfluencersPage() {
                         <th className="px-5 py-4">{t("couponUsers.table.user", "User")}</th>
                         <th className="px-5 py-4">{t("couponUsers.table.email", "Email")}</th>
                         <th className="px-5 py-4">{t("couponUsers.table.phone", "Phone")}</th>
+                        <th className="px-5 py-4">{t("couponUsers.table.originalTotal", "Original Total")}</th>
                         <th className="px-5 py-4">{t("couponUsers.table.orderTotal", "Order Total")}</th>
                         <th className="px-5 py-4">{t("couponUsers.table.discount", "Discount")}</th>
                         <th className="px-5 py-4">{t("couponUsers.table.commission", "Commission")}</th>
@@ -436,13 +443,16 @@ export default function TraderInfluencersPage() {
                           <td className="px-5 py-4 text-gray-text">{u.userEmail}</td>
                           <td className="px-5 py-4 text-gray-text">{u.userPhone || "—"}</td>
                           <td className="px-5 py-4 text-foreground">
-                            EGP {u.orderTotal.toFixed(2)}
+                            {formatEgp(getOriginalOrderTotal(u.orderItems, u.orderTotal, u.discountAmount))}
+                          </td>
+                          <td className="px-5 py-4 text-foreground">
+                            {formatEgp(u.orderTotal)}
                           </td>
                           <td className="px-5 py-4 text-red-500">
-                            -EGP {u.discountAmount.toFixed(2)}
+                            {formatEgp(u.discountAmount, "-")}
                           </td>
                           <td className="px-5 py-4 font-semibold text-green-600">
-                            +EGP {u.commissionAmount.toFixed(2)}
+                            {formatEgp(u.commissionAmount, "+")}
                           </td>
                           <td className="px-5 py-4 text-gray-text">
                             {new Date(u.usedAt).toLocaleDateString(
@@ -516,60 +526,89 @@ export default function TraderInfluencersPage() {
                     </span>
                   </p>
                   <p>
+                    <span className="text-gray-text">{t("modal.originalTotal", "Original Total:")}</span>{" "}
+                    <span className="text-foreground">
+                      {formatEgp(getOriginalOrderTotal(
+                        modalData.orderItems,
+                        modalData.orderTotal,
+                        modalData.discountAmount,
+                      ))}
+                    </span>
+                  </p>
+                  <p>
                     <span className="text-gray-text">{t("modal.orderTotal", "Order Total:")}</span>{" "}
                     <span className="text-foreground">
-                      EGP {modalData.orderTotal.toFixed(2)}
+                      {formatEgp(modalData.orderTotal)}
                     </span>
                   </p>
                   <p>
                     <span className="text-gray-text">{t("modal.discount", "Discount:")}</span>{" "}
                     <span className="text-red-500">
-                      -EGP {modalData.discountAmount.toFixed(2)}
+                      {formatEgp(modalData.discountAmount, "-")}
                     </span>
                   </p>
                 </div>
               </div>
 
               <div className="space-y-3">
-                {modalData.orderItems.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center gap-3 rounded-xl border border-stroke p-3"
-                  >
-                    {item.imageSrc ? (
-                      <img
-                        src={item.imageSrc}
-                        alt={item.title}
-                        className="h-14 w-14 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/10">
-                        <span className="text-xs text-gray-text">{t("modal.noImg", "No img")}</span>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
-                        {item.title}
-                      </p>
-                      <div className="flex gap-3 text-xs text-gray-text mt-0.5">
-                        {item.size && <span>{t("modal.size", "Size:")} {item.size}</span>}
-                        {item.color && <span>{t("modal.color", "Color:")} {item.color}</span>}
-                        <span>{t("modal.qty", "Qty:")} {item.quantity}</span>
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-medium text-foreground">
-                        EGP {item.price.toFixed(2)}
-                      </p>
-                      {item.quantity > 1 && (
-                        <p className="text-xs text-gray-text">
-                          x{item.quantity} = EGP{" "}
-                          {(item.price * item.quantity).toFixed(2)}
-                        </p>
+                {modalData.orderItems.map((item, idx) => {
+                  const itemSubtotal = item.price * item.quantity;
+                  const itemDiscount = getItemDiscount(
+                    item,
+                    modalData.orderItems,
+                    modalData.discountAmount,
+                  );
+                  const itemTotalAfterDiscount = getItemTotalAfterDiscount(
+                    item,
+                    modalData.orderItems,
+                    modalData.discountAmount,
+                  );
+
+                  return (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-3 rounded-xl border border-stroke p-3"
+                    >
+                      {item.imageSrc ? (
+                        <img
+                          src={item.imageSrc}
+                          alt={item.title}
+                          className="h-14 w-14 rounded-lg object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/10">
+                          <span className="text-xs text-gray-text">{t("modal.noImg", "No img")}</span>
+                        </div>
                       )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground truncate">
+                          {item.title}
+                        </p>
+                        <div className="flex gap-3 text-xs text-gray-text mt-0.5">
+                          {item.size && <span>{t("modal.size", "Size:")} {item.size}</span>}
+                          {item.color && <span>{t("modal.color", "Color:")} {item.color}</span>}
+                          <span>{t("modal.qty", "Qty:")} {item.quantity}</span>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-medium text-foreground">
+                          {formatEgp(itemSubtotal)}
+                        </p>
+                        <p className="text-xs text-red-500">
+                          {formatEgp(itemDiscount, "-")}
+                        </p>
+                        <p className="text-xs font-medium text-green-600">
+                          {formatEgp(itemTotalAfterDiscount)}
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-xs text-gray-text">
+                            {item.quantity} x {formatEgp(item.price)}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
