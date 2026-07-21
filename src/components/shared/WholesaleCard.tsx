@@ -27,7 +27,7 @@ export default function WholesaleCard({ wholesale, to }: WholesaleCardProps) {
       images={wholesale.images}
       rating={wholesale.rating ?? 0}
       brand={wholesale.brand?.name}
-      category={wholesale.category?.name}
+      category={wholesale.category?.name ?? wholesale.categories?.[0]?.name}
       colors={wholesale.colors?.map((wc) => wc.colorName || wc.color || "") ?? []}
       wholesaleSizes={sizes}
       sizeLabel={sizes.slice(0, 4).join("-") || "All Sizes"}

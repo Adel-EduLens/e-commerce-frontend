@@ -25,7 +25,7 @@ const FALLBACK_DATE_STR = new Date(FALLBACK_DATE_RAW).toLocaleDateString(
 );
 
 // --- Main Page Component ---
-export default function TraderRetailProductsPage({ onEdit }: { onEdit: (item: InventoryItem) => void }) {
+export default function TraderRetailProductsPage({ onEdit = () => {} }: { onEdit?: (item: InventoryItem) => void }) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { t } = useTranslation("traderProduct");
 
@@ -39,7 +39,7 @@ export default function TraderRetailProductsPage({ onEdit }: { onEdit: (item: In
   const deleteProduct = useDeleteProduct();
 
   // Handle parsing the array properly in case it is nested
-  const raw = rawProducts as Record<string, unknown>;
+  const raw = rawProducts as unknown as Record<string, unknown>;
 
   let productsArray: Product[] = [];
   if (Array.isArray(rawProducts)) {

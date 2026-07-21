@@ -45,11 +45,11 @@ const CreateYourDesignPage = () => {
               images={product.colors?.flatMap(c => 
                 c.images.map(img => ({
                   id: img.id,
-                  url: img.url,
+                  url: img.url || img.imageUrl || "",
                   color: c.color,
                 }))
               )}
-              colors={product.colors?.map(c => c.color)}
+              colors={product.colors?.map(c => c.colorName || c.color).filter((color): color is string => Boolean(color))}
               to={`/createYourDesign/${product.id}`}
               productType="SHOP"
               hideAddToCart={true}

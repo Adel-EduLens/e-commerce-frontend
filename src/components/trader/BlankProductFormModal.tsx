@@ -15,6 +15,17 @@ import { Toggle } from "../ui";
 
 type ImageDirection = "FRONT" | "BACK" | "LEFT" | "RIGHT" | "TOP" | "BOTTOM";
 
+function isImageDirection(value: unknown): value is ImageDirection {
+  return (
+    value === "FRONT" ||
+    value === "BACK" ||
+    value === "LEFT" ||
+    value === "RIGHT" ||
+    value === "TOP" ||
+    value === "BOTTOM"
+  );
+}
+
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);
@@ -38,7 +49,9 @@ export function BlankProductFormModal({
   const { t } = useTranslation("traderBlankProducts");
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
-  const [price, setPrice] = useState(product?.price?.toString() ?? "");
+  const [price, setPrice] = useState(
+    (product?.blankPrice ?? product?.price)?.toString() ?? "",
+  );
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
 
   const [materials, setMaterials] = useState<string[]>(
@@ -53,10 +66,10 @@ export function BlankProductFormModal({
     }[]
   >(
     product?.colors?.map((c) => ({
-      color: c.color,
+      color: c.colorName || c.color || "",
       images: c.images.map((img) => ({
-        url: img.url,
-        direction: img.direction,
+        url: img.url || img.imageUrl || "",
+        direction: isImageDirection(img.direction) ? img.direction : "",
       })),
     })) ?? [],
   );
@@ -135,8 +148,9 @@ export function BlankProductFormModal({
 
     onSave({
       name,
-      description: description || null,
-      price: price ? parseFloat(price) : null,
+      description: description || undefined,
+      price: price ? parseFloat(price) : undefined,
+      blankPrice: price ? parseFloat(price) : undefined,
       isActive,
       productTypes: ["BLANK"],
       materials: materials.map((m) => ({ material: m })),

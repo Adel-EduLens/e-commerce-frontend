@@ -6,6 +6,7 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useProduct,
+  type ProductFormData,
   useAddProductColor,
   useDeleteProductColor,
   useReplaceProductColorImages,
@@ -15,6 +16,7 @@ import {
   useAddProductSize,
   useDeleteProductSize,
 } from "../../hooks/queries/productsQuery";
+import { useWholesale } from "../../hooks/queries/wholesaleQuery";
 
 
 import ImageCropModal, {
@@ -1270,8 +1272,7 @@ export function EditItemModal({
   const { data: categories = [] } = useCategories(!isProductType);
   const { data: brands = [] } = useBrands();
   const updateProduct = useUpdateProduct();
-  const updateWholesale = useUpdateWholesale();
-  const isSaving = updateProduct.isPending || updateWholesale.isPending;
+  const isSaving = updateProduct.isPending;
 
   // React Query fetch for nested colors & variants
   const { data: product, isLoading: productLoading } = useProduct(

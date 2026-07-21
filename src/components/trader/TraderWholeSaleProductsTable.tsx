@@ -9,7 +9,7 @@ import {
 } from "../../components/trader/InventoryShared";
 import { useTraderProducts, useDeleteProduct } from "../../hooks/queries/productsQuery";
 
-export function TraderWholeSaleProductsTable({ onEdit }: { onEdit: (item: InventoryItem) => void }) {
+export function TraderWholeSaleProductsTable({ onEdit = () => {} }: { onEdit?: (item: InventoryItem) => void }) {
   const { t } = useTranslation("traderWholesale");
 
   const {
@@ -45,7 +45,7 @@ export function TraderWholeSaleProductsTable({ onEdit }: { onEdit: (item: Invent
     type: "wholesale" as const,
     description: w.description ?? "",
     sizes: Array.from(new Set(w.colors?.flatMap(wc => wc.variants?.map(s => s.size)) || [])),
-    colors: w.colors?.map(wc => wc.colorName || wc.color) || [],
+    colors: w.colors?.map(wc => wc.colorName || wc.color).filter((color): color is string => Boolean(color)) || [],
     minOrder: w.colors?.[0]?.minOrder ?? 1,
     isMustHave: false,
     isFlashDeals: false,

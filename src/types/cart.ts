@@ -3,7 +3,10 @@ import type { Product } from './product'
 export interface CartItem {
   id: string
   productId?: string | number | null
+  retailProductId?: string | number | null
   productType?: string
+  categoryId?: string
+  categoryIds?: string[]
   title: string
   unitPrice: number
   currency: 'EGP'
@@ -12,6 +15,9 @@ export interface CartItem {
   colorHex?: string
   imageSrc: string
   quantity: number
+  minOrder?: number
+  retailColorId?: string | number | null
+  retailSizeId?: string | number | null
   product?: Product | null
 }
 

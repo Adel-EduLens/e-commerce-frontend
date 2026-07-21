@@ -90,7 +90,7 @@ export default function TraderInventoryPage() {
       );
       const uniqueColors = Array.from(
         new Set(
-          p.colors?.map((c) => c.colorName || c.color).filter(Boolean) ?? [],
+          p.colors?.map((c) => c.colorName || c.color).filter((color): color is string => Boolean(color)) ?? [],
         ),
       );
 
@@ -204,7 +204,7 @@ export default function TraderInventoryPage() {
         {/* Shared table panel */}
         <InventoryTablePanel
           items={inventoryItems}
-          isLoading={loadingProducts || loadingWholesales}
+          isLoading={loadingProducts}
           errorMessages={errorMessages}
           onAdd={() => setShowModal(true)}
           onEdit={setEditItem}

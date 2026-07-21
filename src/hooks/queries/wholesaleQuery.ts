@@ -4,6 +4,7 @@ import { api } from "../../lib/axios";
 export interface WholesaleColorSize {
   id: string;
   size: string;
+  quantity?: number;
 }
 
 export interface WholesaleColor {
