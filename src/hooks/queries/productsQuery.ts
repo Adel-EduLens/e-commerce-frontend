@@ -164,52 +164,6 @@ export function transformProduct(raw: Record<string, unknown>): Product {
 const getProducts = async (
   params: ProductsQuery,
 ): Promise<ProductsResponse> => {
-  if (params.type === "WHOLESALE") {
-    const { type, category, ...rest } = params;
-    const queryParams: Record<string, any> = { ...rest };
-    if (category) queryParams.category = category;
-
-    const { data } = await api.get("/wholesales", { params: queryParams });
-    const wholesaleItems: any[] = Array.isArray(data.data) ? data.data : (data.data?.products || []);
-
-    const mappedProducts = wholesaleItems.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description || "",
-      price: item.price,
-      wholesalePrice: item.price,
-      rating: item.rating || 0,
-      traderId: item.traderId,
-      minOrder: item.minOrder || 1,
-      stock: item.stock || 0,
-      brand: { id: item.brand || "", name: item.brand || "" },
-      categories: item.category ? [{ id: item.category.id, name: item.category.name }] : [],
-      category: item.category,
-      images: item.images || [],
-      colors: item.wholesaleColors
-        ? item.wholesaleColors.map((wc: any) => ({
-            id: wc.id,
-            colorName: wc.color,
-            color: wc.color,
-            variants: wc.sizes
-              ? wc.sizes.map((s: any) => ({
-                  id: s.id,
-                  size: s.size,
-                  quantity: s.stock || 0,
-                }))
-              : [],
-          }))
-        : [],
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    }));
-
-    return {
-      products: mappedProducts as unknown as Product[],
-      pagination: { page: 1, limit: mappedProducts.length, total: mappedProducts.length, totalPages: 1 }
-    };
-  }
-
   const { data } = await api.get("/products", {
     params,
   });

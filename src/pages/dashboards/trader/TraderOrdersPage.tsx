@@ -352,6 +352,7 @@ export default function TraderOrdersPage() {
   const { t } = useTranslation("traderOrders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("");
@@ -366,7 +367,7 @@ export default function TraderOrdersPage() {
       const res = await api.get("/orders/trader");
       setOrders(res.data?.data || []);
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t("fetchOrdersError");
+      const errorMessage = err instanceof Error ? err.message : t("fetchOrdersError", "Failed to load orders");
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

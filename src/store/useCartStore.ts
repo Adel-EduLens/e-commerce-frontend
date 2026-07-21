@@ -35,6 +35,12 @@ export const useCartStore = create<CartStore>()((set, get) => ({
   items: INITIAL_CART_ITEMS,
 
   addItem: async (item) => {
+    if (item.productType === "WHOLESALE") {
+      const { useWholesaleCartStore } = await import("./useWholesaleCartStore");
+      await useWholesaleCartStore.getState().addItem(item);
+      return;
+    }
+
     // 1. Optimistic local state update
     set((state) => {
       const existingItem = state.items.find(
@@ -91,7 +97,7 @@ type CartDbItem = {
 
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: CartDbItem) => ({
+            res.data.items.map((dbItem: CartDbItem & { imageSrc?: string; image?: string; minOrder?: number }) => ({
               id: dbItem.id,
               productId: dbItem.productId,
               categoryIds: dbItem.categoryIds,
@@ -101,7 +107,7 @@ type CartDbItem = {
               size: dbItem.size || "",
               color: dbItem.color || "",
               colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || "",
+              imageSrc: dbItem.imageSrc || dbItem.image || "",
               quantity: dbItem.quantity,
               minOrder: dbItem.minOrder,
               productType: dbItem.productType,
@@ -125,7 +131,7 @@ type CartDbItem = {
         const res = await cartApi.removeCartItem(itemId);
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: import('../types/cart').ApiCartItem) => ({
+            res.data.items.map((dbItem: any) => ({
               id: dbItem.id,
               productId: dbItem.productId,
               categoryIds: dbItem.categoryIds,
@@ -135,7 +141,7 @@ type CartDbItem = {
               size: dbItem.size || "",
               color: dbItem.color || "",
               colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || "",
+              imageSrc: dbItem.imageSrc || dbItem.image || "",
               quantity: dbItem.quantity,
               minOrder: dbItem.minOrder,
               productType: dbItem.productType,
@@ -163,7 +169,7 @@ type CartDbItem = {
         const res = await cartApi.updateCartItem(itemId, quantity);
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: CartDbItem) => ({
+            res.data.items.map((dbItem: any) => ({
               id: dbItem.id,
               productId: dbItem.productId,
               categoryIds: dbItem.categoryIds,
@@ -173,7 +179,7 @@ type CartDbItem = {
               size: dbItem.size || "",
               color: dbItem.color || "",
               colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || "",
+              imageSrc: dbItem.imageSrc || dbItem.image || "",
               quantity: dbItem.quantity,
               minOrder: dbItem.minOrder,
               productType: dbItem.productType,
@@ -214,7 +220,8 @@ type CartDbItem = {
   },
 
   setItems: (items) => {
-    const sortedItems = [...items].sort((a, b) => a.id.localeCompare(b.id));
+    const nonWholesaleItems = items.filter((item) => item.productType !== "WHOLESALE");
+    const sortedItems = [...nonWholesaleItems].sort((a, b) => a.id.localeCompare(b.id));
     const currentItems = get().items;
     if (JSON.stringify(currentItems) !== JSON.stringify(sortedItems)) {
       set({ items: sortedItems });
@@ -237,25 +244,7 @@ export const useCartSubtotal = () =>
     )
   );
 
-// Selectors for specific product types
-export const useWholesaleCartItems = () => {
-  const items = useCartStore((state) => state.items);
-  return items.filter((item) => item.productType === "WHOLESALE");
-};
 
-export const useWholesaleCartCount = () => {
-  const items = useCartStore((state) => state.items);
-  return items
-    .filter((item) => item.productType === "WHOLESALE")
-    .reduce((total, item) => total + item.quantity, 0);
-};
-
-export const useWholesaleCartSubtotal = () => {
-  const items = useCartStore((state) => state.items);
-  return items
-    .filter((item) => item.productType === "WHOLESALE")
-    .reduce((total, item) => total + item.unitPrice * item.quantity, 0);
-};
 
 export const useRetailCartItems = () => {
   const items = useCartStore((state) => state.items);

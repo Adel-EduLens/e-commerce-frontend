@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { cartApi } from "../services/cartApi";
 import { useCartStore } from "../store/useCartStore";
+import { useWholesaleCartStore } from "../store/useWholesaleCartStore";
 
 import type { CartItem } from "../types/cart";
 
@@ -9,6 +10,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 export function useCart() {
   const setItems = useCartStore((state) => state.setItems);
+  const setWholesaleItems = useWholesaleCartStore((state) => state.setItems);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return useQuery({
@@ -17,23 +19,24 @@ export function useCart() {
       if (!isAuthenticated) return null;
       const data = await cartApi.getCart();
       if (data && data.data && data.data.items) {
-        setItems(
-          data.data.items.map((item: import("../types/cart").ApiCartItem) => ({
-            id: item.id,
-            productId: item.productId,
-            categoryIds: item.categoryIds,
-            title: item.title,
-            unitPrice: item.price,
-            currency: "EGP",
-            size: item.size || "",
-            color: item.color || "",
-            colorHex: item.color || "",
-            imageSrc: item.imageSrc,
-            quantity: item.quantity,
-            minOrder: item.minOrder,
-            productType: item.productType,
-          })),
-        );
+        const mappedItems = data.data.items.map((item: any) => ({
+          id: item.id,
+          productId: item.productId,
+          categoryIds: item.categoryIds,
+          title: item.title,
+          unitPrice: item.price,
+          currency: "EGP",
+          size: item.size || "",
+          color: item.color || "",
+          colorHex: item.color || "",
+          imageSrc: item.imageSrc || item.image || "",
+          quantity: item.quantity,
+          minOrder: item.minOrder,
+          productType: item.productType,
+        }));
+
+        setItems(mappedItems.filter((i: any) => i.productType !== "WHOLESALE"));
+        setWholesaleItems(mappedItems.filter((i: any) => i.productType === "WHOLESALE"));
       }
       return data;
     },

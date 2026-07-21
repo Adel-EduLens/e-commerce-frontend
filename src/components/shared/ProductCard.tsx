@@ -14,7 +14,7 @@ import {
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useCartStore } from "../../store/useCartStore";
-
+import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
@@ -180,6 +180,7 @@ export default function ProductCard({
   const toggleWishlist = useToggleWishlist();
   const isWishlisted = Boolean(wishlistStatus?.isWishlisted);
   const cartItems = useCartStore((s) => s.items);
+  const wholesaleCartItems = useWholesaleCartStore((s) => s.items);
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
 
@@ -189,19 +190,17 @@ export default function ProductCard({
 
   const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
-  const existingCartItem = cartItems.find((item) => {
-    const matchId =
-      String(item.productId) === String(actualProductId) ||
-      String(item.id).startsWith(String(actualProductId));
-    if (isWholesale) {
-      return (
-        matchId &&
-        item.productType === "WHOLESALE" &&
+  const existingCartItem = isWholesale
+    ? wholesaleCartItems.find((item) =>
+        String(item.productId) === String(actualProductId) &&
         (useWholesaleCard ? item.color?.toLowerCase() === selectedColor.toLowerCase() : true)
-      );
-    }
-    return matchId;
-  });
+      )
+    : cartItems.find((item) => {
+        return (
+          String(item.productId) === String(actualProductId) ||
+          String(item.id).startsWith(String(actualProductId))
+        );
+      });
 
   const isInCart = Boolean(existingCartItem);
 
@@ -252,7 +251,11 @@ export default function ProductCard({
     e.stopPropagation();
 
     if (existingCartItem) {
-      removeItem(existingCartItem.id);
+      if (isWholesale) {
+        useWholesaleCartStore.getState().removeItem(existingCartItem.id);
+      } else {
+        removeItem(existingCartItem.id);
+      }
       toast.success(t("removedFromCartToast"));
     } else {
       if (stock !== undefined && stock <= 0) {
@@ -267,7 +270,7 @@ export default function ProductCard({
         const allSizesStr =
           wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
 
-        addItem({
+        useWholesaleCartStore.getState().addItem({
           id: `${actualProductId}-${selectedColor.toLowerCase()}-wholesale`,
           productId: actualProductId,
           title,

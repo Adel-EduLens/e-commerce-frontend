@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useCartStore, useWholesaleCartItems } from "../../store/useCartStore";
+import { useWholesaleCartItems, useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 import GoogleMapPicker from "../../components/shared/GoogleMap";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
@@ -446,7 +446,7 @@ export default function WholesaleCheckoutPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const items = useWholesaleCartItems();
-  const clearCart = useCartStore((s) => s.clearCart);
+  const clearCart = useWholesaleCartStore((s) => s.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
@@ -529,8 +529,10 @@ export default function WholesaleCheckoutPage() {
 
       await api.post("/wholesale-orders", orderPayload);
 
-      clearCart();
+      await clearCart();
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesale-orders"] });
 
       toast.success("Wholesale order placed successfully!");
       navigate("/my-orders");

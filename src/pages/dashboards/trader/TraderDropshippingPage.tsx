@@ -149,7 +149,8 @@ function OrdersDonutChart() {
 
   const segments = orderStatus.map((seg, index) => {
     const startAngle = -90 + (orderStatus.slice(0, index).reduce((acc, s) => acc + s.share, 0) / 100) * 360;
-    const angle = (seg.share / 100) * 360;
+    const rawAngle = (seg.share / 100) * 360;
+    const angle = Math.min(rawAngle, 359.99);
     const endAngle = startAngle + angle;
     const startRad = (startAngle * Math.PI) / 180;
     const endRad = (endAngle * Math.PI) / 180;

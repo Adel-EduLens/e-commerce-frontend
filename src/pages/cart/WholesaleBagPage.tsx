@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { api } from "../../lib/axios";
 import { type CartItem, } from "../../store/useCartStore";
 import {
-  useCartStore,
-  useWholesaleCartItems
-} from "../../store/useCartStore";
+  useWholesaleCartItems,
+  useWholesaleCartStore,
+} from "../../store/useWholesaleCartStore";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const formatCurrency = (amount: number) =>
@@ -230,9 +230,9 @@ export default function WholesaleBagPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const items = useWholesaleCartItems();
-  const removeItem = useCartStore((s) => s.removeItem);
-  const incrementQuantity = useCartStore((s) => s.incrementQuantity);
-  const decrementQuantity = useCartStore((s) => s.decrementQuantity);
+  const removeItem = useWholesaleCartStore((s) => s.removeItem);
+  const incrementQuantity = useWholesaleCartStore((s) => s.incrementQuantity);
+  const decrementQuantity = useWholesaleCartStore((s) => s.decrementQuantity);
   const [isValidating, setIsValidating] = useState(false);
 
   const subtotal = useMemo(
@@ -271,14 +271,17 @@ export default function WholesaleBagPage() {
           const item = items.find((i) => i.productId === productId);
           if (!item) return;
           try {
-            const { data } = await api.get(`/wholesales/${productId}`);
+            const { data } = await api.get(`/products/${productId}`);
             const product = data.data;
-            const colorObj = product.wholesaleColors?.find(
-              (c: any) => c.color && item.color && c.color.toLowerCase() === item.color.toLowerCase()
+            const colorObj = product.colors?.find(
+              (c: any) =>
+                (c.colorName || c.color) &&
+                item.color &&
+                (c.colorName || c.color).toLowerCase() === item.color.toLowerCase()
             );
-            const availableStock = colorObj ? colorObj.stock : 0;
+            const availableStock = colorObj && colorObj.stock !== undefined ? colorObj.stock : (product.stock ?? 999999);
 
-            if (item.quantity > availableStock) {
+            if (availableStock > 0 && item.quantity > availableStock) {
               errors.push(
                 `"${item.title}" (${item.color}) — requested ${item.quantity} but only ${availableStock} available.`
               );

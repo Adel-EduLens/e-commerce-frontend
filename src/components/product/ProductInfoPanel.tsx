@@ -7,6 +7,7 @@ import { BsBag } from "react-icons/bs";
 import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check, Scissors } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/useCartStore";
+import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
@@ -250,7 +251,7 @@ export function ProductInfoPanel({
     }
     
     const currentCartQty = isWholesale
-      ? useCartStore.getState().items
+      ? useWholesaleCartStore.getState().items
           .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
           .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items
@@ -276,7 +277,7 @@ export function ProductInfoPanel({
 
       const cartItemId = `${item.id}-${selectedColor ? selectedColor.toLowerCase() : "all"}-wholesale`;
 
-      addItem({
+      useWholesaleCartStore.getState().addItem({
         id: cartItemId,
         productId: String(item.id),
         categoryId: item.category?.id ? String(item.category.id) : undefined,
@@ -362,7 +363,7 @@ export function ProductInfoPanel({
 
     // Calculate total quantity of this product in the wholesale cart after adding this item
     const currentCartQty = isWholesale
-      ? useCartStore.getState().items
+      ? useWholesaleCartStore.getState().items
           .filter((cartItem) => cartItem.productId === String(item.id))
           .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items

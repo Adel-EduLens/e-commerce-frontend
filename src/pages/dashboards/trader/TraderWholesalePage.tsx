@@ -8,6 +8,7 @@ import {
   type WholesaleOrder,
 } from "../../../hooks/queries/wholesaleOrderQuery";
 import { useTraderProducts } from "../../../hooks/queries/productsQuery";
+import { useWholesale } from "../../../hooks/queries/wholesaleQuery";
 import {
   Loader2,
   ArrowLeft,
@@ -558,7 +559,8 @@ function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder
   const { paths } = categorySegments.reduce(
     (acc, seg) => {
       const exactFraction = totalUnits > 0 ? seg.units / totalUnits : seg.value / 100;
-      const angle = exactFraction * 2 * Math.PI;
+      const safeFraction = Math.min(exactFraction, 0.9999);
+      const angle = safeFraction * 2 * Math.PI;
       const startAngle = acc.currentAngle;
       const endAngle = startAngle + angle;
       const isActive = activeCategory === seg.label;
@@ -713,7 +715,26 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
   const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
-  const selectedColorObj = product?.wholesaleColors?.find(
+  const colors = useMemo(() => {
+    if (!product) return [];
+    if (product.colors && product.colors.length > 0) {
+      return product.colors.map((c: any) => ({
+        id: c.id,
+        color: c.colorName || c.color || "",
+        stock: c.stock ?? product.stock ?? Infinity,
+      }));
+    }
+    if (product.wholesaleColors && product.wholesaleColors.length > 0) {
+      return product.wholesaleColors.map((c: any) => ({
+        id: c.id,
+        color: c.color || "",
+        stock: c.stock ?? product.stock ?? Infinity,
+      }));
+    }
+    return [];
+  }, [product]);
+
+  const selectedColorObj = colors.find(
     (c) => item.color && c.color.toLowerCase() === item.color.toLowerCase()
   );
   const currentWarehouseStock = selectedColorObj !== undefined
@@ -840,16 +861,35 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
   const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
+  const colors = useMemo(() => {
+    if (!product) return [];
+    if (product.colors && product.colors.length > 0) {
+      return product.colors.map((c: any) => ({
+        id: c.id,
+        color: c.colorName || c.color || "",
+        stock: c.stock ?? product.stock ?? 0,
+      }));
+    }
+    if (product.wholesaleColors && product.wholesaleColors.length > 0) {
+      return product.wholesaleColors.map((c: any) => ({
+        id: c.id,
+        color: c.color || "",
+        stock: c.stock ?? product.stock ?? 0,
+      }));
+    }
+    return [];
+  }, [product]);
+
   const availableColors = useMemo(() => {
-    return product?.wholesaleColors?.filter((c) => {
+    return colors.filter((c) => {
       if (item.color && c.color.toLowerCase() === item.color.toLowerCase()) {
         return true;
       }
       return !usedColors.has(c.color.toLowerCase());
-    }) || [];
-  }, [product?.wholesaleColors, item.color, usedColors]);
+    });
+  }, [colors, item.color, usedColors]);
 
-  const selectedColorObj = product?.wholesaleColors?.find(
+  const selectedColorObj = colors.find(
     (c) => item.color && c.color.toLowerCase() === item.color.toLowerCase()
   );
   const maxStock = selectedColorObj !== undefined ? selectedColorObj.stock : (product?.stock !== undefined ? product.stock : Infinity);
@@ -877,7 +917,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
               value={item.color || ""}
               onChange={(e) => {
                 const chosenColor = e.target.value || null;
-                const colorObj = product?.wholesaleColors?.find(c => c.color.toLowerCase() === (chosenColor || "").toLowerCase());
+                const colorObj = colors.find(c => c.color.toLowerCase() === (chosenColor || "").toLowerCase());
                 const colorMaxStock = colorObj ? colorObj.stock : Infinity;
                 let newQty = item.quantity;
                 if (chosenColor && colorObj && newQty > colorMaxStock) {

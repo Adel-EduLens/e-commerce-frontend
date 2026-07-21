@@ -43,9 +43,22 @@ export interface WholesaleProduct {
   updatedAt: string;
 }
 
-const getWholesale = async (id: string): Promise<WholesaleProduct> => {
-  const { data } = await api.get(`/wholesales/${id}`);
-  return data.data;
+import { transformProduct } from "./productsQuery";
+
+const getWholesale = async (id: string): Promise<any> => {
+  const { data } = await api.get(`/products/${id}`);
+  const raw = data.data;
+  const product = transformProduct(raw);
+  return {
+    ...product,
+    wholesaleColors: (product.colors || []).map((c: any) => ({
+      id: c.id,
+      color: c.colorName || c.color || "",
+      sizes: (c.variants || []).map((v: any) => ({ id: v.id, size: v.size })),
+      stock: c.stock ?? product.stock,
+      minOrder: product.minOrder,
+    })),
+  };
 };
 
 export const useWholesale = (id?: string) => {

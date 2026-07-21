@@ -64,6 +64,14 @@ export default function RecentlyViewedPage() {
                   ? `/wholesale/${item.id}`
                   : `/product-details/${item.id}`;
 
+            const displayPrice = item.shopPrice ?? item.wholesalePrice ?? item.retailPrice ?? item.blankPrice ?? item.price ?? 0;
+            const computedImageSrc =
+              item.images?.[0]?.url ||
+              item.images?.[0]?.imageUrl ||
+              item.colors?.[0]?.images?.[0]?.imageUrl ||
+              item.colors?.[0]?.images?.[0]?.url ||
+              (typeof item.images?.[0] === 'string' ? item.images[0] : undefined);
+
             return (
               <ProductCard
                 key={p.id}
@@ -71,8 +79,8 @@ export default function RecentlyViewedPage() {
                 productType={p.productType}
                 to={targetUrl}
                 title={item.name}
-                price={`$${Number(item.shopPrice ?? item.wholesalePrice ?? item.retailPrice ?? item.blankPrice ?? item.price ?? 0).toFixed(2)}`}
-                imageSrc={item.colors?.[0]?.images?.[0]?.imageUrl || item.colors?.[0]?.images?.[0]?.url || item.images?.[0]?.url || item.images?.[0]}
+                price={`${displayPrice} EGP`}
+                imageSrc={computedImageSrc}
                 sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name || Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ")}
                 rating={item.rating || item.averageRating}
               />
