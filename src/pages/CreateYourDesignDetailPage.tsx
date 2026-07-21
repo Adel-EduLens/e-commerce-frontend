@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useBlankProduct } from "../hooks/queries/blankProductQuery";
+import { useProduct } from "../hooks/queries/productsQuery";
 import { Rnd } from "react-rnd";
 import {
   Maximize2,
@@ -16,7 +16,7 @@ const CreateYourDesignDetailPage = () => {
   const { t } = useTranslation("createYourDesignDetailsPage");
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: blankProduct, isLoading, error } = useBlankProduct(id ?? "");
+  const { data: blankProduct, isLoading, error } = useProduct(id ?? "");
 
   const [activeImage, setActiveImage] = useState<string>("");
   const [activeColor, setActiveColor] = useState<string>("");
@@ -37,15 +37,15 @@ const CreateYourDesignDetailPage = () => {
       if (blankProduct.colors.length > 0) {
         const firstColor = blankProduct.colors[0];
 
-        setActiveColor(firstColor.color);
+        setActiveColor(firstColor.color || "");
 
         if (firstColor.images.length > 0) {
-          setActiveDirection(firstColor.images[0].direction);
-          setActiveImage(firstColor.images[0].url);
+          setActiveDirection(firstColor.images[0].direction || "");
+          setActiveImage(firstColor.images[0].url || "");
         }
       }
 
-      if (blankProduct.materials.length > 0) {
+      if (blankProduct.materials && blankProduct.materials.length > 0) {
         setActiveMaterial(blankProduct.materials[0].material);
       }
     };
@@ -63,7 +63,8 @@ const CreateYourDesignDetailPage = () => {
     }
   };
 
-  const handleColorClick = (color: string) => {
+  const handleColorClick = (color?: string) => {
+    if (!color) return;
     setActiveColor(color);
 
     const colorObj = blankProduct?.colors.find((c) => c.color === color);
@@ -71,11 +72,12 @@ const CreateYourDesignDetailPage = () => {
     if (!colorObj) return;
 
     if (colorObj.images.length > 0) {
-      setActiveDirection(colorObj.images[0].direction);
-      setActiveImage(colorObj.images[0].url);
+      setActiveDirection(colorObj.images[0].direction || "");
+      setActiveImage(colorObj.images[0].url || "");
     }
   };
-  const handleDirectionClick = (direction: string) => {
+  const handleDirectionClick = (direction?: string) => {
+    if (!direction) return;
     setActiveDirection(direction);
 
     const colorObj = blankProduct?.colors.find((c) => c.color === activeColor);
@@ -85,7 +87,7 @@ const CreateYourDesignDetailPage = () => {
     const image = colorObj.images.find((img) => img.direction === direction);
 
     if (image) {
-      setActiveImage(image.url);
+      setActiveImage(image.url || "");
     }
   };
   if (isLoading) {
@@ -121,7 +123,7 @@ const CreateYourDesignDetailPage = () => {
               {blankProduct.name}
             </h2>
             <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-foreground">
-              {blankProduct.price}$
+              {blankProduct.blankPrice ?? blankProduct.price}$
             </p>
           </div>
 
@@ -211,7 +213,7 @@ const CreateYourDesignDetailPage = () => {
           </div>
 
           {/* Material Section */}
-          {blankProduct.materials?.length > 0 && (
+          {blankProduct.materials && blankProduct.materials.length > 0 && (
             <div className="flex flex-col gap-4">
               <h3 className="font-['Montserrat'] text-base font-semibold text-foreground">
                 {t("material")}

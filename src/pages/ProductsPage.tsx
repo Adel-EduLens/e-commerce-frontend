@@ -8,7 +8,7 @@ import { useCategories } from "../hooks/queries/categoriesQuery";
 import { useBrands } from "../hooks/queries/brandsQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
 import { useHomeFilters } from "../hooks/utils/HomeFilters";
-import { useWholesales } from "../hooks/queries/wholesaleQuery";
+
 import { useTranslation } from "react-i18next";
 
 export default function ProductsPage() {
@@ -37,15 +37,7 @@ export default function ProductsPage() {
 
   const [page, setPage] = useState(1);
 
-  const { data: rawCategories = [] } = useCategories(false);
-  const categories = useMemo(() => {
-    return rawCategories.filter(
-      (c) =>
-        !c.isWholesale &&
-        (c as any).type !== "WHOLESALE" &&
-        (c as any).type !== "RETAIL",
-    );
-  }, [rawCategories]);
+  const { data: categories = [] } = useCategories("SHOP");
   const { data: brands = [] } = useBrands();
 
   const categoryId = useMemo(() => {
@@ -77,10 +69,12 @@ export default function ProductsPage() {
     page,
     limit: 16,
     collectionId,
+    type: "SHOP",
   });
 
-  const { data: wholesales = [], isLoading: isWholesaleLoading } =
-    useWholesales(filters.search ? { search: filters.search } : undefined);
+  const { data: wholesalesData, isLoading: isWholesaleLoading } =
+    useProducts(filters.search ? { search: filters.search, type: "WHOLESALE" } : { type: "WHOLESALE" });
+  const wholesales = filters.search ? wholesalesData?.products || [] : [];
 
   const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
 
@@ -130,11 +124,10 @@ export default function ProductsPage() {
       });
     }
 
-    // Add sizes from wholesale products
     if (wholesales) {
       wholesales.forEach((wholesale) => {
-        wholesale.wholesaleColors?.forEach((wc) => {
-          wc.sizes?.forEach((s) => {
+        wholesale.colors?.forEach((wc) => {
+          wc.variants?.forEach((s) => {
             if (s.size) sizes.add(s.size);
           });
         });
@@ -155,7 +148,7 @@ export default function ProductsPage() {
             productId={product.id}
             colors={product.colors?.map((c) => c.colorName)}
             images={product.images}
-            price={`$${product.price}`}
+            price={`${product.shopPrice ?? product.retailPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
             imageSrc={
               product.colors?.[0]?.images?.[0]?.imageUrl ||
               product.colors?.[0]?.images?.[0]?.url ||
@@ -192,26 +185,26 @@ export default function ProductsPage() {
             productType="WHOLESALE"
             title={wholesale.name}
             subtitle={wholesale.description || undefined}
-            price={`$${wholesale.price}`}
+            price={`${wholesale.wholesalePrice ?? wholesale.shopPrice ?? wholesale.retailPrice ?? wholesale.blankPrice ?? wholesale.price ?? 0} EGP`}
             imageSrc={wholesale.images[0]?.url}
             images={wholesale.images}
             rating={wholesale.rating}
             to={`/wholesale/${wholesale.id}`}
-            brand={wholesale.brand}
+            brand={wholesale.brand?.name}
             category={wholesale.category?.name}
-            colors={wholesale.wholesaleColors?.map((wc) => wc.color) || []}
+            colors={wholesale.colors?.map((wc) => wc.colorName || wc.color || "") || []}
             wholesaleSizes={Array.from(
               new Set(
-                wholesale.wholesaleColors?.flatMap((wc) =>
-                  wc.sizes.map((s) => s.size),
+                wholesale.colors?.flatMap((wc) =>
+                  wc.variants?.map((s) => s.size),
                 ) || [],
               ),
             )}
             sizeLabel={
               Array.from(
                 new Set(
-                  wholesale.wholesaleColors?.flatMap((wc) =>
-                    wc.sizes.map((s) => s.size),
+                  wholesale.colors?.flatMap((wc) =>
+                    wc.variants?.map((s) => s.size),
                   ) || [],
                 ),
               )
@@ -220,7 +213,7 @@ export default function ProductsPage() {
             }
             minOrder={wholesale.minOrder}
             wholesaleCard
-            stock={(wholesale as any).stock}
+            stock={wholesale.stock}
           />,
         );
       });
@@ -252,6 +245,7 @@ export default function ProductsPage() {
         loadingText={t("Loading")}
         availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
         isWholesale={false}
+        isShop={true}
         categories={categories}
       />
     </div>

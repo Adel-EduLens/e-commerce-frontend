@@ -4,19 +4,19 @@ import { asset } from "../../components/trader/inventoryUtils";
 import { BlankProductFormModal } from "../../components/trader/BlankProductFormModal";
 import { LoadingSpinner } from "../../components/shared";
 import {
-  type BlankProduct,
-  useBlankProducts,
-  useCreateBlankProduct,
-  useUpdateBlankProduct,
-  useDeleteBlankProduct,
-} from "../../hooks/queries/blankProductQuery";
+  type Product,
+  useTraderProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "../../hooks/queries/productsQuery";
 import { toast } from "sonner";
 
 interface BlankProductTablePanelProps {
-  products: BlankProduct[];
+  products: Product[];
   loading: boolean;
-  onAdd: () => void;
-  onEdit: (product: BlankProduct) => void;
+  onAdd?: () => void;
+  onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
 }
 
@@ -90,14 +90,16 @@ export function BlankProductTablePanel({
             className="w-full rounded-2xl border border-stroke bg-card py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
           />
         </label>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-        >
-          <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          {t("addBlankProduct")}
-        </button>
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-1.5 rounded-lg border border-stroke bg-card px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+          >
+            <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
+            {t("addBlankProduct")}
+          </button>
+        )}
       </div>
 
       <section className="rounded-2xl border border-stroke bg-card shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)]">
@@ -222,7 +224,7 @@ export function BlankProductTablePanel({
                         {p.name}
                       </p>
                       <span className="font-['Montserrat'] text-sm font-bold text-primary">
-                        ${p.price ?? 0}
+                        ${p.blankPrice ?? p.price ?? 0}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-stroke">
@@ -311,7 +313,7 @@ export function BlankProductTablePanel({
                         {p.name}
                       </td>
                       <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
-                        ${p.price ?? 0}
+                        ${p.blankPrice ?? p.price ?? 0}
                       </td>
                       <td className="px-4 py-3 text-center font-['Montserrat'] text-sm font-medium text-foreground">
                         {p.isActive ? t("yes", { ns: "traderRetailCategories" }) : t("no", { ns: "traderRetailCategories" })}
@@ -466,64 +468,33 @@ export function BlankProductTablePanel({
   );
 }
 
-export default function TraderBlankProductsPage() {
+export default function TraderBlankProductsPage({ onEdit }: { onEdit: (item: any) => void }) {
   const { t } = useTranslation("traderBlankProducts");
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editProduct, setEditProduct] = useState<BlankProduct | null>(null);
 
-  const { data: blankProducts = [], isLoading } = useBlankProducts();
-  const createProduct = useCreateBlankProduct();
-  const updateProduct = useUpdateBlankProduct();
-  const deleteProduct = useDeleteBlankProduct();
+  const { data: blankProducts = [], isLoading } = useTraderProducts("BLANK");
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  const deleteProduct = useDeleteProduct();
 
   return (
     <>
-      {showAddModal && (
-        <BlankProductFormModal
-          onClose={() => setShowAddModal(false)}
-          onSave={async (data) => {
-            try {
-              await createProduct.mutateAsync(data);
-              setShowAddModal(false);
-              toast.success(t("productCreated"));
-            } catch (error) {
-              toast.error(
-                error instanceof Error
-                  ? error.message
-                  : t("failedCreate"),
-              );
-            }
-          }}
-        />
-      )}
-      {editProduct && (
-        <BlankProductFormModal
-          product={editProduct}
-          onClose={() => setEditProduct(null)}
-          onSave={async (formData) => {
-            try {
-              await updateProduct.mutateAsync({
-                id: editProduct.id,
-                data: formData,
-              });
-              setEditProduct(null);
-              toast.success(t("productUpdated"));
-            } catch (error) {
-              toast.error(
-                error instanceof Error
-                  ? error.message
-                  : t("failedUpdate"),
-              );
-            }
-          }}
-        />
-      )}
-
       <BlankProductTablePanel
         products={blankProducts}
         loading={isLoading}
-        onAdd={() => setShowAddModal(true)}
-        onEdit={setEditProduct}
+        onEdit={(product) => {
+          const item = {
+            id: product.id,
+            product: product.name,
+            categoryIds: product.categories?.map((c) => c.id) || [],
+            brandId: product.brandId,
+            description: product.description,
+            sku: product.sku,
+            type: "blank",
+            priceNum: product.blankPrice ?? product.price,
+            colors: product.colors?.map((c) => c.colorName || c.color) || [],
+          };
+          onEdit(item);
+        }}
         onDelete={(id) => deleteProduct.mutate(id)}
       />
     </>

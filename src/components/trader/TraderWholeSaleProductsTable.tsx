@@ -6,17 +6,10 @@ import {
 } from "../../components/trader/inventoryUtils";
 import {
   InventoryTablePanel,
-  AddItemModal,
-  EditItemModal,
 } from "../../components/trader/InventoryShared";
-import {
-  useTraderWholesales,
-  useDeleteWholesale,
-} from "../../hooks/queries/wholesaleQuery";
+import { useTraderProducts, useDeleteProduct } from "../../hooks/queries/productsQuery";
 
-export function TraderWholeSaleProductsTable() {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+export function TraderWholeSaleProductsTable({ onEdit }: { onEdit: (item: InventoryItem) => void }) {
   const { t } = useTranslation("traderWholesale");
 
   const {
@@ -24,8 +17,8 @@ export function TraderWholeSaleProductsTable() {
     isLoading,
     isError,
     error: errorMsg,
-  } = useTraderWholesales();
-  const deleteWholesale = useDeleteWholesale();
+  } = useTraderProducts("WHOLESALE");
+  const deleteWholesale = useDeleteProduct();
 
   const items: InventoryItem[] = traderWholesales.map((w) => ({
     id: w.id,
@@ -35,13 +28,13 @@ export function TraderWholeSaleProductsTable() {
       color: img.color ?? undefined,
     })),
     product: w.name,
-    category: w.category?.name ?? "",
-    categoryId: w.categoryId,
+    categories: w.categories?.map(c => ({ id: c.id, name: c.name })) || [],
+    categoryIds: w.categories?.map(c => String(c.id)) || [],
     brandId: "",
     stock: w.stock ?? 0,
     sku: w.sku ?? "",
-    price: `$${w.price}`,
-    priceNum: w.price,
+    price: `$${w.wholesalePrice ?? w.price ?? 0}`,
+    priceNum: w.wholesalePrice ?? w.price ?? 0,
     date: new Date(w.createdAt).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -51,9 +44,9 @@ export function TraderWholeSaleProductsTable() {
     status: getStatus(w.stock ?? 0),
     type: "wholesale" as const,
     description: w.description ?? "",
-    sizes: Array.from(new Set(w.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])),
-    colors: w.wholesaleColors?.map(wc => wc.color) || [],
-    minOrder: w.minOrder ?? 1,
+    sizes: Array.from(new Set(w.colors?.flatMap(wc => wc.variants?.map(s => s.size)) || [])),
+    colors: w.colors?.map(wc => wc.colorName || wc.color) || [],
+    minOrder: w.colors?.[0]?.minOrder ?? 1,
     isMustHave: false,
     isFlashDeals: false,
     flashDealPrice: null,
@@ -76,21 +69,11 @@ export function TraderWholeSaleProductsTable() {
 
   return (
     <>
-      {showAddModal && (
-        <AddItemModal
-          onClose={() => setShowAddModal(false)}
-          lockedType="wholesale"
-        />
-      )}
-      {editItem && (
-        <EditItemModal item={editItem} onClose={() => setEditItem(null)} />
-      )}
       <InventoryTablePanel
         items={items}
         isLoading={isLoading}
         errorMessages={errorMessages}
-        onAdd={() => setShowAddModal(true)}
-        onEdit={setEditItem}
+        onEdit={onEdit}
         onDelete={(item) => deleteWholesale.mutate(item.id)}
         showTypeFilter={false}
         title={t("wholesaleProducts")}

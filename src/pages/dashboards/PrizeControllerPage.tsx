@@ -3,9 +3,7 @@ import { handleApiError } from '../../lib/utils';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { prizeSchema } from "../../schemas";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
 import type { PrizeFormValues } from "../../schemas";
-import type {ApiErrorResponse} from "../../types/api";
 import {
   usePrizes,
   useAddPrize,

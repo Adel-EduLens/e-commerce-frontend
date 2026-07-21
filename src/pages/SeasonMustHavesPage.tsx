@@ -121,7 +121,7 @@ export default function SeasonMustHavesPage() {
               key={product.id}
               productId={product.id}
               title={product.name}
-              price={`$${product.price}`}
+              price={`${product.shopPrice ?? product.retailPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
               imageSrc={product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url || product.images?.[0]?.url}
               colors={product.colors?.map((c) => c.colorName || c.color).filter(Boolean) as string[]}
               sizeLabel={Array.from(new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).join(" - ")}

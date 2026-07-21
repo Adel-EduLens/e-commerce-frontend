@@ -20,17 +20,30 @@ function ViewAllButton({ onClick }: { onClick?: () => void }) {
   );
 }
 
-const getProductImage = (prod: any, fallback: string) => {
+type DashboardProduct = {
+  image?: string;
+  images?: Array<{ url?: string } | string>;
+  imageUrl?: string;
+  product?: DashboardProduct;
+  retailProduct?: DashboardProduct;
+  shopProduct?: DashboardProduct;
+  wholesaleProduct?: DashboardProduct;
+  [key: string]: unknown;
+};
+
+const getProductImage = (prod: DashboardProduct | null | undefined, fallback: string) => {
   if (!prod) return fallback;
   if (typeof prod.image === 'string') return prod.image;
   if (Array.isArray(prod.images) && prod.images.length > 0) {
-    return prod.images[0].url || prod.images[0] || fallback;
+    const firstImg = prod.images[0];
+    if (typeof firstImg === 'string') return firstImg;
+    return firstImg.url || fallback;
   }
   if (prod.imageUrl) return prod.imageUrl;
   return fallback;
 };
 
-function ProductGallery({ title, products = [], onNavigate }: { title: string; products?: any[]; onNavigate?: () => void }) {
+function ProductGallery({ title, products = [], onNavigate }: { title: string; products?: DashboardProduct[]; onNavigate?: () => void }) {
   const fallbackImg = asset("medium-shot-man-posing-with-blue-background-removebg-preview 1.png");
   const mainImage = getProductImage(products[0], fallbackImg);
   const thumbnailProducts = products.slice(1, 4).filter(Boolean);
@@ -82,13 +95,13 @@ export default function UserDashboard() {
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
-    ? wishlistData.data.map((item: any) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
+    ? wishlistData.data.map((item: DashboardProduct) => item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct).filter(Boolean)
     : [];
   const favoriteProducts = apiFavorites.length > 0 ? apiFavorites : defaultProducts.slice(0, 4);
 
   const { data: recentlyViewedData } = useRecentlyViewed();
   const apiRecentlyViewed = Array.isArray(recentlyViewedData?.data)
-    ? recentlyViewedData.data.map((item: any) => item.product).filter(Boolean)
+    ? recentlyViewedData.data.map((item: DashboardProduct) => item.product).filter(Boolean)
     : [];
 
   const viewedProducts = apiRecentlyViewed.length > 0

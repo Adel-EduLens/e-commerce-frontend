@@ -6,31 +6,12 @@ import {
   ProductCard,
   FilterCategory,
 } from "../components/shared";
-import { useRetailProducts } from "../hooks/useRetailProducts";
-import { useRetailCategories } from "../hooks/useRetailCategories";
-import { useRetailBrands } from "../hooks/queries/retailBrandQuery";
+import { useProducts, type Product } from "../hooks/queries/productsQuery";
+import { useCategories, type Category } from "../hooks/queries/categoriesQuery";
+import { useBrands } from "../hooks/queries/brandsQuery";
 import type { FilterValues } from "../components/shared/CatalogFilters";
 
-import type { RetailProduct, RetailCategory, RetailProductSize, RetailProductColor, RetailProductImage } from "../types/retail";
 
-type RetailApiResponse = {
-  data?: {
-    products?: RetailProduct[];
-    pagination?: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
-  } | RetailProduct[];
-  products?: RetailProduct[];
-  pagination?: {
-    page: number;
-    totalPages: number;
-  };
-  totalPages?: number;
-  currentPage?: number;
-};
 
 export default function RetailShopPage() {
   const { t } = useTranslation("productSection");
@@ -54,16 +35,16 @@ export default function RetailShopPage() {
   const effectiveCategoryName = filters.category;
   const [page, setPage] = useState(1);
 
-  const { data: catData } = useRetailCategories();
+  const { data: catData } = useCategories("RETAIL");
   const categories = Array.isArray(catData) ? catData : catData?.data || [];
 
-  const { data: brandsData } = useRetailBrands();
+  const { data: brandsData } = useBrands();
   const brands = Array.isArray(brandsData) ? brandsData : brandsData?.data || [];
 
   const categoryId = useMemo(() => {
     if (!effectiveCategoryName) return "";
     const matchedId = categories.find(
-      (c: RetailCategory) => c.name.toLowerCase() === effectiveCategoryName.toLowerCase(),
+      (c: Category) => c.name.toLowerCase() === effectiveCategoryName.toLowerCase(),
     )?.id;
 
     return matchedId ?? "0000000";
@@ -77,8 +58,8 @@ export default function RetailShopPage() {
     return matchedId ?? "0000000";
   }, [brands, filters.brand]);
 
-  const { data, isLoading, isError } = useRetailProducts({
-    search: filters.search,
+  const { data, isLoading, isError } = useProducts({
+    search: filters.search || undefined,
     categoryId,
     brandId,
     size: filters.size ?? "",
@@ -89,6 +70,7 @@ export default function RetailShopPage() {
     page,
     limit: 16,
     collectionId,
+    type: "RETAIL"
   });
 
   useEffect(() => {
@@ -123,23 +105,18 @@ export default function RetailShopPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
 
-  const products: RetailProduct[] = useMemo(() => {
-    const typedData = data as RetailApiResponse | RetailProduct[] | undefined;
-    if (Array.isArray(typedData)) return typedData;
-    if (typedData && !Array.isArray(typedData)) {
-      if (Array.isArray(typedData.products)) return typedData.products;
-      if (Array.isArray(typedData.data)) return typedData.data;
-      if (typedData.data && !Array.isArray(typedData.data) && Array.isArray(typedData.data.products)) return typedData.data.products;
-    }
-    return [];
+  const products: Product[] = useMemo(() => {
+    return data?.products || [];
   }, [data]);
 
   const availableSizes = useMemo(() => {
     if (products.length === 0) return undefined;
     const sizes = new Set<string>();
-    products.forEach((product: RetailProduct) => {
-      product.sizes?.forEach((size: RetailProductSize) => {
-        if (size.size) sizes.add(size.size);
+    products.forEach((product: Product) => {
+      product.colors?.forEach((c) => {
+        c.variants?.forEach((v) => {
+          if (v.size) sizes.add(v.size);
+        });
       });
     });
     return Array.from(sizes);
@@ -148,16 +125,17 @@ export default function RetailShopPage() {
   const availableColors = useMemo(() => {
     if (products.length === 0) return undefined;
     const colors = new Set<string>();
-    products.forEach((product: RetailProduct) => {
-      product.colors?.forEach((c: RetailProductColor) => {
-        if (c.color) colors.add(c.color);
+    products.forEach((product: Product) => {
+      product.colors?.forEach((c) => {
+        if (c.colorName) colors.add(c.colorName);
+        else if (c.color) colors.add(c.color);
       });
     });
     return Array.from(colors);
   }, [products]);
 
   const filter2 = useMemo(() => [
-    { key: 'category', label: 'Category', options: categories.map((c: RetailCategory) => c.name) },
+    { key: 'category', label: 'Category', options: categories.map((c: Category) => c.name) },
     { key: 'brand', label: 'Brand', options: brands.map((b: { id: string; name: string }) => b.name) },
     { key: 'size', label: 'Size', options: availableSizes || [] },
     { key: 'color', label: 'Color', options: availableColors || [] },
@@ -166,15 +144,16 @@ export default function RetailShopPage() {
   const productsList = useMemo(() => {
     if (products.length === 0) return [];
 
-    return products.map((product: RetailProduct) => {
-      let sizeLabels: string[] = [];
-      if (product.sizes && Array.isArray(product.sizes)) {
-         sizeLabels = product.sizes.map((s: RetailProductSize) => s.size).filter(Boolean) as string[];
-      }
+    return products.map((product: Product) => {
+      const sizeLabels: string[] = [];
+      const colorsList: string[] = [];
       
-      const colorsList = product.colors
-            ?.map((c: RetailProductColor) => c.color)
-            .filter(Boolean) as string[];
+      product.colors?.forEach(c => {
+         if (c.colorName || c.color) colorsList.push(c.colorName || c.color || "");
+         c.variants?.forEach(v => {
+            if (v.size) sizeLabels.push(v.size);
+         });
+      });
 
       const imageSrc = product.images?.[0]?.url;
 
@@ -183,23 +162,23 @@ export default function RetailShopPage() {
           key={`retail-${product.id}`}
           title={product.name}
           productId={String(product.id)}
-          colors={colorsList}
-          images={product.images?.map((img: RetailProductImage) => ({ 
+          colors={Array.from(new Set(colorsList))}
+          images={product.images?.map((img) => ({ 
             ...img, 
             id: String(img.id),
             productId: img.productId ? String(img.productId) : undefined 
           }))}
-          price={`$${product.price}`}
+          price={`${product.retailPrice ?? product.shopPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
           imageSrc={imageSrc}
-          sizeLabel={sizeLabels.join(" - ")}
+          sizeLabel={Array.from(new Set(sizeLabels)).join(" - ")}
           featured={product.isFeatured ?? (product.rating >= 4)}
      
           rating={product.rating}
-          productType="SHOP"
+          productType="RETAIL"
           showTypeBadge={!!filters.search}
           to={`/retail/shop/${product.id}`}
           subtitle={product.description}
-          stock={(product as any).stock}
+          stock={product.stock}
         />
       );
     });
@@ -221,16 +200,8 @@ export default function RetailShopPage() {
         onFilterChange={setFilters}
         isAnyLoading={isLoading}
         combinedProducts={productsList}
-        totalPages={
-          (data as RetailApiResponse)?.data && !Array.isArray((data as RetailApiResponse)?.data)
-            ? ((data as RetailApiResponse).data as Exclude<RetailApiResponse["data"], RetailProduct[] | undefined>)?.pagination?.totalPages || 1
-            : (data as RetailApiResponse)?.pagination?.totalPages || (data as RetailApiResponse)?.totalPages || 1
-        }
-        currentPage={
-          (data as RetailApiResponse)?.data && !Array.isArray((data as RetailApiResponse)?.data)
-            ? ((data as RetailApiResponse).data as Exclude<RetailApiResponse["data"], RetailProduct[] | undefined>)?.pagination?.page || page
-            : (data as RetailApiResponse)?.pagination?.page || (data as RetailApiResponse)?.currentPage || page
-        }
+        totalPages={data?.pagination?.totalPages || 1}
+        currentPage={data?.pagination?.page || page}
         onPageChange={setPage}
         noProductsText={t("No products found.")}
         loadingText={t("Loading")}

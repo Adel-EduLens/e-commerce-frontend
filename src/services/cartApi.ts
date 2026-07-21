@@ -1,5 +1,5 @@
 import { api } from '../lib/axios'
-import type { AddRetailCartPayload, AddCartItemPayload } from '../types/cart'
+import type { AddCartItemPayload } from '../types/cart'
 
 export const cartApi = {
   async getCart() {
@@ -10,17 +10,6 @@ export const cartApi = {
   async addProductToCart(payload: AddCartItemPayload) {
     const response = await api.post('/cart/items', payload)
     return response.data
-  },
-
-  async addRetailProductToCart(payload: AddRetailCartPayload) {
-    try {
-      const response = await api.post('/cart/retail-items', payload)
-      return response.data
-    } catch (error) {
-      // Fallback to unified cart endpoint if the backend uses a shared cart API.
-      const response = await api.post('/cart/items', payload)
-      return response.data
-    }
   },
 
   async updateCartItem(itemId: string | number, quantity: number) {

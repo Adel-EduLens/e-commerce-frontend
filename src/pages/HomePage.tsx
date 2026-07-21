@@ -422,7 +422,7 @@ export function HomePage() {
           filter: "must-have",
         }}
       />
-      <CategoriesSection />
+      <CategoriesSection isShop />
       <ProductsSection
         title="Recommended for You"
         navigateTo="/products"

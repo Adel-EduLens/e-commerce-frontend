@@ -12,30 +12,11 @@ import {
   type CompareProductType
 } from "../utils/compareStorage";
 
-import { useCompareProducts, useCompareRetailProducts, type Product } from "../hooks/queries/productsQuery";
-import type { RetailProduct } from "../types/retail";
+import { useCompareProducts, type Product } from "../hooks/queries/productsQuery";
 
 type CompareProduct = Product & {
   productType: CompareProductType;
 };
-function mapRetailToCompareProduct(retail: RetailProduct & { isMapped?: boolean }): Product {
-  if (retail.isMapped) return retail as unknown as Product;
-  return {
-    ...retail,
-    isMapped: true,
-    rating: retail.rating ?? retail.averageRating ?? 0,
-    category: { name: retail.category?.name ?? "Retail" },
-    brand: retail.brand ? { name: retail.brand.name } : undefined,
-    colors: retail.colors?.map((c) => ({
-      color: c.color,
-      colorName: c.color,
-      images: retail.images?.filter((img) => img.color === c.color).map((img) => ({ url: img.url, imageUrl: img.url })),
-      variants: retail.sizes?.filter((s) => s.color === c.color).map((s) => ({ size: s.size })),
-    })) ?? [],
-    images: retail.images?.map((img) => ({ url: img.url, imageUrl: img.url })) ?? [],
-    // Add productType property so handleRemove can remove the correct item
-  } as unknown as Product;
-}
 
 export default function ComparePage() {
   const [compareItems, setCompareItems] = useState<CompareItem[]>(getCompareProducts);
@@ -48,45 +29,30 @@ export default function ComparePage() {
     return () => window.removeEventListener("compareUpdated", func);
   }, []);
 
-  const shopIds = compareItems.filter((i) => i.type === "SHOP").map((i) => String(i.id));
-  const retailIds = compareItems.filter((i) => i.type === "RETAIL").map((i) => String(i.id));
+  const allIds = compareItems.map((i) => String(i.id));
+  const queries = useCompareProducts(allIds);
 
-  const shopQueries = useCompareProducts(shopIds);
-  const retailQueries = useCompareRetailProducts(retailIds);
+  const loading = queries.some((query) => query.isLoading);
 
-  const loading =
-    shopQueries.some((query) => query.isLoading) ||
-    retailQueries.some((query) => query.isLoading);
-const products = useMemo<CompareProduct[]>(() => {
-  const shopProducts = shopQueries
-    .map((query) => {
-      const p = query.data as CompareProduct | undefined;
-      if (p) p.productType = "SHOP";
-      return p;
-    })
-    .filter(Boolean) as CompareProduct[];
+  const products = useMemo<CompareProduct[]>(() => {
+    const loadedProducts = queries
+      .map((query) => query.data as Product | undefined)
+      .filter(Boolean) as Product[];
 
-  const retailProducts = retailQueries
-    .map((query) => {
-      const data = query.data as RetailProduct | undefined;
-      return data ? (mapRetailToCompareProduct(data) as CompareProduct) : null;
-    })
-    .filter(Boolean) as CompareProduct[];
+    const combined: CompareProduct[] = [];
 
-  const combined: CompareProduct[] = [];
+    compareItems.forEach((item) => {
+      const found = loadedProducts.find((p) => String(p.id) === String(item.id));
+      if (found) {
+        combined.push({
+          ...found,
+          productType: item.type,
+        } as CompareProduct);
+      }
+    });
 
-  compareItems.forEach((item) => {
-    if (item.type === "SHOP") {
-      const found = shopProducts.find((p) => String(p.id) === String(item.id));
-      if (found) combined.push(found);
-    } else {
-      const found = retailProducts.find((p) => String(p.id) === String(item.id));
-      if (found) combined.push(found);
-    }
-  });
-
-  return combined;
-}, [shopQueries, retailQueries, compareItems]);
+    return combined;
+  }, [queries, compareItems]);
 
   const handleRemove = (id: string) => {
     // We need to know the type to remove it. CompareCard only passes the ID.

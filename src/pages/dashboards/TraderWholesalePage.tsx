@@ -7,7 +7,7 @@ import {
   useUpdateWholesaleOrder,
   type WholesaleOrder,
 } from "../../hooks/queries/wholesaleOrderQuery";
-import { useTraderWholesales, useWholesale, type Wholesale } from "../../hooks/queries/wholesaleQuery";
+import { useTraderProducts } from "../../hooks/queries/productsQuery";
 import {
   Loader2,
   ArrowLeft,
@@ -1360,7 +1360,7 @@ export default function TraderWholesalePage() {
   const [selectedOrder, setSelectedOrder] = useState<WholesaleOrder | null>(null);
 
   const { data: orders = [], isLoading, isError, error } = useTraderWholesaleOrders();
-  const { data: products = [] } = useTraderWholesales();
+  const { data: products = [] } = useTraderProducts("WHOLESALE");
   const updateStatusMutation = useUpdateWholesaleOrderStatus();
   const deleteOrderMutation = useDeleteWholesaleOrder();
   const updateOrderMutation = useUpdateWholesaleOrder();

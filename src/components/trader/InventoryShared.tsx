@@ -15,11 +15,7 @@ import {
   useAddProductSize,
   useDeleteProductSize,
 } from "../../hooks/queries/productsQuery";
-import {
-  useCreateWholesale,
-  useUpdateWholesale,
-  useWholesale,
-} from "../../hooks/queries/wholesaleQuery";
+
 
 import ImageCropModal, {
   validateImageDimensions,
@@ -50,7 +46,7 @@ export function MultiSelect({
   onChange,
 }: {
   label: string;
-  options: string[];
+  options: (string | { value: string; label: string })[];
   selected: string[];
   onChange: (val: string[]) => void;
 }) {
@@ -64,6 +60,11 @@ export function MultiSelect({
     );
   };
 
+  const displaySelected = selected.map(s => {
+    const obj = options.find(o => typeof o === 'object' && o.value === s);
+    return obj && typeof obj === 'object' ? obj.label : s;
+  });
+
   return (
     <div className="relative">
       <button
@@ -72,7 +73,7 @@ export function MultiSelect({
         className="w-full flex items-center justify-between rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm text-foreground bg-white outline-none focus:border-primary"
       >
         <span className={selected.length === 0 ? "text-gray-text" : ""}>
-          {selected.length === 0 ? label : selected.join(", ")}
+          {selected.length === 0 ? label : displaySelected.join(", ")}
         </span>
         <svg
           className={`h-4 w-4 text-gray-text transition-transform ${open ? "rotate-180" : ""}`}
@@ -85,21 +86,25 @@ export function MultiSelect({
         </svg>
       </button>
       {open && (
-        <div className="absolute z-10 mt-1 w-full rounded-xl border border-stroke bg-white shadow-lg">
+        <div className="absolute z-10 mt-1 w-full max-h-60 overflow-y-auto rounded-xl border border-stroke bg-white shadow-lg">
           <div className="flex flex-wrap gap-2 p-3">
-            {options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => toggle(opt)}
-                className={`rounded-lg border px-3 py-1 font-['Montserrat'] text-xs font-medium transition ${selected.includes(opt)
-                    ? "border-primary bg-primary text-foreground"
-                    : "border-stroke bg-white text-foreground hover:bg-background"
-                  }`}
-              >
-                {opt}
-              </button>
-            ))}
+            {options.map((opt) => {
+              const val = typeof opt === 'string' ? opt : opt.value;
+              const lbl = typeof opt === 'string' ? opt : opt.label;
+              return (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => toggle(val)}
+                  className={`rounded-lg border px-3 py-1 font-['Montserrat'] text-xs font-medium transition ${selected.includes(val)
+                      ? "border-primary bg-primary text-foreground"
+                      : "border-stroke bg-white text-foreground hover:bg-background"
+                    }`}
+                >
+                  {lbl}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -226,7 +231,7 @@ export function AddItemModal({
 }) {
   const [type, setType] = useState<ProductType>(lockedType ?? "product");
   const [name, setName] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [brandId, setBrandId] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
@@ -287,11 +292,10 @@ export function AddItemModal({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const { data: categories = [] } = useCategories(type === "wholesale");
+  const { data: categories = [] } = useCategories(type === "wholesale" ? "WHOLESALE" : undefined);
   const { data: brands = [] } = useBrands();
   const createProduct = useCreateProduct();
-  const createWholesale = useCreateWholesale();
-  const isSaving = createProduct.isPending || createWholesale.isPending;
+  const isSaving = createProduct.isPending;
   const { t } = useTranslation("traderProduct");
   const { t: tShared } = useTranslation("traderInventoryShared");
   const handleColorsChange = (colors: string[]) => {
@@ -314,7 +318,7 @@ export function AddItemModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!name || !categoryId || !price) {
+    if (!name || categoryIds.length === 0 || !price) {
       setError("Name, category and price are required.");
       return;
     }
@@ -378,90 +382,62 @@ export function AddItemModal({
 
     try {
       setUploading(true);
-      if (type === "product") {
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("price", price);
-        formData.append("categoryId", categoryId);
-        if (brandId) formData.append("brandId", brandId);
-        if (sku) formData.append("sku", sku);
 
-        const calculatedStock = productColors.reduce(
-          (sum, c) => sum + c.variants.reduce((s, v) => s + v.quantity, 0),
-          0,
-        );
-        formData.append("stock", String(calculatedStock));
+      const colorsData = await Promise.all(
+        productColors.map(async (pc) => {
+          const urls = await Promise.all(pc.images.map(uploadImageFile));
+          const colorStock = pc.stock ?? pc.variants.reduce((s, v) => s + v.quantity, 0);
+          return {
+            color: pc.color,
+            minOrder: type === "wholesale" ? (Number(minOrder) || 1) : 1,
+            stock: colorStock,
+            images: urls.map((url) => ({ url, color: pc.color })),
+            sizes: pc.variants.map((v) => ({ size: v.size, quantity: v.quantity })),
+          };
+        })
+      );
 
-        if (isMustHave) formData.append("isMustHave", "true");
-        if (isFlashDeals) {
-          formData.append("isFlashDeals", "true");
-          if (flashDealPrice) formData.append("flashDealPrice", flashDealPrice);
-          if (flashDealEndsAt)
-            formData.append("flashDealEndsAt", flashDealEndsAt);
-        }
+      const allImages = colorsData.flatMap((c) => c.images);
+      const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
 
-        // Format colors JSON array expected by backend
-        const colorsJson = productColors.map((pc) => ({
-          name: pc.color,
-          color: pc.color,
-          code: pc.color,
-          sizes: pc.variants.map((v) => ({
-            size: v.size,
-            quantity: v.quantity,
-          })),
-        }));
-        formData.append("colors", JSON.stringify(colorsJson));
+      const payload: Partial<ProductFormData> = {
+        name,
+        description,
+        categoryIds,
+        sku: sku || undefined,
+        stock: calculatedStock,
+        productTypes: [type.toUpperCase()],
+        colors: colorsData.map((c) => ({
+          color: c.color,
+          name: c.color,
+          code: c.color,
+          minOrder: c.minOrder,
+          stock: c.stock,
+          sizes: c.sizes,
+        })),
+        images: allImages,
+      };
 
-        // Append image files individually as images_ColorName
-        productColors.forEach((pc) => {
-          pc.images.forEach((file) => {
-            formData.append(`images_${pc.color}`, file);
-          });
-        });
+      if (brandId) payload.brandId = brandId;
 
-        setUploading(false);
-        await createProduct.mutateAsync(formData);
+      if (type === "wholesale") {
+        payload.wholesalePrice = Number(price);
+        payload.minOrder = Number(minOrder) || 1;
+        payload.isBestDeal = isBestDeal;
+        payload.isMostPopular = isMostPopular;
+        payload.isPremiumCollection = isPremiumCollection;
       } else {
-        const colorsData = await Promise.all(
-          productColors.map(async (pc) => {
-            const urls = await Promise.all(pc.images.map(uploadImageFile));
-            const colorStock = pc.stock ?? 0;
-            return {
-              color: pc.color,
-              minOrder: Number(minOrder) || 1,
-              stock: colorStock,
-              images: urls.map((url) => ({ url, color: pc.color })),
-              sizes: pc.variants.map((v) => ({ size: v.size })),
-            };
-          })
-        );
-
-        const allImages = colorsData.flatMap((c) => c.images);
-        const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
-
-        setUploading(false);
-        await createWholesale.mutateAsync({
-          name,
-          description,
-          price: Number(price),
-          categoryId,
-          brand: "",
-          minOrder: Number(minOrder) || 1,
-          isBestDeal,
-          isMostPopular,
-          isPremiumCollection,
-          images: allImages,
-          sku: sku || undefined,
-          stock: calculatedStock,
-          colors: colorsData.map((c) => ({
-            color: c.color,
-            minOrder: c.minOrder,
-            stock: c.stock,
-            sizes: c.sizes,
-          })),
-        });
+        payload.shopPrice = Number(price);
+        payload.isMustHave = isMustHave;
+        payload.isFlashDeals = isFlashDeals;
+        if (isFlashDeals) {
+          payload.flashDealPrice = Number(flashDealPrice);
+          payload.flashDealEndsAt = flashDealEndsAt;
+        }
       }
+
+      setUploading(false);
+      await createProduct.mutateAsync(payload);
       onClose();
     } catch (err: unknown) {
       setUploading(false);
@@ -538,18 +514,13 @@ export function AddItemModal({
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
           />
 
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-          >
-            <option value="">{tShared("selectCategory")}</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <label className="text-xs font-semibold text-gray-text">Category *</label>
+          <MultiSelect
+            label={tShared("selectCategory")}
+            options={categories.map((c) => ({ value: c.id, label: c.name }))}
+            selected={categoryIds}
+            onChange={setCategoryIds}
+          />
 
           {type === "product" && (
             <select
@@ -1230,7 +1201,7 @@ export function EditItemModal({
   const isProductType = item.type === "product";
 
   const [name, setName] = useState(item.product);
-  const [categoryId, setCategoryId] = useState(item.categoryId);
+  const [categoryIds, setCategoryIds] = useState<string[]>(item.categoryIds || []);
   const [brandId, setBrandId] = useState(item.brandId);
   const [description, setDescription] = useState(item.description);
   const [price, setPrice] = useState(String(item.priceNum));
@@ -1333,7 +1304,7 @@ export function EditItemModal({
 
       const initialSizes = Array.from(
         new Set(
-          (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
+      (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
         )
       );
       setSharedSizes(initialSizes);
@@ -1355,14 +1326,16 @@ export function EditItemModal({
     setError("");
     try {
       setUploading(true);
-      if (item.type === "product") {
+      const isProductType = item?.type === "product";
 
+      if (isProductType) {
         await updateProduct.mutateAsync({
           id: item.id,
           name,
           description,
           price: Number(price),
-          categoryId,
+          shopPrice: Number(price),
+          categoryIds,
           brandId: brandId || undefined,
           sku: sku || undefined,
           isMustHave,
@@ -1407,13 +1380,7 @@ export function EditItemModal({
             return;
           }
         }
-        if (sharedSizes.length === 0) {
-          setError(tShared("selectAtLeastOneSharedSize"));
-          setUploading(false);
-          return;
-        }
-
-        // Upload new images and construct final images array with color associations
+        
         const colorsData = await Promise.all(
           wholesaleColorsState.map(async (wc) => {
             const updatedImages = await Promise.all(
@@ -1430,7 +1397,7 @@ export function EditItemModal({
               minOrder: Number(minOrder) || 1,
               stock: wc.stock ?? 0,
               images: updatedImages,
-              sizes: wc.variants.map((v) => ({ size: v.size })),
+              sizes: wc.variants.map((v) => ({ size: v.size, quantity: v.quantity ?? 0 })),
             };
           })
         );
@@ -1438,31 +1405,33 @@ export function EditItemModal({
         const allImages = colorsData.flatMap((c) => c.images);
         const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
 
-        await updateWholesale.mutateAsync({
+        const payload: Partial<ProductFormData> = {
           id: item.id,
           name,
           description,
-          price: Number(price),
-          categoryId,
+          categoryIds,
           images: allImages,
+          wholesalePrice: Number(price),
           minOrder: Number(minOrder) || 1,
           sku: sku || undefined,
           stock: calculatedStock,
-          brand: "",
           isBestDeal,
           isMostPopular,
           isPremiumCollection,
           colors: colorsData.map((c) => ({
             color: c.color,
+            name: c.color,
+            code: c.color,
             minOrder: c.minOrder,
             stock: c.stock,
             sizes: c.sizes,
           })),
-        });
-      }
+        };
 
-      setUploading(false);
-      onClose();
+        if (brandId) payload.brandId = brandId;
+        
+        await updateProduct.mutateAsync(payload);
+      }
     } catch (err: unknown) {
       setUploading(false);
       const e = err as {
@@ -1517,18 +1486,13 @@ export function EditItemModal({
             className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
           />
 
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-          >
-            <option value="">{t("selectCategory")}</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+          <label className="text-xs font-semibold text-gray-text">Category *</label>
+          <MultiSelect
+            label={t("selectCategory")}
+            options={categories.map((c) => ({ value: c.id, label: c.name }))}
+            selected={categoryIds}
+            onChange={setCategoryIds}
+          />
 
           {item.type === "product" && (
             <select
@@ -2467,7 +2431,7 @@ interface InventoryTablePanelProps {
   items: InventoryItem[];
   isLoading: boolean;
   errorMessages?: string[];
-  onAdd: () => void;
+  onAdd?: () => void;
   onEdit: (item: InventoryItem) => void;
   onDelete: (item: InventoryItem) => void;
   showTypeFilter?: boolean;
@@ -2506,7 +2470,7 @@ export function InventoryTablePanel({
   }, [openFilter]);
 
   const uniqueCategories = Array.from(
-    new Set(items.map((i) => i.category).filter(Boolean)),
+    new Set(items.flatMap((i) => i.categories?.map((c) => c.name) || [])),
   );
 
   const filtered = items
@@ -2514,10 +2478,10 @@ export function InventoryTablePanel({
       const q = search.toLowerCase();
       const matchesSearch =
         i.product.toLowerCase().includes(q) ||
-        i.category.toLowerCase().includes(q) ||
+        (i.categories && i.categories.some((c) => c.name.toLowerCase().includes(q))) ||
         i.sku.toLowerCase().includes(q);
       const matchesCategory =
-        filterCategory === "all" || i.category === filterCategory;
+        filterCategory === "all" || (i.categories && i.categories.some((c) => c.name === filterCategory));
       const matchesStatus = filterStatus === "all" || i.status === filterStatus;
       const matchesType =
         !showTypeFilter || filterType === "all" || i.type === filterType;
@@ -2643,14 +2607,16 @@ export function InventoryTablePanel({
             className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
           />
         </label>
-        <button
-          type="button"
-          onClick={onAdd}
-          className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
-        >
-          <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
-          {t(addLabel)}
-        </button>
+        {onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+          >
+            <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
+            {t(addLabel)}
+          </button>
+        )}
       </div>
 
       {/* Panel */}
@@ -2862,7 +2828,7 @@ export function InventoryTablePanel({
                   showTypeFilter
                     ? [
                       i.product,
-                      i.category,
+                      i.categories?.map((c) => c.name).join(", ") || "",
                       i.type,
                       i.stock,
                       i.sku,
@@ -2873,7 +2839,7 @@ export function InventoryTablePanel({
                     ]
                     : [
                       i.product,
-                      i.category,
+                      i.categories?.map((c) => c.name).join(", ") || "",
                       i.stock,
                       i.sku,
                       i.priceNum,
@@ -2967,7 +2933,7 @@ export function InventoryTablePanel({
                     </p>
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
-                        {item.category}
+                        {item.categories?.map((c) => c.name).join(", ")}
                       </p>
                       <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
                         SKU:{" "}
@@ -3105,7 +3071,7 @@ export function InventoryTablePanel({
                         {item.product}
                       </td>
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                        {item.category}
+                        {item.categories?.map(c => c.name).join(", ")}
                       </td>
                       {showTypeFilter && (
                         <td className="px-3 py-3 text-center">

@@ -5,7 +5,7 @@ import { ProductCard, FilterCategory } from '../components/shared'
 import CategoriesSection from '../components/shared/CategorySection'
 import FaqSection from '../components/shared/FaqSection'
 import CatalogFilters, { type FilterValues } from '../components/shared/CatalogFilters'
-import { useWholesales } from '../hooks/queries/wholesaleQuery'
+import { useProducts, type ProductsQuery } from '../hooks/queries/productsQuery'
 import { asset } from '../lib/utils';
 
 function AssetImage({
@@ -200,7 +200,7 @@ function ViewAllButton({ to }: { to: string }) {
   )
 }
 
-function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: Parameters<typeof useWholesales>[0]; viewAllLink?: string }) {
+function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: ProductsQuery; viewAllLink?: string }) {
   const { t } = useTranslation("productSection")
   const initialCategory = baseFilters?.category ?? null
 
@@ -235,10 +235,11 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
       : (baseFilters?.category || undefined),
   }), [baseFilters, filterState, userModified])
 
-  const { data: products = [], isLoading } = useWholesales(queryFilters)
+  const { data: resData, isLoading } = useProducts({ ...queryFilters, type: "WHOLESALE" })
+  const products = resData?.products || []
 
-  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category.name))], [products])
-  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand).filter(Boolean) as string[])], [products])
+  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category?.name).filter(Boolean))], [products])
+  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean))], [products])
   const filterConfigs = useMemo(() => [
     { key: 'category', label: t('Category', 'Category'), options: allCategories },
     { key: 'brand', label: t('Brand', 'Brand'), options: allBrands },
@@ -283,19 +284,19 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
                     productType="WHOLESALE"
                     title={item.name}
                     subtitle={item.description || undefined}
-                    price={`$${item.price}`}
+                    price={`${item.wholesalePrice ?? item.shopPrice ?? item.retailPrice ?? item.blankPrice ?? item.price ?? 0} EGP`}
                     imageSrc={item.images[0]?.url}
                     images={item.images}
                     rating={item.rating}
                     to={`/wholesale/${item.id}`}
-                    brand={item.brand}
+                    brand={item.brand?.name}
                     category={item.category?.name}
-                    colors={item.wholesaleColors?.map(wc => wc.color) || []}
-                    wholesaleSizes={Array.from(new Set(item.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || []))}
-                    sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap(wc => wc.sizes.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+                    colors={item.colors?.map(wc => wc.colorName || wc.color || "") || []}
+                    wholesaleSizes={Array.from(new Set(item.colors?.flatMap(wc => wc.variants.map(s => s.size)) || []))}
+                    sizeLabel={Array.from(new Set(item.colors?.flatMap(wc => wc.variants.map(s => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
                     minOrder={item.minOrder}
                     wholesaleCard
-                    stock={(item as any).stock}
+                    stock={item.stock}
                   />
                 ))
               ) : (
@@ -315,7 +316,7 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
 function WholesaleFilterSection({
   baseFilters,
 }: {
-  baseFilters?: Parameters<typeof useWholesales>[0]
+  baseFilters?: ProductsQuery
 }) {
   const { t } = useTranslation("productSection")
   const [filters, setFilters] = useState<FilterValues>({
@@ -346,7 +347,7 @@ function WholesaleFilterSection({
   ])
 
   const queryParams = useMemo(() => {
-    const q: Parameters<typeof useWholesales>[0] = {}
+    const q: ProductsQuery = {}
     if (filters.category) {
       q.category = filters.category
     }
@@ -356,16 +357,17 @@ function WholesaleFilterSection({
     return q
   }, [filters.category, baseFilters])
 
-  const { data: products = [], isLoading } = useWholesales(queryParams)
+  const { data: resData, isLoading } = useProducts({ ...queryParams, type: "WHOLESALE" })
+  const products = resData?.products || []
 
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
       if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
       if (filters.priceMin !== null && item.price < Number(filters.priceMin)) return false
       if (filters.priceMax !== null && item.price > Number(filters.priceMax)) return false
-      if (filters.brand && item.brand?.toLowerCase() !== filters.brand.toLowerCase()) return false
-      if (filters.color && !item.wholesaleColors?.some(wc => wc.color.toLowerCase() === filters.color?.toLowerCase())) return false
-      if (filters.size && !item.wholesaleColors?.some(wc => wc.sizes?.some(s => s.size.toLowerCase() === filters.size?.toLowerCase()))) return false
+      if (filters.brand && item.brand?.name?.toLowerCase() !== filters.brand.toLowerCase()) return false
+      if (filters.color && !item.colors?.some(wc => (wc.colorName || wc.color || "").toLowerCase() === filters.color?.toLowerCase())) return false
+      if (filters.size && !item.colors?.some(wc => wc.variants?.some(s => s.size.toLowerCase() === filters.size?.toLowerCase()))) return false
       return true
     })
   }, [products, filters])
@@ -373,8 +375,8 @@ function WholesaleFilterSection({
   const availableSizes = useMemo(() => {
     const sizes = new Set<string>()
     products.forEach((item) => {
-      item.wholesaleColors?.forEach((wc) => {
-        wc.sizes?.forEach((s) => {
+      item.colors?.forEach((wc) => {
+        wc.variants?.forEach((s) => {
           if (s.size) sizes.add(s.size)
         })
       })
@@ -390,19 +392,19 @@ function WholesaleFilterSection({
         productType="WHOLESALE"
         title={item.name}
         subtitle={item.description || undefined}
-        price={`$${item.price}`}
+        price={`${item.wholesalePrice ?? item.shopPrice ?? item.retailPrice ?? item.blankPrice ?? item.price ?? 0} EGP`}
         imageSrc={item.images[0]?.url}
         images={item.images}
         rating={item.rating}
         to={`/wholesale/${item.id}`}
-        brand={item.brand}
+        brand={item.brand?.name}
         category={item.category?.name}
-        colors={item.wholesaleColors?.map((wc) => wc.color) || []}
-        wholesaleSizes={Array.from(new Set(item.wholesaleColors?.flatMap((wc) => wc.sizes.map((s) => s.size)) || []))}
-        sizeLabel={Array.from(new Set(item.wholesaleColors?.flatMap((wc) => wc.sizes.map((s) => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
+        colors={item.colors?.map((wc) => wc.colorName || wc.color || "") || []}
+        wholesaleSizes={Array.from(new Set(item.colors?.flatMap((wc) => wc.variants.map((s) => s.size)) || []))}
+        sizeLabel={Array.from(new Set(item.colors?.flatMap((wc) => wc.variants.map((s) => s.size)) || [])).slice(0, 4).join("-") || "All Sizes"}
         minOrder={item.minOrder}
         wholesaleCard
-        stock={(item as any).stock}
+        stock={item.stock}
       />
     ))
   }, [filteredProducts])
@@ -429,7 +431,7 @@ export default function WholesalePage() {
   const filterParam = searchParams.get('filter')
   const categoryName = categoryFilter
 
-  const filterMap: Record<string, { label: string; filters: Parameters<typeof useWholesales>[0] }> = {
+  const filterMap: Record<string, { label: string; filters: ProductsQuery }> = {
     'best-deals': { label: 'Best Deals', filters: { isBestDeal: true } },
     'most-popular': { label: 'Most Popular', filters: { isMostPopular: true } },
     'premium-collections': { label: 'Premium Collections', filters: { isPremiumCollection: true } },

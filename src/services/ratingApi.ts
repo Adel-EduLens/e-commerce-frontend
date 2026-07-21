@@ -13,15 +13,15 @@ export type RateProductResponse = {
   rating?: number
   userRating?: number
   averageRating?: number
-  raw?: any
+  raw?: unknown
 }
 
-function normalizeRatingResponse(response: any): RateProductResponse {
-  const data = response?.data ?? response
+function normalizeRatingResponse(response: { data?: Record<string, unknown> } | Record<string, unknown>): RateProductResponse {
+  const data = (response && 'data' in response && response.data ? response.data : response) as Record<string, unknown>
   return {
-    rating: data?.userRating ?? data?.rating,
-    userRating: data?.userRating ?? data?.rating,
-    averageRating: data?.averageRating,
+    rating: typeof data?.userRating === 'number' ? data.userRating : typeof data?.rating === 'number' ? data.rating : undefined,
+    userRating: typeof data?.userRating === 'number' ? data.userRating : typeof data?.rating === 'number' ? data.rating : undefined,
+    averageRating: typeof data?.averageRating === 'number' ? data.averageRating : undefined,
     raw: data,
   }
 }
@@ -48,8 +48,6 @@ export async function rateProduct(payload: RateProductPayload) {
 
 
   try {
-    const state = (await import('../store/useAuthStore')).useAuthStore.getState()
-
     if (payload.productType === 'RETAIL') {
       const response = await api.post(`/retail/products/${payload.productId}/rating`, { rating: payload.rating })
       return normalizeRatingResponse(response.data)
@@ -62,9 +60,6 @@ export async function rateProduct(payload: RateProductPayload) {
     })
     return normalizeRatingResponse(response.data)
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-
-    }
 
     if (
       axios.isAxiosError(error) &&

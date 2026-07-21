@@ -132,20 +132,19 @@ export default function TraderDesignPage() {
 
   const canSubmit = title.trim() !== '' && !!image
 
-  const fetchImages = async () => {
-    try {
-      const res = await api.get('/trader/designs/images')
-      if (res.status === 200) {
-        setImages(res.data?.data?.images ?? [])
-      }
-    } catch (error) {
-      handleApiError(error, t('loadImagesError'));
-    }
-  }
-
   useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const res = await api.get('/trader/designs/images')
+        if (res.status === 200) {
+          setImages(res.data?.data?.images ?? [])
+        }
+      } catch (error) {
+        handleApiError(error, t('loadImagesError'));
+      }
+    }
     fetchImages()
-  }, [])
+  }, [t])
 
   async function handleSubmit() {
     setTouched(true)

@@ -19,6 +19,7 @@ export interface ProductColor {
     imageUrl: string;
     isPrimary?: boolean;
     url?: string;
+    direction?: string;
   }[];
   variants: {
     id: string;
@@ -26,6 +27,7 @@ export interface ProductColor {
     quantity: number;
     sku?: string | null;
   }[];
+  stock?: number;
 }
 
 export interface Product {
@@ -35,7 +37,6 @@ export interface Product {
   price: number;
   rating: number;
   traderId: number;
-  categoryId: string;
   createdAt: string;
   updatedAt: string;
   sizeguide?: string;
@@ -50,12 +51,16 @@ export interface Product {
     createdAt: string;
     updatedAt: string;
   };
-  category: {
+  categories: {
     id: string;
     name: string;
     createdAt: string;
     updatedAt: string;
-  };
+  }[];
+  materials?: {
+    id: string;
+    material: string;
+  }[];
 
   images: {
     id: string;
@@ -65,6 +70,16 @@ export interface Product {
   }[];
   stock: number;
   colors: ProductColor[];
+  price?: number;
+  shopPrice?: number;
+  retailPrice?: number;
+  wholesalePrice?: number;
+  blankPrice?: number;
+  depositAmount?: number;
+  securityDeposit?: number;
+  termsAndConditions?: string;
+  privacyPolicy?: string;
+  minOrder?: number;
 }
 
 export type ProductsQuery = {
@@ -82,6 +97,7 @@ export type ProductsQuery = {
   page?: number;
   limit?: number;
   collectionId?: string;
+  type?: string;
 };
 
 type ProductsResponse = {
@@ -94,7 +110,7 @@ type ProductsResponse = {
   };
 };
 
-type RawImage = { id?: string; url?: string; imageUrl?: string; color?: string };
+type RawImage = { id?: string; url?: string; imageUrl?: string; color?: string; direction?: string };
 type RawSize = { id?: string; size?: string; quantity?: number; color?: string };
 type RawColor = { id?: string; colorName?: string; color?: string; images?: RawImage[] };
 
@@ -126,6 +142,7 @@ export function transformProduct(raw: Record<string, unknown>): Product {
           id: img.id || "",
           imageUrl: img.url || img.imageUrl || "",
           url: img.url || img.imageUrl || "",
+          direction: img.direction,
         })),
       variants: flatSizes
         .filter((s) =>
@@ -147,6 +164,7 @@ export function transformProduct(raw: Record<string, unknown>): Product {
 const getProducts = async (
   params: ProductsQuery,
 ): Promise<ProductsResponse> => {
+    console.log("getProducts");
   const { data } = await api.get("/products", {
     params,
   });
@@ -189,7 +207,7 @@ export interface ProductFilters {
 }
 
 type RawProductItem = {
-  category?: { name?: string };
+  categories?: { name?: string }[];
   brand?: { name?: string };
   sizes?: { size?: string }[];
   colors?: { colorName?: string; color?: string }[];
@@ -204,7 +222,7 @@ const getProductFilters = async (
   const products: RawProductItem[] = data.data?.products ?? [];
 
   const categories = Array.from(
-    new Set(products.map((p) => p.category?.name).filter(Boolean)),
+    new Set(products.flatMap((p) => p.categories?.map(c => c.name)).filter(Boolean)),
   ) as string[];
   const brands = Array.from(
     new Set(products.map((p) => p.brand?.name).filter(Boolean)),
@@ -246,52 +264,68 @@ export const useCompareProducts = (ids: string[]) => {
   });
 };
 
-export const useCompareRetailProducts = (ids: string[]) => {
-  return useQueries({
-    queries: ids.map((id) => ({
-      queryKey: ["retailProduct", id],
-      queryFn: async () => {
-        const { retailApi } = await import("../../services/retailApi");
-        return retailApi.getRetailProductById(id);
-      },
-      enabled: !!id,
-    })),
-  });
-};
+
 
 const getTraderProducts = async (
   traderId: string | number,
+  type?: string
 ): Promise<Product[]> => {
   const { data } = await api.get("/products", {
-    params: { traderId, limit: 1000 },
+    params: { traderId, limit: 1000, type },
   });
   return (data.data?.products ?? []).map(transformProduct);
 };
 
-export const useTraderProducts = () => {
+export const useTraderProducts = (type?: string) => {
   const user = useAuthStore.getState().user;
   return useQuery({
-    queryKey: ["trader-products", user?.id],
-    queryFn: () => getTraderProducts(user!.id),
+    queryKey: ["trader-products", user?.id, type],
+    queryFn: () => getTraderProducts(user!.id, type),
     enabled: !!user?.id,
   });
 };
 
+export interface ProductColorPayload {
+  color: string;
+  name: string;
+  code: string;
+  minOrder?: number;
+  stock?: number;
+  sizes?: { size: string; quantity: number }[];
+}
+
 export interface ProductFormData {
   name: string;
   description?: string;
-  price: number;
-  categoryId: string;
+  price?: number;
+  shopPrice?: number;
+  wholesalePrice?: number;
+  categoryIds?: string[];
   brandId?: string;
-  images: { url: string; color: string }[];
-  sizes: string[];
-  colors: string[];
+  images: { url: string; color: string; direction?: string }[];
+  sizes?: string[] | { size: string; quantity: number }[];
+  colors: string[] | ProductColorPayload[];
+  materials?: { material: string }[];
+  isActive?: boolean;
+  productTypes?: string[];
   sku?: string;
   stock?: number;
   isMustHave?: boolean;
   isFlashDeals?: boolean;
   flashDealPrice?: number | null;
   flashDealEndsAt?: string | null;
+  depositAmount?: number;
+  securityDeposit?: number;
+  termsAndConditions?: string;
+  privacyPolicy?: string;
+  isFeatured?: boolean;
+  minOrder?: number;
+  isBestDeal?: boolean;
+  isMostPopular?: boolean;
+  isPremiumCollection?: boolean;
+  sizeguide?: string;
+  blankPrice?: number;
+  retailPrice?: number;
 }
 
 const createProduct = async (body: ProductFormData | FormData) => {

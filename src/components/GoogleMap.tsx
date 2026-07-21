@@ -186,7 +186,7 @@ export default function GoogleMapPicker({
   useEffect(() => {
     // Intentionally avoiding auto-prompting GPS or fetching IP location on mount to comply with GDPR/privacy best practices.
     // The user must explicitly click "Use my current location".
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   useEffect(() => {

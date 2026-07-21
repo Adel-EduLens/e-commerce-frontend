@@ -17,6 +17,7 @@ interface FilterCategoryProps {
   loadingText?: string;
   availableSizes?: string[];
   isWholesale?: boolean;
+  isShop?: boolean;
   categories?: { id: string | number; name: string }[];
   brands?: { id: string | number; name: string }[];
 }
@@ -31,6 +32,7 @@ const FilterCategory: React.FC<FilterCategoryProps> = ({
   totalPages = 1,
   availableSizes,
   isWholesale,
+  isShop,
   categories,
   brands,
   currentPage = 1,
@@ -49,6 +51,7 @@ const FilterCategory: React.FC<FilterCategoryProps> = ({
             onFilterChange={onFilterChange}
             availableSizes={availableSizes}
             isWholesale={isWholesale}
+            isShop={isShop}
             categories={categories}
             brands={brands}
           />

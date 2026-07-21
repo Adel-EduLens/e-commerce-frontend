@@ -182,7 +182,7 @@ function BagItemCard({
       <button
         type="button"
         onClick={onRemove}
-        className="absolute hover:bg-primary hover:text-white cursor-pointer top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-background-hover transition text-foreground"
+        className="absolute hover:bg-primary hover:text-white cursor-pointer top-4 left-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-background-hover transition text-foreground"
         aria-label={t("bagItem.remove", { title: item.title })}
       >
         <Trash2 className="h-5 w-5" strokeWidth={1.5} />
@@ -239,6 +239,11 @@ function BagItemCard({
               )}
               <strong className="font-bold">{item.color}</strong>
             </span>
+            {item.productType && (
+              <span className="rounded-xl border border-primary bg-primary/10 px-3 py-1 font-['Montserrat'] text-sm text-primary font-bold">
+                {item.productType === "STANDARD" ? "SHOP" : item.productType}
+              </span>
+            )}
           </div>
         </div>
 

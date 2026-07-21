@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAddSignalMutation } from "../hooks/queries/recommendQuery";
 import { useAddRecentlyViewed } from "../hooks/useRecentlyViewed";
 
-import { useProduct } from "../hooks/queries/productsQuery";
+import { useProduct, type ProductColor } from "../hooks/queries/productsQuery";
 import { useParams } from "react-router-dom";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
@@ -25,45 +25,65 @@ export default function ProductDetailsPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
 
-  const {t} = useTranslation("productDetails");
+  const { t } = useTranslation("productDetails");
 
   // Initialize selected values on product load
   useEffect(() => {
-    if (product && product.colors && product.colors.length > 0) {
-      const firstColor = product.colors[0];
-      setSelectedColor(firstColor.colorName || firstColor.color || "");
-      
-      const firstAvailableSize = firstColor.variants?.find((v: any) => v.quantity > 0)?.size || firstColor.variants?.[0]?.size || "";
-      setSelectedSize(firstAvailableSize);
+    const func = () => {
+      if (product && product.colors && product.colors.length > 0) {
+        const firstColor = product.colors[0];
+        setSelectedColor(firstColor.colorName || firstColor.color || "");
 
-      const firstImage = firstColor.images?.[0]?.imageUrl || firstColor.images?.[0]?.url || "";
-      setSelectedImage(firstImage);
-      
-      setQuantity(1);
-    }
+        const firstAvailableSize =
+          firstColor.variants?.find(
+            (v: { quantity: number; size: string }) => v.quantity > 0,
+          )?.size ||
+          firstColor.variants?.[0]?.size ||
+          "";
+        setSelectedSize(firstAvailableSize);
+
+        const firstImage =
+          firstColor.images?.[0]?.imageUrl || firstColor.images?.[0]?.url || "";
+        setSelectedImage(firstImage);
+
+        setQuantity(1);
+      }
+    };
+    func();
   }, [product]);
 
   const handleColorChange = (colorName: string) => {
     setSelectedColor(colorName);
-    const colorObj = product?.colors?.find((c: any) => (c.colorName || c.color) === colorName);
+    const colorObj = product?.colors?.find(
+      (c: ProductColor) => (c.colorName || c.color) === colorName,
+    );
     if (colorObj) {
-      const firstAvailableSize = colorObj.variants?.find((v: any) => v.quantity > 0)?.size || colorObj.variants?.[0]?.size || "";
+      const firstAvailableSize =
+        colorObj.variants?.find(
+          (v: { quantity: number; size: string }) => v.quantity > 0,
+        )?.size ||
+        colorObj.variants?.[0]?.size ||
+        "";
       setSelectedSize(firstAvailableSize);
-      
-      const firstImage = colorObj.images?.[0]?.imageUrl || colorObj.images?.[0]?.url || "";
+
+      const firstImage =
+        colorObj.images?.[0]?.imageUrl || colorObj.images?.[0]?.url || "";
       setSelectedImage(firstImage);
-      
+
       setQuantity(1);
     }
   };
 
   useEffect(() => {
     if (product) {
-      addSignal({ productId: product.id, categoryId: product.categoryId, type: "view" });
+      addSignal({
+        productId: product.id,
+        categoryId: product.categories?.[0]?.id || "",
+        type: "view",
+      });
       addRecentlyViewed({ productType: "SHOP", productId: product.id });
     }
   }, [addSignal, product, product?.id, addRecentlyViewed]);
-
 
   if (isPending) return <div className="p-10 text-center">{t("loading")}</div>;
   if (isError || !product)
@@ -71,16 +91,25 @@ export default function ProductDetailsPage() {
 
   const item: DetailItem = {
     ...product,
+    price:
+      product.price ??
+      product.shopPrice ??
+      product.retailPrice ??
+      product.wholesalePrice ??
+      0,
     brandName: product.brand?.name ?? null,
     sizeguide: product.sizeguide,
-    images: product.colors?.flatMap((c: any) =>
-      (c.images || []).map((img: any) => ({
-        id: img.id,
-        url: img.url || img.imageUrl || "",
-        color: c.colorName || c.color || "",
-      }))
-    ) ?? [],
-    colors: (product.colors || []).map((c: any) => ({
+    images:
+      product.colors?.flatMap((c: ProductColor) =>
+        (c.images || []).map(
+          (img: { id: string; url?: string; imageUrl?: string }) => ({
+            id: img.id,
+            url: img.url || img.imageUrl || "",
+            color: c.colorName || c.color || "",
+          }),
+        ),
+      ) ?? [],
+    colors: (product.colors || []).map((c: ProductColor) => ({
       id: c.id,
       color: c.colorName || c.color || "",
       colorHex: c.colorCode || null,
@@ -88,9 +117,12 @@ export default function ProductDetailsPage() {
     sizes: Array.from(
       new Map(
         (product.colors || [])
-          .flatMap((c: any) => c.variants || [])
-          .map((v: any) => [v.size, { id: v.id, size: v.size }])
-      ).values()
+          .flatMap((c: ProductColor) => c.variants || [])
+          .map((v: { id: string; size: string }) => [
+            v.size,
+            { id: v.id, size: v.size },
+          ]),
+      ).values(),
     ),
   };
 
@@ -98,7 +130,9 @@ export default function ProductDetailsPage() {
     <div className="w-full bg-background">
       <div className="mx-auto flex w-full max-w-[1428px] flex-col gap-12 px-4 py-6 sm:px-6 sm:py-8 lg:gap-20 lg:px-8 lg:py-10">
         <div className="font-['Montserrat'] text-sm font-normal text-gray-text sm:text-base">
-          {t("home")} / {product.category.name} / {product.name}
+          {t("home")} /{" "}
+          {product.categories?.map((c: { name: string }) => c.name).join(", ")}{" "}
+          / {product.name}
         </div>
 
         <div className="flex w-full flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-8">

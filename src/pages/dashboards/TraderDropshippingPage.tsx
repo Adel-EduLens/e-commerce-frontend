@@ -1,6 +1,3 @@
-const asset = (file: string) =>
-  `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
-
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
@@ -145,19 +142,17 @@ function EarningsChart() {
 }
 
 function OrdersDonutChart() {
-  let startAngle = -90;
   const cx = 112;
   const cy = 112;
   const r = 90;
   const innerR = 58;
 
-  const segments = orderStatus.map((seg) => {
+  const segments = orderStatus.map((seg, index) => {
+    const startAngle = -90 + (orderStatus.slice(0, index).reduce((acc, s) => acc + s.share, 0) / 100) * 360;
     const angle = (seg.share / 100) * 360;
-    const start = startAngle;
-    startAngle += angle;
-    const end = startAngle;
-    const startRad = (start * Math.PI) / 180;
-    const endRad = (end * Math.PI) / 180;
+    const endAngle = startAngle + angle;
+    const startRad = (startAngle * Math.PI) / 180;
+    const endRad = (endAngle * Math.PI) / 180;
     const x1 = cx + r * Math.cos(startRad);
     const y1 = cy + r * Math.sin(startRad);
     const x2 = cx + r * Math.cos(endRad);

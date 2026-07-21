@@ -5,8 +5,9 @@ import { toast } from "sonner";
 import { api } from "../lib/axios";
 import { type CartItem, } from "../store/useCartStore";
 import {
-  useWholesaleCartStore,
-} from "../store/useWholesaleCartStore";
+  useCartStore,
+  useWholesaleCartItems
+} from "../store/useCartStore";
 import { useAuthStore } from "../store/useAuthStore";
 
 const formatCurrency = (amount: number) =>
@@ -228,10 +229,10 @@ function SummaryCard({
 export default function WholesaleBagPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const items = useWholesaleCartStore((s) => s.items);
-  const removeItem = useWholesaleCartStore((s) => s.removeItem);
-  const incrementQuantity = useWholesaleCartStore((s) => s.incrementQuantity);
-  const decrementQuantity = useWholesaleCartStore((s) => s.decrementQuantity);
+  const items = useWholesaleCartItems();
+  const removeItem = useCartStore((s) => s.removeItem);
+  const incrementQuantity = useCartStore((s) => s.incrementQuantity);
+  const decrementQuantity = useCartStore((s) => s.decrementQuantity);
   const [isValidating, setIsValidating] = useState(false);
 
   const subtotal = useMemo(

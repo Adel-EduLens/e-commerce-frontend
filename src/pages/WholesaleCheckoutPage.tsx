@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWholesaleCartStore } from "../store/useWholesaleCartStore";
+import { useCartStore, useWholesaleCartItems } from "../store/useCartStore";
 import GoogleMapPicker from "../components/GoogleMap";
 import { api } from "../lib/axios";
 import { toast } from "sonner";
@@ -445,8 +445,8 @@ function OrderSummary({
 export default function WholesaleCheckoutPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const items = useWholesaleCartStore((s) => s.items);
-  const clearCart = useWholesaleCartStore((s) => s.clearCart);
+  const items = useWholesaleCartItems();
+  const clearCart = useCartStore((s) => s.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 

@@ -1,15 +1,14 @@
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ThumbsUp } from "lucide-react";
-import { useProductReviews } from "../../hooks/queries/reviewQuery";
-import { useRetailReviews } from "../../hooks/queries/retailReviewQuery";
+import { useProductReviews, type Review } from "../../hooks/queries/reviewQuery";
 import { useAuthStore } from "../../store/useAuthStore";
 import { Star } from "../ui/star";
 import { ReviewForm } from "./ReviewForm";
 import { useTranslation } from "react-i18next";
 
 interface ReviewsSectionProps {
-  productType?: "PRODUCT" | "RETAIL";
+  productType?: "PRODUCT" | "RETAIL" | "WHOLESALE";
 }
 
 type ReviewFilterValue = "all" | "5" | "4" | "3" | "2" | "1";
@@ -43,15 +42,7 @@ export function ReviewsSection({
   const { id } = useParams();
   const { user } = useAuthStore();
 
-  const productReviewsQuery = useProductReviews(
-    productType === "PRODUCT" ? id : undefined,
-  );
-  const retailReviewsQuery = useRetailReviews(
-    productType === "RETAIL" ? id : undefined,
-  );
-
-  const query =
-    productType === "RETAIL" ? retailReviewsQuery : productReviewsQuery;
+  const query = useProductReviews(id);
   const { data: reviews = [], isPending, isError } = query;
 
   const [filterValue, setFilterValue] = useState<ReviewFilterValue>("all");
@@ -118,17 +109,11 @@ export function ReviewsSection({
     return visibleReviews.slice(0, pageSize);
   }, [visibleReviews, pageSize]);
 
-  const renderReviewCard = (review: any) => {
+  const renderReviewCard = (review: Review) => {
     const isHelpful = helpfulReviewIds.includes(review.id);
     const helpfulCount = isHelpful ? 1 : 0;
 
-    // Deterministic mock review images based on review id to look premium & complete
-    const mockImageIds = [1011, 1015, 1025, 1043, 1056];
-    const imageCount = (Number(review.id.charCodeAt(0) || 0) % 3) + 1; // 1 to 3 images
-    const reviewImages = mockImageIds
-      .slice(0, imageCount)
-      .map((imgId) => `https://picsum.photos/id/${imgId}/200/200`);
-
+ 
     return (
       <div
         key={review.id}
@@ -193,23 +178,7 @@ export function ReviewsSection({
           {review.comment ?? t("noCommentProvided")}{" "}
         </p>
 
-        {/* Review Images */}
-        {reviewImages.length > 0 && (
-          <div className="flex gap-2 items-center mt-2 flex-wrap">
-            {reviewImages.map((src, index) => (
-              <div
-                key={index}
-                className="h-16 w-16 overflow-hidden rounded-lg border border-stroke bg-gray-50 shrink-0"
-              >
-                <img
-                  src={src}
-                  alt={t("reviewAttachment")}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-        )}
+       
       </div>
     );
   };

@@ -14,10 +14,7 @@ import {
   useTraderProducts,
   useDeleteProduct,
 } from "../../hooks/queries/productsQuery";
-import {
-  useTraderWholesales,
-  useDeleteWholesale,
-} from "../../hooks/queries/wholesaleQuery";
+
 import { useTranslation } from "react-i18next";
 const alerts = [
   {
@@ -72,14 +69,7 @@ export default function TraderInventoryPage() {
     isError: productsError,
     error: productsErrorMsg,
   } = useTraderProducts();
-  const {
-    data: traderWholesales = [],
-    isLoading: loadingWholesales,
-    isError: wholesalesError,
-    error: wholesalesErrorMsg,
-  } = useTraderWholesales();
   const deleteProduct = useDeleteProduct();
-  const deleteWholesale = useDeleteWholesale();
 
   const inventoryItems: InventoryItem[] = [
     ...traderProducts.map((p) => {
@@ -99,21 +89,23 @@ export default function TraderInventoryPage() {
         ),
       );
       const uniqueColors = Array.from(
-        new Set(p.colors?.map((c) => c.colorName) ?? []),
+        new Set(
+          p.colors?.map((c) => c.colorName || c.color).filter(Boolean) ?? [],
+        ),
       );
 
       return {
         id: p.id,
-        image: allImages[0]?.url ?? "",
+        image: allImages[0]?.url || "",
         imagesByColor: allImages,
         product: p.name,
-        category: p.category?.name ?? "",
-        categoryId: p.categoryId,
-        brandId: p.brand?.id ?? "",
+        categories: p.categories?.map(c => ({ id: c.id, name: c.name })) || [],
+        categoryIds: p.categories?.map(c => String(c.id)) || [],
+        brandId: p.brand?.id,
         stock: totalStock,
         sku: p.sku ?? "",
-        price: `$${p.price}`,
-        priceNum: p.price,
+        price: `$${p.shopPrice ?? p.price ?? 0}`,
+        priceNum: p.shopPrice ?? p.price ?? 0,
         date: new Date(p.createdAt).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
@@ -135,46 +127,10 @@ export default function TraderInventoryPage() {
         isPremiumCollection: false,
       };
     }),
-    ...traderWholesales.map((w) => ({
-      id: w.id,
-      image: w.images[0]?.url ?? "",
-      imagesByColor: w.images.map((img) => ({
-        url: img.url,
-        color: img.color ?? undefined,
-      })),
-      product: w.name,
-      category: w.category?.name ?? "",
-      categoryId: w.categoryId,
-      brandId: "",
-      stock: w.stock ?? 0,
-      sku: w.sku ?? "",
-      price: `$${w.price}`,
-      priceNum: w.price,
-      date: new Date(w.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      createdAtRaw: new Date(w.createdAt).getTime(),
-      status: getStatus(w.stock ?? 0),
-      type: "wholesale" as const,
-      description: w.description ?? "",
-      sizes: [],
-      colors: [],
-      minOrder: w.minOrder ?? 1,
-      isMustHave: false,
-      isFlashDeals: false,
-      flashDealPrice: null,
-      flashDealEndsAt: null,
-      isBestDeal: w.isBestDeal ?? false,
-      isMostPopular: w.isMostPopular ?? false,
-      isPremiumCollection: w.isPremiumCollection ?? false,
-    })),
   ];
 
   const handleDelete = (item: InventoryItem) => {
-    if (item.type === "product") deleteProduct.mutate(item.id);
-    else deleteWholesale.mutate(item.id);
+    deleteProduct.mutate(item.id);
   };
 
   const errorMessages: string[] = [];
@@ -183,16 +139,6 @@ export default function TraderInventoryPage() {
 
     errorMessages.push(
       `Products: ${
-        error.response?.data?.message ?? error.message ?? "Unknown error"
-      }`,
-    );
-  }
-
-  if (wholesalesError) {
-    const error = wholesalesErrorMsg as AxiosError<ErrorResponse>;
-
-    errorMessages.push(
-      `Wholesales: ${
         error.response?.data?.message ?? error.message ?? "Unknown error"
       }`,
     );

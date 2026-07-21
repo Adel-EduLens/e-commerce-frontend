@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { type InventoryItem, getStatus } from "../../components/trader/inventoryUtils";
-import { InventoryTablePanel, AddItemModal, EditItemModal } from "../../components/trader/InventoryShared";
+import { InventoryTablePanel } from "../../components/trader/InventoryShared";
 import { useTraderProducts, useDeleteProduct } from "../../hooks/queries/productsQuery";
 import { useTranslation } from "react-i18next";
 
-export default function TraderProductsPage() {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+export default function TraderProductsPage({ onEdit }: { onEdit: (item: InventoryItem) => void }) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { t } = useTranslation("traderProduct");
 
@@ -15,7 +13,7 @@ export default function TraderProductsPage() {
     isLoading,
     isError,
     error: errorMsg,
-  } = useTraderProducts();
+  } = useTraderProducts("SHOP");
 
   const deleteProduct = useDeleteProduct();
 
@@ -37,13 +35,13 @@ export default function TraderProductsPage() {
       image: allImages[0]?.url ?? "",
       imagesByColor: allImages,
       product: p.name,
-      category: p.category?.name ?? "",
-      categoryId: p.categoryId,
+      categories: p.categories?.map(c => ({ id: c.id, name: c.name })) || [],
+      categoryIds: p.categories?.map(c => String(c.id)) || [],
       brandId: p.brand?.id ?? "",
       stock: totalStock,
       sku: p.sku ?? "",
-      price: `$${p.price}`,
-      priceNum: p.price,
+      price: `$${p.shopPrice ?? p.price ?? 0}`,
+      priceNum: p.shopPrice ?? p.price ?? 0,
       date: new Date(p.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
       createdAtRaw: new Date(p.createdAt).getTime(),
       status: getStatus(totalStock),
@@ -62,28 +60,19 @@ export default function TraderProductsPage() {
     };
   });
 
+  const errRes = errorMsg as { response?: { data?: { message?: string } }; message?: string } | null;
   const errorMessages = isError
-    ? [(errorMsg as any)?.response?.data?.message ?? (errorMsg as any)?.message ?? "Failed to load products"]
+    ? [errRes?.response?.data?.message ?? errRes?.message ?? "Failed to load products"]
     : [];
 
   return (
     <>
-      {showAddModal && (
-        <AddItemModal
-          onClose={() => setShowAddModal(false)}
-          lockedType="product"
-        />
-      )}
-      {editItem && (
-        <EditItemModal item={editItem} onClose={() => setEditItem(null)} />
-      )}
 
       <InventoryTablePanel
         items={items}
         isLoading={isLoading}
         errorMessages={errorMessages}
-        onAdd={() => setShowAddModal(true)}
-        onEdit={setEditItem}
+        onEdit={onEdit}
         onDelete={(item) => setDeleteId(item.id)}
         showTypeFilter={false}
         title="productsTable"

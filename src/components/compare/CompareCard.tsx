@@ -12,13 +12,20 @@ import {
 
 import type { Product } from "../../hooks/queries/productsQuery";
 import { useTranslation } from "react-i18next";
+import { getColorVar } from "../../components/trader/inventoryUtils";
 
 interface CompareCardProps {
-  product: Product;
+  product: Product & { productType?: string };
   onRemove: (id: string) => void;
 }
 
 export function CompareCard({ product, onRemove }: CompareCardProps) {
+  const pType = product.productType || "SHOP";
+  const displayPrice = pType === "SHOP" ? product.shopPrice ?? product.price ?? 0
+                     : pType === "RETAIL" ? product.retailPrice ?? product.price ?? 0
+                     : pType === "WHOLESALE" ? product.wholesalePrice ?? product.price ?? 0
+                     : product.blankPrice ?? product.price ?? 0;
+
   const image =
     product.colors?.[0]?.images?.[0]?.imageUrl ||
     product.colors?.[0]?.images?.[0]?.url ||
@@ -28,7 +35,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
   const hasFlashDeal =
     product.isFlashDeals &&
     product.flashDealPrice &&
-    product.flashDealPrice < product.price;
+    product.flashDealPrice < displayPrice;
 
   const uniqueSizes = Array.from(
     new Set(product.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])
@@ -81,6 +88,15 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
             </span>
           )}
         </div>
+
+        <div className="absolute right-3 bottom-3 flex flex-col gap-2">
+          <span className="flex w-fit items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">
+            {pType === "SHOP" ? t("card.typeShop", "Shop") 
+             : pType === "RETAIL" ? t("card.typeRetail", "Retail") 
+             : pType === "WHOLESALE" ? t("card.typeWholesale", "Wholesale") 
+             : t("card.typeBlank", "Blank")}
+          </span>
+        </div>
       </div>
 
       {/* BODY */}
@@ -101,12 +117,12 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
                 </span>
 
                 <span className="text-xs text-gray-text line-through">
-                  ${product.price}
+                  ${displayPrice}
                 </span>
               </>
             ) : (
               <span className="text-lg font-bold text-foreground">
-                ${product.price}
+                ${displayPrice}
               </span>
             )}
           </div>
@@ -136,7 +152,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
           <InfoRow
             icon={<Tag size={16} />}
             label={t("card.category")}
-            value={product.category.name}
+            value={product.categories?.map((c) => c.name).join(", ") || "—"}
           />
         </div>
 
@@ -167,7 +183,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
                   >
                     <span
                       className="w-full h-full rounded-full inline-block border border-black/10"
-                      style={{ backgroundColor: colorValue ? colorValue.toLowerCase() : "#ddd" }}
+                      style={{ backgroundColor: getColorVar(colorValue) }}
                     />
                   </div>
                 );

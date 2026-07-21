@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { api } from "../../lib/axios";
 import {
-  type BlankProduct,
-  type CreateBlankProductData,
-  type ImageDirection,
-} from "../../hooks/queries/blankProductQuery";
+  type Product,
+  type ProductFormData,
+} from "../../hooks/queries/productsQuery";
 import ImageCropModal, {
   validateImageDimensions,
 } from "../../components/trader/ImageCropModal";
@@ -13,18 +12,21 @@ import { COLOR_OPTIONS } from "./inventoryUtils";
 import { MultiSelect } from "./InventoryShared";
 import { useTranslation } from "react-i18next";
 import { Toggle } from "../ui";
+
+type ImageDirection = "FRONT" | "BACK" | "LEFT" | "RIGHT" | "TOP" | "BOTTOM";
+
 const uploadImageFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);
-  const { data } = await api.post("/upload/blank-product-image", formData, {
+  const { data } = await api.post("/upload/product-image", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
   return data.data.url;
 };
 
 interface BlankProductFormModalProps {
-  product?: BlankProduct;
-  onSave: (data: CreateBlankProductData) => void;
+  product?: Product;
+  onSave: (data: ProductFormData) => void;
   onClose: () => void;
 }
 
@@ -136,14 +138,21 @@ export function BlankProductFormModal({
       description: description || null,
       price: price ? parseFloat(price) : null,
       isActive,
+      productTypes: ["BLANK"],
       materials: materials.map((m) => ({ material: m })),
       colors: colors.map((c) => ({
         color: c.color,
-        images: c.images.map((img) => ({
-          url: img.url,
-          direction: img.direction as ImageDirection,
-        })),
+        name: c.color,
+        code: c.color,
       })),
+      images: colors.flatMap((c) => 
+        c.images.map((img) => ({
+          url: img.url,
+          color: c.color,
+          direction: img.direction,
+        }))
+      ),
+      sizes: [],
     });
   };
 

@@ -60,7 +60,6 @@ import TraderWebsiteSettingsPage from "../pages/dashboards/TraderWebsiteSettings
 import CreateYourDesignPage from "../pages/CreateYourDesignPage";
 import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
 
-import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
 import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
 import TraderCollectionsPage from "../pages/dashboards/TraderCollectionsPage";
 import TraderBlankProductsPage from "../pages/dashboards/TraderBlankProductsPage";
@@ -310,10 +309,6 @@ export const router = createBrowserRouter([
           {
             path: "faqs",
             element: <TraderWebsiteSettingsPage defaultTab="faqs" />,
-          },
-          {
-            path: "retailCategories",
-            element: <TraderRetailCategoriesPage />,
           },
           {
             path: "retailProducts",

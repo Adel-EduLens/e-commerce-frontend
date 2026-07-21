@@ -23,6 +23,9 @@ interface CategoryFormModalProps {
     name: string;
     image: string;
     appearOnHome: boolean;
+    isShop: boolean;
+    isWholesale: boolean;
+    isRetail: boolean;
   }) => void;
   onClose: () => void;
 }
@@ -34,9 +37,10 @@ export function CategoryFormModal({
 }: CategoryFormModalProps) {
   const [name, setName] = useState(category?.name ?? "");
   const [image, setImage] = useState(category?.image ?? "");
-  const [appearOnHome, setAppearOnHome] = useState(
-    category?.appearOnHome ?? false,
-  );
+  const [appearOnHome, setAppearOnHome] = useState(category?.appearOnHome ?? false);
+  const [isShop, setIsShop] = useState(category?.isShop ?? false);
+  const [isWholesale, setIsWholesale] = useState(category?.isWholesale ?? false);
+  const [isRetail, setIsRetail] = useState(category?.isRetail ?? false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const { t } = useTranslation("traderCategoriesPage");
@@ -109,6 +113,27 @@ export function CategoryFormModal({
             />
           </div>
 
+          <div className="flex justify-between">
+            <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
+              {t("isShop", "Shop Category")}
+            </label>
+            <Toggle checked={isShop} onChange={setIsShop} size="sm" />
+          </div>
+
+          <div className="flex justify-between">
+            <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
+              {t("isWholesale", "Wholesale Category")}
+            </label>
+            <Toggle checked={isWholesale} onChange={setIsWholesale} size="sm" />
+          </div>
+
+          <div className="flex justify-between">
+            <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
+              {t("isRetail", "Retail Category")}
+            </label>
+            <Toggle checked={isRetail} onChange={setIsRetail} size="sm" />
+          </div>
+
           <div className="space-y-2">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
               {t("categoryImage")}
@@ -142,7 +167,7 @@ export function CategoryFormModal({
             <button
               type="button"
               disabled={uploading || !name}
-              onClick={() => onSave({ name, image, appearOnHome })}
+              onClick={() => onSave({ name, image, appearOnHome, isShop, isWholesale, isRetail })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
               {uploading ? t("uploading") : t("save")}

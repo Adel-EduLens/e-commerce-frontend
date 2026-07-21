@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Star } from "../ui/star";
 import { asset } from "../../lib/utils";
@@ -13,9 +13,7 @@ import {
 } from "../../utils/compareStorage";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useCartStore } from "../../store/useCartStore";
-import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
-
+import { useCartStore, useWholesaleCartItems } from "../../store/useCartStore";
 
 const defaultImage = asset(
   "medium-shot-man-posing-with-blue-background-removebg-preview 1.png",
@@ -175,9 +173,12 @@ export default function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
 
-  const wholesaleCartItems = useWholesaleCartStore((s) => s.items);
-  const addWholesaleItem = useWholesaleCartStore((s) => s.addItem);
-  const removeWholesaleItem = useWholesaleCartStore((s) => s.removeItem);
+  const wholesaleCartItems = useMemo(
+    () => cartItems.filter((item) => item.productType === "WHOLESALE"),
+    [cartItems],
+  );
+  const addWholesaleItem = useCartStore((s) => s.addItem);
+  const removeWholesaleItem = useCartStore((s) => s.removeItem);
 
   const isWholesale = productType === "WHOLESALE";
   const useWholesaleCard = isWholesale && wholesaleCard;
@@ -186,16 +187,20 @@ export default function ProductCard({
   const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
   const existingCartItem = isWholesale
-    ? wholesaleCartItems.find((item) =>
-        String(item.productId) === String(actualProductId) &&
-        (useWholesaleCard ? item.color.toLowerCase() === selectedColor.toLowerCase() : true)
+    ? wholesaleCartItems.find(
+        (item) =>
+          String(item.productId) === String(actualProductId) &&
+          (useWholesaleCard
+            ? item.color.toLowerCase() === selectedColor.toLowerCase()
+            : true),
       )
     : cartItems.find((item) => {
+        const expectedType = productType === "SHOP" ? "STANDARD" : productType;
         const matchId =
           String(item.productId) === String(actualProductId) ||
           String(item.retailProductId) === String(actualProductId) ||
           String(item.wholesaleProductId) === String(actualProductId);
-        return matchId;
+        return matchId && item.productType === expectedType;
       });
 
   const isInCart = Boolean(existingCartItem);
@@ -204,12 +209,7 @@ export default function ProductCard({
     setActiveImage(imageSrc);
   }, [imageSrc]);
   useEffect(() => {
-    setIsCompared(
-      isProductCompared(
-        actualProductId,
-        compareType,
-      ),
-    );
+    setIsCompared(isProductCompared(actualProductId, compareType));
   }, [actualProductId, compareType]);
 
   const handleToggleWishlist = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -233,7 +233,7 @@ export default function ProductCard({
         setIsCompared(false);
         toast.success(t("removedFromCompareToast"));
       } else {
-        addCompareProduct(actualProductId,compareType);
+        addCompareProduct(actualProductId, compareType);
         setIsCompared(true);
         toast.success(t("addedToCompareToast"));
       }
@@ -283,17 +283,17 @@ export default function ProductCard({
       } else {
         const firstSize = sizeLabel
           ? sizeLabel.includes("-")
-          ? sizeLabel.split("-")[0].trim()
-          : sizeLabel.includes(",")
-            ? sizeLabel.split(",")[0].trim()
-            : sizeLabel.trim()
+            ? sizeLabel.split("-")[0].trim()
+            : sizeLabel.includes(",")
+              ? sizeLabel.split(",")[0].trim()
+              : sizeLabel.trim()
           : "Default";
         const firstColor = safeColors.length > 0 ? safeColors[0] : "Default";
         const firstColorHex =
           safeColors.length > 0 ? colorToHex(safeColors[0]) : "#000";
 
         addItem({
-          id: `${actualProductId}-${firstSize}-${firstColor}`,
+          id: `${actualProductId}-${firstSize}-${firstColor}-${productType === "SHOP" ? "STANDARD" : productType}`,
           productId: actualProductId,
           title,
           unitPrice: numPrice,
@@ -418,7 +418,9 @@ export default function ProductCard({
             {!useWholesaleCard && (
               <button
                 onClick={handleCompare}
-                aria-label={isCompared ? "Remove from compare" : "Add to compare"}
+                aria-label={
+                  isCompared ? "Remove from compare" : "Add to compare"
+                }
                 className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
                   isCompared
                     ? "bg-primary text-primary-foreground"
@@ -587,7 +589,7 @@ export default function ProductCard({
             className={`${useWholesaleCard ? "text-right text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
           >
             {showFlashDeal && flashDealPrice
-              ? `$${flashDealPrice.toFixed(2)}`
+              ? `${flashDealPrice.toFixed(2)} EGP`
               : price}
             {isWholesale && (
               <span
@@ -608,7 +610,11 @@ export default function ProductCard({
             disabled={stock !== undefined && stock <= 0 && !isInCart}
             className={`${useWholesaleCard ? "mt-2 text-sm font-semibold" : "mt-5 text-base font-medium"} w-full rounded-xl ${stock !== undefined && stock <= 0 && !isInCart ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "btn-cart-gradient"} py-3 text-center transition-colors`}
           >
-            {isInCart ? t("removeFromCart") : stock !== undefined && stock <= 0 ? t("outOfStock", "Out of stock") : t("addToCart")}
+            {isInCart
+              ? t("removeFromCart")
+              : stock !== undefined && stock <= 0
+                ? t("outOfStock", "Out of stock")
+                : t("addToCart")}
           </button>
         )}
       </div>

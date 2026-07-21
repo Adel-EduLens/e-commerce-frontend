@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, X, Eye, Edit2 } from "lucide-react";
@@ -74,7 +74,7 @@ export default function TraderInfluencersPage() {
 
   // Detail / Edit
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [detailData, setDetailData] = useState<any>(null);
+  const [detailData, setDetailData] = useState<Record<string, unknown> | null>(null);
   const [editCoupon, setEditCoupon] = useState(false);
   const [couponForm, setCouponForm] = useState({
     code: "",
@@ -91,17 +91,17 @@ export default function TraderInfluencersPage() {
   // Detail tab
   const [detailTab, setDetailTab] = useState<"info" | "coupon-users">("info");
 
-  const loadInfluencers = () => {
+  const loadInfluencers = useCallback(() => {
     api
       .get("/trader/influencers")
       .then((res) => setInfluencers(res.data.data))
       .catch(() => toast.error(t("toast.loadError", "Failed to load influencers")))
       .finally(() => setLoading(false));
-  };
+  }, [t]);
 
   useEffect(() => {
     loadInfluencers();
-  }, []);
+  }, [loadInfluencers]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,7 +264,7 @@ export default function TraderInfluencersPage() {
                 </p>
                 <p>
                   <span className="text-gray-text">{t("info.status", "Status:")}</span>{" "}
-                  {t(`status.${detailData.influencer.status}` as any, detailData.influencer.status) as string}
+                  {t(`status.${detailData.influencer.status}`, { defaultValue: detailData.influencer.status })}
                 </p>
               </div>
             </div>
@@ -738,7 +738,7 @@ export default function TraderInfluencersPage() {
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {t(`status.${inf.status}` as any, inf.status) as string}
+                        {t(`status.${inf.status}`, { defaultValue: inf.status })}
                       </button>
                     </td>
                     <td className="px-5 py-4">

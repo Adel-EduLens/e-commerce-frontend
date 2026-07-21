@@ -22,6 +22,10 @@
     "noDescription": "No description available.",
     "viewProduct": "View Product",
     "remove": "Remove",
-    "noData": "—"
+    "noData": "—",
+    "typeShop": "Shop",
+    "typeRetail": "Retail",
+    "typeWholesale": "Wholesale",
+    "typeBlank": "Blank"
   }
 }

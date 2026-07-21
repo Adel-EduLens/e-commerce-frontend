@@ -9,7 +9,6 @@ import {
   useUpdateCollection,
   useDeleteCollection,
 } from "../../hooks/queries/collectionsQuery";
-import { toast } from "sonner";
 
 interface CollectionTablePanelProps {
   collections: Collection[];

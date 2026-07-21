@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Calendar, User, Mail, Phone, MapPin, CreditCard, ShoppingBag } from "lucide-react";
+import { Loader2, ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag } from "lucide-react";
 
 interface OrderItem {
   id: string;
@@ -54,7 +54,7 @@ function statusPill(status: string) {
   return { bg: "bg-rose-50", text: "text-rose-700", ring: "outline-rose-700" };
 }
 
-function getLocalizedStatus(status: string, t: any) {
+function getLocalizedStatus(status: string, t: (key: string) => string) {
   const norm = status.toUpperCase();
   if (norm === "COMPLETED") return t("statusCompleted");
   if (norm === "DELIVERED") return t("statusDelivered");
@@ -65,7 +65,7 @@ function getLocalizedStatus(status: string, t: any) {
   return status;
 }
 
-function getTimelineSteps(status: string, dateStr: string, timeStr: string, t: any) {
+function getTimelineSteps(status: string, dateStr: string, timeStr: string, t: (key: string) => string) {
   const s = status.toUpperCase();
   const baseTime = `${dateStr} ${timeStr}`;
   return [
@@ -359,22 +359,24 @@ export default function TraderOrdersPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       const res = await api.get("/orders/trader");
       setOrders(res.data?.data || []);
-    } catch (err) {
-      console.error("Failed to fetch trader orders:", err);
-      toast.error(t("fetchOrdersError"));
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : t("fetchOrdersError");
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     try {

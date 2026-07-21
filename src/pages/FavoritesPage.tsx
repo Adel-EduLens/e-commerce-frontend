@@ -90,66 +90,40 @@ export default function FavoritesPage() {
         <EmptyFavorites />
       ) : (
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {items.map((item) => {
-            if (!item.product) return null
+          {Array.from(new Map(items.filter(i => i.product).map(item => [item.product!.id, item])).values()).map((item) => {
+            const p = item.product!
+            const wholesaleColors = (p.wholesaleColors ?? []) as WholesaleColor[]
+            const wholesaleSizes = Array.from(new Set(wholesaleColors.flatMap((wc) => wc.sizes.map((s) => s.size))))
 
-            if (item.productType === 'RETAIL') {
-              return (
-                <RetailProductCard
-                  key={item.id}
-                  product={{ ...item.product, isWishlisted: true } as unknown as RetailProduct}
-                />
-              )
-            }
+            // Determine routing path based on the type it was favorited as
+            let route = `/product-details/${p.id}`;
+            if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
+            else if (item.productType === 'RETAIL') route = `/retail/${p.id}`;
 
-            if (item.productType === 'SHOP') {
-              const p = item.product
-              return (
-                <ProductCard
-                  key={item.id}
-                  productId={p.id}
-                  productType="SHOP"
-                  title={p.name}
-                  price={`${p.price} EGP`}
-                  to={`/product-details/${p.id}`}
-                  imageSrc={p.images?.[0]?.url}
-                  rating={p.rating ?? 0}
-                  flashDealPrice={p.flashDealPrice ?? undefined}
-                  flashDealEndsAt={p.flashDealEndsAt ?? undefined}
-                  isFlashDeals={p.isFlashDeals ?? false}
-                />
-              )
-            }
-
-            if (item.productType === 'WHOLESALE') {
-              const p = item.product
-              const wholesaleColors = (p.wholesaleColors ?? []) as WholesaleColor[]
-              const wholesaleSizes = Array.from(new Set(wholesaleColors.flatMap((wc) => wc.sizes.map((s) => s.size))))
-
-              return (
-                <ProductCard
-                  key={item.id}
-                  productId={p.id}
-                  productType="WHOLESALE"
-                  title={p.name}
-                  subtitle={p.description || undefined}
-                  price={`${p.price} EGP`}
-                  to={`/wholesale/${p.id}`}
-                  imageSrc={p.images?.[0]?.url}
-                  images={p.images}
-                  rating={p.rating ?? 0}
-                  brand={p.brand}
-                  category={p.category?.name}
-                  colors={wholesaleColors.map((wc) => wc.color)}
-                  wholesaleSizes={wholesaleSizes}
-                  sizeLabel={wholesaleSizes.slice(0, 4).join("-") || "All Sizes"}
-                  minOrder={p.minOrder}
-                  wholesaleCard
-                />
-              )
-            }
-
-            return null
+            return (
+              <ProductCard
+                key={item.id}
+                productId={p.id}
+                productType={item.productType as any}
+                title={p.name}
+                subtitle={p.description || undefined}
+                price={`${p.shopPrice ?? p.retailPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0} EGP`}
+                to={route}
+                imageSrc={p.images?.[0]?.url}
+                images={p.images}
+                rating={p.rating ?? 0}
+                flashDealPrice={p.flashDealPrice ?? undefined}
+                flashDealEndsAt={p.flashDealEndsAt ?? undefined}
+                isFlashDeals={p.isFlashDeals ?? false}
+                brand={p.brand}
+                category={p.category?.name}
+                colors={wholesaleColors.map((wc) => wc.color)}
+                wholesaleSizes={wholesaleSizes}
+                sizeLabel={wholesaleSizes.slice(0, 4).join("-") || "All Sizes"}
+                minOrder={p.minOrder}
+                wholesaleCard={item.productType === 'WHOLESALE'}
+              />
+            )
           })}
         </div>
       )}

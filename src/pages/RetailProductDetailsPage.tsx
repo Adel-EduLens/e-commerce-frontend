@@ -2,21 +2,15 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useRetailProductById } from "../hooks/useRetailProducts";
+import { useProduct, type Product } from "../hooks/queries/productsQuery";
 import useRetailNotifyMe from "../hooks/useRetailNotifyMe";
 import { useAuthStore } from "../store/useAuthStore";
-import { useAddRetailProductToCart } from "../hooks/useCart";
+import { useAddProductToCart } from "../hooks/useCart";
 import { useAddRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
 import { ReviewsSection } from "../components/product/ReviewsSection";
-import { useRetailReviews } from "../hooks/queries/retailReviewQuery";
-import type {
-  RetailProduct,
-  RetailProductImage,
-  RetailProductColor,
-  RetailProductSize,
-} from "../types/retail";
+import { useReviews } from "../hooks/queries/reviewQuery";
 import type { DetailItem } from "../types/DetailItem";
 import { useTranslation } from "react-i18next";
 /** Safely convert a value to a finite number, defaulting to 0. */
@@ -25,11 +19,12 @@ function toNumber(value: string | number | null | undefined): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-/** Map a RetailProduct into the shared DetailItem shape used by ProductGallery & ProductInfoPanel. */
-function toDetailItem(product: RetailProduct): DetailItem {
+function toDetailItem(product: Product): DetailItem {
   const images = product.images ?? [];
   const colors = product.colors ?? [];
-  const sizes = product.sizes ?? [];
+
+  const allVariants = colors.flatMap(c => c.variants || []);
+  const uniqueSizes = Array.from(new Map(allVariants.map(v => [v.size, { id: v.id, size: v.size }])).values());
 
   return {
     id: product.id,
@@ -37,31 +32,26 @@ function toDetailItem(product: RetailProduct): DetailItem {
     description: product.description,
     price: product.price,
     rating: product.rating,
-    averageRating: product.averageRating,
-    discountPrice: product.discountPrice,
+    averageRating: product.rating,
+    discountPrice: product.flashDealPrice,
     brandName: product.brand?.name ?? null,
     stock: product.stock,
 
-    category: product.category
-      ? { id: product.category.id, name: product.category.name }
-      : undefined,
+    categories: product.categories?.map((c: any) => ({ id: c.id, name: c.name })) || [],
 
-    images: images.map((img: RetailProductImage) => ({
+    images: images.map((img: { id: string; url: string; color?: string }) => ({
       id: img.id,
       url: img.url,
       color: img.color ?? null,
     })),
 
-    colors: colors.map((c: RetailProductColor) => ({
+    colors: colors.map((c) => ({
       id: c.id,
-      color: c.color,
+      color: c.colorName || c.color || "",
       colorHex: null,
     })),
 
-    sizes: sizes.map((s: RetailProductSize) => ({
-      id: s.id,
-      size: s.size,
-    })),
+    sizes: uniqueSizes,
   };
 }
 
@@ -69,12 +59,12 @@ export default function RetailProductDetailsPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
   const { id } = useParams();
-  const { data: product, isLoading, error } = useRetailProductById(id ?? "");
-  const typedProduct = product as RetailProduct | null | undefined;
-  const { data: reviews = [] } = useRetailReviews(id);
+  const { data: product, isLoading, error } = useProduct(id ?? "");
+  const typedProduct = product as Product | null | undefined;
+  const { data: reviews = [] } = useReviews(id ?? "");
   const { t } = useTranslation("retailDetailsPage");
   const notify = useRetailNotifyMe(user?.id);
-  const addRetailProductToCart = useAddRetailProductToCart();
+  const addProductToCart = useAddProductToCart();
 
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState("");
@@ -110,11 +100,12 @@ export default function RetailProductDetailsPage() {
     const func = () => {
       if (typedProduct) {
         const colors = typedProduct.colors ?? [];
-        const sizes = typedProduct.sizes ?? [];
         const images = typedProduct.images ?? [];
+        
+        const sizes = colors.flatMap(c => c.variants || []);
 
         if (colors.length > 0) {
-          setSelectedColor(colors[0].color);
+          setSelectedColor(colors[0].colorName || colors[0].color || "");
         }
         if (sizes.length > 0) {
           setSelectedSize(sizes[0].size);
@@ -133,7 +124,7 @@ export default function RetailProductDetailsPage() {
     // Update image to match selected color
     const images = typedProduct?.images ?? [];
     const colorImage = images.find(
-      (img: RetailProductImage) =>
+      (img) =>
         img.color && img.color.toLowerCase() === colorName.toLowerCase(),
     );
     if (colorImage) {
@@ -146,14 +137,14 @@ export default function RetailProductDetailsPage() {
 
     const images = typedProduct.images ?? [];
     const colors = typedProduct.colors ?? [];
-    const sizes = typedProduct.sizes ?? [];
+    const sizes = colors.flatMap(c => c.variants || []);
     const mainImage = images[0];
 
-    const priceNumber = toNumber(typedProduct.price);
+    const priceNumber = toNumber(typedProduct.retailPrice ?? typedProduct.price);
     const discountNumber =
-      typedProduct.discountPrice !== null &&
-      typedProduct.discountPrice !== undefined
-        ? toNumber(typedProduct.discountPrice)
+      typedProduct.flashDealPrice !== null &&
+      typedProduct.flashDealPrice !== undefined
+        ? toNumber(typedProduct.flashDealPrice)
         : undefined;
     const unitPrice =
       discountNumber && discountNumber < priceNumber
@@ -161,11 +152,11 @@ export default function RetailProductDetailsPage() {
         : priceNumber;
 
     const selectedColorObj = colors.find(
-      (c: RetailProductColor) =>
-        c?.color?.toLowerCase() === selectedColor?.toLowerCase(),
+      (c) =>
+        (c?.colorName || c?.color)?.toLowerCase() === selectedColor?.toLowerCase(),
     );
     const selectedSizeObj = sizes.find(
-      (s: RetailProductSize) => s?.size === selectedSize,
+      (s) => s?.size === selectedSize,
     );
 
     if (colors.length > 0 && !selectedColorObj) {
@@ -180,7 +171,7 @@ export default function RetailProductDetailsPage() {
 
     const cartItem = {
       id: `retail-${typedProduct.id}-${selectedColor || "none"}-${selectedSize || "none"}`,
-      retailProductId: typedProduct.id,
+      productId: typedProduct.id,
       title: typedProduct.name,
       unitPrice,
       currency: "EGP" as const,
@@ -189,18 +180,17 @@ export default function RetailProductDetailsPage() {
       size: selectedSize,
       color: selectedColor,
       colorHex: "#ddd",
-      retailColorId: selectedColor,
-      retailSizeId: selectedSize,
       productType: "RETAIL" as const,
     };
 
-    addRetailProductToCart.mutate({
+    addProductToCart.mutate({
       cartItem,
       apiPayload: {
-        retailProductId: typedProduct.id,
+        productId: typedProduct.id,
         quantity,
-        retailColorId: selectedColor,
-        retailSizeId: selectedSize,
+        colorId: selectedColor,
+        sizeId: selectedSize,
+        productType: "RETAIL"
       },
     });
   };
@@ -254,7 +244,7 @@ export default function RetailProductDetailsPage() {
       <div className="mx-auto flex w-full max-w-[1428px] flex-col gap-12 px-4 py-6 sm:px-6 sm:py-8 lg:gap-20 lg:px-8 lg:py-10">
         {/* Breadcrumb */}
         <div className="font-['Montserrat'] text-sm font-normal text-gray-text sm:text-base">
-          Home / {typedProduct.category?.name ?? "Products"} /{" "}
+          Home / {typedProduct.categories?.map((c: any) => c.name).join(", ") || "Products"} /{" "}
           {typedProduct.name}
         </div>
 
@@ -281,7 +271,7 @@ export default function RetailProductDetailsPage() {
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
             onNotifyMe={handleNotifyMe}
-            isAddingToCart={addRetailProductToCart.isPending}
+            isAddingToCart={addProductToCart.isPending}
           />
         </div>
 

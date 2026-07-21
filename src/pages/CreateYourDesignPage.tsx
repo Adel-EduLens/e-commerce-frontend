@@ -1,11 +1,12 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useBlankProducts } from '../hooks/queries/blankProductQuery'
+import { useProducts } from '../hooks/queries/productsQuery'
 import ProductCard from '../components/shared/ProductCard'
 
 const CreateYourDesignPage = () => {
   const { t } = useTranslation("productSection")
-  const { data: blankProducts, isLoading, error } = useBlankProducts()
+  const { data, isLoading, error } = useProducts({ type: "BLANK" })
+  const blankProducts = data?.products || []
 
   if (isLoading) {
     return (
@@ -39,7 +40,7 @@ const CreateYourDesignPage = () => {
               productId={product.id}
               title={product.name}
               subtitle={product.description || product.materials?.map(m => m.material).join(', ')}
-              price={`${product.price} EGP`}
+              price={`${product.blankPrice ?? product.price ?? 0} EGP`}
               imageSrc={product.colors?.[0]?.images?.[0]?.url}
               images={product.colors?.flatMap(c => 
                 c.images.map(img => ({
