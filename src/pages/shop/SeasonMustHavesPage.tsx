@@ -28,7 +28,8 @@ export default function SeasonMustHavesPage() {
 
   // Map selected name back to ID for the API query
   const categoryId = useMemo(
-    () => allProducts.find((p) => p.category.name === filterState.category)?.category.id ?? "",
+    () =>
+      allProducts.find((p) => p.category?.name === filterState.category)?.category?.id ?? "",
     [allProducts, filterState.category],
   );
   const brandId = useMemo(
@@ -54,7 +55,15 @@ export default function SeasonMustHavesPage() {
   const allBrands = useMemo(() => [...new Set(allProducts.map((p) => p.brand?.name).filter(Boolean) as string[])], [allProducts]);
   const allSizes = useMemo(() => [...new Set((allProducts.flatMap((p) => p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? [])).filter(Boolean) as string[])], [allProducts]);
   const allColors = useMemo(() => [...new Set((allProducts.flatMap((p) => p.colors?.map((c) => c.colorName || c.color) ?? [])).filter(Boolean) as string[])], [allProducts]);
-  const priceRanges = useMemo(() => buildPriceRanges(allProducts.map((p) => p.price)), [allProducts]);
+  const priceRanges = useMemo(
+    () =>
+      buildPriceRanges(
+        allProducts
+          .map((p) => p.price ?? p.shopPrice ?? p.retailPrice ?? p.wholesalePrice ?? p.blankPrice)
+          .filter((price): price is number => typeof price === "number"),
+      ),
+    [allProducts],
+  );
 
   const filterConfigs = useMemo(
     () => [

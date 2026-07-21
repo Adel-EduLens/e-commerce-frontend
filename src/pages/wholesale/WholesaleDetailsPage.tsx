@@ -76,6 +76,13 @@ export default function WholesaleDetailsPage() {
 
   const item: DetailItem = {
     ...wholesale,
+    price:
+      wholesale.wholesalePrice ??
+      wholesale.price ??
+      wholesale.shopPrice ??
+      wholesale.retailPrice ??
+      wholesale.blankPrice ??
+      0,
     brandName: typeof wholesale.brand === "string" ? wholesale.brand : wholesale.brand?.name ?? null,
     minOrder: wholesale.minOrder ?? 1,
     colors: (wholesale.wholesaleColors || []).map((wc) => ({ id: wc.id, color: wc.color })),

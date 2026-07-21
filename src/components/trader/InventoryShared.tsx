@@ -402,7 +402,7 @@ export function AddItemModal({
       const allImages = colorsData.flatMap((c) => c.images);
       const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
 
-      const payload: Partial<ProductFormData> = {
+      const payload: ProductFormData = {
         name,
         description,
         categoryIds,
@@ -1187,7 +1187,7 @@ interface WholesaleColorEditState {
   minOrder: number;
   stock: number;
   images: { id?: string; url?: string; file?: File }[];
-  variants: { id?: string; size: string }[];
+  variants: { id?: string; size: string; quantity?: number }[];
 }
 
 // ─── Edit Item Modal ───────────────────────────────────────────────────────────
@@ -1406,7 +1406,7 @@ export function EditItemModal({
         const allImages = colorsData.flatMap((c) => c.images);
         const calculatedStock = colorsData.reduce((sum, c) => sum + c.stock, 0);
 
-        const payload: Partial<ProductFormData> = {
+        const payload: Partial<ProductFormData> & { id: string } = {
           id: item.id,
           name,
           description,

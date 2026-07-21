@@ -8,6 +8,16 @@ import CatalogFilters, { type FilterValues } from '../../components/shared/Catal
 import { useProducts, type ProductsQuery } from '../../hooks/queries/productsQuery'
 import { asset } from '../../lib/utils';
 
+function getEffectivePrice(item: {
+  price?: number
+  wholesalePrice?: number
+  shopPrice?: number
+  retailPrice?: number
+  blankPrice?: number
+}) {
+  return item.wholesalePrice ?? item.price ?? item.shopPrice ?? item.retailPrice ?? item.blankPrice ?? 0
+}
+
 function AssetImage({
   file,
   className,
@@ -238,8 +248,14 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
   const { data: resData, isLoading } = useProducts({ ...queryFilters, type: "WHOLESALE" })
   const products = resData?.products || []
 
-  const allCategories = useMemo(() => [...new Set(products.map((p) => p.category?.name).filter(Boolean))], [products])
-  const allBrands = useMemo(() => [...new Set(products.map((p) => p.brand?.name).filter(Boolean))], [products])
+  const allCategories = useMemo(
+    () => [...new Set(products.map((p) => p.category?.name).filter((name): name is string => Boolean(name)))],
+    [products],
+  )
+  const allBrands = useMemo(
+    () => [...new Set(products.map((p) => p.brand?.name).filter((name): name is string => Boolean(name)))],
+    [products],
+  )
   const filterConfigs = useMemo(() => [
     { key: 'category', label: t('Category', 'Category'), options: allCategories },
     { key: 'brand', label: t('Brand', 'Brand'), options: allBrands },
@@ -253,9 +269,10 @@ function ProductSection({ title, baseFilters, viewAllLink }: { title: string; ba
   // Client-side filtering for search and price; category is already handled server-side
   const filtered = useMemo(() => {
     return products.filter((item) => {
+      const itemPrice = getEffectivePrice(item)
       if (filterState.search && !item.name.toLowerCase().includes(filterState.search.toLowerCase())) return false
-      if (filterState.priceMin !== null && item.price < Number(filterState.priceMin)) return false
-      if (filterState.priceMax !== null && item.price > Number(filterState.priceMax)) return false
+      if (filterState.priceMin !== null && itemPrice < Number(filterState.priceMin)) return false
+      if (filterState.priceMax !== null && itemPrice > Number(filterState.priceMax)) return false
       return true
     })
   }, [products, filterState])
@@ -362,9 +379,10 @@ function WholesaleFilterSection({
 
   const filteredProducts = useMemo(() => {
     return products.filter((item) => {
+      const itemPrice = getEffectivePrice(item)
       if (filters.search && !item.name.toLowerCase().includes(filters.search.toLowerCase())) return false
-      if (filters.priceMin !== null && item.price < Number(filters.priceMin)) return false
-      if (filters.priceMax !== null && item.price > Number(filters.priceMax)) return false
+      if (filters.priceMin !== null && itemPrice < Number(filters.priceMin)) return false
+      if (filters.priceMax !== null && itemPrice > Number(filters.priceMax)) return false
       if (filters.brand && item.brand?.name?.toLowerCase() !== filters.brand.toLowerCase()) return false
       if (filters.color && !item.colors?.some(wc => (wc.colorName || wc.color || "").toLowerCase() === filters.color?.toLowerCase())) return false
       if (filters.size && !item.colors?.some(wc => wc.variants?.some(s => s.size.toLowerCase() === filters.size?.toLowerCase()))) return false

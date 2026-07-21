@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
+import { transformProduct, type Product } from "./productsQuery";
 
 export interface WholesaleColorSize {
   id: string;
@@ -44,20 +45,26 @@ export interface WholesaleProduct {
   updatedAt: string;
 }
 
-import { transformProduct } from "./productsQuery";
+export type WholesaleProductDetails = Product & {
+  wholesaleColors: WholesaleColor[];
+};
 
-const getWholesale = async (id: string): Promise<any> => {
+const getWholesale = async (id: string): Promise<WholesaleProductDetails> => {
   const { data } = await api.get(`/products/${id}`);
   const raw = data.data;
   const product = transformProduct(raw);
   return {
     ...product,
-    wholesaleColors: (product.colors || []).map((c: any) => ({
+    wholesaleColors: (product.colors || []).map((c) => ({
       id: c.id,
       color: c.colorName || c.color || "",
-      sizes: (c.variants || []).map((v: any) => ({ id: v.id, size: v.size })),
+      sizes: (c.variants || []).map((v) => ({
+        id: v.id,
+        size: v.size,
+        quantity: v.quantity,
+      })),
       stock: c.stock ?? product.stock,
-      minOrder: product.minOrder,
+      minOrder: c.minOrder ?? product.minOrder,
     })),
   };
 };
