@@ -8,7 +8,7 @@ import {
   type WholesaleOrder,
 } from "../../../hooks/queries/wholesaleOrderQuery";
 import { useTraderProducts } from "../../../hooks/queries/productsQuery";
-import { useWholesale } from "../../../hooks/queries/wholesaleQuery";
+import { useWholesale, type WholesaleProduct } from "../../../hooks/queries/wholesaleQuery";
 import {
   Loader2,
   ArrowLeft,
@@ -486,7 +486,7 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
   );
 }
 
-function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder[]; products?: Wholesale[] }) {
+function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder[]; products?: WholesaleProduct[] }) {
   const { t } = useTranslation("traderWholesale");
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -705,8 +705,8 @@ interface EditableOrderItemRowProps {
   item: WholesaleOrder["items"][number];
   idx: number;
   isEditing: boolean;
-  currentEdit: { quantity: number; price: number };
-  onChange: (updates: Partial<{ quantity: number; price: number }>) => void;
+  currentEdit: { quantity: number; price: number; sizeQuantities?: Record<string, number> };
+  onChange: (updates: Partial<{ quantity: number; price: number; sizeQuantities?: Record<string, number> }>) => void;
   onDelete: () => void;
   onAddColorRow?: () => void;
 }
@@ -722,6 +722,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
         id: c.id,
         color: c.colorName || c.color || "",
         stock: c.stock ?? product.stock ?? Infinity,
+        sizes: c.sizes || c.variants || [],
       }));
     }
     if (product.wholesaleColors && product.wholesaleColors.length > 0) {
@@ -729,6 +730,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
         id: c.id,
         color: c.color || "",
         stock: c.stock ?? product.stock ?? Infinity,
+        sizes: c.sizes || c.variants || [],
       }));
     }
     return [];
@@ -743,6 +745,27 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
   const maxStock = currentWarehouseStock !== Infinity
     ? currentWarehouseStock + item.quantity
     : Infinity;
+
+  const sizeList: Array<{ id?: string; size: string }> = useMemo(() => {
+    if (selectedColorObj?.sizes && selectedColorObj.sizes.length > 0) {
+      return selectedColorObj.sizes;
+    }
+    if (product?.sizes && product.sizes.length > 0) {
+      return product.sizes.map((s: any) => typeof s === "string" ? { size: s } : s);
+    }
+    return [];
+  }, [selectedColorObj, product]);
+
+  const handleProductQuantityChange = (newProductQty: number) => {
+    const validQty = Math.max(1, newProductQty);
+    const updatedSizeQuantities: Record<string, number> = {};
+    if (sizeList.length > 0) {
+      sizeList.forEach((s) => {
+        updatedSizeQuantities[s.size] = validQty;
+      });
+    }
+    onChange({ quantity: validQty, sizeQuantities: updatedSizeQuantities });
+  };
 
   return (
     <tr className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
@@ -772,6 +795,27 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
           )}
         </div>
 
+        {/* Display Sizes & Quantities */}
+        {sizeList.length > 0 && (
+          <div className="mt-2 text-center">
+            <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("sizesAndQuantities", "Sizes & Quantities:")}</span>
+            <div className="flex flex-wrap gap-1 justify-center">
+              {sizeList.map((s) => {
+                const szQty = currentEdit.sizeQuantities?.[s.size] ?? currentEdit.quantity;
+                return (
+                  <span
+                    key={s.id || s.size}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-secondary/10 text-foreground rounded border border-stroke"
+                  >
+                    <span>{s.size}:</span>
+                    <span className="text-secondary font-bold">{szQty}</span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {isEditing && (
           <div className="flex justify-center gap-2.5 mt-2">
             <button
@@ -799,7 +843,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
                   toast.error(`Quantity cannot exceed total available stock (${maxStock}) for ${item.product} ${item.color ? `(${item.color})` : ""}`);
                   validQty = maxStock;
                 }
-                onChange({ quantity: validQty });
+                handleProductQuantityChange(validQty);
               }}
               className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
             />
@@ -850,10 +894,11 @@ interface NewOrderItemRowProps {
     price: number;
     color: string | null;
     size?: string | null;
+    sizeQuantities?: Record<string, number>;
     image: string;
   };
   usedColors: Set<string>;
-  onChange: (updates: Partial<{ quantity: number; price: number; color: string | null; size: string | null }>) => void;
+  onChange: (updates: Partial<{ quantity: number; price: number; color: string | null; size: string | null; sizeQuantities?: Record<string, number> }>) => void;
   onRemove: () => void;
 }
 
@@ -868,6 +913,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
         id: c.id,
         color: c.colorName || c.color || "",
         stock: c.stock ?? product.stock ?? 0,
+        sizes: c.sizes || c.variants || [],
       }));
     }
     if (product.wholesaleColors && product.wholesaleColors.length > 0) {
@@ -875,6 +921,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
         id: c.id,
         color: c.color || "",
         stock: c.stock ?? product.stock ?? 0,
+        sizes: c.sizes || c.variants || [],
       }));
     }
     return [];
@@ -893,6 +940,27 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
     (c) => item.color && c.color.toLowerCase() === item.color.toLowerCase()
   );
   const maxStock = selectedColorObj !== undefined ? selectedColorObj.stock : (product?.stock !== undefined ? product.stock : Infinity);
+
+  const sizeList: Array<{ id?: string; size: string }> = useMemo(() => {
+    if (selectedColorObj?.sizes && selectedColorObj.sizes.length > 0) {
+      return selectedColorObj.sizes;
+    }
+    if (product?.sizes && product.sizes.length > 0) {
+      return product.sizes.map((s: any) => typeof s === "string" ? { size: s } : s);
+    }
+    return [];
+  }, [selectedColorObj, product]);
+
+  const handleQuantityUpdate = (newProductQty: number) => {
+    const validQty = Math.max(1, newProductQty);
+    const updatedSizeQuantities: Record<string, number> = {};
+    if (sizeList.length > 0) {
+      sizeList.forEach((s) => {
+        updatedSizeQuantities[s.size] = validQty;
+      });
+    }
+    onChange({ quantity: validQty, sizeQuantities: updatedSizeQuantities });
+  };
 
   return (
     <tr className="bg-amber-50/10 border-b border-stroke">
@@ -925,7 +993,12 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
                   newQty = Math.max(1, colorMaxStock);
                 }
                 const defaultSize = null;
-                onChange({ color: chosenColor, quantity: newQty, size: defaultSize });
+                const updatedSizeQuantities: Record<string, number> = {};
+                const chosenSizes = colorObj?.sizes || [];
+                chosenSizes.forEach((s: any) => {
+                  updatedSizeQuantities[s.size] = newQty;
+                });
+                onChange({ color: chosenColor, quantity: newQty, size: defaultSize, sizeQuantities: updatedSizeQuantities });
               }}
               className="w-full text-xs rounded border border-stroke bg-background p-1 text-foreground focus:outline-none cursor-pointer"
             >
@@ -943,18 +1016,22 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
             )}
           </div>
 
-          {selectedColorObj?.sizes && selectedColorObj.sizes.length > 0 && (
+          {sizeList.length > 0 && (
             <div className="mt-1">
-              <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("availableSizes", "Available Sizes:")}</span>
+              <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("sizesAndQuantities", "Sizes & Quantities:")}</span>
               <div className="flex flex-wrap gap-1">
-                {selectedColorObj.sizes.map((s) => (
-                  <span
-                    key={s.id}
-                    className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-foreground rounded border border-stroke"
-                  >
-                    {s.size}
-                  </span>
-                ))}
+                {sizeList.map((s) => {
+                  const szQty = item.sizeQuantities?.[s.size] ?? item.quantity;
+                  return (
+                    <span
+                      key={s.id || s.size}
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold bg-secondary/10 text-foreground rounded border border-stroke"
+                    >
+                      <span>{s.size}:</span>
+                      <span className="text-secondary font-bold">{szQty}</span>
+                    </span>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -983,7 +1060,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
               toast.error(`Quantity cannot exceed available stock (${maxStock}) for ${item.color || "this item"}`);
               validQty = maxStock;
             }
-            onChange({ quantity: validQty });
+            handleQuantityUpdate(validQty);
           }}
           className="w-16 mx-auto rounded border border-stroke bg-background px-2 py-1 text-center font-semibold text-foreground focus:outline-none"
         />
