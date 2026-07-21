@@ -6,15 +6,15 @@ export const asset = (file: string) =>
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 export type InventoryStatus = "Active" | "Low Stock" | "Out of Stock";
-export type ProductType = "product" | "wholesale";
+export type ProductType = "product" | "wholesale" | "retail" | "blank";
 
 export interface InventoryItem {
   id: string;
   image: string;
-  imagesByColor: { url: string; color?: string }[];
+  imagesByColor: { url: string; color?: string; direction?: string }[];
   product: string;
-  category: string;
-  categoryId: string;
+  categories: { id: string, name: string }[];
+  categoryIds: string[];
   stock: number;
   sku: string;
   price: string;
@@ -64,6 +64,12 @@ export function typePill(type: ProductType) {
   return type === "wholesale"
     ? { bg: "bg-blue-50", text: "text-blue-700", label: "Wholesale" }
     : { bg: "bg-violet-50", text: "text-violet-700", label: "Product" };
+}
+
+export function getColorVar(colorName: string | undefined): string {
+  if (!colorName) return "transparent";
+  const formatted = colorName.toLowerCase().replace(/\s+/g, '-');
+  return `var(--color-${formatted}, ${colorName.toLowerCase()})`;
 }
 
 // ─── Upload helper ─────────────────────────────────────────────────────────────

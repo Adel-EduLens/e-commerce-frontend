@@ -4,10 +4,9 @@ import { Star } from "../ui/star";
 import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
-import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check } from "lucide-react";
+import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check, Scissors } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/useCartStore";
-import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
@@ -17,6 +16,7 @@ import {
   isProductCompared,
 } from "../../utils/compareStorage";
 import { useState } from "react";
+import { Modal } from "../../components/ui/modal";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNotifyMeCheck, useNotifyMeSubscribe, useNotifyMeUnsubscribe } from "../../hooks/useNotifyMe";
 
@@ -62,7 +62,7 @@ export function ProductInfoPanel({
 }: ProductInfoPanelProps) {
   const navigate = useNavigate();
   const addItem = useCartStore((state) => state.addItem);
-  const addWholesaleItem = useWholesaleCartStore((state) => state.addItem);
+  const addWholesaleItem = useCartStore((state) => state.addItem);
   const queryClient = useQueryClient();
 
   const { data: wishlistStatus } = useWishlistStatus(productType, item.id);
@@ -96,6 +96,7 @@ export function ProductInfoPanel({
   const { t } = useTranslation("productDetails");
 
   const [isCompared, setIsCompared] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   useEffect(() => {
   const func=()=>{
@@ -183,15 +184,20 @@ export function ProductInfoPanel({
   }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale]);
 
   // Flash deal price calculation
+  const basePrice = 
+    isWholesale ? (rawProduct?.wholesalePrice ?? rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
+    isRetail ? (rawProduct?.retailPrice ?? rawProduct?.shopPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
+    (rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0);
+
   const hasFlashDeal =
     rawProduct?.isFlashDeals &&
     rawProduct?.flashDealPrice &&
-    rawProduct?.flashDealPrice < item.price;
+    rawProduct?.flashDealPrice < basePrice;
 
-  const activePrice = Number(hasFlashDeal ? rawProduct.flashDealPrice : item.price);
-  const oldPrice = hasFlashDeal ? item.price : null;
-  const discountPercent = hasFlashDeal
-    ? Math.round(((item.price - Number(rawProduct.flashDealPrice)) / item.price) * 100)
+  const activePrice = Number(hasFlashDeal ? rawProduct.flashDealPrice : basePrice);
+  const oldPrice = hasFlashDeal ? basePrice : null;
+  const discountPercent = hasFlashDeal && basePrice > 0
+    ? Math.round(((basePrice - Number(rawProduct.flashDealPrice)) / basePrice) * 100)
     : null;
 
   // Stock status styling
@@ -244,7 +250,7 @@ export function ProductInfoPanel({
     }
     
     const currentCartQty = isWholesale
-      ? useWholesaleCartStore.getState().items
+      ? useCartStore.getState().items
           .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
           .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items
@@ -263,26 +269,26 @@ export function ProductInfoPanel({
     
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
 
-    if (isWholesale && colorObj) {
+    if (isWholesale) {
       const sizesForSelectedColor = colorObj
         ? (colorObj.sizes || []).map((s: any) => s.size).join(", ")
-        : "";
+        : (item.sizes || []).map((s: any) => typeof s === "string" ? s : s.size).filter(Boolean).join(", ");
 
-      const cartItemId = `${item.id}-${selectedColor.toLowerCase()}-wholesale`;
+      const cartItemId = `${item.id}-${selectedColor ? selectedColor.toLowerCase() : "all"}-wholesale`;
 
-      addWholesaleItem({
+      addItem({
         id: cartItemId,
         productId: String(item.id),
         categoryId: item.category?.id ? String(item.category.id) : undefined,
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
-        size: sizesForSelectedColor,
-        color: selectedColor,
+        size: sizesForSelectedColor || "All Sizes",
+        color: selectedColor || "All Colors",
         colorHex: "",
         imageSrc:
           item.images.find(
-            (img) => img.color?.toLowerCase() === selectedColor.toLowerCase()
+            (img) => img.color && selectedColor && img.color.toLowerCase() === selectedColor.toLowerCase()
           )?.url || item.images[0]?.url || "",
         quantity,
         minOrder: minQty,
@@ -295,8 +301,8 @@ export function ProductInfoPanel({
       toast.success(
         t(quantity > 1 ? "addedToBagPlural" : "addedToBag", {
           count: quantity,
-          size: sizesForSelectedColor,
-          color: selectedColor,
+          size: sizesForSelectedColor || "All Sizes",
+          color: selectedColor || "All Colors",
         })
       );
     } else {
@@ -307,7 +313,7 @@ export function ProductInfoPanel({
       );
 
       addItem({
-        id: `${item.id}-${selectedSize}-${selectedColor}`,
+        id: `${item.id}-${selectedSize}-${selectedColor}-${productType === "SHOP" ? "STANDARD" : productType}`,
         productId: String(item.id),
         categoryId: item.category?.id ? String(item.category.id) : undefined,
         title: item.name,
@@ -319,7 +325,7 @@ export function ProductInfoPanel({
         imageSrc: matchingImage?.url || item.images[0]?.url || "",
         quantity,
         minOrder: item.minOrder || 1,
-        productType: "STANDARD",
+        productType: productType === "SHOP" ? "STANDARD" : productType,
       });
 
       toast.success(
@@ -356,7 +362,7 @@ export function ProductInfoPanel({
 
     // Calculate total quantity of this product in the wholesale cart after adding this item
     const currentCartQty = isWholesale
-      ? useWholesaleCartStore.getState().items
+      ? useCartStore.getState().items
           .filter((cartItem) => cartItem.productId === String(item.id))
           .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items
@@ -492,14 +498,6 @@ export function ProductInfoPanel({
                 </button>
               );
             })}
-            <button
-              type="button"
-              onClick={handleShare}
-              className="ml-auto text-xs text-gray-text hover:text-primary flex items-center gap-1"
-            >
-              <RiShareForwardLine className="h-4 w-4" />
-              {t("sizeGuide")}
-            </button>
           </div>
         </div>
       )}
@@ -507,8 +505,20 @@ export function ProductInfoPanel({
       {/* Sizes */}
       {colorVariants.length > 0 && (
         <div className="flex flex-col gap-2">
-          <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
-            {isWholesale ? t("availableSizes") : t("sizeLabel", { size: selectedSize })}
+          <div className="flex items-center justify-between">
+            <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
+              {isWholesale ? t("availableSizes") : t("sizeLabel", { size: selectedSize })}
+            </div>
+            {item.sizeguide && (
+              <button
+                type="button"
+                onClick={() => setShowSizeGuide(true)}
+                className="flex items-center gap-1 text-xs text-[#00a2e8] hover:text-[#0081b8] transition-colors"
+              >
+                <Scissors className="h-3 w-3" />
+                {t("sizeGuide")}
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
@@ -650,6 +660,15 @@ export function ProductInfoPanel({
           <span className="font-bold text-foreground">{t("freeReturns")}</span>
         </div>
       </div>
+      
+      {/* Size Guide Modal */}
+      {item.sizeguide && (
+        <Modal isOpen={showSizeGuide} onClose={() => setShowSizeGuide(false)} title={t("sizeGuide")}>
+          <div className="w-full flex items-center justify-center">
+            <img src={item.sizeguide} alt="Size Guide" className="max-w-full rounded-md object-contain" />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

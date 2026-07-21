@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAuthStore } from '../../store/useAuthStore'
 import { useRateProduct } from '../../hooks/useRateProduct'
-import { useAddRetailProductToCart } from '../../hooks/useCart'
+import { useAddProductToCart } from '../../hooks/useCart'
 import WishlistHeartButton from '../wishlist/WishlistHeartButton'
 import ProductRatingStars from '../rating/ProductRatingStars'
 
@@ -15,7 +15,7 @@ function toNumber(value: any) {
 
 export default function RetailProductCard({ product }: { product: RetailProduct }) {
   const navigate = useNavigate()
-  const addRetailProductToCart = useAddRetailProductToCart()
+  const addRetailProductToCart = useAddProductToCart()
   const productData = product as any
   const images = Array.isArray(productData.images) ? productData.images : []
   const colors = Array.isArray(productData.colors) ? productData.colors : []
@@ -24,7 +24,7 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
   const mainImage = images.find((image: any) => image?.isMain) ?? images[0]
   const imageUrl = mainImage?.url || 'https://via.placeholder.com/360x420?text=Product'
 
-  const priceNumber = toNumber(productData.price)
+  const priceNumber = toNumber(productData.retailPrice ?? productData.price)
   const discountNumber = productData.discountPrice !== null && productData.discountPrice !== undefined ? toNumber(productData.discountPrice) : undefined
   const unitPrice = discountNumber && discountNumber < priceNumber ? discountNumber : priceNumber
   const hasOptions = colors.length > 0 || sizes.length > 0
@@ -105,10 +105,11 @@ export default function RetailProductCard({ product }: { product: RetailProduct 
 
     addRetailProductToCart.mutate({
       apiPayload: {
-        retailProductId: product.id,
+        productId: product.id,
         quantity: 1,
-        retailColorId: colors[0]?.id,
-        retailSizeId: sizes[0]?.id,
+        colorId: colors[0]?.id,
+        sizeId: sizes[0]?.id,
+        productType: 'RETAIL'
       },
       cartItem,
     })

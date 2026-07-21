@@ -306,7 +306,7 @@ export function RecommedProducts({
                   productId={product.id}
                   title={product.name}
                   subtitle={product.description || "High-end product tailored for you"}
-                  price={`${product.price} ${t("egp")}`}
+                  price={`${product.shopPrice ?? product.wholesalePrice ?? product.retailPrice ?? product.blankPrice ?? product.price ?? 0} ${t("egp")}`}
                   imageSrc={imageSrc}
                   sizeLabel={sizeLabel}
                   colors={

@@ -58,6 +58,7 @@ export const useCreateReview = (productId: string) => {
     onSuccess: () => {
       // يعمل ريفريش لليست بعد الإضافة
       queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+      queryClient.invalidateQueries({ queryKey: ["product", productId] });
     },
   });
 };

@@ -1,50 +1,49 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
 
-export interface Wholesale {
+export interface WholesaleColorSize {
+  id: string;
+  size: string;
+}
+
+export interface WholesaleColor {
+  id: string;
+  color: string;
+  minOrder?: number;
+  stock?: number;
+  sizes: WholesaleColorSize[];
+}
+
+export interface WholesaleImage {
+  id: string;
+  url: string;
+  color?: string | null;
+}
+
+export interface WholesaleProduct {
   id: string;
   name: string;
-  description: string;
+  description?: string | null;
   price: number;
   minOrder: number;
   isBestDeal: boolean;
   isMostPopular: boolean;
   isPremiumCollection: boolean;
-  brand: string;
+  brand?: string | null;
   rating: number;
-  traderId: number;
-  categoryId: string;
-  createdAt: string;
-  updatedAt: string;
-  sku?: string;
-  stock?: number;
-
+  sku?: string | null;
+  stock: number;
   category: {
     id: string;
     name: string;
-    createdAt: string;
-    updatedAt: string;
   };
-
-  images: {
-    id: string;
-    url: string;
-    color?: string;
-    wholesaleId: string;
-  }[];
-  
-  wholesaleColors?: {
-    id: string;
-    color: string;
-    minOrder: number;
-    stock: number;
-    wholesaleId: string;
-    sizes: { id: string; size: string; wholesaleColorId: string }[];
-  }[];
-
+  images: WholesaleImage[];
+  wholesaleColors: WholesaleColor[];
+  createdAt: string;
+  updatedAt: string;
 }
 
-const getWholesale = async (id: string): Promise<Wholesale> => {
+const getWholesale = async (id: string): Promise<WholesaleProduct> => {
   const { data } = await api.get(`/wholesales/${id}`);
   return data.data;
 };
@@ -54,122 +53,5 @@ export const useWholesale = (id?: string) => {
     queryKey: ["wholesale", id],
     queryFn: () => getWholesale(id!),
     enabled: !!id,
-  });
-};
-
-const getWholesales = async (filters?: { search?: string; isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }): Promise<Wholesale[]> => {
-  const params: Record<string, string> = {};
-  if (filters?.search) params.search = filters.search;
-  if (filters?.isBestDeal !== undefined) params.isBestDeal = String(filters.isBestDeal);
-  if (filters?.isMostPopular !== undefined) params.isMostPopular = String(filters.isMostPopular);
-  if (filters?.isPremiumCollection !== undefined) params.isPremiumCollection = String(filters.isPremiumCollection);
-  if (filters?.categoryId) params.categoryId = filters.categoryId;
-  if (filters?.category) params.category = filters.category;
-  const { data } = await api.get("/wholesales", { params });
-  return data.data;
-};
-
-const getTraderWholesales = async (): Promise<Wholesale[]> => {
-  const { data } = await api.get("/wholesales/trader");
-  return data.data;
-};
-
-export const useWholesales = (filters?: { search?: string; isBestDeal?: boolean; isMostPopular?: boolean; isPremiumCollection?: boolean; categoryId?: string; category?: string }) => {
-  return useQuery({
-    queryKey: ["wholesales", filters],
-    queryFn: () => getWholesales(filters),
-  });
-};
-
-export const useTraderWholesales = () => {
-  return useQuery({
-    queryKey: ["trader-wholesales"],
-    queryFn: getTraderWholesales,
-  });
-};
-
-export interface WholesaleColorInput {
-  color: string;
-  minOrder: number;
-  stock: number;
-  sizes: { size: string }[];
-}
-
-export interface WholesaleFormData {
-  name: string;
-  description: string;
-  price: number;
-  minOrder: number;
-  brand: string;
-  categoryId: string;
-  isBestDeal: boolean;
-  isMostPopular: boolean;
-  isPremiumCollection: boolean;
-  images: { url: string; color?: string }[];
-  sku?: string;
-  stock?: number;
-  colors?: WholesaleColorInput[];
-  sizes?: string[];
-}
-
-const createWholesale = async (body: WholesaleFormData) => {
-  const { data } = await api.post("/wholesales", body);
-  return data.data;
-};
-export const useCreateWholesale = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: createWholesale,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
-      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
-    },
-  });
-};
-
-const updateWholesale = async ({ id, ...body }: WholesaleFormData & { id: string }) => {
-  const { data } = await api.patch(`/wholesales/${id}`, body);
-  return data.data;
-};
-export const useUpdateWholesale = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: updateWholesale,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
-      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
-    },
-  });
-};
-
-const deleteWholesale = async (id: string) => {
-  const { data } = await api.delete(`/wholesales/${id}`);
-  return data.data;
-};
-export const useDeleteWholesale = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteWholesale,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
-      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
-    },
-  });
-};
-
-const addWholesaleColor = async ({ wholesaleId, ...body }: { wholesaleId: string; color: string; stock: number; minOrder: number; sizes?: string[] }) => {
-  const { data } = await api.post(`/wholesales/${wholesaleId}/colors`, body);
-  return data.data;
-};
-
-export const useAddWholesaleColor = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: addWholesaleColor,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["trader-wholesales"] });
-      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
-      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
-    },
   });
 };

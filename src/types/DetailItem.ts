@@ -15,10 +15,10 @@ export type DetailItem = {
   minOrder?: number;
   stock?: number;
 
-  category?: {
+  categories?: {
     id: string | number;
     name: string;
-  };
+  }[];
 
   images: {
     id: string | number;

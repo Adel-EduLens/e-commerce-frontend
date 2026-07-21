@@ -10,7 +10,7 @@ export type Coupon = {
 };
 
 type CartItem = {
-  categoryId?: number | string | null;
+  categoryIds?: (number | string)[] | null;
   productId?: number | string | null;
   [key: string]: any;
 };
@@ -18,14 +18,14 @@ type CartItem = {
 export function couponAppliesToItem(coupon: Coupon, item: CartItem): boolean {
   if (!coupon) return false;
 
-  const itemCategoryId = item.categoryId;
+  const itemCategoryIds = item.categoryIds || [];
   const itemProductId = item.productId;
 
   if (!coupon.categoryId && !coupon.productId && !coupon.retailCategoryId && !coupon.retailProductId) return true;
   if (coupon.productId && String(itemProductId) === String(coupon.productId)) return true;
-  if (coupon.categoryId && String(itemCategoryId) === String(coupon.categoryId)) return true;
+  if (coupon.categoryId && itemCategoryIds.some(id => String(id) === String(coupon.categoryId))) return true;
   if (coupon.retailProductId && String(itemProductId) === String(coupon.retailProductId)) return true;
-  if (coupon.retailCategoryId && String(itemCategoryId) === String(coupon.retailCategoryId)) return true;
+  if (coupon.retailCategoryId && itemCategoryIds.some(id => String(id) === String(coupon.retailCategoryId))) return true;
 
   return false;
 }

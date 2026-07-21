@@ -22,6 +22,10 @@
     "noDescription": "لا يوجد وصف متاح.",
     "viewProduct": "عرض المنتج",
     "remove": "إزالة",
-    "noData": "—"
+    "noData": "—",
+    "typeShop": "المتجر",
+    "typeRetail": "تأجير",
+    "typeWholesale": "جملة",
+    "typeBlank": "أساسي"
   }
 }

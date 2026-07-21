@@ -5,9 +5,7 @@ import { useAuthStore } from "./useAuthStore";
 export type CartItem = {
   id: string;
   productId: string;
-  retailProductId?: string | number | null;
-  wholesaleProductId?: string | number | null;
-  categoryId?: string;
+  categoryIds?: string[];
   title: string;
   unitPrice: number;
   currency: "EGP";
@@ -44,7 +42,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
           currentItem.id === item.id ||
           (currentItem.productId === item.productId &&
             (currentItem.size || "") === (item.size || "") &&
-            (currentItem.color || "") === (item.color || ""))
+            (currentItem.color || "") === (item.color || "") &&
+            (currentItem.productType || "") === (item.productType || ""))
       );
 
       if (existingItem) {
@@ -69,30 +68,33 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     const isAuthenticated = useAuthStore.getState().isAuthenticated;
     if (isAuthenticated) {
       try {
-        const isRetail = item.id.includes('retail') || !isNaN(Number(item.productId));
-        let res;
-        if (isRetail) {
-          res = await cartApi.addRetailProductToCart({
-            retailProductId: item.productId,
-            quantity: item.quantity,
-            retailColorId: item.color,
-            retailSizeId: item.size,
-          });
-        } else {
-          res = await cartApi.addProductToCart({
-            productId: item.productId,
-            quantity: item.quantity,
-            colorId: item.color,
-            sizeId: item.size,
-          });
-        }
+        const res = await cartApi.addProductToCart({
+          productId: item.productId,
+          quantity: item.quantity,
+          colorId: item.color,
+          sizeId: item.size,
+          productType: item.productType,
+        });
+
+type CartDbItem = {
+  id: string;
+  productId: string;
+  categoryIds?: string[];
+  title: string;
+  price: number;
+  size?: string;
+  color?: string;
+  quantity: number;
+  image?: string;
+  productType?: "SHOP" | "RETAIL" | "WHOLESALE" | "BLANK";
+};
 
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: any) => ({
+            res.data.items.map((dbItem: CartDbItem) => ({
               id: dbItem.id,
               productId: dbItem.productId,
-              categoryId: dbItem.categoryId,
+              categoryIds: dbItem.categoryIds,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -123,10 +125,10 @@ export const useCartStore = create<CartStore>()((set, get) => ({
         const res = await cartApi.removeCartItem(itemId);
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: any) => ({
+            res.data.items.map((dbItem: import('../types/cart').ApiCartItem) => ({
               id: dbItem.id,
               productId: dbItem.productId,
-              categoryId: dbItem.categoryId,
+              categoryIds: dbItem.categoryIds,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -161,10 +163,10 @@ export const useCartStore = create<CartStore>()((set, get) => ({
         const res = await cartApi.updateCartItem(itemId, quantity);
         if (res && res.data && res.data.items) {
           get().setItems(
-            res.data.items.map((dbItem: any) => ({
+            res.data.items.map((dbItem: CartDbItem) => ({
               id: dbItem.id,
               productId: dbItem.productId,
-              categoryId: dbItem.categoryId,
+              categoryIds: dbItem.categoryIds,
               title: dbItem.title,
               unitPrice: dbItem.price,
               currency: "EGP",
@@ -234,6 +236,45 @@ export const useCartSubtotal = () =>
       0
     )
   );
+
+// Selectors for specific product types
+export const useWholesaleCartItems = () => {
+  const items = useCartStore((state) => state.items);
+  return items.filter((item) => item.productType === "WHOLESALE");
+};
+
+export const useWholesaleCartCount = () => {
+  const items = useCartStore((state) => state.items);
+  return items
+    .filter((item) => item.productType === "WHOLESALE")
+    .reduce((total, item) => total + item.quantity, 0);
+};
+
+export const useWholesaleCartSubtotal = () => {
+  const items = useCartStore((state) => state.items);
+  return items
+    .filter((item) => item.productType === "WHOLESALE")
+    .reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+};
+
+export const useRetailCartItems = () => {
+  const items = useCartStore((state) => state.items);
+  return items.filter((item) => item.productType !== "WHOLESALE");
+};
+
+export const useRetailCartCount = () => {
+  const items = useCartStore((state) => state.items);
+  return items
+    .filter((item) => item.productType !== "WHOLESALE")
+    .reduce((total, item) => total + item.quantity, 0);
+};
+
+export const useRetailCartSubtotal = () => {
+  const items = useCartStore((state) => state.items);
+  return items
+    .filter((item) => item.productType !== "WHOLESALE")
+    .reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+};
 
 // Clear cart items when user logs out
 useAuthStore.subscribe((state) => {

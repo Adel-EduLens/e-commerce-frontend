@@ -12,7 +12,7 @@ export interface BagProduct {
   imageUrl?: string;
   featured?: boolean;
   rating?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export type Product = BagProduct;

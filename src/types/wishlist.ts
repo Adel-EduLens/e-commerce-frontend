@@ -1,15 +1,12 @@
-export type WishlistProductType = 'RETAIL' | 'WHOLESALE' | 'SHOP'
+import type { Product } from './product'
+
+export type WishlistProductType = 'RETAIL' | 'WHOLESALE' | 'SHOP' | 'BLANK'
 
 export interface WishlistItem {
   id: number | string
   productType: WishlistProductType
-  retailProductId?: number | string | null
-  wholesaleProductId?: number | string | null
-  shopProductId?: number | string | null
-  retailProduct?: Record<string, any> | null
-  wholesaleProduct?: Record<string, any> | null
-  shopProduct?: Record<string, any> | null
-  product?: Record<string, any> | null
+  productId?: number | string | null
+  product?: Product | null
   createdAt?: string
 }
 
@@ -19,4 +16,4 @@ export interface WishlistStatusResponse {
   action?: string
 }
 
-export interface WishlistToggleResponse extends WishlistStatusResponse {}
+export type WishlistToggleResponse = WishlistStatusResponse;

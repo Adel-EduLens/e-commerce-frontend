@@ -14,7 +14,6 @@ import {
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useCartStore } from "../../store/useCartStore";
-import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
 
 
 const defaultImage = asset(
@@ -169,8 +168,8 @@ export default function ProductCard({
     productType === "RETAIL"
       ? `/retail/shop/${actualProductId}`
       : productType === "WHOLESALE"
-      ? `/wholesale/${actualProductId}`
-      : `/product-details/${actualProductId}`;
+        ? `/wholesale/${actualProductId}`
+        : `/product-details/${actualProductId}`;
 
   const targetTo = to && to !== "/product-details" ? to : computedTo;
 
@@ -184,28 +183,25 @@ export default function ProductCard({
   const addItem = useCartStore((s) => s.addItem);
   const removeItem = useCartStore((s) => s.removeItem);
 
-  const wholesaleCartItems = useWholesaleCartStore((s) => s.items);
-  const addWholesaleItem = useWholesaleCartStore((s) => s.addItem);
-  const removeWholesaleItem = useWholesaleCartStore((s) => s.removeItem);
-
   const isWholesale = productType === "WHOLESALE";
   const useWholesaleCard = isWholesale && wholesaleCard;
   const compareType: CompareProductType = productType ?? "SHOP";
 
   const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
-  const existingCartItem = isWholesale
-    ? wholesaleCartItems.find((item) =>
-        String(item.productId) === String(actualProductId) &&
-        (useWholesaleCard ? item.color.toLowerCase() === selectedColor.toLowerCase() : true)
-      )
-    : cartItems.find((item) => {
-        const matchId =
-          String(item.productId) === String(actualProductId) ||
-          String(item.retailProductId) === String(actualProductId) ||
-          String(item.wholesaleProductId) === String(actualProductId);
-        return matchId;
-      });
+  const existingCartItem = cartItems.find((item) => {
+    const matchId =
+      String(item.productId) === String(actualProductId) ||
+      String(item.id).startsWith(String(actualProductId));
+    if (isWholesale) {
+      return (
+        matchId &&
+        item.productType === "WHOLESALE" &&
+        (useWholesaleCard ? item.color?.toLowerCase() === selectedColor.toLowerCase() : true)
+      );
+    }
+    return matchId;
+  });
 
   const isInCart = Boolean(existingCartItem);
 
@@ -242,7 +238,7 @@ export default function ProductCard({
         setIsCompared(false);
         toast.success(t("removedFromCompareToast"));
       } else {
-        addCompareProduct(actualProductId,compareType);
+        addCompareProduct(actualProductId, compareType);
         setIsCompared(true);
         toast.success(t("addedToCompareToast"));
       }
@@ -256,11 +252,7 @@ export default function ProductCard({
     e.stopPropagation();
 
     if (existingCartItem) {
-      if (isWholesale) {
-        removeWholesaleItem(existingCartItem.id);
-      } else {
-        removeItem(existingCartItem.id);
-      }
+      removeItem(existingCartItem.id);
       toast.success(t("removedFromCartToast"));
     } else {
       if (stock !== undefined && stock <= 0) {
@@ -275,7 +267,7 @@ export default function ProductCard({
         const allSizesStr =
           wholesaleSizes.join(", ") || sizeLabel || "All Sizes";
 
-        addWholesaleItem({
+        addItem({
           id: `${actualProductId}-${selectedColor.toLowerCase()}-wholesale`,
           productId: actualProductId,
           title,
@@ -292,10 +284,10 @@ export default function ProductCard({
       } else {
         const firstSize = sizeLabel
           ? sizeLabel.includes("-")
-          ? sizeLabel.split("-")[0].trim()
-          : sizeLabel.includes(",")
-            ? sizeLabel.split(",")[0].trim()
-            : sizeLabel.trim()
+            ? sizeLabel.split("-")[0].trim()
+            : sizeLabel.includes(",")
+              ? sizeLabel.split(",")[0].trim()
+              : sizeLabel.trim()
           : "Default";
         const firstColor = safeColors.length > 0 ? safeColors[0] : "Default";
         const firstColorHex =
@@ -328,16 +320,14 @@ export default function ProductCard({
       {/* Image container */}
       <Link
         to={targetTo}
-        className={`relative block aspect-[4/5] w-full overflow-hidden ${
-          useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
-        }`}
+        className={`relative block aspect-[4/5] w-full overflow-hidden ${useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
+          }`}
       >
         <img
-          className={`h-full w-full object-cover ${
-            useWholesaleCard
-              ? "transition-transform duration-300 group-hover:scale-105"
-              : ""
-          }`}
+          className={`h-full w-full object-cover ${useWholesaleCard
+            ? "transition-transform duration-300 group-hover:scale-105"
+            : ""
+            }`}
           src={activeImage}
           alt={imageAlt ?? title}
           draggable={false}
@@ -358,9 +348,8 @@ export default function ProductCard({
           {/* Flash deal countdown badge */}
           {showFlashDeal && countdownLabel && (
             <div
-              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${
-                expired ? "bg-gray-text" : "bg-urgent"
-              }`}
+              className={`flex items-center gap-1 rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm ${expired ? "bg-gray-text" : "bg-urgent"
+                }`}
             >
               <svg
                 className="h-3 w-3 shrink-0"
@@ -401,24 +390,22 @@ export default function ProductCard({
               type="button"
               onClick={handleToggleWishlist}
               disabled={toggleWishlist.isPending}
-              className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${
-                useWholesaleCard
-                  ? "bg-white shadow-md"
-                  : "bg-black/60 backdrop-blur-sm"
-              }`}
+              className={`absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all hover:scale-105 disabled:opacity-70 ${useWholesaleCard
+                ? "bg-white shadow-md"
+                : "bg-black/60 backdrop-blur-sm"
+                }`}
             >
               <Heart
                 size={useWholesaleCard ? 18 : 20}
                 strokeWidth={useWholesaleCard ? 2 : 1.8}
-                className={`transition-colors ${
-                  useWholesaleCard
-                    ? isWishlisted
-                      ? "text-primary"
-                      : "text-[#555]"
-                    : isWishlisted
-                      ? "text-primary"
-                      : "text-gray-300"
-                }`}
+                className={`transition-colors ${useWholesaleCard
+                  ? isWishlisted
+                    ? "text-primary"
+                    : "text-[#555]"
+                  : isWishlisted
+                    ? "text-primary"
+                    : "text-gray-300"
+                  }`}
                 fill={isWishlisted ? "currentColor" : "none"}
               />
             </button>
@@ -428,11 +415,10 @@ export default function ProductCard({
               <button
                 onClick={handleCompare}
                 aria-label={isCompared ? "Remove from compare" : "Add to compare"}
-                className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${
-                  isCompared
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-black/60 text-gray-300 hover:text-white"
-                }`}
+                className={`absolute right-3 top-16 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-sm transition-all hover:scale-105 ${isCompared
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-black/60 text-gray-300 hover:text-white"
+                  }`}
               >
                 <MdCompare size={18} />
               </button>
@@ -452,15 +438,14 @@ export default function ProductCard({
                 e.stopPropagation();
                 setActiveImage(img.url);
               }}
-              className={`rounded-full ${
-                useWholesaleCard
-                  ? activeImage === img.url
-                    ? "h-1.5 w-4 bg-danger transition-all"
-                    : "h-1.5 w-1.5 bg-black/40 transition-all"
-                  : activeImage === img.url
-                    ? "h-2 w-2 bg-danger"
-                    : "h-2 w-2 bg-black"
-              }`}
+              className={`rounded-full ${useWholesaleCard
+                ? activeImage === img.url
+                  ? "h-1.5 w-4 bg-danger transition-all"
+                  : "h-1.5 w-1.5 bg-black/40 transition-all"
+                : activeImage === img.url
+                  ? "h-2 w-2 bg-danger"
+                  : "h-2 w-2 bg-black"
+                }`}
             />
           ))}
         </div>
@@ -543,15 +528,14 @@ export default function ProductCard({
                       }
                     }}
                     title={c}
-                    className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${
-                      useWholesaleCard
-                        ? isSelected
-                          ? "border-foreground scale-110"
-                          : "border-foreground/10 hover:border-gray-400"
-                        : isSelected
-                          ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
-                          : "hover:scale-105 border-foreground/50 border"
-                    }`}
+                    className={`${useWholesaleCard ? "h-5 w-5 border-2" : "h-6 w-6"} rounded-full cursor-pointer transition-all ${useWholesaleCard
+                      ? isSelected
+                        ? "border-foreground scale-110"
+                        : "border-foreground/10 hover:border-gray-400"
+                      : isSelected
+                        ? "ring-1 ring-gray-400 ring-offset-2 ring-offset-card scale-110"
+                        : "hover:scale-105 border-foreground/50 border"
+                      }`}
                     style={{
                       backgroundColor: colorToHex(c),
                     }}
@@ -567,11 +551,10 @@ export default function ProductCard({
 
           {sizeLabel && (
             <div
-              className={`rounded-full border ${
-                useWholesaleCard
-                  ? "ml-auto shrink-0 whitespace-nowrap border-gray-400 px-2.5 py-0.5 text-[10px] text-gray-500"
-                  : "border-gray-500 px-3 py-1 text-xs text-gray-400"
-              }`}
+              className={`rounded-full border ${useWholesaleCard
+                ? "ml-auto shrink-0 whitespace-nowrap border-gray-400 px-2.5 py-0.5 text-[10px] text-gray-500"
+                : "border-gray-500 px-3 py-1 text-xs text-gray-400"
+                }`}
             >
               {sizeLabel}
             </div>

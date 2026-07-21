@@ -2,13 +2,11 @@ type ProductsSectionProps = {
   title: string;
   navigateTo: string;
   query?: ProductsQuery;
-  productType?: "SHOP" | "RETAIL";
+  productType?: "SHOP" | "RETAIL" | "WHOLESALE";
 };
 import { useMemo, useState } from "react";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
-import { useRetailCategories } from "../../hooks/useRetailCategories";
 import { useBrands } from "../../hooks/queries/brandsQuery";
-import { useRetailBrands } from "../../hooks/queries/retailBrandQuery";
 import type { FilterValues } from "./CatalogFilters";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,30 +14,12 @@ import {
   transformProduct,
   type Product,
 } from "../../hooks/queries/productsQuery";
-import { useRetailProducts } from "../../hooks/useRetailProducts";
 import type { ProductsQuery } from "../../hooks/queries/productsQuery";
 import ProductCard from "../shared/ProductCard";
 import { ViewAllButton } from "../ui/ViewAllButton";
 import CatalogFilters from "./CatalogFilters";
 import { useTranslation } from "react-i18next";
 
-function normalizeProducts(res: unknown): Record<string, unknown>[] {
-  if (!res || typeof res !== 'object') return [];
-  const r = res as Record<string, unknown>;
-  if (Array.isArray(r)) return r;
-  if (Array.isArray(r.products)) return r.products as Record<string, unknown>[];
-  if (Array.isArray(r.retailProducts)) return r.retailProducts as Record<string, unknown>[];
-  if (Array.isArray(r.items)) return r.items as Record<string, unknown>[];
-  if (Array.isArray(r.data)) return r.data as Record<string, unknown>[];
-  
-  const rData = r.data as Record<string, unknown> | undefined;
-  if (rData) {
-    if (Array.isArray(rData.products)) return rData.products as Record<string, unknown>[];
-    if (Array.isArray(rData.retailProducts)) return rData.retailProducts as Record<string, unknown>[];
-    if (Array.isArray(rData.data)) return rData.data as Record<string, unknown>[];
-  }
-  return [];
-}
 
 export default function ProductsSection({
   title,
@@ -50,6 +30,7 @@ export default function ProductsSection({
   const { t } = useTranslation("productSection");
   const navigate = useNavigate();
   const isRetail = productType === "RETAIL";
+  const isWholesale = productType === "WHOLESALE";
 
   const [filterValues, setFilterValues] = useState<FilterValues>({
     search: "",
@@ -61,36 +42,11 @@ export default function ProductsSection({
     priceMax: null,
   });
 
-  const { data: standardCategories = [] } = useCategories(false, {
-    enabled: !isRetail,
-  });
-  const { data: retailCategoriesResponse } = useRetailCategories({
-    enabled: isRetail,
-  });
-  let categories: { id: string | number; name: string }[] = standardCategories as { id: string | number; name: string }[];
-  if (isRetail) {
-    if (Array.isArray(retailCategoriesResponse))
-      categories = retailCategoriesResponse;
-    else if (
-      retailCategoriesResponse?.data &&
-      Array.isArray(retailCategoriesResponse.data)
-    )
-      categories = retailCategoriesResponse.data;
-    else categories = [];
-  }
+  const { data: standardCategories = [] } = useCategories(isRetail ? "RETAIL" : undefined);
+  const categories: { id: string | number; name: string }[] = standardCategories as { id: string | number; name: string }[];
 
   const { data: standardBrands = [] } = useBrands();
-  const { data: retailBrandsResponse } = useRetailBrands(); // assumes it's globally enabled
-  let brands: { id: string | number; name: string }[] = standardBrands as { id: string | number; name: string }[];
-  if (isRetail) {
-    if (Array.isArray(retailBrandsResponse)) brands = retailBrandsResponse;
-    else if (
-      retailBrandsResponse?.data &&
-      Array.isArray(retailBrandsResponse.data)
-    )
-      brands = retailBrandsResponse.data;
-    else brands = [];
-  }
+  const brands: { id: string | number; name: string }[] = standardBrands as { id: string | number; name: string }[];
 
   const categoryId = useMemo(() => {
     if (!filterValues.category) return "";
@@ -108,7 +64,7 @@ export default function ProductsSection({
     return found ? String(found.id) : "0000000";
   }, [brands, filterValues.brand]);
 
-  const shopQueryFilters = {
+  const shopQueryFilters: ProductsQuery = {
     ...query,
     search: filterValues.search,
     categoryId,
@@ -118,24 +74,16 @@ export default function ProductsSection({
     priceMin: filterValues.priceMin ?? "",
     priceMax: filterValues.priceMax ?? "",
     limit: 4,
+    type: isRetail ? "RETAIL" : isWholesale ? "WHOLESALE" : "SHOP",
   };
 
   const {
     data: shopData,
-    isPending: isShopPending,
-    isError: isShopError,
-  } = useProducts(shopQueryFilters, { enabled: !isRetail });
-  const {
-    data: retailDataRaw,
-    isPending: isRetailPending,
-    isError: isRetailError,
-  } = useRetailProducts(shopQueryFilters as unknown as Record<string, string | number | boolean | null | undefined>, { enabled: isRetail });
+    isPending,
+    isError,
+  } = useProducts(shopQueryFilters);
 
-  const isPending = isRetail ? isRetailPending : isShopPending;
-  const isError = isRetail ? isRetailError : isShopError;
-  const products: Product[] = isRetail
-    ? normalizeProducts(retailDataRaw).map((p) => transformProduct(p))
-    : shopData?.products || [];
+  const products: Product[] = shopData?.products || [];
 
   const filters = useMemo(() => {
     const availableSizes = Array.from(
@@ -160,7 +108,7 @@ export default function ProductsSection({
     const availableCategories = Array.from(
       new Set(
         products
-          .map((p) => p.category?.name || (p.category as unknown as string))
+          .flatMap((p) => p.categories?.map((c) => c.name) || [])
           .filter((x): x is string => Boolean(x)),
       ),
     );
@@ -223,7 +171,7 @@ export default function ProductsSection({
                 productType={isRetail ? "RETAIL" : "SHOP"}
                 title={product.name}
                 subtitle={product.description}
-                price={`$${product.price}`}
+                price={`${isRetail ? product.retailPrice ?? product.price ?? 0 : isWholesale ? product.wholesalePrice ?? product.price ?? 0 : product.shopPrice ?? product.price ?? 0} EGP`}
                 imageSrc={
                   product.colors?.[0]?.images?.[0]?.imageUrl ||
                   product.colors?.[0]?.images?.[0]?.url ||
@@ -253,7 +201,7 @@ export default function ProductsSection({
                       ) || []
                 }
                 brand={product.brand?.name || (product.brand as unknown as string)}
-                category={product.category?.name || (product.category as unknown as string)}
+                category={product.categories?.map((c) => c.name).join(", ") || ""}
                 sizeLabel={Array.from(
                   new Set(
                     product.colors?.flatMap(
@@ -263,9 +211,9 @@ export default function ProductsSection({
                 ).join(" - ")}
                 featured={product.rating >= 4}
                 isMustHave={product.isMustHave}
-                isFlashDeals={product.isFlashDeals}
-                flashDealPrice={product.flashDealPrice}
-                flashDealEndsAt={product.flashDealEndsAt}
+                isFlashDeals={!isRetail && !isWholesale ? product.isFlashDeals : false}
+                flashDealPrice={!isRetail && !isWholesale ? product.flashDealPrice : undefined}
+                flashDealEndsAt={!isRetail && !isWholesale ? product.flashDealEndsAt : undefined}
                 rating={product.rating}
                 stock={product.stock}
                 to={

@@ -12,6 +12,7 @@ type SidebarFiltersProps = {
   onFilterChange?: (values: FilterValues) => void;
   availableSizes?: string[];
   isWholesale?: boolean;
+  isShop?: boolean;
   categories?: { id: string | number; name: string }[];
   brands?: { id: string | number; name: string }[];
 };
@@ -24,11 +25,14 @@ export default function SidebarFilters({
   onFilterChange,
   availableSizes,
   isWholesale,
+  isShop,
   categories: propCategories,
   brands: propBrands,
 }: SidebarFiltersProps) {
   const { t } = useTranslation("sidebarFilter");
-  const { data: defaultCategories = [] } = useCategories(isWholesale);
+  const { data: defaultCategories = [] } = useCategories(
+    isWholesale ? "WHOLESALE" : isShop ? "SHOP" : undefined
+  );
   const { data: defaultBrands = [] } = useBrands();
 
   const categories = propCategories || defaultCategories;

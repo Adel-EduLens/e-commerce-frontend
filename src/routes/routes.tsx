@@ -2,77 +2,76 @@ import { createBrowserRouter } from "react-router-dom";
 import StudentLayout from "../layouts/StudentLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import UserLayout from "../layouts/UserLayout";
-import HomePage from "../pages/HomePage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
-import MenCollectionPage from "../pages/MenCollectionPage";
-import BagPage from "../pages/BagPage";
-import WholesaleBagPage from "../pages/WholesaleBagPage";
-import ContactDetailsPage from "../pages/ContactDetailsPage";
-import NotificationsPage from "../pages/NotificationsPage";
-import NotifyMeListPage from "../pages/NotifyMeListPage";
-import SettingsPage from "../pages/SettingsPage";
-import AuthPage from "../pages/AuthPage";
-import WholesaleCheckoutPage from "../pages/WholesaleCheckoutPage";
+import HomePage from "../pages/shop/HomePage";
+import ProductDetailsPage from "../pages/shop/ProductDetailsPage";
+import MenCollectionPage from "../pages/shop/MenCollectionPage";
+import BagPage from "../pages/cart/BagPage";
+import WholesaleBagPage from "../pages/cart/WholesaleBagPage";
+import ContactDetailsPage from "../pages/user/ContactDetailsPage";
+import NotificationsPage from "../pages/user/NotificationsPage";
+import NotifyMeListPage from "../pages/user/NotifyMeListPage";
+import SettingsPage from "../pages/user/SettingsPage";
+import AuthPage from "../pages/auth/AuthPage";
+import WholesaleCheckoutPage from "../pages/cart/WholesaleCheckoutPage";
 
 
-import TraderDashboard from "../pages/dashboards/TraderDashboard";
-import TraderCustomersPage from "../pages/dashboards/TraderCustomersPage";
-import TraderOrdersPage from "../pages/dashboards/TraderOrdersPage";
-import TraderInventoryPage from "../pages/dashboards/TraderInventoryPage";
-import TraderFinancePage from "../pages/dashboards/TraderFinancePage";
-import TraderAnalyticsPage from "../pages/dashboards/TraderAnalyticsPage";
-import TraderDropshippingPage from "../pages/dashboards/TraderDropshippingPage";
-import TraderWholesalePage from "../pages/dashboards/TraderWholesalePage";
-import TraderBrandPartnersPage from "../pages/dashboards/TraderBrandPartnersPage";
-import TraderNotificationsPage from "../pages/dashboards/TraderNotificationsPage";
-import TraderStoreSettingsPage from "../pages/dashboards/TraderStoreSettingsPage";
-import TraderPreferencesPage from "../pages/dashboards/TraderPreferencesPage";
-import TraderRetailPage from "../pages/dashboards/TraderRetailPage";
+import TraderDashboard from "../pages/dashboards/trader/TraderDashboard";
+import TraderCustomersPage from "../pages/dashboards/trader/TraderCustomersPage";
+import TraderOrdersPage from "../pages/dashboards/trader/TraderOrdersPage";
+import TraderInventoryPage from "../pages/dashboards/trader/TraderInventoryPage";
+import TraderFinancePage from "../pages/dashboards/trader/TraderFinancePage";
+import TraderAnalyticsPage from "../pages/dashboards/trader/TraderAnalyticsPage";
+import TraderDropshippingPage from "../pages/dashboards/trader/TraderDropshippingPage";
+import TraderWholesalePage from "../pages/dashboards/trader/TraderWholesalePage";
+import TraderBrandPartnersPage from "../pages/dashboards/trader/TraderBrandPartnersPage";
+import TraderNotificationsPage from "../pages/dashboards/trader/TraderNotificationsPage";
+import TraderStoreSettingsPage from "../pages/dashboards/trader/TraderStoreSettingsPage";
+import TraderPreferencesPage from "../pages/dashboards/trader/TraderPreferencesPage";
+import TraderRetailPage from "../pages/dashboards/trader/TraderRetailPage";
 import TraderLayout from "../components/layout/TraderLayout";
-import TraderCouponsPage from "../pages/dashboards/TraderCouponsPage";
-import UserDashboard from "../pages/dashboards/UserDashboard";
-import RecentlyViewedPage from "../pages/RecentlyViewedPage";
-import MyOrdersPage from "../pages/MyOrdersPage";
-import HelpCenterPage from "../pages/HelpCenterPage";
-import WalletRewardsPage from "../pages/WalletRewardsPage";
-import CheckoutPage from "../pages/CheckoutPage";
-import DropshippingPage from "../pages/DropshippingPage";
-import FavoritesPage from "../pages/FavoritesPage";
-import WholesalePage from "../pages/WholesalePage";
-import WholesaleDetailsPage from "../pages/WholesaleDetailsPage";
-import DesignLabPage from "../pages/DesignLabPage";
+import TraderCouponsPage from "../pages/dashboards/trader/TraderCouponsPage";
+import UserDashboard from "../pages/dashboards/user/UserDashboard";
+import RecentlyViewedPage from "../pages/shop/RecentlyViewedPage";
+import MyOrdersPage from "../pages/user/MyOrdersPage";
+import HelpCenterPage from "../pages/help/HelpCenterPage";
+import WalletRewardsPage from "../pages/user/WalletRewardsPage";
+import CheckoutPage from "../pages/cart/CheckoutPage";
+import DropshippingPage from "../pages/dropshipping/DropshippingPage";
+import FavoritesPage from "../pages/shop/FavoritesPage";
+import WholesalePage from "../pages/wholesale/WholesalePage";
+import WholesaleDetailsPage from "../pages/wholesale/WholesaleDetailsPage";
+import DesignLabPage from "../pages/custom-design/DesignLabPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-import TestPage from "../pages/TestPage";
-import HelpCenterCategorie from "../pages/HelpCenterCategorie";
-import TraderDesignPage from "../pages/dashboards/TraderDesignPage";
-import TraderLoginPage from "../pages/TraderLoginPage";
+import TestPage from "../pages/dev/TestPage";
+import HelpCenterCategorie from "../pages/help/HelpCenterCategorie";
+import TraderDesignPage from "../pages/dashboards/trader/TraderDesignPage";
+import TraderLoginPage from "../pages/auth/TraderLoginPage";
 
-import ProductsPage from "../pages/ProductsPage";
-import RetailPage from "../pages/RetailPage";
-import RetailProductDetailsPage from "../pages/RetailProductDetailsPage";
+import ProductsPage from "../pages/shop/ProductsPage";
+import RetailPage from "../pages/retail/RetailPage";
+import RetailProductDetailsPage from "../pages/retail/RetailProductDetailsPage";
 
-import ComparePage from "../pages/ComparePage";
+import ComparePage from "../pages/shop/ComparePage";
 
-import TraderCategoriesPage from "../pages/dashboards/TraderCategoriesPage";
-import TraderWebsiteSettingsPage from "../pages/dashboards/TraderWebsiteSettingsPage";
+import TraderCategoriesPage from "../pages/dashboards/trader/TraderCategoriesPage";
+import TraderWebsiteSettingsPage from "../pages/dashboards/trader/TraderWebsiteSettingsPage";
 
-import CreateYourDesignPage from "../pages/CreateYourDesignPage";
-import CreateYourDesignDetailPage from "../pages/CreateYourDesignDetailPage";
+import CreateYourDesignPage from "../pages/custom-design/CreateYourDesignPage";
+import CreateYourDesignDetailPage from "../pages/custom-design/CreateYourDesignDetailPage";
 
-import TraderRetailCategoriesPage from "../pages/dashboards/TraderRetailCategoriesPage";
-import TraderRetailProductsPage from "../pages/dashboards/TraderRetailProductsPage";
-import TraderCollectionsPage from "../pages/dashboards/TraderCollectionsPage";
-import TraderBlankProductsPage from "../pages/dashboards/TraderBlankProductsPage";
-import RetailShopPage from "../pages/RetailShopPage";
+import TraderRetailProductsPage from "../pages/dashboards/trader/TraderRetailProductsPage";
+import TraderCollectionsPage from "../pages/dashboards/trader/TraderCollectionsPage";
+import TraderBlankProductsPage from "../pages/dashboards/trader/TraderBlankProductsPage";
+import RetailShopPage from "../pages/retail/RetailShopPage";
 
-import InfluencerLoginPage from "../pages/InfluencerLoginPage";
+import InfluencerLoginPage from "../pages/auth/InfluencerLoginPage";
 import InfluencerLayout from "../components/layout/InfluencerLayout";
-import InfluencerDashboard from "../pages/dashboards/InfluencerDashboard";
-import InfluencerCouponUsersPage from "../pages/dashboards/InfluencerCouponUsersPage";
-import InfluencerEarningsPage from "../pages/dashboards/InfluencerEarningsPage";
-import TraderInfluencersPage from "../pages/dashboards/TraderInfluencersPage";
-import TraderShopPage from "../pages/dashboards/TraderShopPage";
+import InfluencerDashboard from "../pages/dashboards/influencer/InfluencerDashboard";
+import InfluencerCouponUsersPage from "../pages/dashboards/influencer/InfluencerCouponUsersPage";
+import InfluencerEarningsPage from "../pages/dashboards/influencer/InfluencerEarningsPage";
+import TraderInfluencersPage from "../pages/dashboards/trader/TraderInfluencersPage";
+import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -310,10 +309,6 @@ export const router = createBrowserRouter([
           {
             path: "faqs",
             element: <TraderWebsiteSettingsPage defaultTab="faqs" />,
-          },
-          {
-            path: "retailCategories",
-            element: <TraderRetailCategoriesPage />,
           },
           {
             path: "retailProducts",

@@ -9,31 +9,34 @@ export interface Category {
   image?: string;
   appearOnHome: boolean;
   isWholesale?: boolean;
+  isRetail?: boolean;
+  isShop?: boolean;
+  type?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type CategoryFilter = boolean | "all" | undefined;
+export type CategoryFilter = string | "all" | undefined;
 
-const getCategories = async (isWholesale?: CategoryFilter): Promise<Category[]> => {
+const getCategories = async (typeFilter?: CategoryFilter): Promise<Category[]> => {
   const { data } = await api.get("/categories", {
     params:
-      isWholesale === "all"
+      typeFilter === "all"
         ? { all: true }
-        : isWholesale !== undefined
-          ? { isWholesale }
+        : typeFilter !== undefined
+          ? { type: typeFilter }
           : undefined,
   });
   return data.data;
 };
 
 export const useCategories = (
-  isWholesale?: CategoryFilter,
-  options?: Omit<UseQueryOptions<Category[], Error, Category[], (string | boolean | undefined)[]>, "queryKey" | "queryFn">
+  typeFilter?: CategoryFilter,
+  options?: Omit<UseQueryOptions<Category[], Error, Category[], (string | undefined)[]>, "queryKey" | "queryFn">
 ): UseQueryResult<Category[], Error> => {
   return useQuery({
-    queryKey: ["categories", isWholesale],
-    queryFn: () => getCategories(isWholesale),
+    queryKey: ["categories", typeFilter],
+    queryFn: () => getCategories(typeFilter),
     ...options
   });
 };
@@ -43,6 +46,9 @@ const createCategory = async (data: {
   image?: string;
   appearOnHome: boolean;
   isWholesale?: boolean;
+  isRetail?: boolean;
+  isShop?: boolean;
+  type?: string;
 }) => {
   const res = await api.post("/categories", data);
   return res.data.data;
@@ -79,6 +85,9 @@ const updateCategory = async ({
     image?: string;
     appearOnHome?: boolean;
     isWholesale?: boolean;
+    isRetail?: boolean;
+    isShop?: boolean;
+    type?: string;
   };
 }) => {
   const res = await api.patch(`/categories/${id}`, data);
