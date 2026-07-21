@@ -413,7 +413,7 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
                   {activeMetric === "revenue" ? t("revenueLabel", "Revenue") : t("ordersLabel", "Orders")}:
                 </span>
                 <span className="text-sm font-bold text-foreground">
-                  {activeMetric === "revenue" ? `EGP ${activePoint.value.toLocaleString()}` : `${activePoint.orders}`}
+                  {activeMetric === "revenue" ? `${t("currencyEGP", "EGP")} ${activePoint.value.toLocaleString()}` : `${activePoint.orders}`}
                 </span>
               </div>
               {activeMetric === "revenue" && (
@@ -450,7 +450,7 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
             {t("totalPeriodVal", activeMetric === "revenue" ? "Total Revenue" : "Total Volume")}
           </span>
           <span className="text-sm sm:text-base font-bold text-foreground mt-0.5">
-            {activeMetric === "revenue" ? `EGP ${totalPeriodValue.toLocaleString()}` : `${totalPeriodValue.toLocaleString()} Orders`}
+            {activeMetric === "revenue" ? `${t("currencyEGP", "EGP")} ${totalPeriodValue.toLocaleString()}` : `${totalPeriodValue.toLocaleString()} ${t("ordersCountUnit", "Orders")}`}
           </span>
         </div>
         <div className="flex flex-col border-l border-stroke pl-3">
@@ -460,7 +460,7 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
           <span className="text-sm sm:text-base font-bold text-foreground mt-0.5 flex items-center gap-1.5">
             {peakPoint.month}
             <span className="text-xs font-semibold text-secondary">
-              ({activeMetric === "revenue" ? `EGP ${peakPoint.value.toLocaleString()}` : `${peakPoint.orders}`})
+              ({activeMetric === "revenue" ? `${t("currencyEGP", "EGP")} ${peakPoint.value.toLocaleString()}` : `${peakPoint.orders}`})
             </span>
           </span>
         </div>
@@ -710,6 +710,7 @@ interface EditableOrderItemRowProps {
 }
 
 function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onDelete, onAddColorRow }: EditableOrderItemRowProps) {
+  const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
   const selectedColorObj = product?.wholesaleColors?.find(
@@ -740,12 +741,12 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
         <div className="flex justify-center gap-2 mt-1">
           {item.size && (
             <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
-              Size: {item.size}
+              {t("sizeLabel", "Size:")} {item.size}
             </span>
           )}
           {item.color && (
             <span className="inline-block px-1.5 py-0.5 text-[10px] font-semibold bg-background text-gray-text rounded border border-stroke">
-              Color: {item.color}
+              {t("colorLabel", "Color:")} {item.color}
             </span>
           )}
         </div>
@@ -757,7 +758,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
               onClick={onDelete}
               className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 hover:underline cursor-pointer"
             >
-              <Trash2 className="h-3 w-3" /> Delete Color
+              <Trash2 className="h-3 w-3" /> {t("deleteColor", "Delete Color")}
             </button>
           </div>
         )}
@@ -783,7 +784,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
             />
             {maxStock !== Infinity && (
               <div className="text-[10px] font-semibold text-gray-text mt-1">
-                Stock: {currentWarehouseStock}
+                {t("stockLabel", "Stock:")} {currentWarehouseStock}
               </div>
             )}
           </div>
@@ -836,6 +837,7 @@ interface NewOrderItemRowProps {
 }
 
 function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemRowProps) {
+  const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
   const availableColors = useMemo(() => {
@@ -865,12 +867,12 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
       </td>
       <td className="px-4 py-4 text-center font-['Montserrat']">
         <div className="font-bold text-foreground text-sm">
-          {item.product} <span className="text-xs font-semibold text-secondary">(New Color Row)</span>
+          {item.product} <span className="text-xs font-semibold text-secondary">{t("newColorRow", "(New Color Row)")}</span>
         </div>
 
         <div className="mt-2 max-w-[160px] mx-auto text-left space-y-2">
           <div>
-            <label className="text-[9px] font-bold text-gray-text block uppercase mb-1">Select Color</label>
+            <label className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("selectColor", "Select Color")}</label>
             <select
               value={item.color || ""}
               onChange={(e) => {
@@ -887,23 +889,23 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
               }}
               className="w-full text-xs rounded border border-stroke bg-background p-1 text-foreground focus:outline-none cursor-pointer"
             >
-              <option value="">Select Color</option>
+              <option value="">{t("selectColor", "Select Color")}</option>
               {availableColors.map((c) => (
                 <option key={c.id} value={c.color} disabled={c.stock <= 0}>
-                  {c.color} {c.stock <= 0 ? "(Out of stock)" : `(Stock: ${c.stock})`}
+                  {c.color} {c.stock <= 0 ? t("outOfStock", "(Out of stock)") : `(${t("stockLabel", "Stock:")} ${c.stock})`}
                 </option>
               ))}
             </select>
             {availableColors.length === 0 && (
               <span className="text-[10px] font-semibold text-rose-500 block mt-1">
-                No more available colors for this product
+                {t("noMoreColors", "No more available colors for this product")}
               </span>
             )}
           </div>
 
           {selectedColorObj?.sizes && selectedColorObj.sizes.length > 0 && (
             <div className="mt-1">
-              <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">Available Sizes:</span>
+              <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("availableSizes", "Available Sizes:")}</span>
               <div className="flex flex-wrap gap-1">
                 {selectedColorObj.sizes.map((s) => (
                   <span
@@ -924,7 +926,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
             onClick={onRemove}
             className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600 hover:underline cursor-pointer"
           >
-            <Trash2 className="h-3 w-3" /> Remove
+            <Trash2 className="h-3 w-3" /> {t("remove", "Remove")}
           </button>
         </div>
       </td>
@@ -947,7 +949,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
         />
         {maxStock !== Infinity && (
           <div className={`text-[10px] font-semibold mt-1 ${maxStock === 0 ? "text-rose-600" : "text-gray-text"}`}>
-            Stock: {maxStock}
+            {t("stockLabel", "Stock:")} {maxStock}
           </div>
         )}
       </td>
@@ -1213,7 +1215,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
                   onClick={() => handleAddColorRow()}
                   className="rounded-xl border border-secondary bg-secondary/15 px-4 py-2 font-['Montserrat'] text-xs font-bold text-secondary transition hover:bg-secondary/25 cursor-pointer"
                 >
-                  <Plus className="h-3 w-3 inline mr-1" /> Add Color Row
+                  <Plus className="h-3 w-3 inline mr-1" /> {t("addColorRow", "Add Color Row")}
                 </button>
                 <button
                   type="button"
@@ -1419,14 +1421,14 @@ export default function TraderWholesalePage() {
   const statCards = [
     {
       label: "totalWholesaleOrders",
-      value: `${totalOrdersCount} Orders`,
+      value: `${totalOrdersCount} ${t("ordersCountUnit", "Orders")}`,
       trend: "100%",
       trendUp: true,
       sub: "allTimeReceived",
     },
     {
       label: "totalWholesaleRevenue",
-      value: `EGP ${totalRevenue.toLocaleString()}`,
+      value: `${t("currencyEGP", "EGP")} ${totalRevenue.toLocaleString()}`,
       trend: "100%",
       trendUp: true,
       sub: "fromAllOrders",

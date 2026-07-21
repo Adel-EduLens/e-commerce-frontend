@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../store/useAuthStore";
 import { useAddSignalMutation } from "../hooks/queries/recommendQuery";
 import { useWholesale } from "../hooks/queries/wholesaleQuery";
+import { useAddRecentlyViewed } from "../hooks/useRecentlyViewed";
 import { ProductGallery } from "../components/product/ProductGallery";
 import { ProductInfoPanel } from "../components/product/ProductInfoPanel";
 import { RecommedProducts } from "../components/product/recommedProducts";
@@ -17,6 +18,7 @@ export default function WholesaleDetailsPage() {
   const { user, isAuthenticated } = useAuthStore();
   const { data: wholesale, isPending, isError } = useWholesale(id);
   const { mutate: addSignal } = useAddSignalMutation();
+  const { mutate: addRecentlyViewed } = useAddRecentlyViewed();
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
@@ -28,6 +30,13 @@ export default function WholesaleDetailsPage() {
       navigate("/login");
     }
   }, [isAuthenticated, user, navigate]);
+
+  // Track recently viewed wholesale product
+  useEffect(() => {
+    if (wholesale && wholesale.id) {
+      addRecentlyViewed({ productType: "WHOLESALE", productId: wholesale.id });
+    }
+  }, [wholesale, wholesale?.id, addRecentlyViewed]);
 
   // Initialize selected values on wholesale product load
   useEffect(() => {

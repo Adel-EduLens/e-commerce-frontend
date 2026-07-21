@@ -165,6 +165,15 @@ export default function ProductCard({
     title ||
     "unknown-id";
 
+  const computedTo =
+    productType === "RETAIL"
+      ? `/retail/shop/${actualProductId}`
+      : productType === "WHOLESALE"
+      ? `/wholesale/${actualProductId}`
+      : `/product-details/${actualProductId}`;
+
+  const targetTo = to && to !== "/product-details" ? to : computedTo;
+
   const { data: wishlistStatus } = useWishlistStatus(
     productType,
     actualProductId,
@@ -318,7 +327,7 @@ export default function ProductCard({
     >
       {/* Image container */}
       <Link
-        to={to}
+        to={targetTo}
         className={`relative block aspect-[4/5] w-full overflow-hidden ${
           useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
         }`}
@@ -484,7 +493,7 @@ export default function ProductCard({
 
         {/* Title */}
         <Link
-          to={to}
+          to={targetTo}
           className={`${useWholesaleCard ? "text-base font-semibold leading-snug" : "text-xl sm:text-2xl font-medium"} text-card-text hover:underline line-clamp-1`}
         >
           {title}

@@ -92,7 +92,7 @@ const sidebarItems = [
     path: "/dashboard/trader/designs",
   },
   {
-    label: "Website Settings",
+    label: "websiteSettings",
     icon: "solar_settings-linear.svg",
     path: "/dashboard/trader/website-settings",
   },
@@ -185,7 +185,7 @@ export default function TraderLayout() {
                     <img
                       className="h-12 w-12 rounded-full object-cover ring-2 ring-stroke dark:ring-white/10"
                       src={avatar}
-                      alt={user?.name || "Trader"}
+                      alt={user?.name || t("traderRole")}
                     />
                   ) : (
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-white/10 ring-2 ring-stroke dark:ring-white/10">
@@ -243,7 +243,7 @@ export default function TraderLayout() {
                 <img
                   className="h-12 w-12 rounded-full object-cover"
                   src={avatar}
-                  alt="Profile"
+                  alt={t("profile")}
                 />
               ) : (
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-stroke bg-gray-100">

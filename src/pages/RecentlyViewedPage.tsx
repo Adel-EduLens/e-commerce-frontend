@@ -33,16 +33,55 @@ export default function RecentlyViewedPage() {
           {products.map((p: any) => {
             const item = p.product;
             if (!item) return null;
+            const isWholesale = p.productType === 'WHOLESALE';
+            const wholesaleColors = item.wholesaleColors || [];
+            const wholesaleSizes: string[] = Array.from(
+              new Set(wholesaleColors.flatMap((wc: any) => wc.sizes?.map((s: any) => s.size) ?? []))
+            );
+            const imageSrc =
+              (Array.isArray(item.images) && item.images.length > 0
+                ? typeof item.images[0] === 'string'
+                  ? item.images[0]
+                  : item.images[0]?.url || item.images[0]?.imageUrl
+                : undefined) ||
+              item.colors?.[0]?.images?.[0]?.imageUrl ||
+              item.colors?.[0]?.images?.[0]?.url ||
+              item.colors?.[0]?.imageUrl ||
+              item.imageUrl ||
+              item.image;
+
+            const sizeLabel =
+              wholesaleSizes.length > 0
+                ? wholesaleSizes.slice(0, 4).join('-')
+                : item.sizes?.[0]?.size ||
+                  item.sizes?.[0]?.name ||
+                  Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(' - ');
+
+            const targetUrl =
+              p.productType === 'RETAIL'
+                ? `/retail/shop/${item.id}`
+                : isWholesale
+                ? `/wholesale/${item.id}`
+                : `/product-details/${item.id}`;
+
             return (
               <ProductCard
                 key={p.id}
                 productId={item.id}
-                to={p.productType === 'RETAIL' ? `/retail/${item.slug || item.id}` : p.productType === 'WHOLESALE' ? `/wholesale/${item.id}` : `/products/${item.id}`}
+                productType={p.productType}
+                to={targetUrl}
                 title={item.name}
-                price={`$${Number(item.price).toFixed(2)}`}
-                imageSrc={item.colors?.[0]?.images?.[0]?.imageUrl || item.colors?.[0]?.images?.[0]?.url || item.images?.[0]?.url || item.images?.[0]}
-                sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name || Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ")}
-                rating={item.rating || item.averageRating}
+                price={`${item.price !== undefined ? Number(item.price).toFixed(2) : '0.00'} EGP`}
+                imageSrc={imageSrc}
+                images={item.images}
+                sizeLabel={sizeLabel}
+                rating={item.rating || item.averageRating || 0}
+                brand={item.brand?.name || item.brand}
+                category={item.category?.name}
+                wholesaleCard={isWholesale}
+                wholesaleSizes={wholesaleSizes}
+                colors={isWholesale ? wholesaleColors.map((wc: any) => wc.color) : item.colors?.map((c: any) => c.colorName || c.color)}
+                minOrder={item.minOrder}
               />
             );
           })}
