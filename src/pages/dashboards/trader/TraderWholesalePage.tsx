@@ -1524,8 +1524,9 @@ export default function TraderWholesalePage() {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder((prev) => prev ? { ...prev, status } : null);
       }
-    } catch {
-      toast.error(t("statusUpdateError", "Failed to update order status"));
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || t("statusUpdateError", "Failed to update order status");
+      toast.error(errMsg);
     }
   };
 
@@ -1545,8 +1546,9 @@ export default function TraderWholesalePage() {
       const updated = await updateOrderMutation.mutateAsync({ orderId, items, deletedItemIds });
       toast.success(t("orderUpdateSuccess", "Order items updated successfully"));
       setSelectedOrder(updated);
-    } catch {
-      toast.error(t("orderUpdateError", "Failed to update order items"));
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || t("orderUpdateError", "Failed to update order items");
+      toast.error(errMsg);
     }
   };
 
@@ -1555,8 +1557,9 @@ export default function TraderWholesalePage() {
       await deleteOrderMutation.mutateAsync(orderId);
       toast.success(t("deleteSuccess", "Order deleted successfully"));
       setSelectedOrder(null);
-    } catch {
-      toast.error(t("deleteError", "Failed to delete order"));
+    } catch (err: any) {
+      const errMsg = err.response?.data?.message || err.message || t("deleteError", "Failed to delete order");
+      toast.error(errMsg);
     }
   };
 

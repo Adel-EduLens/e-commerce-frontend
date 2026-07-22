@@ -127,7 +127,7 @@ export function ProductInfoPanel({
   // Retail products have a flat `sizes` array with quantity per size+color combo,
   // whereas shop products nest variants under each color object.
   const colorVariants = isWholesale
-    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: colorObj?.stock ?? 0 }))
+    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: s.quantity ?? colorObj?.stock ?? 0 }))
     : isRetail
     ? ((rawProduct?.sizes || []) as any[]).filter(
         (s: any) => !s.color || !selectedColor || s.color.toLowerCase() === selectedColor.toLowerCase()
