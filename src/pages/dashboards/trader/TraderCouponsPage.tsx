@@ -144,14 +144,14 @@ export default function TraderCouponsPage() {
   const { t } = useTranslation("traderCoupons");
   const queryClient = useQueryClient();
   const { data: coupons = [], isLoading: isLoadingCoupons } = useCoupons();
-  const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+  const { data: categories = [], isLoading: isLoadingCategories } = useCategories("all");
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 100 });
 
   const products = productsData?.products || [];
 
-  const categoryOptions = [
-    ...categories.map(c => ({ id: String(c.id), name: c.name }))
-  ];
+  const categoryOptions = categories
+    .filter((c) => !c.isWholesale)
+    .map((c) => ({ id: String(c.id), name: c.name }));
 
   const productOptions = [
     ...products.map(p => ({ id: String(p.id), name: p.name }))

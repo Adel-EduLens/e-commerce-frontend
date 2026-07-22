@@ -280,7 +280,9 @@ export function ProductInfoPanel({
       useWholesaleCartStore.getState().addItem({
         id: cartItemId,
         productId: String(item.id),
-        categoryId: item.category?.id ? String(item.category.id) : undefined,
+        categoryId: item.category?.id ? String(item.category.id) : (item.categories?.[0]?.id ? String(item.categories[0].id) : undefined),
+        category: item.category || item.categories?.[0] || undefined,
+        categories: item.categories || (item.category ? [item.category] : undefined),
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",
@@ -316,7 +318,9 @@ export function ProductInfoPanel({
       addItem({
         id: `${item.id}-${selectedSize}-${selectedColor}-${productType === "SHOP" ? "STANDARD" : productType}`,
         productId: String(item.id),
-        categoryId: item.category?.id ? String(item.category.id) : undefined,
+        categoryId: item.category?.id ? String(item.category.id) : (item.categories?.[0]?.id ? String(item.categories[0].id) : undefined),
+        category: item.category || item.categories?.[0] || undefined,
+        categories: item.categories || (item.category ? [item.category] : undefined),
         title: item.name,
         unitPrice: activePrice,
         currency: "EGP",

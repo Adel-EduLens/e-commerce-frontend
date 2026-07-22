@@ -213,13 +213,8 @@ function OrderSummary({
             return;
           }
 
-          const { data: useData } = await api.post<{ data: Coupon }>(
-            `/coupons/use/${coupon.code}`
-          );
-          const updatedCoupon = useData?.data || coupon;
-
-          setAppliedCoupon(updatedCoupon);
-          toast.success(`Coupon "${updatedCoupon.code}" applied!`);
+          setAppliedCoupon(coupon);
+          toast.success(`Coupon "${coupon.code}" applied!`);
         }
       } else {
         setCouponError("Invalid coupon code");
