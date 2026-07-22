@@ -492,6 +492,11 @@ export default function WholesaleCheckoutPage() {
   const handlePlaceOrder = async () => {
     if (isSubmitting) return;
 
+    if (items.length === 0) {
+      toast.error("Your wholesale bag is empty");
+      return;
+    }
+
     if (!formData.firstName || !formData.lastName || !formData.phone || !formData.email) {
       toast.error("Please fill in all required contact details");
       return;
@@ -541,7 +546,7 @@ export default function WholesaleCheckoutPage() {
       toast.success("Wholesale order placed successfully!");
       navigate("/my-orders");
     } catch (err: any) {
-      const errMsg = err.response?.data?.message || "An error occurred during checkout";
+      const errMsg = err.response?.data?.message || err.message || "An error occurred during checkout";
       toast.error(errMsg);
     } finally {
       setIsSubmitting(false);

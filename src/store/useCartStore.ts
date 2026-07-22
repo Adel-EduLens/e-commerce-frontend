@@ -7,6 +7,8 @@ export type CartItem = {
   productId: string;
   categoryId?: string;
   categoryIds?: string[];
+  category?: { id?: string | number; name?: string } | null;
+  categories?: ({ id?: string | number; name?: string } | string | number)[] | null;
   title: string;
   unitPrice: number;
   currency: "EGP";

@@ -388,7 +388,9 @@ export function AddItemModal({
       const colorsData = await Promise.all(
         productColors.map(async (pc) => {
           const urls = await Promise.all(pc.images.map(uploadImageFile));
-          const colorStock = pc.stock ?? pc.variants.reduce((s, v) => s + v.quantity, 0);
+          const colorStock = pc.variants && pc.variants.length > 0
+            ? pc.variants.reduce((s, v) => s + v.quantity, 0)
+            : (pc.stock ?? 0);
           return {
             color: pc.color,
             minOrder: type === "wholesale" ? (Number(minOrder) || 1) : 1,
@@ -562,13 +564,12 @@ export function AddItemModal({
               readOnly
               disabled
               value={
-                type === "wholesale"
-                  ? productColors.reduce((sum, c) => sum + (c.stock ?? 0), 0) || ""
-                  : productColors.reduce(
-                    (sum, c) =>
-                      sum + c.variants.reduce((s, v) => s + v.quantity, 0),
-                    0,
-                  ) || ""
+                productColors.reduce((sum, c) => {
+                  const colorStock = c.variants && c.variants.length > 0
+                    ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                    : (c.stock ?? 0);
+                  return sum + colorStock;
+                }, 0) || ""
               }
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
             />
@@ -1396,7 +1397,9 @@ export function EditItemModal({
             return {
               color: wc.color,
               minOrder: Number(minOrder) || 1,
-              stock: wc.stock ?? 0,
+              stock: wc.variants && wc.variants.length > 0
+                ? wc.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                : (wc.stock ?? 0),
               images: updatedImages,
               sizes: wc.variants.map((v) => ({ size: v.size, quantity: v.quantity ?? 0 })),
             };
@@ -1537,16 +1540,20 @@ export function EditItemModal({
                 item.type === "wholesale"
                   ? wholesaleLoading
                     ? "Loading..."
-                    : (wholesaleColorsState || []).reduce((sum, c) => sum + (c.stock ?? 0), 0) || ""
+                    : (wholesaleColorsState || []).reduce((sum, c) => {
+                        const colorStock = c.variants && c.variants.length > 0
+                          ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                          : (c.stock ?? 0);
+                        return sum + colorStock;
+                      }, 0) || ""
                   : productLoading
                     ? "Loading..."
-                    : product?.colors?.reduce(
-                      (sum, c) =>
-                        sum +
-                        (c.variants?.reduce((s, v) => s + v.quantity, 0) ??
-                          0),
-                      0,
-                    ) || ""
+                    : product?.colors?.reduce((sum, c) => {
+                        const colorStock = c.variants && c.variants.length > 0
+                          ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                          : (c.stock ?? 0);
+                        return sum + colorStock;
+                      }, 0) || ""
               }
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
             />

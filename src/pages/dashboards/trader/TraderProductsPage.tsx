@@ -25,7 +25,16 @@ export default function TraderProductsPage({ onEdit }: { onEdit: (item: Inventor
       }))
     ) ?? [];
 
-    const totalStock = p.stock ?? 0;
+    const calculatedColorStock = p.colors?.reduce((sum, c) => {
+      const colorStock = (c.variants && c.variants.length > 0)
+        ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+        : (c.stock ?? 0);
+      return sum + colorStock;
+    }, 0);
+
+    const totalStock = (p.colors && p.colors.length > 0 && calculatedColorStock !== undefined)
+      ? calculatedColorStock
+      : (p.stock ?? 0);
 
     const uniqueSizes = Array.from(new Set(p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ?? []));
     const uniqueColors = Array.from(new Set(p.colors?.map((c) => c.colorName) ?? []));

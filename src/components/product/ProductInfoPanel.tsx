@@ -535,12 +535,12 @@ export function ProductInfoPanel({
                   disabled={!isWholesale && isOutOfStock}
                   onClick={() => !isWholesale && setSelectedSize(variant.size)}
                   className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${isWholesale
-                      ? "bg-card text-foreground border-stroke cursor-default"
-                      : isSelected
-                        ? "bg-foreground text-background border-foreground"
-                        : isOutOfStock
-                          ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
-                          : "bg-card text-foreground border-stroke hover:border-gray-text"
+                    ? "bg-card text-foreground border-stroke cursor-default"
+                    : isSelected
+                      ? "bg-foreground text-background border-foreground"
+                      : isOutOfStock
+                        ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
+                        : "bg-card text-foreground border-stroke hover:border-gray-text"
                     }`}
                 >
                   {variant.size}
@@ -629,8 +629,8 @@ export function ProductInfoPanel({
             onClick={externalNotifyMe ?? handleNotifyMeToggle}
             disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
             className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${(isNotifySubscribed ?? isSubscribed)
-                ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-                : "border-primary text-primary bg-transparent hover:bg-primary/5"
+              ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
+              : "border-primary text-primary bg-transparent hover:bg-primary/5"
               }`}
           >
             {(isNotifySubscribed ?? isSubscribed) ? (
