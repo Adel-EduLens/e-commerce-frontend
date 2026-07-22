@@ -24,7 +24,7 @@ function CategoriesSection({ isWholesale = false, isRetail = false, isShop = fal
         )}
         {!isCategoriesLoading &&
           categories
-            .filter((category) => category.appearOnHome || isWholesale || isRetail || isShop)
+            .filter((category) => category.appearOnHome )
             .map((category) => (
               <Link
                 key={category.id}
