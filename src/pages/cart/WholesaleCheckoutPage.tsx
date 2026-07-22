@@ -58,11 +58,10 @@ function SavedAddressesSection({
                   key={address.id}
                   type="button"
                   onClick={() => onSelect(address)}
-                  className={`rounded-xl border p-4 text-left transition-all duration-300 ${
-                    active
-                      ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
-                      : "border-stroke bg-card hover:border-primary/40"
-                  }`}
+                  className={`rounded-xl border p-4 text-left transition-all duration-300 ${active
+                    ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
+                    : "border-stroke bg-card hover:border-primary/40"
+                    }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>

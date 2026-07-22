@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Star } from "../ui/star";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
-import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check, Scissors } from "lucide-react";
+import { Heart, Tag, Truck, RotateCcw, Scale, Bell, BellRing, Check, Scissors, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "../../store/useCartStore";
 import { useWholesaleCartStore } from "../../store/useWholesaleCartStore";
@@ -492,8 +492,11 @@ export function ProductInfoPanel({
                   type="button"
                   onClick={() => onColorChange(color.color)}
                   title={color.color}
-                  className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${isSelected ? "border-primary" : "border-stroke hover:border-gray-text"
-                    }`}
+                  className={`w-7 h-7 rounded-full border-2 p-0.5 flex items-center justify-center transition-all ${
+                    isSelected
+                      ? "border-primary ring-2 ring-primary/40 scale-110 shadow-sm"
+                      : "border-stroke opacity-75 hover:opacity-100 hover:border-gray-text"
+                  }`}
                 >
                   <span
                     className="w-full h-full rounded-full inline-block border border-black/10"
@@ -526,22 +529,21 @@ export function ProductInfoPanel({
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
-              const isSelected = !isWholesale && variant.size === selectedSize;
+              const isSelected = variant.size === selectedSize;
               const isOutOfStock = variant.quantity <= 0;
               return (
                 <button
                   key={variant.size}
                   type="button"
-                  disabled={!isWholesale && isOutOfStock}
-                  onClick={() => !isWholesale && setSelectedSize(variant.size)}
-                  className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${isWholesale
-                    ? "bg-card text-foreground border-stroke cursor-default"
-                    : isSelected
-                      ? "bg-foreground text-background border-foreground"
+                  disabled={isOutOfStock}
+                  onClick={() => setSelectedSize(variant.size)}
+                  className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
+                    isSelected
+                      ? "bg-foreground text-background border-foreground shadow-sm scale-105"
                       : isOutOfStock
-                        ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
-                        : "bg-card text-foreground border-stroke hover:border-gray-text"
-                    }`}
+                        ? "bg-background text-gray-text/40 border-stroke line-through opacity-50 cursor-not-allowed"
+                        : "bg-card text-foreground border-stroke hover:border-foreground/50 hover:bg-gray-50 active:scale-95 cursor-pointer"
+                  }`}
                 >
                   {variant.size}
                 </button>
@@ -628,20 +630,25 @@ export function ProductInfoPanel({
             type="button"
             onClick={externalNotifyMe ?? handleNotifyMeToggle}
             disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
-            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${(isNotifySubscribed ?? isSubscribed)
-              ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
-              : "border-primary text-primary bg-transparent hover:bg-primary/5"
+            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 shadow-sm disabled:opacity-75 disabled:cursor-not-allowed ${(isNotifySubscribed ?? isSubscribed)
+              ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700 hover:bg-emerald-100/80 active:scale-[0.98]"
+              : "border-primary text-primary bg-transparent hover:bg-primary/10 active:scale-[0.98]"
               }`}
           >
-            {(isNotifySubscribed ?? isSubscribed) ? (
+            {subscribeMutation.isPending || unsubscribeMutation.isPending ? (
               <>
-                <Check className="h-4 w-4" />
-                {t("subscribedForRestock")}
+                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <span>{t("loading") ?? "Loading..."}</span>
+              </>
+            ) : (isNotifySubscribed ?? isSubscribed) ? (
+              <>
+                <BellRing className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span>{t("subscribedForRestock")}</span>
               </>
             ) : (
               <>
-                <Bell className="h-4 w-4 animate-bounce" />
-                {t("notifyMeInStock")}
+                <Bell className="h-4 w-4" />
+                <span>{t("notifyMeInStock")}</span>
               </>
             )}
           </button>
