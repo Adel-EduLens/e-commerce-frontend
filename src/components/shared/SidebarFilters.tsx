@@ -220,34 +220,36 @@ export default function SidebarFilters({
         <div className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-text">
           {t("Price Range")}
         </div>
-        <div className="mb-4 flex items-center justify-between text-sm text-gray-text">
-          <span>{currentMin} EGP</span>
-          <span>{currentMax} EGP</span>
-        </div>
-        <div className="relative mt-2 h-1 w-full rounded-full bg-stroke">
-          {/* Active track */}
-          <div
-            className="absolute h-full rounded-full bg-danger"
-            style={{ left: `${minPercent}%`, right: `${100 - maxPercent}%` }}
-          />
-          {/* Min Thumb */}
-          <input
-            type="range"
-            min={0}
-            max={MAX_PRICE}
-            value={currentMin}
-            onChange={handleMinChange}
-            className="pointer-events-none absolute -top-[6px] w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-danger [&::-webkit-slider-thumb]:bg-background [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-danger [&::-moz-range-thumb]:bg-background"
-          />
-          {/* Max Thumb */}
-          <input
-            type="range"
-            min={0}
-            max={MAX_PRICE}
-            value={currentMax}
-            onChange={handleMaxChange}
-            className="pointer-events-none absolute -top-[6px] w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-danger [&::-webkit-slider-thumb]:bg-background [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-danger [&::-moz-range-thumb]:bg-background"
-          />
+        <div dir="ltr">
+          <div className="mb-4 flex items-center justify-between text-sm text-gray-text">
+            <span>{currentMin} EGP</span>
+            <span>{currentMax} EGP</span>
+          </div>
+          <div className="relative mt-2 h-1 w-full rounded-full bg-stroke">
+            {/* Active track */}
+            <div
+              className="absolute h-full rounded-full bg-danger"
+              style={{ left: `${minPercent}%`, right: `${100 - maxPercent}%` }}
+            />
+            {/* Min Thumb */}
+            <input
+              type="range"
+              min={0}
+              max={MAX_PRICE}
+              value={currentMin}
+              onChange={handleMinChange}
+              className="pointer-events-none absolute -top-[6px] w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-danger [&::-webkit-slider-thumb]:bg-background [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-danger [&::-moz-range-thumb]:bg-background"
+            />
+            {/* Max Thumb */}
+            <input
+              type="range"
+              min={0}
+              max={MAX_PRICE}
+              value={currentMax}
+              onChange={handleMaxChange}
+              className="pointer-events-none absolute -top-[6px] w-full appearance-none bg-transparent [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-danger [&::-webkit-slider-thumb]:bg-background [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-danger [&::-moz-range-thumb]:bg-background"
+            />
+          </div>
         </div>
       </div>
 
