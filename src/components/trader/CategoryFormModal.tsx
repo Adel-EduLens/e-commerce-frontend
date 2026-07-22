@@ -19,6 +19,7 @@ const uploadImageFile = async (file: File): Promise<string> => {
 
 interface CategoryFormModalProps {
   category?: Category;
+  defaultType?: "product" | "wholesale" | "retail";
   onSave: (data: {
     name: string;
     image: string;
@@ -32,15 +33,16 @@ interface CategoryFormModalProps {
 
 export function CategoryFormModal({
   category,
+  defaultType,
   onSave,
   onClose,
 }: CategoryFormModalProps) {
   const [name, setName] = useState(category?.name ?? "");
   const [image, setImage] = useState(category?.image ?? "");
   const [appearOnHome, setAppearOnHome] = useState(category?.appearOnHome ?? false);
-  const [isShop, setIsShop] = useState(category?.isShop ?? false);
-  const [isWholesale, setIsWholesale] = useState(category?.isWholesale ?? false);
-  const [isRetail, setIsRetail] = useState(category?.isRetail ?? false);
+  const [isShop, setIsShop] = useState(category?.isShop ?? (defaultType === "product" ? true : false));
+  const [isWholesale, setIsWholesale] = useState(category?.isWholesale ?? (defaultType === "wholesale" ? true : false));
+  const [isRetail, setIsRetail] = useState(category?.isRetail ?? (defaultType === "retail" ? true : false));
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const { t } = useTranslation("traderCategoriesPage");
@@ -167,7 +169,13 @@ export function CategoryFormModal({
             <button
               type="button"
               disabled={uploading || !name}
-              onClick={() => onSave({ name, image, appearOnHome, isShop, isWholesale, isRetail })}
+              onClick={() => {
+                if (!isShop && !isWholesale && !isRetail) {
+                  toast.error(t("atLeastOneType", "Please select at least one category type (Shop, Wholesale, or Retail)"));
+                  return;
+                }
+                onSave({ name, image, appearOnHome, isShop, isWholesale, isRetail });
+              }}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
               {uploading ? t("uploading") : t("save")}

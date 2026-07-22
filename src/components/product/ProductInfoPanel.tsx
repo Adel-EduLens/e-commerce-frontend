@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Star } from "../ui/star";
-import { RiShareForwardLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { BsBag } from "react-icons/bs";
 import { Heart, Tag, Truck, RotateCcw, Scale, Bell, Check, Scissors } from "lucide-react";
@@ -100,10 +99,10 @@ export function ProductInfoPanel({
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   useEffect(() => {
-  const func=()=>{
-    setIsCompared(isProductCompared(item.id, (productType as "WHOLESALE" | "RETAIL" | "SHOP") || "SHOP"));
-  }
-  func();
+    const func = () => {
+      setIsCompared(isProductCompared(item.id, (productType as "WHOLESALE" | "RETAIL" | "SHOP") || "SHOP"));
+    }
+    func();
   }, [item.id, productType]);
 
   const isWholesale = productType === 'WHOLESALE';
@@ -129,10 +128,10 @@ export function ProductInfoPanel({
   const colorVariants = isWholesale
     ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: s.quantity ?? colorObj?.stock ?? 0 }))
     : isRetail
-    ? ((rawProduct?.sizes || []) as any[]).filter(
+      ? ((rawProduct?.sizes || []) as any[]).filter(
         (s: any) => !s.color || !selectedColor || s.color.toLowerCase() === selectedColor.toLowerCase()
       ).map((s: any) => ({ size: s.size, quantity: s.quantity ?? 0 }))
-    : colorObj?.variants || [];
+      : colorObj?.variants || [];
 
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
@@ -185,10 +184,10 @@ export function ProductInfoPanel({
   }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale]);
 
   // Flash deal price calculation
-  const basePrice = 
+  const basePrice =
     isWholesale ? (rawProduct?.wholesalePrice ?? rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
-    isRetail ? (rawProduct?.retailPrice ?? rawProduct?.shopPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
-    (rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0);
+      isRetail ? (rawProduct?.retailPrice ?? rawProduct?.shopPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
+        (rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0);
 
   const hasFlashDeal =
     rawProduct?.isFlashDeals &&
@@ -249,14 +248,14 @@ export function ProductInfoPanel({
       toast.error(t("outOfStockOption"));
       return;
     }
-    
+
     const currentCartQty = isWholesale
       ? useWholesaleCartStore.getState().items
-          .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
-          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
+        .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
+        .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items
-          .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
-          .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+        .filter((cartItem) => cartItem.productId === String(item.id) && (!selectedColor || cartItem.color.toLowerCase() === selectedColor.toLowerCase()) && (!selectedSize || cartItem.size === selectedSize))
+        .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
 
     if (currentCartQty + quantity > availableStock) {
       toast.error(t("cannotCheckoutStock", { count: availableStock }));
@@ -267,7 +266,7 @@ export function ProductInfoPanel({
       externalAddToCart();
       return;
     }
-    
+
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
 
     if (isWholesale) {
@@ -354,7 +353,7 @@ export function ProductInfoPanel({
       return;
     }
     const minQty = isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1);
-    
+
     if (isWholesale && quantity < minQty) {
       toast.error(t("lessThanMinOrder", { quantity, minQty }));
       return;
@@ -368,11 +367,11 @@ export function ProductInfoPanel({
     // Calculate total quantity of this product in the wholesale cart after adding this item
     const currentCartQty = isWholesale
       ? useWholesaleCartStore.getState().items
-          .filter((cartItem) => cartItem.productId === String(item.id))
-          .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
+        .filter((cartItem) => cartItem.productId === String(item.id))
+        .reduce((sum, cartItem) => sum + cartItem.quantity, 0)
       : useCartStore.getState().items
-          .filter((cartItem) => cartItem.productId === String(item.id))
-          .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+        .filter((cartItem) => cartItem.productId === String(item.id))
+        .reduce((sum, cartItem) => sum + cartItem.quantity, 0);
     const newTotalQty = currentCartQty + quantity;
 
     if (isWholesale && newTotalQty < minQty) {
@@ -535,15 +534,14 @@ export function ProductInfoPanel({
                   type="button"
                   disabled={!isWholesale && isOutOfStock}
                   onClick={() => !isWholesale && setSelectedSize(variant.size)}
-                  className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${
-                    isWholesale
+                  className={`h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs transition-all border outline-none ${isWholesale
                       ? "bg-card text-foreground border-stroke cursor-default"
                       : isSelected
-                      ? "bg-foreground text-background border-foreground"
-                      : isOutOfStock
-                      ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
-                      : "bg-card text-foreground border-stroke hover:border-gray-text"
-                  }`}
+                        ? "bg-foreground text-background border-foreground"
+                        : isOutOfStock
+                          ? "bg-background text-gray-text/50 border-stroke line-through cursor-not-allowed"
+                          : "bg-card text-foreground border-stroke hover:border-gray-text"
+                    }`}
                 >
                   {variant.size}
                 </button>
@@ -630,11 +628,10 @@ export function ProductInfoPanel({
             type="button"
             onClick={externalNotifyMe ?? handleNotifyMeToggle}
             disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
-            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${
-              (isNotifySubscribed ?? isSubscribed)
+            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 ${(isNotifySubscribed ?? isSubscribed)
                 ? "bg-green-50 text-green-600 border-green-200 hover:bg-green-100"
                 : "border-primary text-primary bg-transparent hover:bg-primary/5"
-            }`}
+              }`}
           >
             {(isNotifySubscribed ?? isSubscribed) ? (
               <>
@@ -665,7 +662,7 @@ export function ProductInfoPanel({
           <span className="font-bold text-foreground">{t("freeReturns")}</span>
         </div>
       </div>
-      
+
       {/* Size Guide Modal */}
       {item.sizeguide && (
         <Modal isOpen={showSizeGuide} onClose={() => setShowSizeGuide(false)} title={t("sizeGuide")}>

@@ -496,15 +496,15 @@ export default function TraderCategoriesPage() {
     <>
       {showAddModal && (
         <CategoryFormModal
+          defaultType={categoryFilter}
           onClose={() => setShowAddModal(false)}
           onSave={async (data) => {
             try {
               await createCategory.mutateAsync(data);
               setShowAddModal(false);
-            } catch (error) {
-              // error is handled in mutation
-              console.log(error)
-              toast.error("there is error")
+            } catch (error: any) {
+              const msg = error?.response?.data?.message || error?.message || "Failed to create category";
+              toast.error(msg);
             }
           }}
         />
@@ -515,18 +515,23 @@ export default function TraderCategoriesPage() {
           category={editCategory}
           onClose={() => setEditCategory(null)}
           onSave={async (formData) => {
-            await updateCategory.mutateAsync({
-              id: String(editCategory.id),
-              data: {
-                name: formData.name,
-                image: formData.image,
-                appearOnHome: formData.appearOnHome,
-                isShop: formData.isShop,
-                isWholesale: formData.isWholesale,
-                isRetail: formData.isRetail,
-              },
-            });
-            setEditCategory(null);
+            try {
+              await updateCategory.mutateAsync({
+                id: String(editCategory.id),
+                data: {
+                  name: formData.name,
+                  image: formData.image,
+                  appearOnHome: formData.appearOnHome,
+                  isShop: formData.isShop,
+                  isWholesale: formData.isWholesale,
+                  isRetail: formData.isRetail,
+                },
+              });
+              setEditCategory(null);
+            } catch (error: any) {
+              const msg = error?.response?.data?.message || error?.message || "Failed to update category";
+              toast.error(msg);
+            }
           }}
         />
       )}
