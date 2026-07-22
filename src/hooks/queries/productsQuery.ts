@@ -14,6 +14,7 @@ export interface ProductColor {
   colorName: string;
   color?: string;
   colorCode?: string | null;
+  minOrder?: number;
   images: {
     id: string;
     imageUrl: string;
@@ -28,13 +29,13 @@ export interface ProductColor {
     sku?: string | null;
   }[];
   stock?: number;
+  [key: string]: any;
 }
 
 export interface Product {
   id: string;
   name: string;
   description: string;
-  price: number;
   rating: number;
   traderId: number;
   createdAt: string;
@@ -43,14 +44,23 @@ export interface Product {
   sku?: string;
   isMustHave?: boolean;
   isFlashDeals?: boolean;
+  isBestDeal?: boolean;
+  isMostPopular?: boolean;
+  isPremiumCollection?: boolean;
+  isActive?: boolean;
   flashDealPrice?: number;
   flashDealEndsAt?: string;
+  brandId?: string;
   brand: {
     id: string;
     name: string;
     createdAt: string;
     updatedAt: string;
-  };
+  } | null;
+  category?: {
+    id: string;
+    name: string;
+  } | null;
   categories: {
     id: string;
     name: string;
@@ -80,6 +90,10 @@ export interface Product {
   termsAndConditions?: string;
   privacyPolicy?: string;
   minOrder?: number;
+  userRating?: number;
+  myRating?: number;
+  averageRating?: number;
+  [key: string]: any;
 }
 
 export type ProductsQuery = {
@@ -98,6 +112,12 @@ export type ProductsQuery = {
   limit?: number;
   collectionId?: string;
   type?: string;
+  category?: string;
+  isBestDeal?: boolean;
+  isMostPopular?: boolean;
+  isPremiumCollection?: boolean;
+  isFeatured?: boolean;
+  [key: string]: any;
 };
 
 type ProductsResponse = {
@@ -158,7 +178,13 @@ export function transformProduct(raw: Record<string, unknown>): Product {
     } as ProductColor;
   });
 
-  return { ...raw, colors } as unknown as Product;
+  const categories = (raw.categories as Product["categories"]) || [];
+  return {
+    ...raw,
+    category: (raw.category as Product["category"]) ?? categories[0] ?? null,
+    brandId: (raw.brandId as string | undefined) ?? ((raw.brand as Product["brand"])?.id),
+    colors,
+  } as unknown as Product;
 }
 
 const getProducts = async (

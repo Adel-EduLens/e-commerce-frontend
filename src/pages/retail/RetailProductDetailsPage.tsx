@@ -30,7 +30,7 @@ function toDetailItem(product: Product): DetailItem {
     id: product.id,
     name: product.name,
     description: product.description,
-    price: product.price,
+    price: product.retailPrice ?? product.price ?? 0,
     rating: product.rating,
     averageRating: product.rating,
     discountPrice: product.flashDealPrice,

@@ -5,6 +5,7 @@ import { useAuthStore } from "./useAuthStore";
 export type CartItem = {
   id: string;
   productId: string;
+  categoryId?: string;
   categoryIds?: string[];
   title: string;
   unitPrice: number;

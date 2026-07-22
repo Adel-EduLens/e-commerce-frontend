@@ -80,7 +80,7 @@ export default function TraderInfluencersPage() {
 
   // Detail / Edit
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [detailData, setDetailData] = useState<Record<string, unknown> | null>(null);
+  const [detailData, setDetailData] = useState<Record<string, any> | null>(null);
   const [editCoupon, setEditCoupon] = useState(false);
   const [couponForm, setCouponForm] = useState({
     code: "",

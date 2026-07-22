@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { asset } from "../../../components/trader/inventoryUtils";
+import {
+  asset,
+  getStatus,
+  type InventoryItem,
+} from "../../../components/trader/inventoryUtils";
 import { BlankProductFormModal } from "../../../components/trader/BlankProductFormModal";
 import { LoadingSpinner } from "../../../components/shared";
 import {
@@ -468,7 +472,11 @@ export function BlankProductTablePanel({
   );
 }
 
-export default function TraderBlankProductsPage({ onEdit }: { onEdit: (item: any) => void }) {
+export default function TraderBlankProductsPage({
+  onEdit = () => {},
+}: {
+  onEdit?: (item: InventoryItem) => void;
+}) {
   const { t } = useTranslation("traderBlankProducts");
 
   const { data: blankProducts = [], isLoading } = useTraderProducts("BLANK");
@@ -482,16 +490,61 @@ export default function TraderBlankProductsPage({ onEdit }: { onEdit: (item: any
         products={blankProducts}
         loading={isLoading}
         onEdit={(product) => {
-          const item = {
+          const imagesByColor =
+            product.colors?.flatMap((color) =>
+              (color.images || []).map((image) => ({
+                url: image.url || image.imageUrl || "",
+                color: color.colorName || color.color || undefined,
+                direction: image.direction,
+              })),
+            ) ?? [];
+
+          const sizes = Array.from(
+            new Set(
+              product.colors?.flatMap((color) => color.variants?.map((variant) => variant.size) ?? []) ?? [],
+            ),
+          );
+          const colors = Array.from(
+            new Set(
+              product.colors
+                ?.map((color) => color.colorName || color.color)
+                .filter((color): color is string => Boolean(color)) ?? [],
+            ),
+          );
+
+          const item: InventoryItem = {
             id: product.id,
+            image: imagesByColor[0]?.url ?? product.images?.[0]?.url ?? "",
+            imagesByColor,
             product: product.name,
+            categories: product.categories?.map((c) => ({ id: c.id, name: c.name })) || [],
             categoryIds: product.categories?.map((c) => c.id) || [],
-            brandId: product.brandId,
-            description: product.description,
-            sku: product.sku,
+            stock: product.stock ?? 0,
+            sku: product.sku ?? "",
+            price: `$${product.blankPrice ?? product.price ?? 0}`,
+            priceNum: product.blankPrice ?? product.price ?? 0,
+            depositAmount: product.depositAmount,
+            securityDeposit: product.securityDeposit,
+            date: new Date(product.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            createdAtRaw: new Date(product.createdAt).getTime(),
+            status: getStatus(product.stock ?? 0),
             type: "blank",
-            priceNum: product.blankPrice ?? product.price,
-            colors: product.colors?.map((c) => c.colorName || c.color) || [],
+            description: product.description ?? "",
+            sizes,
+            colors,
+            minOrder: 1,
+            brandId: product.brandId ?? product.brand?.id ?? "",
+            isMustHave: product.isMustHave ?? false,
+            isFlashDeals: product.isFlashDeals ?? false,
+            flashDealPrice: product.flashDealPrice ?? null,
+            flashDealEndsAt: product.flashDealEndsAt ?? null,
+            isBestDeal: product.isBestDeal ?? false,
+            isMostPopular: product.isMostPopular ?? false,
+            isPremiumCollection: product.isPremiumCollection ?? false,
           };
           onEdit(item);
         }}
@@ -499,4 +552,4 @@ export default function TraderBlankProductsPage({ onEdit }: { onEdit: (item: any
       />
     </>
   );
-}
+}

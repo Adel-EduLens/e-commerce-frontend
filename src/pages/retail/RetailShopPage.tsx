@@ -36,10 +36,10 @@ export default function RetailShopPage() {
   const [page, setPage] = useState(1);
 
   const { data: catData } = useCategories("RETAIL");
-  const categories = Array.isArray(catData) ? catData : catData?.data || [];
+  const categories = catData ?? [];
 
   const { data: brandsData } = useBrands();
-  const brands = Array.isArray(brandsData) ? brandsData : brandsData?.data || [];
+  const brands = brandsData ?? [];
 
   const categoryId = useMemo(() => {
     if (!effectiveCategoryName) return "";

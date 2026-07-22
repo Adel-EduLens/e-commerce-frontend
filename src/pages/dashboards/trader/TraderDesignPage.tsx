@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FaImage, FaPlus, FaTimes, FaTrash } from 'react-icons/fa'
 import { api } from '../../../lib/axios'
@@ -132,19 +132,20 @@ export default function TraderDesignPage() {
 
   const canSubmit = title.trim() !== '' && !!image
 
-  useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        const res = await api.get('/trader/designs/images')
-        if (res.status === 200) {
-          setImages(res.data?.data?.images ?? [])
-        }
-      } catch (error) {
-        handleApiError(error, t('loadImagesError'));
+  const fetchImages = useCallback(async () => {
+    try {
+      const res = await api.get('/trader/designs/images')
+      if (res.status === 200) {
+        setImages(res.data?.data?.images ?? [])
       }
+    } catch (error) {
+      handleApiError(error, t('loadImagesError'));
     }
-    fetchImages()
   }, [t])
+
+  useEffect(() => {
+    fetchImages()
+  }, [fetchImages])
 
   async function handleSubmit() {
     setTouched(true)

@@ -7,7 +7,7 @@ import {
   useUpdateWholesaleOrder,
   type WholesaleOrder,
 } from "../../../hooks/queries/wholesaleOrderQuery";
-import { useTraderProducts } from "../../../hooks/queries/productsQuery";
+import { useTraderProducts, type Product } from "../../../hooks/queries/productsQuery";
 import { useWholesale, type WholesaleProduct } from "../../../hooks/queries/wholesaleQuery";
 import {
   Loader2,
@@ -55,6 +55,33 @@ function getLocalizedStatus(status: string, t: ReturnType<typeof useTranslation>
   if (norm === "PENDING") return t("statusPending", "Pending");
   if (norm === "CANCELLED") return t("statusCancelled", "Cancelled");
   return status;
+}
+
+type SizeOption = {
+  id?: string;
+  size: string;
+  quantity?: number;
+};
+
+type ColorOption = {
+  id: string;
+  color: string;
+  stock: number;
+  sizes: SizeOption[];
+};
+
+function normalizeSizeOptions(sizes?: Product["sizes"]): SizeOption[] {
+  if (!Array.isArray(sizes)) return [];
+
+  return sizes.map((size) =>
+    typeof size === "string"
+      ? { size }
+      : {
+          id: "id" in size ? size.id : undefined,
+          size: size.size,
+          quantity: "quantity" in size ? size.quantity : undefined,
+        },
+  );
 }
 
 // ─── Interactive Charts ────────────────────────────────────────────────────────
@@ -486,7 +513,13 @@ function EarningsChart({ orders = [] }: { orders?: WholesaleOrder[] }) {
   );
 }
 
-function CategoryDonut({ orders = [], products = [] }: { orders?: WholesaleOrder[]; products?: WholesaleProduct[] }) {
+function CategoryDonut({
+  orders = [],
+  products = [],
+}: {
+  orders?: WholesaleOrder[];
+  products?: Array<{ id: string | number; category?: { name: string } | null }>;
+}) {
   const { t } = useTranslation("traderWholesale");
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -715,22 +748,22 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
   const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
-  const colors = useMemo(() => {
+  const colors = useMemo<ColorOption[]>(() => {
     if (!product) return [];
     if (product.colors && product.colors.length > 0) {
-      return product.colors.map((c: any) => ({
+      return product.colors.map((c) => ({
         id: c.id,
         color: c.colorName || c.color || "",
         stock: c.stock ?? product.stock ?? Infinity,
-        sizes: c.sizes || c.variants || [],
+        sizes: c.variants || [],
       }));
     }
     if (product.wholesaleColors && product.wholesaleColors.length > 0) {
-      return product.wholesaleColors.map((c: any) => ({
+      return product.wholesaleColors.map((c) => ({
         id: c.id,
         color: c.color || "",
         stock: c.stock ?? product.stock ?? Infinity,
-        sizes: c.sizes || c.variants || [],
+        sizes: c.sizes || [],
       }));
     }
     return [];
@@ -751,7 +784,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
       return selectedColorObj.sizes;
     }
     if (product?.sizes && product.sizes.length > 0) {
-      return product.sizes.map((s: any) => typeof s === "string" ? { size: s } : s);
+      return normalizeSizeOptions(product.sizes);
     }
     return [];
   }, [selectedColorObj, product]);
@@ -906,22 +939,22 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
   const { t } = useTranslation("traderWholesale");
   const { data: product } = useWholesale(item.productId);
 
-  const colors = useMemo(() => {
+  const colors = useMemo<ColorOption[]>(() => {
     if (!product) return [];
     if (product.colors && product.colors.length > 0) {
-      return product.colors.map((c: any) => ({
+      return product.colors.map((c) => ({
         id: c.id,
         color: c.colorName || c.color || "",
         stock: c.stock ?? product.stock ?? 0,
-        sizes: c.sizes || c.variants || [],
+        sizes: c.variants || [],
       }));
     }
     if (product.wholesaleColors && product.wholesaleColors.length > 0) {
-      return product.wholesaleColors.map((c: any) => ({
+      return product.wholesaleColors.map((c) => ({
         id: c.id,
         color: c.color || "",
         stock: c.stock ?? product.stock ?? 0,
-        sizes: c.sizes || c.variants || [],
+        sizes: c.sizes || [],
       }));
     }
     return [];
@@ -946,7 +979,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
       return selectedColorObj.sizes;
     }
     if (product?.sizes && product.sizes.length > 0) {
-      return product.sizes.map((s: any) => typeof s === "string" ? { size: s } : s);
+      return normalizeSizeOptions(product.sizes);
     }
     return [];
   }, [selectedColorObj, product]);
@@ -995,7 +1028,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
                 const defaultSize = null;
                 const updatedSizeQuantities: Record<string, number> = {};
                 const chosenSizes = colorObj?.sizes || [];
-                chosenSizes.forEach((s: any) => {
+                chosenSizes.forEach((s) => {
                   updatedSizeQuantities[s.size] = newQty;
                 });
                 onChange({ color: chosenColor, quantity: newQty, size: defaultSize, sizeQuantities: updatedSizeQuantities });

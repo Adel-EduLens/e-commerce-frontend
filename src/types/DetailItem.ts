@@ -19,6 +19,11 @@ export type DetailItem = {
     id: string | number;
     name: string;
   }[];
+  category?: {
+    id: string | number;
+    name: string;
+  } | null;
+  categoryId?: string | number;
 
   images: {
     id: string | number;
@@ -35,5 +40,11 @@ export type DetailItem = {
     id: string | number;
     color: string;
     colorHex?: string | null;
+    minOrder?: number;
+    sizes?: {
+      id?: string | number;
+      size: string;
+      quantity?: number;
+    }[];
   }[];
 };

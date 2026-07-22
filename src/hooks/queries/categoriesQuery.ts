@@ -16,13 +16,17 @@ export interface Category {
   updatedAt: string;
 }
 
-export type CategoryFilter = string | "all" | undefined;
+export type CategoryFilter = string | boolean | "all" | undefined;
 
 const getCategories = async (typeFilter?: CategoryFilter): Promise<Category[]> => {
   const { data } = await api.get("/categories", {
     params:
       typeFilter === "all"
         ? { all: true }
+        : typeFilter === true
+          ? { type: "WHOLESALE" }
+          : typeFilter === false
+            ? undefined
         : typeFilter !== undefined
           ? { type: typeFilter }
           : undefined,
@@ -32,7 +36,7 @@ const getCategories = async (typeFilter?: CategoryFilter): Promise<Category[]> =
 
 export const useCategories = (
   typeFilter?: CategoryFilter,
-  options?: Omit<UseQueryOptions<Category[], Error, Category[], (string | undefined)[]>, "queryKey" | "queryFn">
+  options?: Omit<UseQueryOptions<Category[], Error, Category[], CategoryFilter[]>, "queryKey" | "queryFn">
 ): UseQueryResult<Category[], Error> => {
   return useQuery({
     queryKey: ["categories", typeFilter],
