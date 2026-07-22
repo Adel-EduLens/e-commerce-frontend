@@ -533,6 +533,10 @@ export default function WholesaleCheckoutPage() {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
       queryClient.invalidateQueries({ queryKey: ["wholesale-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesale"] });
+      queryClient.invalidateQueries({ queryKey: ["wholesales"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["trader-products"] });
 
       toast.success("Wholesale order placed successfully!");
       navigate("/my-orders");
