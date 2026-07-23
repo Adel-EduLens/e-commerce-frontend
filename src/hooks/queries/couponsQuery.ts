@@ -30,6 +30,44 @@ export interface Coupon {
   createdAt: string;
 }
 
+export interface CouponAnalyticsData {
+  summary: {
+    totalCoupons: number;
+    activeCoupons: number;
+    expiredCoupons: number;
+    inactiveCoupons: number;
+    totalUsages: number;
+    avgDiscount: number;
+  };
+  discountRanges: {
+    range1_15: number;
+    range16_30: number;
+    range31_50: number;
+    range51Plus: number;
+  };
+  scopeBreakdown: {
+    global: number;
+    category: number;
+    product: number;
+  };
+  monthlyTrend: {
+    monthKey: string;
+    defaultMonth: string;
+    usages: number;
+  }[];
+  topCoupons: {
+    id: string;
+    code: string;
+    discount: number;
+    usedCount: number;
+    usageLimit: number | null;
+    validUntil: string;
+    isActive: boolean;
+    restriction: string | null;
+    scope: 'global' | 'category' | 'product';
+  }[];
+}
+
 export const useCoupons = () => {
   return useQuery<Coupon[]>({
     queryKey: ['coupons'],
@@ -39,3 +77,14 @@ export const useCoupons = () => {
     },
   });
 };
+
+export const useCouponAnalytics = () => {
+  return useQuery<CouponAnalyticsData>({
+    queryKey: ['couponAnalytics'],
+    queryFn: async () => {
+      const { data } = await api.get('/coupons/analytics');
+      return data?.data;
+    },
+  });
+};
+

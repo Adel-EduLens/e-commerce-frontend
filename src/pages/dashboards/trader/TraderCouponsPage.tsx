@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Trash2, Plus, Calendar, Tag, Percent, ShoppingBag, Eye, ChevronDown, X } from "lucide-react";
+import {
+  Plus, Calendar, Tag, Percent, ShoppingBag, Eye, ChevronDown, X,
+  BarChart2, ListFilter
+} from "lucide-react";
 import { api } from "../../../lib/axios";
 import { Toggle } from "../../../components/ui";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -10,16 +13,7 @@ import type { Coupon } from "../../../hooks/queries/couponsQuery";
 import { useCategories } from "../../../hooks/queries/categoriesQuery";
 import { useProducts } from "../../../hooks/queries/productsQuery";
 import { handleApiError } from '../../../lib/utils';
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-}
+import TraderCouponChartsTab from "../../../components/trader/TraderCouponChartsTab";
 
 function SearchableSelect({
   label,
@@ -40,7 +34,6 @@ function SearchableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Sync search query when value changes from outside (e.g. form reset)
   useEffect(() => {
     if (!value) {
       setSearchQuery("");
@@ -140,9 +133,13 @@ function SearchableSelect({
   );
 }
 
+// ─── Main Page ─────────────────────────────────────────────────────────────
+
 export default function TraderCouponsPage() {
   const { t } = useTranslation("traderCoupons");
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<'list' | 'analytics'>('list');
+
   const { data: coupons = [], isLoading: isLoadingCoupons } = useCoupons();
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories("all");
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 100 });
@@ -188,6 +185,7 @@ export default function TraderCouponsPage() {
       setUsageLimit("");
       setIsCreateModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      queryClient.invalidateQueries({ queryKey: ['couponAnalytics'] });
     },
     onError: (error) => {
       handleApiError(error, t("failedToCreateCoupon"));
@@ -202,6 +200,7 @@ export default function TraderCouponsPage() {
     onSuccess: (_, variables) => {
       toast.success(variables.isActive ? t("couponActivatedSuccess") : t("couponDeactivatedSuccess"));
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      queryClient.invalidateQueries({ queryKey: ['couponAnalytics'] });
     },
     onError: (error) => {
       handleApiError(error, t("failedToUpdateCouponStatus"));
@@ -241,7 +240,7 @@ export default function TraderCouponsPage() {
 
   return (
     <div className="space-y-6">
-      {/* ── Heading / Create Coupon Trigger ── */}
+      {/* ── Heading & Action ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-['Montserrat'] text-2xl font-bold text-foreground">{t("traderCouponsTitle")}</h1>
@@ -257,156 +256,192 @@ export default function TraderCouponsPage() {
         </button>
       </div>
 
-      {/* ── Stat cards ── */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
-            <Percent className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-text">{t("activeCoupons")}</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
-              {coupons.filter(c => c.isActive && new Date(c.validUntil) > new Date()).length}
-            </p>
-          </div>
-        </div>
-        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
-            <Tag className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-text">{t("totalCoupons")}</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{coupons.length}</p>
-          </div>
-        </div>
-        <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4 sm:col-span-2 lg:col-span-1">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600">
-            <Calendar className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-text">{t("expiredCoupons")}</p>
-            <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
-              {coupons.filter(c => new Date(c.validUntil) <= new Date()).length}
-            </p>
-          </div>
-        </div>
+      {/* ── Tabs Navigation ── */}
+      <div className="flex border-b border-stroke gap-6">
+        <button
+          type="button"
+          onClick={() => setActiveTab('list')}
+          className={`pb-3 font-['Montserrat'] text-sm font-bold transition-all relative flex items-center gap-2 cursor-pointer ${
+            activeTab === 'list'
+              ? 'text-primary border-b-2 border-primary'
+              : 'text-gray-text hover:text-foreground'
+          }`}
+        >
+          <ListFilter className="h-4 w-4" />
+          <span>{t("tabCouponsList")}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('analytics')}
+          className={`pb-3 font-['Montserrat'] text-sm font-bold transition-all relative flex items-center gap-2 cursor-pointer ${
+            activeTab === 'analytics'
+              ? 'text-primary border-b-2 border-primary'
+              : 'text-gray-text hover:text-foreground'
+          }`}
+        >
+          <BarChart2 className="h-4 w-4" />
+          <span>{t("tabAnalytics")}</span>
+        </button>
       </div>
 
-      {/* ── Coupons List Table ── */}
-      <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm w-full">
-        <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
-          {t("couponManagement")}
-        </h2>
+      {/* ── TAB 1: Coupons List ── */}
+      {activeTab === 'list' && (
+        <div className="space-y-6">
+          {/* ── Stat cards ── */}
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
+                <Percent className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-text">{t("activeCoupons")}</p>
+                <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
+                  {coupons.filter(c => c.isActive && new Date(c.validUntil) > new Date()).length}
+                </p>
+              </div>
+            </div>
+            <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/25 text-foreground">
+                <Tag className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-text">{t("totalCoupons")}</p>
+                <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{coupons.length}</p>
+              </div>
+            </div>
+            <div className="rounded-[24px] bg-white border border-stroke p-6 shadow-sm flex items-center gap-4 sm:col-span-2 lg:col-span-1">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600">
+                <Calendar className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-text">{t("expiredCoupons")}</p>
+                <p className="font-['Montserrat'] text-2xl font-bold text-foreground">
+                  {coupons.filter(c => new Date(c.validUntil) <= new Date()).length}
+                </p>
+              </div>
+            </div>
+          </div>
 
-        {loading ? (
-          <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-            {t("loadingCoupons")}
-          </div>
-        ) : coupons.length === 0 ? (
-          <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
-            {t("noCouponsMessage")}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
-                  <th className="py-3 px-4">{t("colCode")}</th>
-                  <th className="py-3 px-4">{t("colDiscount")}</th>
-                  <th className="py-3 px-4">{t("colRestrictions")}</th>
-                  <th className="py-3 px-4">{t("colUsesLimit")}</th>
-                  <th className="py-3 px-4">{t("colExpiry")}</th>
-                  <th className="py-3 px-4">{t("colStatus")}</th>
-                  <th className="py-3 px-4">{t("colUsedBy")}</th>
-                  <th className="py-3 px-4 text-right">{t("colActions")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {coupons.map((coupon) => {
-                  const isExpired = new Date(coupon.validUntil) <= new Date();
-                  return (
-                    <tr key={coupon.id} className="border-b border-stroke text-sm text-foreground hover:bg-background transition">
-                      <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
-                        {coupon.code}
-                      </td>
-                      <td className="py-4 px-4 font-['Montserrat'] font-semibold">
-                        {coupon.discount}% {t("off")}
-                      </td>
-                      <td className="py-4 px-4">
-                        {coupon.product ? (
-                          <span className="inline-flex items-center gap-1 rounded-xl bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs text-blue-600 font-medium">
-                            <ShoppingBag className="h-3 w-3" />
-                            {coupon.product.name}
-                          </span>
-                        ) : coupon.category ? (
-                          <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
-                            <Tag className="h-3 w-3" />
-                            {coupon.category.name}
-                          </span>
-                        ) : (
-                          <span className="text-gray-text text-xs">{t("globalCoupon")}</span>
-                        )}
-                      </td>
-                      <td className="py-4 px-4 font-['Montserrat'] text-xs font-semibold text-gray-text">
-                        {coupon.usedCount} / {coupon.usageLimit !== null ? coupon.usageLimit : "∞"}
-                      </td>
-                      <td className="py-4 px-4 font-['Montserrat'] text-xs text-gray-text">
-                        {new Date(coupon.validUntil).toLocaleDateString()}
-                      </td>
-                      <td className="py-4 px-4">
-                        {!coupon.isActive ? (
-                          <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
-                            {t("statusInactive")}
-                          </span>
-                        ) : isExpired ? (
-                          <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
-                            {t("statusExpired")}
-                          </span>
-                        ) : coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit ? (
-                          <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
-                            {t("statusLimitReached")}
-                          </span>
-                        ) : (
-                          <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
-                            {t("statusActive")}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-4 px-4">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedCouponForModal(coupon);
-                            setIsModalOpen(true);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 text-secondary hover:bg-primary/20 transition text-xs font-semibold cursor-pointer"
-                          aria-label={t("viewUsages")}
-                          title={t("viewUsages")}
-                        >
-                          <Eye className="h-4 w-4" />
-                          <span>{t("viewUsages")}</span>
-                        </button>
-                      </td>
-                      <td className="py-4 pl-4 text-right">
-                        <div className="flex items-center justify-end gap-3">
-                          {/* Toggle switch for active status */}
-                          <Toggle
-                            checked={coupon.isActive}
-                            onChange={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
-                            size="md"
-                            variant="success"
-                            title={coupon.isActive ? t("deactivateCoupon") : t("activateCoupon")}
-                          />
-                        </div>
-                      </td>
+          {/* ── Coupons List Table ── */}
+          <div className="rounded-3xl border border-stroke bg-white p-6 shadow-sm w-full">
+            <h2 className="font-['Montserrat'] text-lg font-bold text-foreground mb-4">
+              {t("couponManagement")}
+            </h2>
+
+            {loading ? (
+              <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
+                {t("loadingCoupons")}
+              </div>
+            ) : coupons.length === 0 ? (
+              <div className="py-12 text-center text-gray-text font-medium font-['Montserrat']">
+                {t("noCouponsMessage")}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-secondary border-b border-stroke text-xs font-bold text-primary uppercase tracking-wider">
+                      <th className="py-3 px-4">{t("colCode")}</th>
+                      <th className="py-3 px-4">{t("colDiscount")}</th>
+                      <th className="py-3 px-4">{t("colRestrictions")}</th>
+                      <th className="py-3 px-4">{t("colUsesLimit")}</th>
+                      <th className="py-3 px-4">{t("colExpiry")}</th>
+                      <th className="py-3 px-4">{t("colStatus")}</th>
+                      <th className="py-3 px-4">{t("colUsedBy")}</th>
+                      <th className="py-3 px-4 text-right">{t("colActions")}</th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {coupons.map((coupon) => {
+                      const isExpired = new Date(coupon.validUntil) <= new Date();
+                      return (
+                        <tr key={coupon.id} className="border-b border-stroke text-sm text-foreground hover:bg-background transition">
+                          <td className="py-4 pr-4 font-['Montserrat'] font-bold text-foreground">
+                            {coupon.code}
+                          </td>
+                          <td className="py-4 px-4 font-['Montserrat'] font-semibold">
+                            {coupon.discount}% {t("off")}
+                          </td>
+                          <td className="py-4 px-4">
+                            {coupon.product ? (
+                              <span className="inline-flex items-center gap-1 rounded-xl bg-blue-50 border border-blue-200 px-2 py-0.5 text-xs text-blue-600 font-medium">
+                                <ShoppingBag className="h-3 w-3" />
+                                {coupon.product.name}
+                              </span>
+                            ) : coupon.category ? (
+                              <span className="inline-flex items-center gap-1 rounded-xl bg-purple-50 border border-purple-200 px-2 py-0.5 text-xs text-purple-600 font-medium">
+                                <Tag className="h-3 w-3" />
+                                {coupon.category.name}
+                              </span>
+                            ) : (
+                              <span className="text-gray-text text-xs">{t("globalCoupon")}</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-4 font-['Montserrat'] text-xs font-semibold text-gray-text">
+                            {coupon.usedCount} / {coupon.usageLimit !== null ? coupon.usageLimit : "∞"}
+                          </td>
+                          <td className="py-4 px-4 font-['Montserrat'] text-xs text-gray-text">
+                            {new Date(coupon.validUntil).toLocaleDateString()}
+                          </td>
+                          <td className="py-4 px-4">
+                            {!coupon.isActive ? (
+                              <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+                                {t("statusInactive")}
+                              </span>
+                            ) : isExpired ? (
+                              <span className="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800">
+                                {t("statusExpired")}
+                              </span>
+                            ) : coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit ? (
+                              <span className="inline-flex rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                                {t("statusLimitReached")}
+                              </span>
+                            ) : (
+                              <span className="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800">
+                                {t("statusActive")}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 px-4">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedCouponForModal(coupon);
+                                setIsModalOpen(true);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-primary/10 text-secondary hover:bg-primary/20 transition text-xs font-semibold cursor-pointer"
+                              aria-label={t("viewUsages")}
+                              title={t("viewUsages")}
+                            >
+                              <Eye className="h-4 w-4" />
+                              <span>{t("viewUsages")}</span>
+                            </button>
+                          </td>
+                          <td className="py-4 pl-4 text-right">
+                            <div className="flex items-center justify-end gap-3">
+                              <Toggle
+                                checked={coupon.isActive}
+                                onChange={() => handleToggleCouponActive(coupon.id, coupon.isActive)}
+                                size="md"
+                                variant="success"
+                                title={coupon.isActive ? t("deactivateCoupon") : t("activateCoupon")}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* ── TAB 2: Charts & Analytics ── */}
+      {activeTab === 'analytics' && <TraderCouponChartsTab />}
 
       {/* ── Coupon Usages Modal ── */}
       {isModalOpen && selectedCouponForModal && (
@@ -434,7 +469,7 @@ export default function TraderCouponsPage() {
                   setIsModalOpen(false);
                   setSelectedCouponForModal(null);
                 }}
-                className="p-2 hover:bg-gray-light rounded-full text-gray-text hover:text-foreground transition"
+                className="p-2 hover:bg-gray-light rounded-full text-gray-text hover:text-foreground transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>

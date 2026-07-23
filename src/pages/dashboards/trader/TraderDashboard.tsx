@@ -332,6 +332,12 @@ export default function TraderDashboard() {
     }, 0);
   }, [orders]);
 
+  const totalDiscountNum = useMemo(() => {
+    return orders.reduce((sum, order) => {
+      return sum + parsePrice(order.discount);
+    }, 0);
+  }, [orders]);
+
   const summaryCardsData = useMemo(() => {
     const totalOrdersCount = orders.length;
     const totalProductsCount = traderProducts.length;
@@ -355,6 +361,14 @@ export default function TraderDashboard() {
         icon: "mynaui_cart.svg",
       },
       {
+        label: "totalDiscounts",
+        value: `EGP ${totalDiscountNum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        delta: "-3.2%",
+        note: "upFromLastMonth",
+        trend: "up" as const,
+        icon: "hugeicons_trade-up.svg",
+      },
+      {
         label: "activeProducts",
         value: totalProductsCount.toString(),
         delta: "+5.0%",
@@ -371,7 +385,7 @@ export default function TraderDashboard() {
         icon: "hugeicons_trade-up.svg",
       },
     ];
-  }, [orders, traderProducts, totalRevenueNum]);
+  }, [orders, traderProducts, totalRevenueNum, totalDiscountNum]);
 
   // 6. Dynamic Revenue Trend Chart (Monthly sales from backend orders)
   const dynamicRevenueSeries = useMemo(() => {
@@ -716,7 +730,7 @@ export default function TraderDashboard() {
       </section>
 
       {/* Summary Cards */}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {summaryCardsData.map((card) => (
           <SummaryCard key={card.label} {...card} />
         ))}
@@ -862,7 +876,15 @@ export default function TraderDashboard() {
                       className={index % 2 === 0 ? "bg-card hover:bg-background/50 transition-colors" : "bg-background/40 hover:bg-background/80 transition-colors"}
                     >
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
-                        {transaction.orderId || `#${transaction.id.slice(-6)}`}
+                        <div className="flex items-center gap-2">
+                          <span>{transaction.orderId || `#${transaction.id.slice(-6)}`}</span>
+                          {transaction.couponCode && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-500 font-bold text-[10px] border border-amber-500/20">
+                              <Tag className="h-2.5 w-2.5" />
+                              {transaction.couponCode}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
                         {transaction.customer || t("guestCustomer", "عميل زائر")}

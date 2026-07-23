@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../lib/axios";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag } from "lucide-react";
+import { Loader2, ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag, Tag } from "lucide-react";
 
 interface OrderItem {
   id: string;
@@ -33,6 +33,7 @@ interface Order {
   subtotal: string;
   shipping: string;
   discount: string;
+  couponCode?: string | null;
   status: string;
   items: OrderItem[];
 }
@@ -169,6 +170,15 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
               <span className="text-gray-text font-medium">{t("paymentTypeLabel")}</span>
               <span className="font-semibold text-foreground">{order.payment}</span>
             </div>
+            {order.couponCode && (
+              <div className="flex justify-between items-center py-1.5 border-b border-stroke">
+                <span className="text-gray-text font-medium">{t("appliedCoupon", "الكوبون المطبق")}</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl bg-amber-50 text-amber-700 font-bold text-xs border border-amber-200">
+                  <Tag className="h-3 w-3 text-amber-600" />
+                  {order.couponCode}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -633,7 +643,15 @@ export default function TraderOrdersPage() {
                             </div>
                           </td>
                           <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground whitespace-nowrap">
-                            {order.orderId}
+                            <div className="flex flex-col items-center gap-1">
+                              <span>{order.orderId}</span>
+                              {order.couponCode && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[10px] border border-amber-200">
+                                  <Tag className="h-2.5 w-2.5 text-amber-600" />
+                                  {order.couponCode}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-semibold text-foreground whitespace-nowrap">
                             {order.customer}

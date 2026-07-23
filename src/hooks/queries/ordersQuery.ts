@@ -29,6 +29,7 @@ export interface TraderOrder {
   subtotal?: number | string;
   shipping?: number | string;
   discount?: number | string;
+  couponCode?: string | null;
   status: string;
   payment?: string;
   items: OrderItem[];
