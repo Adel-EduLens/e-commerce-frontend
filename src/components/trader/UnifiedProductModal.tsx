@@ -387,7 +387,9 @@ export function UnifiedProductModal({
             direction?: string;
           }[];
           const colorStock =
-            pc.stock ?? pc.variants.reduce((s, v) => s + v.quantity, 0);
+            pc.variants && pc.variants.length > 0
+              ? pc.variants.reduce((s, v) => s + (v.quantity || 0), 0)
+              : (pc.stock ?? 0);
           return {
             color: pc.color,
             minOrder: isWholesale ? Number(minOrder) || 1 : 1,

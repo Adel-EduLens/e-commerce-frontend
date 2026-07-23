@@ -136,6 +136,16 @@ export function ProductInfoPanel({
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
 
+  // Sync selectedSize when selectedColor changes if current selectedSize is not available for new color
+  useEffect(() => {
+    if (colorVariants && colorVariants.length > 0) {
+      const isValid = colorVariants.some((v: any) => v.size === selectedSize);
+      if (!isValid) {
+        setSelectedSize(colorVariants[0].size);
+      }
+    }
+  }, [selectedColor, colorVariants, selectedSize, setSelectedSize]);
+
   const hasColors = isWholesale
     ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.length > 0
     : Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;

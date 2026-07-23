@@ -750,11 +750,19 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
 
   const colors = useMemo<ColorOption[]>(() => {
     if (!product) return [];
+    const getMinSizeStock = (fallbackStock?: number, sizesArr?: any[]) => {
+      if (sizesArr && sizesArr.length > 0) {
+        const quantities = sizesArr.map((s) => Number(s.quantity ?? s.stock ?? 0));
+        return Math.min(...quantities);
+      }
+      return fallbackStock ?? product.stock ?? Infinity;
+    };
+
     if (product.colors && product.colors.length > 0) {
       return product.colors.map((c) => ({
         id: c.id,
         color: c.colorName || c.color || "",
-        stock: c.stock ?? product.stock ?? Infinity,
+        stock: getMinSizeStock(c.stock, c.variants),
         sizes: c.variants || [],
       }));
     }
@@ -762,7 +770,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
       return product.wholesaleColors.map((c) => ({
         id: c.id,
         color: c.color || "",
-        stock: c.stock ?? product.stock ?? Infinity,
+        stock: getMinSizeStock(c.stock, c.sizes),
         sizes: c.sizes || [],
       }));
     }
@@ -783,11 +791,11 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
     if (selectedColorObj?.sizes && selectedColorObj.sizes.length > 0) {
       return selectedColorObj.sizes;
     }
-    if (product?.sizes && product.sizes.length > 0) {
+    if (!item.color && product?.sizes && product.sizes.length > 0) {
       return normalizeSizeOptions(product.sizes);
     }
     return [];
-  }, [selectedColorObj, product]);
+  }, [selectedColorObj, product, item.color]);
 
   const handleProductQuantityChange = (newProductQty: number) => {
     const validQty = Math.max(1, newProductQty);
@@ -829,7 +837,7 @@ function EditableOrderItemRow({ item, idx, isEditing, currentEdit, onChange, onD
         </div>
 
         {/* Display Sizes & Quantities */}
-        {sizeList.length > 0 && (
+        {item.color && sizeList.length > 0 && (
           <div className="mt-2 text-center">
             <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("sizesAndQuantities", "Sizes & Quantities:")}</span>
             <div className="flex flex-wrap gap-1 justify-center">
@@ -941,11 +949,19 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
 
   const colors = useMemo<ColorOption[]>(() => {
     if (!product) return [];
+    const getMinSizeStock = (fallbackStock?: number, sizesArr?: any[]) => {
+      if (sizesArr && sizesArr.length > 0) {
+        const quantities = sizesArr.map((s) => Number(s.quantity ?? s.stock ?? 0));
+        return Math.min(...quantities);
+      }
+      return fallbackStock ?? product.stock ?? 0;
+    };
+
     if (product.colors && product.colors.length > 0) {
       return product.colors.map((c) => ({
         id: c.id,
         color: c.colorName || c.color || "",
-        stock: c.stock ?? product.stock ?? 0,
+        stock: getMinSizeStock(c.stock, c.variants),
         sizes: c.variants || [],
       }));
     }
@@ -953,7 +969,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
       return product.wholesaleColors.map((c) => ({
         id: c.id,
         color: c.color || "",
-        stock: c.stock ?? product.stock ?? 0,
+        stock: getMinSizeStock(c.stock, c.sizes),
         sizes: c.sizes || [],
       }));
     }
@@ -978,11 +994,11 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
     if (selectedColorObj?.sizes && selectedColorObj.sizes.length > 0) {
       return selectedColorObj.sizes;
     }
-    if (product?.sizes && product.sizes.length > 0) {
+    if (!item.color && product?.sizes && product.sizes.length > 0) {
       return normalizeSizeOptions(product.sizes);
     }
     return [];
-  }, [selectedColorObj, product]);
+  }, [selectedColorObj, product, item.color]);
 
   const handleQuantityUpdate = (newProductQty: number) => {
     const validQty = Math.max(1, newProductQty);
@@ -1049,7 +1065,7 @@ function NewOrderItemRow({ item, usedColors, onChange, onRemove }: NewOrderItemR
             )}
           </div>
 
-          {sizeList.length > 0 && (
+          {item.color && sizeList.length > 0 && (
             <div className="mt-1">
               <span className="text-[9px] font-bold text-gray-text block uppercase mb-1">{t("sizesAndQuantities", "Sizes & Quantities:")}</span>
               <div className="flex flex-wrap gap-1">
