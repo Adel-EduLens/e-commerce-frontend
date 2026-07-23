@@ -132,7 +132,7 @@ export function UnifiedProductModal({
             item?.imagesByColor
               ?.filter((img) => img.color === color)
               .map((img) => ({ url: img.url, direction: img.direction })) || [],
-          variants: item?.sizes?.map((size) => ({ size, quantity: 10 })) || [],
+          variants: [],
           stock: 0,
         }))
       : [],
@@ -146,7 +146,7 @@ export function UnifiedProductModal({
   const [addingSizeForColor, setAddingSizeForColor] = useState<string | null>(
     null,
   );
-  const [newSizeSelection, setNewSizeSelection] = useState<string>("M");
+  const [newSizeSelections, setNewSizeSelections] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
@@ -235,28 +235,40 @@ export function UnifiedProductModal({
 
         if (fullProduct.colors && fullProduct.colors.length > 0) {
           const mappedColors = fullProduct.colors
-            .map((c: QueryProductColor) => ({
-              color: c.colorName || c.color || "",
-              images:
-                c.images
-                  ?.map(
-                    (img: {
-                      url?: string;
-                      imageUrl?: string;
-                      direction?: string;
-                    }) => ({
-                      url: img.url || img.imageUrl,
-                      direction: img.direction,
-                    }),
-                  )
-                  .filter((i: { url?: string }) => Boolean(i.url)) || [],
-              variants:
-                c.variants?.map((v: { size: string; quantity: number }) => ({
-                  size: v.size,
-                  quantity: v.quantity,
-                })) || [],
-              stock: c.stock || 0,
-            }))
+            .map((c: any) => {
+              const rawVariants = c.variants || c.sizes || [];
+              return {
+                color: c.colorName || c.color || "",
+                images:
+                  c.images
+                    ?.map(
+                      (img: {
+                        url?: string;
+                        imageUrl?: string;
+                        direction?: string;
+                      }) => ({
+                        url: img.url || img.imageUrl,
+                        direction: img.direction,
+                      }),
+                    )
+                    .filter((i: { url?: string }) => Boolean(i.url)) || [],
+                variants: (() => {
+                  const map = new Map<string, { size: string; quantity: number }>();
+                  for (const v of rawVariants) {
+                    if (!v || !v.size) continue;
+                    const key = String(v.size).trim().toLowerCase();
+                    if (!map.has(key)) {
+                      map.set(key, {
+                        size: String(v.size).trim(),
+                        quantity: v.quantity ?? v.stock ?? 0,
+                      });
+                    }
+                  }
+                  return Array.from(map.values());
+                })(),
+                stock: c.stock || 0,
+              };
+            })
             .filter((c: { color: string }) => !!c.color);
 
           setProductColors(mappedColors);
@@ -341,6 +353,20 @@ export function UnifiedProductModal({
       return;
     }
 
+    for (const pc of productColors) {
+      const seenSizes = new Set<string>();
+      for (const v of pc.variants) {
+        const lower = v.size.trim().toLowerCase();
+        if (seenSizes.has(lower)) {
+          const msg = `Duplicate size "${v.size}" found for color "${pc.color}".`;
+          setError(msg);
+          toast.error(msg);
+          return;
+        }
+        seenSizes.add(lower);
+      }
+    }
+
     try {
       setUploading(true);
 
@@ -371,10 +397,16 @@ export function UnifiedProductModal({
               color: pc.color,
               direction: u.direction,
             })),
-            sizes: pc.variants.map((v) => ({
-              size: v.size,
-              quantity: v.quantity,
-            })),
+            sizes: (() => {
+              const map = new Map<string, { size: string; quantity: number }>();
+              for (const v of pc.variants) {
+                const key = v.size.trim().toLowerCase();
+                if (!map.has(key)) {
+                  map.set(key, { size: v.size.trim(), quantity: v.quantity });
+                }
+              }
+              return Array.from(map.values());
+            })(),
           };
         }),
       );
@@ -1091,16 +1123,18 @@ export function UnifiedProductModal({
                     {addingSizeForColor === pc.color ? (
                       <div className="flex items-center gap-2">
                         <select
-                          value={newSizeSelection}
-                          onChange={(e) => setNewSizeSelection(e.target.value)}
+                          value={newSizeSelections[pc.color] ?? "M"}
+                          onChange={(e) =>
+                            setNewSizeSelections((prev) => ({
+                              ...prev,
+                              [pc.color]: e.target.value,
+                            }))
+                          }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
-                              if (
-                                pc.variants.some(
-                                  (v) => v.size === newSizeSelection,
-                                )
-                              ) {
+                              const selectedSize = newSizeSelections[pc.color] ?? "M";
+                              if (pc.variants.some((v) => v.size === selectedSize)) {
                                 toast.error("Size already exists");
                                 return;
                               }
@@ -1111,10 +1145,7 @@ export function UnifiedProductModal({
                                         ...item,
                                         variants: [
                                           ...item.variants,
-                                          {
-                                            size: newSizeSelection,
-                                            quantity: 0,
-                                          },
+                                          { size: selectedSize, quantity: 0 },
                                         ],
                                       }
                                     : item,
@@ -1136,11 +1167,8 @@ export function UnifiedProductModal({
                         <button
                           type="button"
                           onClick={() => {
-                            if (
-                              pc.variants.some(
-                                (v) => v.size === newSizeSelection,
-                              )
-                            ) {
+                            const selectedSize = newSizeSelections[pc.color] ?? "M";
+                            if (pc.variants.some((v) => v.size === selectedSize)) {
                               toast.error("Size already exists");
                               return;
                             }
@@ -1151,7 +1179,7 @@ export function UnifiedProductModal({
                                       ...item,
                                       variants: [
                                         ...item.variants,
-                                        { size: newSizeSelection, quantity: 0 },
+                                        { size: selectedSize, quantity: 0 },
                                       ],
                                     }
                                   : item,
@@ -1176,7 +1204,10 @@ export function UnifiedProductModal({
                         type="button"
                         onClick={() => {
                           setAddingSizeForColor(pc.color);
-                          setNewSizeSelection("M");
+                          setNewSizeSelections((prev) => ({
+                            ...prev,
+                            [pc.color]: prev[pc.color] ?? "M",
+                          }));
                         }}
                         className="text-xs text-primary font-semibold hover:opacity-80"
                       >
@@ -1201,7 +1232,7 @@ export function UnifiedProductModal({
                             className="bg-card border-b border-stroke"
                           >
                             <td className="p-2 font-semibold">{v.size}</td>
-                            <td className="p-2">
+                            <td className="p-2 flex items-center justify-between gap-2">
                               <input
                                 type="number"
                                 min="0"
@@ -1229,6 +1260,27 @@ export function UnifiedProductModal({
                                 }}
                                 className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
                               />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setProductColors((prev) =>
+                                    prev.map((item) =>
+                                      item.color === pc.color
+                                        ? {
+                                            ...item,
+                                            variants: item.variants.filter(
+                                              (_, idx) => idx !== vIdx,
+                                            ),
+                                          }
+                                        : item,
+                                    ),
+                                  );
+                                }}
+                                className="text-red-500 hover:text-red-700 text-xs font-bold px-1"
+                                title="Delete size"
+                              >
+                                ✕
+                              </button>
                             </td>
                           </tr>
                         ))}

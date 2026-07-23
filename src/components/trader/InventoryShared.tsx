@@ -242,15 +242,13 @@ export function AddItemModal({
   const [productColors, setProductColors] = useState<ProductColor[]>([]);
   const [minOrder, setMinOrder] = useState("1");
   const [description, setDescription] = useState("");
-  const [sharedSizes, setSharedSizes] = useState<string[]>([]);
-
   const handleAddPackage = () => {
     setProductColors((prev) => [
       ...prev,
       {
         color: "",
         images: [],
-        variants: sharedSizes.map((size) => ({ size, quantity: 0 })),
+        variants: [],
         stock: 0,
       },
     ]);
@@ -258,22 +256,6 @@ export function AddItemModal({
 
   const handleRemovePackage = (index: number) => {
     setProductColors((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSharedSizesChange = (newSizes: string[]) => {
-    setSharedSizes(newSizes);
-    setProductColors((prev) =>
-      prev.map((pc) => {
-        const updatedVariants = newSizes.map((size) => {
-          const existing = pc.variants.find((v) => v.size === size);
-          return existing ? existing : { size, quantity: 0 };
-        });
-        return {
-          ...pc,
-          variants: updatedVariants,
-        };
-      })
-    );
   };
 
   const [cropState, setCropState] = useState<{
@@ -349,10 +331,6 @@ export function AddItemModal({
           return;
         }
       }
-      if (sharedSizes.length === 0) {
-        setError("Please select at least one shared size.");
-        return;
-      }
       if ((Number(minOrder) || 0) < 1) {
         setError("Min order quantity must be at least 1.");
         return;
@@ -382,6 +360,18 @@ export function AddItemModal({
       }
     }
 
+    for (const pc of productColors) {
+      const sizeSet = new Set<string>();
+      for (const v of pc.variants) {
+        const lower = v.size.trim().toLowerCase();
+        if (sizeSet.has(lower)) {
+          setError(`Duplicate size '${v.size}' found for color '${pc.color}'.`);
+          return;
+        }
+        sizeSet.add(lower);
+      }
+    }
+
     try {
       setUploading(true);
 
@@ -396,7 +386,16 @@ export function AddItemModal({
             minOrder: type === "wholesale" ? (Number(minOrder) || 1) : 1,
             stock: colorStock,
             images: urls.map((url) => ({ url, color: pc.color })),
-            sizes: pc.variants.map((v) => ({ size: v.size, quantity: v.quantity })),
+            sizes: (() => {
+              const map = new Map<string, { size: string; quantity: number }>();
+              for (const v of pc.variants) {
+                const key = v.size.trim().toLowerCase();
+                if (!map.has(key)) {
+                  map.set(key, { size: v.size.trim(), quantity: v.quantity });
+                }
+              }
+              return Array.from(map.values());
+            })(),
           };
         })
       );
@@ -779,13 +778,13 @@ export function AddItemModal({
                                   onChange={(e) => {
                                     const qty = Number(e.target.value);
                                     setProductColors((prev) =>
-                                      prev.map((item) =>
-                                        item.color === pc.color
+                                      prev.map((item, idx) =>
+                                        idx === colorIdx
                                           ? {
                                             ...item,
                                             variants: item.variants.map(
-                                              (variant, idx) =>
-                                                idx === vIdx
+                                              (variant, i) =>
+                                                i === vIdx
                                                   ? {
                                                     ...variant,
                                                     quantity: qty,
@@ -805,12 +804,12 @@ export function AddItemModal({
                                   type="button"
                                   onClick={() => {
                                     setProductColors((prev) =>
-                                      prev.map((item) =>
-                                        item.color === pc.color
+                                      prev.map((item, idx) =>
+                                        idx === colorIdx
                                           ? {
                                             ...item,
                                             variants: item.variants.filter(
-                                              (_, idx) => idx !== vIdx,
+                                              (_, i) => i !== vIdx,
                                             ),
                                           }
                                           : item,
@@ -836,7 +835,7 @@ export function AddItemModal({
                     {/* Add Size Controls */}
                     <div className="flex gap-2 items-center pt-2">
                       <select
-                        id={`add-size-select-${pc.color}`}
+                        id={`add-size-select-${colorIdx}`}
                         className="flex-1 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] bg-card outline-none focus:border-primary"
                       >
                         <option value="">{tShared("size")}</option>
@@ -849,7 +848,7 @@ export function AddItemModal({
                       <input
                         type="number"
                         min="0"
-                        id={`add-size-qty-${pc.color}`}
+                        id={`add-size-qty-${colorIdx}`}
                         placeholder={tShared("qty")}
                         defaultValue="10"
                         className="w-16 border border-stroke rounded-xl px-3 py-1.5 text-xs font-['Montserrat'] outline-none focus:border-primary"
@@ -858,10 +857,10 @@ export function AddItemModal({
                         type="button"
                         onClick={() => {
                           const sizeSel = document.getElementById(
-                            `add-size-select-${pc.color}`,
+                            `add-size-select-${colorIdx}`,
                           ) as HTMLSelectElement;
                           const qtySel = document.getElementById(
-                            `add-size-qty-${pc.color}`,
+                            `add-size-qty-${colorIdx}`,
                           ) as HTMLInputElement;
                           const sizeVal = sizeSel?.value;
                           const qtyVal = Number(qtySel?.value || 0);
@@ -876,15 +875,15 @@ export function AddItemModal({
                           }
                           if (pc.variants.some((v) => v.size === sizeVal)) {
                             setError(
-                              tShared("sizeExists", { size: sizeVal, color: pc.color }),
+                              tShared("sizeExists", { size: sizeVal, color: pc.color || `#${colorIdx + 1}` }),
                             );
                             return;
                           }
 
                           setError("");
                           setProductColors((prev) =>
-                            prev.map((item) =>
-                              item.color === pc.color
+                            prev.map((item, idx) =>
+                              idx === colorIdx
                                 ? {
                                   ...item,
                                   variants: [
@@ -910,18 +909,6 @@ export function AddItemModal({
 
           {type === "wholesale" && (
             <>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  {tShared("sharedSizes")}
-                </label>
-                <MultiSelect
-                  label={tShared("selectSharedSizes")}
-                  options={SIZE_OPTIONS}
-                  selected={sharedSizes}
-                  onChange={handleSharedSizesChange}
-                />
-              </div>
-
               <div className="flex justify-between items-center pt-2">
                 <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
                   {tShared("packages")}
@@ -1093,13 +1080,13 @@ export function AddItemModal({
                     )}
                   </div>
 
-                  {sharedSizes.length > 0 && (
+                  {pc.variants.length > 0 && (
                     <div className="pt-1.5 flex items-center gap-1.5">
                       <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
                         {tShared("sizes")}:
                       </span>
                       <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
-                        {sharedSizes.join(", ")}
+                        {pc.variants.map((v) => v.size).join(", ")}
                       </span>
                     </div>
                   )}
@@ -1245,8 +1232,6 @@ export function EditItemModal({
   const [wholesaleColorsState, setWholesaleColorsState] = useState<WholesaleColorEditState[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [sharedSizes, setSharedSizes] = useState<string[]>([]);
-
   const handleAddPackageEdit = () => {
     setWholesaleColorsState((prev) => [
       ...prev,
@@ -1255,25 +1240,9 @@ export function EditItemModal({
         minOrder: 1,
         stock: 0,
         images: [],
-        variants: sharedSizes.map((size) => ({ size })),
+        variants: [],
       },
     ]);
-  };
-
-  const handleSharedSizesChangeEdit = (newSizes: string[]) => {
-    setSharedSizes(newSizes);
-    setWholesaleColorsState((prev) =>
-      prev.map((wc) => {
-        const updatedVariants = newSizes.map((size) => {
-          const existing = wc.variants.find((v) => v.size === size);
-          return existing ? existing : { size };
-        });
-        return {
-          ...wc,
-          variants: updatedVariants,
-        };
-      })
-    );
   };
 
   const { data: categories = [] } = useCategories(!isProductType);
@@ -1296,10 +1265,21 @@ export function EditItemModal({
         const colorImages = (wholesale.images || [])
           .filter((img) => img.color === wc.color)
           .map((img) => ({ id: img.id, url: img.url }));
-        const colorSizes = (wc.sizes || []).map((s) => ({
-          id: s.id,
-          size: s.size,
-        }));
+        const colorSizes = (() => {
+          const map = new Map<string, { id?: string; size: string; quantity: number }>();
+          for (const s of wc.sizes || []) {
+            if (!s || !s.size) continue;
+            const key = String(s.size).trim().toLowerCase();
+            if (!map.has(key)) {
+              map.set(key, {
+                id: s.id,
+                size: String(s.size).trim(),
+                quantity: s.quantity ?? 0,
+              });
+            }
+          }
+          return Array.from(map.values());
+        })();
         return {
           color: wc.color,
           minOrder: wc.minOrder ?? 1,
@@ -1309,13 +1289,6 @@ export function EditItemModal({
         };
       });
       setWholesaleColorsState(mapped);
-
-      const initialSizes = Array.from(
-        new Set(
-          (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
-        )
-      );
-      setSharedSizes(initialSizes);
     }
   }, [wholesale]);
 
@@ -2172,18 +2145,6 @@ export function EditItemModal({
 
           {item.type === "wholesale" && (
             <>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                  {tShared("sharedSizes")}
-                </label>
-                <MultiSelect
-                  label={tShared("selectSharedSizes")}
-                  options={SIZE_OPTIONS}
-                  selected={sharedSizes}
-                  onChange={handleSharedSizesChangeEdit}
-                />
-              </div>
-
               <div className="flex justify-between items-center pt-2">
                 <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
                   {tShared("packages")}
@@ -2354,13 +2315,13 @@ export function EditItemModal({
                     </div>
                   </div>
 
-                  {sharedSizes.length > 0 && (
+                  {color.variants.length > 0 && (
                     <div className="pt-1.5 flex items-center gap-1.5">
                       <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
                         {tShared("sizes")}:
                       </span>
                       <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
-                        {sharedSizes.join(", ")}
+                        {color.variants.map((v) => v.size).join(", ")}
                       </span>
                     </div>
                   )}
