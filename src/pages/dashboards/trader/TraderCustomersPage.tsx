@@ -1,36 +1,38 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useTraderCustomers, useTraderDashboardOrders, type TraderCustomer } from "../../../hooks/queries/ordersQuery";
 import LoadingSpinner from "../../../components/shared/LoadingSpinner";
 
 const asset = (file: string) =>
   `/trader-product/${file.split("/").map(encodeURIComponent).join("/")}`;
 
-function statusPill(status: string) {
+function getStatusPillInfo(status: string, t: (key: string) => string) {
   const s = status?.toUpperCase();
   if (s === "COMPLETED" || s === "DELIVERED")
-    return { bg: "bg-emerald-50", text: "text-emerald-700", label: "Completed" };
+    return { bg: "bg-emerald-50", text: "text-emerald-700", label: t("completed") };
   if (s === "SHIPPED")
-    return { bg: "bg-sky-50", text: "text-sky-700", label: "Shipped" };
+    return { bg: "bg-sky-50", text: "text-sky-700", label: t("shipped") };
   if (s === "PROCESSING")
-    return { bg: "bg-sky-50", text: "text-sky-700", label: "Processing" };
+    return { bg: "bg-sky-50", text: "text-sky-700", label: t("processing") };
   if (s === "CANCELLED")
-    return { bg: "bg-red-50", text: "text-red-600", label: "Cancelled" };
-  return { bg: "bg-amber-50", text: "text-amber-700", label: "Pending" };
+    return { bg: "bg-red-50", text: "text-red-600", label: t("cancelled") };
+  return { bg: "bg-amber-50", text: "text-amber-700", label: t("pending") };
 }
 
 function DonutChart({ total, completed, cancelled, pending }: {
   total: number; completed: number; cancelled: number; pending: number;
 }) {
+  const { t } = useTranslation("traderCustomers");
   const rawSegs = [
-    { label: "Completed", value: completed, color: "#A81324" },
-    { label: "Pending/Shipped", value: pending, color: "#FCD34D" },
-    { label: "Cancelled", value: cancelled, color: "#7DD3FC" },
+    { label: t("completed"), value: completed, color: "#A81324" },
+    { label: t("pendingShipped"), value: pending, color: "#FCD34D" },
+    { label: t("cancelled"), value: cancelled, color: "#7DD3FC" },
   ];
   const other = Math.max(0, total - completed - cancelled - pending);
-  if (other > 0) rawSegs.push({ label: "Other", value: other, color: "#E5E7EB" });
+  if (other > 0) rawSegs.push({ label: t("other"), value: other, color: "#E5E7EB" });
   const segments = rawSegs.filter((s) => s.value > 0);
   const isNoData = segments.length === 0;
-  if (isNoData) segments.push({ label: "No data", value: 1, color: "#E5E7EB" });
+  if (isNoData) segments.push({ label: t("noData"), value: 1, color: "#E5E7EB" });
 
   const sum = segments.reduce((s, x) => s + x.value, 0);
   const cx = 70, cy = 70, r = 50, innerR = 28;
@@ -55,13 +57,13 @@ function DonutChart({ total, completed, cancelled, pending }: {
       <svg width="140" height="140" viewBox="0 0 140 140">
         {paths.map((seg) => <path key={seg.label} d={seg.d} fill={seg.color} />)}
         <text x={cx} y={cy - 4} textAnchor="middle" fontSize="14" fontWeight="700" fill="#111827">{total}</text>
-        <text x={cx} y={cy + 14} textAnchor="middle" fontSize="7" fill="#6B7280">Total Customers</text>
+        <text x={cx} y={cy + 14} textAnchor="middle" fontSize="7" fill="#6B7280">{t("totalCustomers")}</text>
       </svg>
       <div className="flex flex-col gap-2">
         {isNoData ? (
           <div className="flex items-center gap-2">
             <span className="h-3 w-3 rounded-full shrink-0 border border-gray-300 bg-[#E5E7EB]" />
-            <span className="font-['Montserrat'] text-xs text-gray-text">No data</span>
+            <span className="font-['Montserrat'] text-xs text-gray-text">{t("noData")}</span>
           </div>
         ) : (
           segments.map((seg) => (
@@ -80,22 +82,23 @@ function DonutChart({ total, completed, cancelled, pending }: {
 }
 
 function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack: () => void }) {
+  const { t } = useTranslation("traderCustomers");
   const { data: allOrders = [], isLoading } = useTraderDashboardOrders({ type: "ALL" });
   const customerOrders = useMemo(
     () => allOrders.filter((o) => o.customerEmail === customer.email),
     [allOrders, customer.email]
   );
   const totalSpentNum = customerOrders.reduce((sum, o) => {
-    const t = typeof o.total === "string" ? parseFloat(o.total.replace(/[^\d.]/g, "")) : Number(o.total);
-    return sum + (isNaN(t) ? 0 : t);
+    const tVal = typeof o.total === "string" ? parseFloat(o.total.replace(/[^\d.]/g, "")) : Number(o.total);
+    return sum + (isNaN(tVal) ? 0 : tVal);
   }, 0);
   const avgOrder = customerOrders.length > 0 ? totalSpentNum / customerOrders.length : 0;
 
   const statCards = [
-    { label: "Total Orders", value: String(customerOrders.length) },
-    { label: "Total Spent", value: customer.totalSpent },
-    { label: "Avg. Order Value", value: customerOrders.length > 0 ? `EGP ${avgOrder.toFixed(2)}` : "—" },
-    { label: "Last Purchase", value: customer.lastPurchase },
+    { label: t("totalOrders"), value: String(customerOrders.length) },
+    { label: t("totalSpent"), value: customer.totalSpent },
+    { label: t("avgOrderValue"), value: customerOrders.length > 0 ? `EGP ${avgOrder.toFixed(2)}` : "—" },
+    { label: t("lastPurchase"), value: customer.lastPurchase },
   ];
 
   return (
@@ -104,7 +107,7 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
         <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
           <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        Back to Customers
+        {t("backToCustomers")}
       </button>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -117,9 +120,9 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
       </div>
 
       <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Customer Information</h3>
+        <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("customerInformation")}</h3>
         <div className="flex flex-col gap-4">
-          {[{ label: "Name", value: customer.name }, { label: "Email", value: customer.email }, { label: "Phone", value: customer.phone || "—" }].map((row) => (
+          {[{ label: t("name"), value: customer.name }, { label: t("email"), value: customer.email }, { label: t("phone"), value: customer.phone || "—" }].map((row) => (
             <div key={row.label} className="flex items-center gap-1.5">
               <div className="h-6 w-6 shrink-0 rounded bg-gray-light" />
               <span className="font-['Montserrat'] text-base font-semibold text-gray-text">{row.label} </span>
@@ -131,26 +134,26 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
 
       <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
-          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">Order History</h3>
-          <span className="font-['Montserrat'] text-sm text-gray-text">{customerOrders.length} orders</span>
+          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">{t("orderHistory")}</h3>
+          <span className="font-['Montserrat'] text-sm text-gray-text">{t("ordersCount", { count: customerOrders.length })}</span>
         </div>
         {isLoading ? (
           <LoadingSpinner containerClassName="py-12" />
         ) : customerOrders.length === 0 ? (
-          <div className="py-12 text-center font-['Montserrat'] text-sm text-gray-text">No orders found.</div>
+          <div className="py-12 text-center font-['Montserrat'] text-sm text-gray-text">{t("noOrdersFound")}</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full border-separate border-spacing-0">
+            <table className="trader-table">
               <thead>
                 <tr className="bg-secondary">
-                  {["Order ID", "Date", "Items", "Payment", "Total", "Status"].map((col) => (
+                  {[t("colOrderId"), t("colDate"), t("colItems"), t("colPayment"), t("colTotal"), t("colStatus")].map((col) => (
                     <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">{col}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {customerOrders.map((order, idx) => {
-                  const pill = statusPill(order.status);
+                  const pill = getStatusPillInfo(order.status, t);
                   return (
                     <tr key={order.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
                       <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
@@ -158,7 +161,7 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
                           <span>{order.orderId}</span>
                           {order.orderType === "WHOLESALE" && (
                             <span className="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
-                              Wholesale
+                              {t("wholesale")}
                             </span>
                           )}
                         </div>
@@ -185,6 +188,7 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
 const PAGE_SIZE = 10;
 
 export default function TraderCustomersPage() {
+  const { t } = useTranslation("traderCustomers");
   const { data: customers = [], isLoading } = useTraderCustomers();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -213,10 +217,10 @@ export default function TraderCustomersPage() {
   const pendingCount = customers.filter((c) => ["PENDING", "PROCESSING", "SHIPPED"].includes(c.status?.toUpperCase())).length;
 
   const summaryCards = [
-    { label: "Total Customers", value: String(customers.length) },
-    { label: "Total Orders", value: String(totalOrders) },
-    { label: "Total Revenue", value: `EGP ${totalSpentAll.toFixed(2)}` },
-    { label: "Avg. Order Value", value: totalOrders > 0 ? `EGP ${avgOrderValue.toFixed(2)}` : "—" },
+    { label: t("totalCustomers"), value: String(customers.length) },
+    { label: t("totalOrders"), value: String(totalOrders) },
+    { label: t("totalRevenue"), value: `EGP ${totalSpentAll.toFixed(2)}` },
+    { label: t("avgOrderValue"), value: totalOrders > 0 ? `EGP ${avgOrderValue.toFixed(2)}` : "—" },
   ];
 
   if (selectedCustomer) {
@@ -239,7 +243,7 @@ export default function TraderCustomersPage() {
           <img className="pointer-events-none absolute left-4 h-5 w-5" src={asset("mynaui_search.svg")} alt="" />
           <input
             type="text"
-            placeholder="Search customers..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full rounded-2xl border border-stroke bg-card py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-primary"
@@ -249,30 +253,30 @@ export default function TraderCustomersPage() {
 
       <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
-          <h2 className="font-['Montserrat'] text-base font-semibold text-foreground">Customer Activity</h2>
-          <span className="font-['Montserrat'] text-xs text-gray-text">{filtered.length} customers</span>
+          <h2 className="font-['Montserrat'] text-base font-semibold text-foreground">{t("customerActivity")}</h2>
+          <span className="font-['Montserrat'] text-xs text-gray-text">{t("customersCount", { count: filtered.length })}</span>
         </div>
 
         {isLoading ? (
           <LoadingSpinner containerClassName="py-16" />
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center font-['Montserrat'] text-sm text-gray-text">
-            {search ? "No customers match your search." : "No customers yet. Orders will appear here once placed."}
+            {search ? t("noCustomersMatch") : t("noCustomersYet")}
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-0">
+              <table className="trader-table">
                 <thead>
                   <tr className="bg-secondary">
-                    {["Customer Name", "Email", "Phone", "Orders", "Total Spent", "Last Purchase", "Status"].map((col) => (
+                    {[t("colCustomerName"), t("email"), t("colPhone"), t("colOrders"), t("colTotalSpent"), t("colLastPurchase"), t("colStatus")].map((col) => (
                       <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">{col}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {paginated.map((customer, idx) => {
-                    const pill = statusPill(customer.status);
+                    const pill = getStatusPillInfo(customer.status, t);
                     return (
                       <tr
                         key={customer.email}
@@ -323,12 +327,12 @@ export default function TraderCustomersPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">Customers by Last Order Status</h3>
+          <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">{t("customersByStatus")}</h3>
           <DonutChart total={customers.length} completed={completedCount} cancelled={cancelledCount} pending={pendingCount} />
         </div>
 
         <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-          <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">Top Spenders</h3>
+          <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">{t("topSpenders")}</h3>
           {isLoading ? (
             <LoadingSpinner containerClassName="py-8" />
           ) : (
@@ -346,7 +350,7 @@ export default function TraderCustomersPage() {
                     <span className="font-['Montserrat'] text-sm font-bold text-primary shrink-0">{c.totalSpent}</span>
                   </div>
                 ))}
-              {customers.length === 0 && <p className="text-center font-['Montserrat'] text-sm text-gray-text">No data yet.</p>}
+              {customers.length === 0 && <p className="text-center font-['Montserrat'] text-sm text-gray-text">{t("noDataYet")}</p>}
             </div>
           )}
         </div>

@@ -86,6 +86,9 @@ import traderCouponsAr from "./locales/ar/traderCoupons.json";
 import traderOrdersEn from "./locales/en/traderOrders.json";
 import traderOrdersAr from "./locales/ar/traderOrders.json";
 
+import traderCustomersEn from "./locales/en/traderCustomers.json";
+import traderCustomersAr from "./locales/ar/traderCustomers.json";
+
 import traderDesignsEn from "./locales/en/traderDesigns.json";
 import traderDesignsAr from "./locales/ar/traderDesigns.json";
 
@@ -170,6 +173,7 @@ i18n
         traderBrands: traderBrandsEn,
         traderCoupons: traderCouponsEn,
         traderOrders: traderOrdersEn,
+        traderCustomers: traderCustomersEn,
         traderDesigns: traderDesignsEn,
         traderHelpCenter: traderHelpCenterEn,
         traderWholesaleCategories: traderWholesaleCategoriesEn,
@@ -216,6 +220,7 @@ i18n
         traderBrands: traderBrandsAr,
         traderCoupons: traderCouponsAr,
         traderOrders: traderOrdersAr,
+        traderCustomers: traderCustomersAr,
         traderDesigns: traderDesignsAr,
         traderHelpCenter: traderHelpCenterAr,
         traderWholesaleCategories: traderWholesaleCategoriesAr,

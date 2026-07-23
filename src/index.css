@@ -374,3 +374,38 @@ select option {
   transform: translateY(1px);
   box-shadow: 0 2px 10px rgba(193, 18, 31, 0.25);
 }
+
+/* Reusable Trader Dashboard Table Styles */
+.trader-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: "Montserrat", sans-serif;
+}
+
+.trader-table th {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background-color: var(--secondary);
+  color: var(--primary);
+  text-align: start;
+}
+
+.trader-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--foreground);
+  text-align: start;
+}
+
+.trader-table tr:nth-child(even) {
+  background-color: var(--background);
+}
+
+.trader-table tr:nth-child(odd) {
+  background-color: var(--card);
+}
+
