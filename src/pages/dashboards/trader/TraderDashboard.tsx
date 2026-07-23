@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { useTranslation } from "react-i18next";
-import { useTraderProducts } from "../../../hooks/queries/productsQuery";
+import { useTraderProducts, type Product } from "../../../hooks/queries/productsQuery";
 import { useCategories } from "../../../hooks/queries/categoriesQuery";
 import { useTraderDashboardOrders } from "../../../hooks/queries/ordersQuery";
+import { useTraderWholesaleOrders } from "../../../hooks/queries/wholesaleOrderQuery";
 import { Loader2, Filter, Calendar, Tag, X, Download } from "lucide-react";
 import { toast } from "sonner";
 
@@ -292,6 +293,33 @@ function getStatusPill(status: string) {
   return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
 }
 
+const getOrderTypes = (order: any, productsList: Product[]) => {
+  if (order.orderType === "WHOLESALE") {
+    return ["WHOLESALE"];
+  }
+
+  const types = new Set<string>();
+  order.items?.forEach((item: any) => {
+    const product = productsList.find((p) => p.id === item.productId);
+    if (product?.productTypes && Array.isArray(product.productTypes)) {
+      product.productTypes.forEach((t) => {
+        // productTypes can be a string relation or string directly
+        const typeStr = typeof t === "string" ? t : (t as any).type || (t as any).productTypes;
+        if (typeStr) types.add(typeStr);
+      });
+    } else if (product) {
+      if (product.shopPrice !== null && product.shopPrice !== undefined) types.add("SHOP");
+      if (product.retailPrice !== null && product.retailPrice !== undefined) types.add("RETAIL");
+      if (product.blankPrice !== null && product.blankPrice !== undefined) types.add("BLANK");
+      if (product.wholesalePrice !== null && product.wholesalePrice !== undefined) types.add("WHOLESALE");
+    } else {
+      types.add("SHOP");
+    }
+  });
+
+  return Array.from(types);
+};
+
 export default function TraderDashboard() {
   const { user } = useAuthStore();
   const { t } = useTranslation("traderOverview");
@@ -314,7 +342,7 @@ export default function TraderDashboard() {
   // 3. Construct Backend Query Params for Orders
   const orderQueryParams = useMemo(
     () => ({
-      type: typeFilter !== "ALL" ? typeFilter : undefined,
+      type: typeFilter !== "ALL" && typeFilter !== "WHOLESALE" ? typeFilter : undefined,
       categoryId: categoryFilter !== "ALL" ? categoryFilter : undefined,
       fromDate: fromDate || undefined,
       toDate: toDate || undefined,
@@ -322,24 +350,77 @@ export default function TraderDashboard() {
     [typeFilter, categoryFilter, fromDate, toDate]
   );
 
-  // 4. Fetch backend-filtered trader orders directly
-  const { data: orders = [], isLoading: ordersLoading } = useTraderDashboardOrders(orderQueryParams);
+  // 4. Fetch backend-filtered trader orders directly (retail, shop, blank)
+  const { data: orders = [], isLoading: ordersLoading } = useTraderDashboardOrders(
+    orderQueryParams,
+    { enabled: typeFilter !== "WHOLESALE" }
+  );
 
-  // 5. Calculate total revenue & metrics directly from backend orders & products
+  // 4b. Fetch wholesale orders separately
+  const { data: wholesaleOrders = [], isLoading: wholesaleOrdersLoading } = useTraderWholesaleOrders({
+    enabled: typeFilter === "ALL" || typeFilter === "WHOLESALE",
+  });
+
+  // 4c. Combine and filter orders in frontend
+  const combinedOrders = useMemo(() => {
+    // Filter wholesale orders by category and dates
+    const filteredWholesale = wholesaleOrders
+      .map((wo) => ({ ...wo, orderType: "WHOLESALE" }))
+      .filter((order) => {
+        // Date filter
+        const orderDate = new Date(order.createdAt || order.date);
+        const from = fromDate ? new Date(fromDate) : null;
+        if (from) from.setHours(0, 0, 0, 0);
+        const to = toDate ? new Date(toDate) : null;
+        if (to) to.setHours(23, 59, 59, 999);
+
+        if (from && orderDate < from) return false;
+        if (to && orderDate > to) return false;
+
+        // Category filter
+        if (categoryFilter !== "ALL") {
+          const hasMatchingProduct = order.items?.some((item) => {
+            const product = traderProducts.find((p) => p.id === item.productId);
+            if (!product) return false;
+            const inCategories = product.categories?.some((c) => c.id === categoryFilter);
+            const inCategory = product.category?.id === categoryFilter;
+            return inCategories || inCategory;
+          });
+          if (!hasMatchingProduct) return false;
+        }
+
+        return true;
+      });
+
+    if (typeFilter === "WHOLESALE") {
+      return filteredWholesale;
+    }
+
+    if (typeFilter === "ALL") {
+      return [...orders, ...filteredWholesale].sort(
+        (a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime()
+      );
+    }
+
+    // Otherwise (SHOP, RETAIL, BLANK)
+    return orders;
+  }, [typeFilter, orders, wholesaleOrders, categoryFilter, fromDate, toDate, traderProducts]);
+
+  // 5. Calculate total revenue & metrics directly from combined orders & products
   const totalRevenueNum = useMemo(() => {
-    return orders.reduce((sum, order) => {
+    return combinedOrders.reduce((sum, order) => {
       return sum + parsePrice(order.total);
     }, 0);
-  }, [orders]);
+  }, [combinedOrders]);
 
   const totalDiscountNum = useMemo(() => {
-    return orders.reduce((sum, order) => {
+    return combinedOrders.reduce((sum, order) => {
       return sum + parsePrice(order.discount);
     }, 0);
-  }, [orders]);
+  }, [combinedOrders]);
 
   const summaryCardsData = useMemo(() => {
-    const totalOrdersCount = orders.length;
+    const totalOrdersCount = combinedOrders.length;
     const totalProductsCount = traderProducts.length;
     const avgOrderVal = totalOrdersCount > 0 ? totalRevenueNum / totalOrdersCount : 0;
 
@@ -385,15 +466,15 @@ export default function TraderDashboard() {
         icon: "hugeicons_trade-up.svg",
       },
     ];
-  }, [orders, traderProducts, totalRevenueNum, totalDiscountNum]);
+  }, [combinedOrders, traderProducts, totalRevenueNum, totalDiscountNum]);
 
-  // 6. Dynamic Revenue Trend Chart (Monthly sales from backend orders)
+  // 6. Dynamic Revenue Trend Chart (Monthly sales from combined orders)
   const dynamicRevenueSeries = useMemo(() => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const monthlyTotals: Record<string, number> = {};
     months.forEach((m) => (monthlyTotals[m] = 0));
 
-    orders.forEach((order) => {
+    combinedOrders.forEach((order) => {
       const d = new Date(order.createdAt || order.date);
       if (!isNaN(d.getTime())) {
         const monthName = months[d.getMonth()];
@@ -406,14 +487,14 @@ export default function TraderDashboard() {
       month: m,
       value: Number((monthlyTotals[m] || 0).toFixed(2)),
     }));
-  }, [orders]);
+  }, [combinedOrders]);
 
   const maxChartVal = useMemo(() => {
     const max = Math.max(...dynamicRevenueSeries.map((s) => s.value), 0);
     return max > 0 ? max * 1.2 : 1000;
   }, [dynamicRevenueSeries]);
 
-  // 7. Order Status Distribution from backend orders
+  // 7. Order Status Distribution from combined orders
   const orderStatusDistribution = useMemo(() => {
     const counts = {
       new: 0,
@@ -422,7 +503,7 @@ export default function TraderDashboard() {
       delivered: 0,
     };
 
-    orders.forEach((o) => {
+    combinedOrders.forEach((o) => {
       const s = (o.status || "").toUpperCase();
       if (s === "PENDING" || s === "NEW") counts.new++;
       else if (s === "PROCESSING" || s === "CONFIRMED") counts.processing++;
@@ -431,7 +512,7 @@ export default function TraderDashboard() {
       else counts.new++;
     });
 
-    const total = orders.length || 1;
+    const total = combinedOrders.length || 1;
 
     return [
       { label: "new", count: counts.new, share: Math.round((counts.new / total) * 100), color: "#EF4444" },
@@ -439,7 +520,7 @@ export default function TraderDashboard() {
       { label: "shipped", count: counts.shipped, share: Math.round((counts.shipped / total) * 100), color: "#38BDF8" },
       { label: "delivered", count: counts.delivered, share: Math.round((counts.delivered / total) * 100), color: "#10B981" },
     ];
-  }, [orders]);
+  }, [combinedOrders]);
 
   // 8. Inventory Snapshot from trader products
   const inventorySnapshot = useMemo(() => {
@@ -545,11 +626,11 @@ export default function TraderDashboard() {
         image: p.images?.[0]?.url || (typeof p.image === "string" ? p.image : undefined) || traderAsset("image 69.png"),
       };
     });
-  }, [orders, traderProducts]);
+  }, [combinedOrders, traderProducts]);
 
   // 10. Export XLS Function with complete financial details and i18n support
   const handleExportXLS = () => {
-    if (orders.length === 0) {
+    if (combinedOrders.length === 0) {
       toast.error(t("noSalesToExport", "لا توجد مبيعات لتصديرها بالفلتر الحالي"));
       return;
     }
@@ -557,7 +638,7 @@ export default function TraderDashboard() {
     let csvContent = "\uFEFF"; // UTF-8 BOM for Arabic compatibility in Excel
     csvContent += `${t("orderId", "رقم الطلب")},${t("customer", "اسم العميل")},${t("customerPhone", "رقم الهاتف")},${t("paymentMethod", "طريقة الدفع")},${t("subtotal", "المبلغ الفرعي")},${t("shipping", "الشحن")},${t("discount", "الخصم")},${t("totalPaid", "المبلغ المدفوع (الإجمالي)")},${t("date", "التاريخ")},${t("status", "الحالة")},${t("itemsCountHeader", "عدد المنتجات")}\n`;
 
-    orders.forEach((order) => {
+    combinedOrders.forEach((order) => {
       const id = order.orderId || `#${order.id.slice(-6)}`;
       const customer = (order.customer || t("guestCustomer", "عميل زائر")).replace(/,/g, " ");
       const phone = (order.customerPhone || "").replace(/,/g, " ");
@@ -587,7 +668,7 @@ export default function TraderDashboard() {
     toast.success(t("exportSuccess", "تم تصدير ملف XLS بنجاح!"));
   };
 
-  const isLoading = productsLoading || ordersLoading;
+  const isLoading = productsLoading || ordersLoading || wholesaleOrdersLoading;
 
   return (
     <div className="space-y-6">
@@ -756,7 +837,7 @@ export default function TraderDashboard() {
           ) : (
             <OrdersByStatus
               orderStatus={orderStatusDistribution}
-              totalOrdersCount={orders.length}
+              totalOrdersCount={combinedOrders.length}
             />
           )}
         </Panel>
@@ -843,7 +924,7 @@ export default function TraderDashboard() {
       {/* Recent Transactions */}
       <section>
         <Panel title={t("recentTransactions", "أحدث المعاملات")}>
-          {orders.length === 0 ? (
+          {combinedOrders.length === 0 ? (
             <div className="py-8 text-center text-sm font-medium text-gray-text">
               {t("noTransactions", "لا توجد معاملات مبيعات حالياً.")}
             </div>
@@ -858,6 +939,11 @@ export default function TraderDashboard() {
                     <th className="px-4 py-3 text-start font-['Montserrat'] text-xs font-semibold text-gray-text">
                       {t("customer", "العميل")}
                     </th>
+                    {typeFilter === "ALL" && (
+                      <th className="px-4 py-3 text-start font-['Montserrat'] text-xs font-semibold text-gray-text">
+                        {t("type", "النوع")}
+                      </th>
+                    )}
                     <th className="px-4 py-3 text-start font-['Montserrat'] text-xs font-semibold text-gray-text">
                       {t("total", "الإجمالي")}
                     </th>
@@ -870,7 +956,7 @@ export default function TraderDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.slice(0, 8).map((transaction, index) => (
+                  {combinedOrders.slice(0, 8).map((transaction, index) => (
                     <tr
                       key={transaction.id}
                       className={index % 2 === 0 ? "bg-card hover:bg-background/50 transition-colors" : "bg-background/40 hover:bg-background/80 transition-colors"}
@@ -889,6 +975,38 @@ export default function TraderDashboard() {
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
                         {transaction.customer || t("guestCustomer", "عميل زائر")}
                       </td>
+                      {typeFilter === "ALL" && (
+                        <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
+                          <div className="flex flex-wrap gap-1">
+                            {getOrderTypes(transaction, traderProducts).map((type) => {
+                              let bgClass = "bg-gray-500/10 text-gray-400 border border-gray-500/20";
+                              if (type === "WHOLESALE") bgClass = "bg-rose-500/10 text-rose-500 border border-rose-500/20";
+                              else if (type === "RETAIL") bgClass = "bg-purple-500/10 text-purple-400 border border-purple-500/20";
+                              else if (type === "SHOP") bgClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+                              else if (type === "BLANK") bgClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";
+
+                              const label = type === "WHOLESALE"
+                                ? t("typeWholesale", "جملة")
+                                : type === "RETAIL"
+                                ? t("typeRetail", "قطاعي")
+                                : type === "SHOP"
+                                ? t("typeShop", "متجر")
+                                : type === "BLANK"
+                                ? t("typeBlank", "سادة")
+                                : type;
+
+                              return (
+                                <span
+                                  key={type}
+                                  className={`inline-flex rounded-xl px-2 py-0.5 text-[10px] font-bold uppercase ${bgClass}`}
+                                >
+                                  {label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
                         {typeof transaction.total === "number"
                           ? `EGP ${transaction.total.toFixed(2)}`

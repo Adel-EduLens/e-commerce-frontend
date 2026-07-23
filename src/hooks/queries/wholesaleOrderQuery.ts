@@ -32,15 +32,18 @@ export interface WholesaleOrder {
   discount: string;
   status: string;
   items: WholesaleOrderItem[];
+  createdAt?: string;
+  couponCode?: string | null;
 }
 
-export const useTraderWholesaleOrders = () => {
+export const useTraderWholesaleOrders = (options?: any) => {
   return useQuery<WholesaleOrder[], Error>({
     queryKey: ["trader-wholesale-orders"],
     queryFn: async () => {
       const { data } = await api.get("/wholesale-orders/trader");
       return data?.data || [];
     },
+    ...options,
   });
 };
 

@@ -58,7 +58,10 @@ const getTraderDashboardOrders = async (params?: GetTraderOrdersParams): Promise
   return data?.data || [];
 };
 
-export const useTraderDashboardOrders = (params?: GetTraderOrdersParams) => {
+export const useTraderDashboardOrders = (
+  params?: GetTraderOrdersParams,
+  options?: any
+) => {
   return useQuery<TraderOrder[]>({
     queryKey: [
       "trader-dashboard-orders",
@@ -68,6 +71,7 @@ export const useTraderDashboardOrders = (params?: GetTraderOrdersParams) => {
       params?.toDate,
     ],
     queryFn: () => getTraderDashboardOrders(params),
+    ...options,
   });
 };
 
