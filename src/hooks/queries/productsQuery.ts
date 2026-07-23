@@ -323,8 +323,8 @@ export interface ProductFormData {
   name: string;
   description?: string;
   price?: number;
-  shopPrice?: number;
-  wholesalePrice?: number;
+  shopPrice?: number | null;
+  wholesalePrice?: number | null;
   categoryIds?: string[];
   brandId?: string;
   images: { url: string; color: string; direction?: string }[];
@@ -339,8 +339,8 @@ export interface ProductFormData {
   isFlashDeals?: boolean;
   flashDealPrice?: number | null;
   flashDealEndsAt?: string | null;
-  depositAmount?: number;
-  securityDeposit?: number;
+  depositAmount?: number | null;
+  securityDeposit?: number | null;
   termsAndConditions?: string;
   privacyPolicy?: string;
   isFeatured?: boolean;
@@ -349,8 +349,8 @@ export interface ProductFormData {
   isMostPopular?: boolean;
   isPremiumCollection?: boolean;
   sizeguide?: string;
-  blankPrice?: number;
-  retailPrice?: number;
+  blankPrice?: number | null;
+  retailPrice?: number | null;
 }
 
 const createProduct = async (body: ProductFormData | FormData) => {
@@ -387,9 +387,12 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProduct,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      if (variables && "id" in variables && variables.id) {
+        queryClient.invalidateQueries({ queryKey: ["product", variables.id] });
+      }
     },
   });
 };
@@ -403,9 +406,12 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteProduct,
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ["trader-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      if (id) {
+        queryClient.invalidateQueries({ queryKey: ["product", id] });
+      }
     },
   });
 };

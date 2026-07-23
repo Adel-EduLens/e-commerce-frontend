@@ -11,21 +11,21 @@ const sidebarItems = [
     icon: "si_dashboard-line.svg",
     path: "/dashboard/trader",
   },
-  {
-    label: "retail",
-    icon: "fluent_building-retail-20-regular.svg",
-    path: "/dashboard/trader/retail",
-  },
+  // {
+  //   label: "retail",
+  //   icon: "fluent_building-retail-20-regular.svg",
+  //   path: "/dashboard/trader/retail",
+  // },
   // {
   //   label: "dropshipping",
   //   icon: "streamline-flex_shipping-box-2.svg",
   //   path: "/dashboard/trader/dropshipping",
   // },
-  {
-    label: "wholesale",
-    icon: "system-uicons_boxes.svg",
-    path: "/dashboard/trader/wholesale",
-  },
+  // {
+  //   label: "wholesale",
+  //   icon: "system-uicons_boxes.svg",
+  //   path: "/dashboard/trader/wholesale",
+  // },
   // {
   //   label: "brandPartners",
   //   icon: "mdi_partnership-outline.svg",
@@ -71,11 +71,11 @@ const sidebarItems = [
     icon: "ion_notifications-outline.svg",
     path: "/dashboard/trader/notifications",
   },
-  {
-    label: "analytics",
-    icon: "grommet-icons_analytics.svg",
-    path: "/dashboard/trader/analytics",
-  },
+  // {
+  //   label: "analytics",
+  //   icon: "grommet-icons_analytics.svg",
+  //   path: "/dashboard/trader/analytics",
+  // },
   {
     label: "Collections",
     icon: "carbon_category-2.svg",

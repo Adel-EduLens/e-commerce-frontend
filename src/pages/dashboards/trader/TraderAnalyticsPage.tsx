@@ -265,7 +265,6 @@ export default function TraderAnalyticsPage() {
       <Panel title={t("netProfitTrend", "Net Profit Trend Over Time")}>
         <NetProfitChart series={profitTrendSeries} />
       </Panel>
-
       <div className="grid gap-5 xl:grid-cols-[minmax(0,2fr)_320px]">
         {/* Performance Margin Trend */}
         <Panel title={t("performanceMarginTrend", "Performance Margin Trend")}>

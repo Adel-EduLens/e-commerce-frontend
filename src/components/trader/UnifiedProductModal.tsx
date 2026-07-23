@@ -170,10 +170,22 @@ export function UnifiedProductModal({
   useEffect(() => {
     const func = () => {
       if (isEditing && fullProduct) {
-        setIsShop(fullProduct.shopPrice != null);
-        setIsWholesale(fullProduct.wholesalePrice != null);
-        setIsRetail(fullProduct.retailPrice != null);
-        setIsBlank(fullProduct.blankPrice != null);
+        const rawTypes = (fullProduct as any).productTypes;
+        const pTypes = Array.isArray(rawTypes)
+          ? rawTypes.map((pt: any) => (typeof pt === "string" ? pt : pt?.type)).filter(Boolean)
+          : [];
+
+        if (pTypes.length > 0) {
+          setIsShop(pTypes.includes("SHOP"));
+          setIsWholesale(pTypes.includes("WHOLESALE"));
+          setIsRetail(pTypes.includes("RETAIL"));
+          setIsBlank(pTypes.includes("BLANK"));
+        } else {
+          setIsShop(fullProduct.shopPrice != null);
+          setIsWholesale(fullProduct.wholesalePrice != null);
+          setIsRetail(fullProduct.retailPrice != null);
+          setIsBlank(fullProduct.blankPrice != null);
+        }
 
         if (fullProduct.shopPrice != null)
           setShopPrice(fullProduct.shopPrice.toString());
@@ -411,6 +423,8 @@ export function UnifiedProductModal({
             payload.sizeguide = await uploadImageFile(sizeguide);
           }
         }
+      } else {
+        payload.shopPrice = null;
       }
 
       if (isWholesale) {
@@ -419,6 +433,8 @@ export function UnifiedProductModal({
         payload.isBestDeal = isBestDeal;
         payload.isMostPopular = isMostPopular;
         payload.isPremiumCollection = isPremiumCollection;
+      } else {
+        payload.wholesalePrice = null;
       }
 
       if (isRetail) {
@@ -428,6 +444,8 @@ export function UnifiedProductModal({
         payload.termsAndConditions = termsAndConditions;
         payload.privacyPolicy = privacyPolicy;
         payload.isFeatured = isFeatured;
+      } else {
+        payload.retailPrice = null;
       }
 
       if (isBlank) {
@@ -436,6 +454,8 @@ export function UnifiedProductModal({
         if (materials) {
           payload.materials = [{ material: materials }];
         }
+      } else {
+        payload.blankPrice = null;
       }
 
       if (isEditing) {
