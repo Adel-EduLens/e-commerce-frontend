@@ -263,45 +263,45 @@ export default function TraderFinancePage() {
           </div>
 
           {/* Top stat cards */}
-          <div className="flex gap-4 overflow-x-auto pb-1">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {topCards.map((card) => (
-              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                <div className="absolute left-4 top-4 flex flex-col gap-2">
-                  <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+              <div key={card.label} className="relative h-32 rounded-2xl border border-stroke bg-card p-4 overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                <div className="flex flex-col gap-1">
+                  <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
                   <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                 </div>
-                <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
-                  <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                <div className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                     <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
                   </svg>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-1">
-                  <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
+                  <span className={`font-['Montserrat'] text-xs font-semibold ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                     {card.trendUp ? "+" : "-"}{card.trend}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
+                  <span className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.sub}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Revenue by Channel + Donut */}
-          <div className="flex gap-4">
-            <div className="flex-1 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-5 font-['Montserrat'] text-xl font-semibold text-foreground">Revenue by Sales Channel</h2>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="rounded-2xl border border-stroke bg-card p-4 sm:p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-5 font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Revenue by Sales Channel</h2>
               <RevenueChannelChart />
             </div>
-            <div className="w-80 shrink-0 rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-              <h2 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">Order Status Distribution</h2>
+            <div className="rounded-2xl border border-stroke bg-card p-4 sm:p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              <h2 className="mb-4 font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Order Status Distribution</h2>
               <FinanceDonutChart />
             </div>
           </div>
 
           {/* Earnings Break Down */}
-          <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
-              <h2 className="font-['Montserrat'] text-xl font-semibold text-foreground">Earnings Break Down</h2>
+          <div className="rounded-2xl border border-stroke bg-card shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stroke px-4 py-4">
+              <h2 className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">Earnings Break Down</h2>
               <ExportBtn />
             </div>
             <div className="overflow-x-auto">
@@ -328,18 +328,18 @@ export default function TraderFinancePage() {
           </div>
 
           {/* Channel revenue cards */}
-          <div className="flex gap-4 overflow-x-auto pb-1">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {channelCards.map((card) => (
-              <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-                <div className="absolute left-4 top-4 flex flex-col gap-2">
-                  <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+              <div key={card.label} className="relative h-32 rounded-2xl border border-stroke bg-card p-4 overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                <div className="flex flex-col gap-1">
+                  <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
                   <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
                 </div>
                 <div className="absolute bottom-4 left-4 flex items-center gap-1">
-                  <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
+                  <span className={`font-['Montserrat'] text-xs font-semibold ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                     {card.trendUp ? "+" : "-"}{card.trend}
                   </span>
-                  <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
+                  <span className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.sub}</span>
                 </div>
               </div>
             ))}

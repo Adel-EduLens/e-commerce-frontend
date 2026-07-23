@@ -84,7 +84,7 @@ export function CategoryTablePanel({
 
   return (
     <div className="space-y-4">
-      <div className="flex w-fit items-center gap-1 rounded-xl border border-stroke bg-white p-1">
+      <div className="flex flex-wrap sm:flex-nowrap w-full sm:w-fit items-center gap-1 rounded-xl border border-stroke bg-card p-1">
         {[
           { value: "product" as const, label: t("productCategories") },
           { value: "wholesale" as const, label: t("wholesaleCategories") },
@@ -97,7 +97,7 @@ export function CategoryTablePanel({
               setCategoryFilter(tab.value);
               setPage(1);
             }}
-            className={`rounded-lg px-3 py-2 font-['Montserrat'] text-sm font-medium transition ${categoryFilter === tab.value ? "bg-primary text-white shadow-sm" : "text-gray-text hover:bg-background hover:text-foreground"}`}
+            className={`flex-1 sm:flex-none rounded-lg px-3 py-2 font-['Montserrat'] text-sm font-medium transition ${categoryFilter === tab.value ? "bg-primary text-white shadow-sm" : "text-gray-text hover:bg-background hover:text-foreground"}`}
           >
             {tab.label}
           </button>
@@ -105,7 +105,7 @@ export function CategoryTablePanel({
       </div>
 
       <div className="flex flex-wrap items-center justify-start gap-3">
-        <label className="relative flex min-w-70 items-center">
+        <label className="relative flex w-full sm:w-auto sm:min-w-[280px] flex-1 items-center">
           <img
             className="pointer-events-none absolute left-4 h-5 w-5"
             src={asset("mynaui_search.svg")}
@@ -119,13 +119,13 @@ export function CategoryTablePanel({
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
+            className="w-full rounded-2xl border border-stroke bg-card py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-primary"
           />
         </label>
         <button
           type="button"
           onClick={() => onAdd()}
-          className="flex items-center gap-1.5 rounded-lg border border-stroke bg-white px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background"
+          className="flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl border border-stroke bg-card px-4 py-3 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer"
         >
           <img className="h-5 w-5" src={asset("ic_round-plus.svg")} alt="" />
           {t("addCategory")}

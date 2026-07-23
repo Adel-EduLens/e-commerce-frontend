@@ -227,24 +227,24 @@ function CustomerDetail({ customer, onBack }: { customer: Customer; onBack: () =
       </button>
 
       {/* Stat cards */}
-      <div className="flex gap-4 overflow-x-auto pb-1">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => (
-          <div key={card.label} className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <div className="absolute left-4 top-4 flex flex-col gap-2">
-              <p className="font-['Montserrat'] text-base font-medium text-gray-text">{card.label}</p>
+          <div key={card.label} className="relative h-32 rounded-2xl border border-stroke bg-card p-4 overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+            <div className="flex flex-col gap-1">
+              <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
               <p className="font-['Montserrat'] text-2xl font-semibold text-foreground">{card.value}</p>
             </div>
-            <div className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary">
-              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+            <div className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
                 <rect x="3" y="3" width="18" height="18" rx="2" stroke="#111827" strokeWidth="1.5" />
                 <path d="M3 9h18" stroke="#111827" strokeWidth="1.5" />
               </svg>
             </div>
             <div className="absolute bottom-4 left-4 flex items-center gap-1">
-              <span className={`font-['Montserrat'] text-sm font-medium ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
+              <span className={`font-['Montserrat'] text-xs font-semibold ${card.trendUp ? "text-teal-500" : "text-rose-500"}`}>
                 {card.trendUp ? "+" : "-"}{card.trend}
               </span>
-              <span className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.sub}</span>
+              <span className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.sub}</span>
             </div>
           </div>
         ))}
@@ -429,9 +429,9 @@ export default function TraderCustomersPage() {
           ) : (
             <>
               {/* Summary Cards */}
-              <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {summaryCards.map((card) => (
-                  <div key={card.label} className="rounded-2xl border border-stroke bg-white p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+                  <div key={card.label} className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
                     <p className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.label}</p>
                     <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
                     <p className={`mt-0.5 font-['Montserrat'] text-xs font-medium ${card.up ? "text-emerald-600" : "text-red-500"}`}>
@@ -443,7 +443,7 @@ export default function TraderCustomersPage() {
 
               {/* Search + Send Offer */}
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <label className="relative flex min-w-[280px] items-center">
+                <label className="relative flex w-full sm:w-auto sm:min-w-[280px] flex-1 items-center">
                   <img
                     className="pointer-events-none absolute left-4 h-5 w-5"
                     src={asset("mynaui_search.svg")}
@@ -454,12 +454,12 @@ export default function TraderCustomersPage() {
                     placeholder="Search customers..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full rounded-2xl border border-stroke bg-white py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-stroke"
+                    className="w-full rounded-2xl border border-stroke bg-card py-3 pl-12 pr-4 font-['Montserrat'] text-base font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-primary"
                   />
                 </label>
                 <button
                   type="button"
-                  className="flex items-center gap-2 rounded-xl bg-secondary px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:opacity-90"
+                  className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-secondary px-5 py-3 font-['Montserrat'] text-sm font-semibold text-white transition hover:opacity-90 cursor-pointer"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
                     <path d="M2 3h12M2 8h8M2 13h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
