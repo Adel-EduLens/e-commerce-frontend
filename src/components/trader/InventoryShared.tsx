@@ -99,8 +99,8 @@ export function MultiSelect({
                   type="button"
                   onClick={() => toggle(val)}
                   className={`rounded-lg border px-3 py-1 font-['Montserrat'] text-xs font-medium transition ${selected.includes(val)
-                      ? "border-primary bg-primary text-foreground"
-                      : "border-stroke bg-white text-foreground hover:bg-background"
+                    ? "border-primary bg-primary text-foreground"
+                    : "border-stroke bg-white text-foreground hover:bg-background"
                     }`}
                 >
                   {lbl}
@@ -999,7 +999,13 @@ export function AddItemModal({
                           const val = Number(e.target.value) || 0;
                           setProductColors((prev) =>
                             prev.map((item, idx) =>
-                              idx === colorIdx ? { ...item, stock: val } : item
+                              idx === colorIdx
+                                ? {
+                                  ...item,
+                                  stock: val,
+                                  variants: item.variants.map((v) => ({ ...v, quantity: val })),
+                                }
+                                : item
                             )
                           );
                         }}
@@ -1306,7 +1312,7 @@ export function EditItemModal({
 
       const initialSizes = Array.from(
         new Set(
-      (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
+          (wholesale.wholesaleColors || []).flatMap((wc) => (wc.sizes || []).map((s) => s.size))
         )
       );
       setSharedSizes(initialSizes);
@@ -1382,7 +1388,7 @@ export function EditItemModal({
             return;
           }
         }
-        
+
         const colorsData = await Promise.all(
           wholesaleColorsState.map(async (wc) => {
             const updatedImages = await Promise.all(
@@ -1433,7 +1439,7 @@ export function EditItemModal({
         };
 
         if (brandId) payload.brandId = brandId;
-        
+
         await updateProduct.mutateAsync(payload);
       }
     } catch (err: unknown) {
@@ -1541,19 +1547,19 @@ export function EditItemModal({
                   ? wholesaleLoading
                     ? "Loading..."
                     : (wholesaleColorsState || []).reduce((sum, c) => {
-                        const colorStock = c.variants && c.variants.length > 0
-                          ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
-                          : (c.stock ?? 0);
-                        return sum + colorStock;
-                      }, 0) || ""
+                      const colorStock = c.variants && c.variants.length > 0
+                        ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                        : (c.stock ?? 0);
+                      return sum + colorStock;
+                    }, 0) || ""
                   : productLoading
                     ? "Loading..."
                     : product?.colors?.reduce((sum, c) => {
-                        const colorStock = c.variants && c.variants.length > 0
-                          ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
-                          : (c.stock ?? 0);
-                        return sum + colorStock;
-                      }, 0) || ""
+                      const colorStock = c.variants && c.variants.length > 0
+                        ? c.variants.reduce((s, v) => s + (v.quantity ?? 0), 0)
+                        : (c.stock ?? 0);
+                      return sum + colorStock;
+                    }, 0) || ""
               }
               className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none text-gray-text cursor-not-allowed"
             />
@@ -2259,7 +2265,13 @@ export function EditItemModal({
                           const val = Number(e.target.value) || 0;
                           setWholesaleColorsState((prev) =>
                             prev.map((item, idx) =>
-                              idx === colorIdx ? { ...item, stock: val } : item
+                              idx === colorIdx
+                                ? {
+                                  ...item,
+                                  stock: val,
+                                  variants: item.variants.map((v) => ({ ...v, quantity: val })),
+                                }
+                                : item
                             )
                           );
                         }}

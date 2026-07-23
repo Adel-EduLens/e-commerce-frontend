@@ -279,9 +279,8 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                   <tr key={item.id} className={`transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}>
                     <td className="px-5 py-4">
                       <div
-                        className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
-                          isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
-                        }`}
+                        className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
+                          }`}
                         onClick={() => toggleItem(item.id)}
                       >
                         {isChecked && <span className="text-[10px]">✓</span>}
@@ -475,22 +474,20 @@ export default function TraderOrdersPage() {
           <button
             type="button"
             onClick={() => handleTabChange("retail")}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${
-              activeTab === "retail"
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${activeTab === "retail"
                 ? "bg-primary text-white"
                 : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
-            }`}
+              }`}
           >
             {t("retailOrders", "Retail Orders")}
           </button>
           <button
             type="button"
             onClick={() => handleTabChange("wholesale")}
-            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${
-              activeTab === "wholesale"
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${activeTab === "wholesale"
                 ? "bg-primary text-white"
                 : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
-            }`}
+              }`}
           >
             {t("wholesaleOrders", "Wholesale Orders")}
           </button>
@@ -669,9 +666,8 @@ export default function TraderOrdersPage() {
                           >
                             <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
                               <div
-                                className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
-                                  isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
-                                }`}
+                                className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
+                                  }`}
                                 onClick={() => toggleRow(order.id)}
                               >
                                 {isChecked && <span className="text-[10px]">✓</span>}

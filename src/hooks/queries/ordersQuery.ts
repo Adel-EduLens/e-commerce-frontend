@@ -18,6 +18,7 @@ export interface OrderItem {
 export interface TraderOrder {
   id: string;
   orderId: string;
+  orderType?: string;
   customer: string;
   customerEmail?: string;
   customerPhone?: string;
@@ -33,6 +34,16 @@ export interface TraderOrder {
   status: string;
   payment?: string;
   items: OrderItem[];
+}
+
+export interface TraderCustomer {
+  email: string;
+  name: string;
+  phone: string | null;
+  orders: number;
+  totalSpent: string;
+  lastPurchase: string;
+  status: string;
 }
 
 export interface GetTraderOrdersParams {
@@ -69,6 +80,16 @@ export const useUpdateTraderOrderStatus = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trader-dashboard-orders"] });
+    },
+  });
+};
+
+export const useTraderCustomers = () => {
+  return useQuery<TraderCustomer[]>({
+    queryKey: ["trader-customers"],
+    queryFn: async () => {
+      const { data } = await api.get("/orders/trader/customers");
+      return data?.data || [];
     },
   });
 };
