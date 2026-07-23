@@ -1642,11 +1642,11 @@ export default function TraderWholesalePage() {
       ) : (
         <>
           {/* Stat cards */}
-          <div className="flex gap-4 overflow-x-auto pb-1">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {statCards.map((card) => (
               <div
                 key={card.label}
-                className="relative flex-1 min-w-[220px] h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
+                className="relative h-32 rounded-2xl border border-stroke bg-white overflow-hidden shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]"
               >
                 <div className="absolute left-4 top-4 flex flex-col gap-2">
                   <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">

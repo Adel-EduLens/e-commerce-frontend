@@ -61,5 +61,7 @@
   "colTraderSubtotal": "Trader Subtotal",
   "colOrderTotal": "Order Total",
   "colStatus": "Status",
-  "noOrdersFound": "No orders found"
+  "noOrdersFound": "No orders found",
+  "retailOrders": "Orders",
+  "wholesaleOrders": "Wholesale Orders"
 }

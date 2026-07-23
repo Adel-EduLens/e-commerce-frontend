@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import StudentLayout from "../layouts/StudentLayout";
 import AccountLayout from "../layouts/AccountLayout";
 import UserLayout from "../layouts/UserLayout";
@@ -365,7 +365,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "wholesale",
-            element: <TraderWholesalePage />,
+            element: <Navigate to="/dashboard/trader/orders?tab=wholesale" replace />,
           },
           {
             path: "brand-partners",

@@ -1,8 +1,10 @@
 import { useCallback, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { api } from "../../../lib/axios";
 import { toast } from "sonner";
 import { Loader2, ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag, Tag } from "lucide-react";
+import TraderWholesalePage from "./TraderWholesalePage";
 
 interface OrderItem {
   id: string;
@@ -370,6 +372,13 @@ export default function TraderOrdersPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") === "wholesale" ? "wholesale" : "retail";
+
+  const handleTabChange = (tab: "retail" | "wholesale") => {
+    setSearchParams({ tab });
+  };
+
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -386,8 +395,10 @@ export default function TraderOrdersPage() {
   }, [t]);
 
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    if (activeTab === "retail") {
+      fetchOrders();
+    }
+  }, [fetchOrders, activeTab]);
 
   const handleUpdateStatus = async (orderId: string, status: string) => {
     try {
@@ -457,231 +468,258 @@ export default function TraderOrdersPage() {
     { label: t("cardCancelledOrders"), value: String(cancelledCount), note: t("noteCancelledReturned"), up: false },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {selectedOrder ? (
-        <OrderDetail
-          order={selectedOrder}
-          onBack={() => setSelectedOrder(null)}
-          onUpdateStatus={handleUpdateStatus}
-        />
-      ) : (
-        <>
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-            {summaryCards.map((card, idx) => (
-              <div
-                key={idx}
-                className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col justify-between"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex flex-col gap-1">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">{card.label}</p>
-                    <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
+      {!selectedOrder && (
+        <div className="flex flex-wrap gap-2 border-b border-stroke pb-4">
+          <button
+            type="button"
+            onClick={() => handleTabChange("retail")}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${
+              activeTab === "retail"
+                ? "bg-primary text-white"
+                : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
+            }`}
+          >
+            {t("retailOrders", "Retail Orders")}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("wholesale")}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${
+              activeTab === "wholesale"
+                ? "bg-primary text-white"
+                : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
+            }`}
+          >
+            {t("wholesaleOrders", "Wholesale Orders")}
+          </button>
+        </div>
+      )}
+
+      {activeTab === "retail" ? (
+        loading ? (
+          <div className="flex h-96 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+          </div>
+        ) : selectedOrder ? (
+          <OrderDetail
+            order={selectedOrder}
+            onBack={() => setSelectedOrder(null)}
+            onUpdateStatus={handleUpdateStatus}
+          />
+        ) : (
+          <>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+              {summaryCards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border border-stroke bg-card p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col justify-between"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex flex-col gap-1">
+                      <p className="font-['Montserrat'] text-xs font-semibold text-gray-text uppercase tracking-wider">{card.label}</p>
+                      <p className="font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
+                    </div>
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background border border-stroke text-secondary">
+                      <ShoppingBag className="h-5 w-5" />
+                    </div>
                   </div>
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-background border border-stroke text-secondary">
-                    <ShoppingBag className="h-5 w-5" />
+                  <div className="mt-3 flex items-center gap-1.5">
+                    <span className="font-['Montserrat'] text-xs font-medium text-gray-text"> {card.note}</span>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-1.5">
-                  <span className="font-['Montserrat'] text-xs font-medium text-gray-text"> {card.note}</span>
-                </div>
+              ))}
+            </div>
+
+            {/* Search & Filters */}
+            <div className="flex flex-wrap items-center justify-start gap-4 bg-card p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+              {/* Search Input */}
+              <div className="relative flex-1 min-w-[280px]">
+                <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="7" cy="7" r="4.5" />
+                  <path d="M10.5 10.5L14 14" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder={t("searchPlaceholder")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full rounded-xl border border-stroke bg-background py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+                />
               </div>
-            ))}
-          </div>
 
-          {/* Search & Filters */}
-          <div className="flex flex-wrap items-center justify-start gap-4 bg-card p-5 rounded-2xl border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            {/* Search Input */}
-            <div className="relative flex-1 min-w-[280px]">
-              <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-text" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="7" cy="7" r="4.5" />
-                <path d="M10.5 10.5L14 14" />
-              </svg>
-              <input
-                type="text"
-                placeholder={t("searchPlaceholder")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-background py-2.5 pl-12 pr-4 font-['Montserrat'] text-sm font-medium text-foreground outline-none transition placeholder:text-gray-text focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
-              />
+              {/* Status Filter */}
+              <div className="relative min-w-[160px]">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+                >
+                  <option value="">{t("allStatuses")}</option>
+                  <option value="PENDING">{t("statusPending")}</option>
+                  <option value="PROCESSING">{t("statusProcessing")}</option>
+                  <option value="SHIPPED">{t("statusShipped")}</option>
+                  <option value="COMPLETED">{t("statusCompleted")}</option>
+                  <option value="CANCELLED">{t("statusCancelled")}</option>
+                </select>
+              </div>
+
+              {/* Payment Method Filter */}
+              <div className="relative min-w-[160px]">
+                <select
+                  value={paymentFilter}
+                  onChange={(e) => setPaymentFilter(e.target.value)}
+                  className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+                >
+                  <option value="">{t("allPayments")}</option>
+                  <option value="Cash">{t("paymentCash")}</option>
+                  <option value="Card">{t("paymentCard")}</option>
+                </select>
+              </div>
+
+              {/* Date Filter */}
+              <div className="relative min-w-[160px]">
+                <input
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
+                />
+              </div>
+
+              {/* Reset Button */}
+              {(search || statusFilter || paymentFilter || dateFilter) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("");
+                    setPaymentFilter("");
+                    setDateFilter("");
+                  }}
+                  className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
+                >
+                  {t("resetFilters")}
+                </button>
+              )}
             </div>
 
-            {/* Status Filter */}
-            <div className="relative min-w-[160px]">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
-              >
-                <option value="">{t("allStatuses")}</option>
-                <option value="PENDING">{t("statusPending")}</option>
-                <option value="PROCESSING">{t("statusProcessing")}</option>
-                <option value="SHIPPED">{t("statusShipped")}</option>
-                <option value="COMPLETED">{t("statusCompleted")}</option>
-                <option value="CANCELLED">{t("statusCancelled")}</option>
-              </select>
-            </div>
+            {/* Orders Table Panel */}
+            <section className="rounded-2xl border border-stroke bg-card shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
+              {/* Panel header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
+                <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("ordersHistoryTable")}</h2>
+              </div>
 
-            {/* Payment Method Filter */}
-            <div className="relative min-w-[160px]">
-              <select
-                value={paymentFilter}
-                onChange={(e) => setPaymentFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
-              >
-                <option value="">{t("allPayments")}</option>
-                <option value="Cash">{t("paymentCash")}</option>
-                <option value="Card">{t("paymentCard")}</option>
-              </select>
-            </div>
-
-            {/* Date Filter */}
-            <div className="relative min-w-[160px]">
-              <input
-                type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                className="w-full rounded-xl border border-stroke bg-background px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground outline-none transition cursor-pointer focus:border-secondary focus:bg-card focus:ring-1 focus:ring-secondary"
-              />
-            </div>
-
-            {/* Reset Button */}
-            {(search || statusFilter || paymentFilter || dateFilter) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearch("");
-                  setStatusFilter("");
-                  setPaymentFilter("");
-                  setDateFilter("");
-                }}
-                className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer"
-              >
-                {t("resetFilters")}
-              </button>
-            )}
-          </div>
-
-          {/* Orders Table Panel */}
-          <section className="rounded-2xl border border-stroke bg-card shadow-[0_6px_20px_-2px_rgba(30,37,45,0.08)] overflow-hidden">
-            {/* Panel header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 p-5 border-b border-stroke">
-              <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">{t("ordersHistoryTable")}</h2>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-0">
-                <thead>
-                  <tr className="bg-secondary border-b border-stroke">
-                    <th className="px-5 py-3.5 text-left w-12">
-                      <div
-                        className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
-                        onClick={toggleAll}
-                      >
-                        {allSelected && (
-                          <svg
-                            className="h-3 w-3 text-primary"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                          >
-                            <path
-                              d="M2 6l3 3 5-5"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        )}
-                      </div>
-                    </th>
-                    {[t("colOrderId"), t("colCustomerName"), t("colDateTime"), t("colPayment"), t("colTraderSubtotal"), t("colOrderTotal"), t("colStatus")].map((col, cIdx) => (
-                      <th
-                        key={cIdx}
-                        className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider whitespace-nowrap"
-                      >
-                        {col}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-gray-text font-medium font-['Montserrat']">
-                        {t("noOrdersFound")}
-                      </td>
-                    </tr>
-                  ) : (
-                    filtered.map((order, idx) => {
-                      const isChecked = selected.has(order.id);
-                      const pill = statusPill(order.status);
-                      return (
-                        <tr
-                          key={order.id}
-                          className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
-                          onClick={() => setSelectedOrder(order)}
+              {/* Table */}
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-separate border-spacing-0">
+                  <thead>
+                    <tr className="bg-secondary border-b border-stroke">
+                      <th className="px-5 py-3.5 text-left w-12">
+                        <div
+                          className="h-5 w-5 cursor-pointer rounded-md border border-primary bg-secondary flex items-center justify-center"
+                          onClick={toggleAll}
                         >
-                          <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
-                            <div
-                              className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
-                                isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
-                              }`}
-                              onClick={() => toggleRow(order.id)}
+                          {allSelected && (
+                            <svg
+                              className="h-3 w-3 text-primary"
+                              viewBox="0 0 12 12"
+                              fill="none"
                             >
-                              {isChecked && <span className="text-[10px]">✓</span>}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground whitespace-nowrap">
-                            <div className="flex flex-col items-center gap-1">
-                              <span>{order.orderId}</span>
-                              {order.couponCode && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[10px] border border-amber-200">
-                                  <Tag className="h-2.5 w-2.5 text-amber-600" />
-                                  {order.couponCode}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-semibold text-foreground whitespace-nowrap">
-                            {order.customer}
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-gray-text whitespace-nowrap">
-                            {order.date} — {order.time}
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
-                            {order.payment}
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-secondary whitespace-nowrap">
-                            {order.subtotal}
-                          </td>
-                          <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
-                            {order.total}
-                          </td>
-                          <td className="px-4 py-4 text-center whitespace-nowrap">
-                            <span className={`inline-flex rounded-xl px-2.5 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
-                              {getLocalizedStatus(order.status, t)}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
+                              <path
+                                d="M2 6l3 3 5-5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                      </th>
+                      {[t("colOrderId"), t("colCustomerName"), t("colDateTime"), t("colPayment"), t("colTraderSubtotal"), t("colOrderTotal"), t("colStatus")].map((col, cIdx) => (
+                        <th
+                          key={cIdx}
+                          className="px-4 py-3.5 text-center font-['Montserrat'] text-xs font-bold text-primary uppercase tracking-wider whitespace-nowrap"
+                        >
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="px-6 py-12 text-center text-gray-text font-medium font-['Montserrat']">
+                          {t("noOrdersFound")}
+                        </td>
+                      </tr>
+                    ) : (
+                      filtered.map((order, idx) => {
+                        const isChecked = selected.has(order.id);
+                        const pill = statusPill(order.status);
+                        return (
+                          <tr
+                            key={order.id}
+                            className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
+                            onClick={() => setSelectedOrder(order)}
+                          >
+                            <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                              <div
+                                className={`h-5 w-5 cursor-pointer rounded border flex items-center justify-center transition ${
+                                  isChecked ? "border-secondary bg-secondary text-secondary-foreground" : "border-stroke bg-card"
+                                }`}
+                                onClick={() => toggleRow(order.id)}
+                              >
+                                {isChecked && <span className="text-[10px]">✓</span>}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-foreground whitespace-nowrap">
+                              <div className="flex flex-col items-center gap-1">
+                                <span>{order.orderId}</span>
+                                {order.couponCode && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 text-amber-700 font-bold text-[10px] border border-amber-200">
+                                    <Tag className="h-2.5 w-2.5 text-amber-600" />
+                                    {order.couponCode}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-semibold text-foreground whitespace-nowrap">
+                              {order.customer}
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-gray-text whitespace-nowrap">
+                              {order.date} — {order.time}
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                              {order.payment}
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-bold text-secondary whitespace-nowrap">
+                              {order.subtotal}
+                            </td>
+                            <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground whitespace-nowrap">
+                              {order.total}
+                            </td>
+                            <td className="px-4 py-4 text-center whitespace-nowrap">
+                              <span className={`inline-flex rounded-xl px-2.5 py-1 text-xs font-semibold font-['Montserrat'] outline outline-1 ${pill.bg} ${pill.text} ${pill.ring}`}>
+                                {getLocalizedStatus(order.status, t)}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )
+      ) : (
+        <TraderWholesalePage />
       )}
     </div>
   );

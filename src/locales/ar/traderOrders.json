@@ -61,5 +61,7 @@
   "colTraderSubtotal": "المجموع الفرعي للتاجر",
   "colOrderTotal": "إجمالي الطلب",
   "colStatus": "الحالة",
-  "noOrdersFound": "لم يتم العثور على أي طلبات"
+  "noOrdersFound": "لم يتم العثور على أي طلبات",
+  "retailOrders": "طلبات",
+  "wholesaleOrders": "طلبات الجملة"
 }
