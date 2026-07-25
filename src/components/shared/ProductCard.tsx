@@ -579,18 +579,18 @@ export default function ProductCard({
             </span>
           </div>
           <div
-            className={`${useWholesaleCard ? "text-right text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
+            className={`${useWholesaleCard ? "text-end text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
           >
             {showFlashDeal && flashDealPrice
-              ? `$${flashDealPrice.toFixed(2)}`
-              : price}
+              ? `${flashDealPrice.toLocaleString()} ${t("egp", "EGP")}`
+              : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
             {isWholesale && (
               <span
                 className={
                   useWholesaleCard ? "text-xs font-normal text-gray-text" : ""
                 }
               >
-                {useWholesaleCard ? "/Pack" : " / Pack"}
+                {` / ${t("pack", "Pack")}`}
               </span>
             )}
           </div>
