@@ -29,7 +29,7 @@ function NotificationBell() {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [coords, setCoords] = useState({ top: 0, right: 0 });
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({ top: 0 });
 
   const unread = data?.unread ?? 0;
   const recent = (data?.notifications ?? []).slice(0, 5);
@@ -37,16 +37,42 @@ function NotificationBell() {
   const updateCoords = () => {
     if (!btnRef.current) return;
     const rect = btnRef.current.getBoundingClientRect();
-    setCoords({
-      top: rect.bottom + 10,
-      right: window.innerWidth - rect.right,
-    });
+    const isRTL = document.documentElement.dir === "rtl";
+    const dropdownWidth = 320;
+    const margin = 16;
+    const top = rect.bottom + 10;
+
+    if (isRTL) {
+      const left = Math.max(
+        margin,
+        Math.min(rect.left, window.innerWidth - dropdownWidth - margin)
+      );
+      setDropdownStyle({ top, left });
+    } else {
+      const right = Math.max(
+        margin,
+        Math.min(window.innerWidth - rect.right, window.innerWidth - dropdownWidth - margin)
+      );
+      setDropdownStyle({ top, right });
+    }
   };
 
   const handleOpen = () => {
     updateCoords();
     setOpen((p) => !p);
   };
+
+  useEffect(() => {
+    if (!open) return;
+    updateCoords();
+    const handleScrollOrResize = () => updateCoords();
+    window.addEventListener("scroll", handleScrollOrResize, true);
+    window.addEventListener("resize", handleScrollOrResize);
+    return () => {
+      window.removeEventListener("scroll", handleScrollOrResize, true);
+      window.removeEventListener("resize", handleScrollOrResize);
+    };
+  }, [open]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -68,8 +94,8 @@ function NotificationBell() {
   const dropdown = open ? (
     <div
       ref={dropdownRef}
-      style={{ top: coords.top, right: coords.right }}
-      className="fixed z-[9999] w-80 rounded-2xl bg-card shadow-[0px_8px_24px_-4px_rgba(30,37,45,0.18)] outline outline-1 outline-stroke overflow-hidden"
+      style={dropdownStyle}
+      className="fixed z-[9999] w-80 max-w-[calc(100vw-32px)] rounded-2xl bg-card shadow-[0px_8px_24px_-4px_rgba(30,37,45,0.18)] outline outline-1 outline-stroke overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-stroke">
