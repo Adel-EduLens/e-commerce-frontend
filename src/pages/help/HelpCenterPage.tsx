@@ -55,7 +55,7 @@ function HelpCenterPanel() {
         <div className=" font-['Montserrat'] text-base font-medium text-foreground">
           {t("Need more help?")}
         </div>
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="flex items-center justify-start gap-2 rounded-2xl bg-card p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
             <MessageSquare
               className="h-6 w-6 text-foreground"

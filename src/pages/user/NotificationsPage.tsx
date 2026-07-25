@@ -19,8 +19,52 @@ import { useCategories } from "../../hooks/queries/categoriesQuery";
 import {
   useCategorySubscriptions,
   useToggleCategorySubscription,
+  type AppNotification,
 } from "../../hooks/queries/notificationQuery";
 import { useTranslation } from "react-i18next";
+
+function formatNotificationMessage(
+  msg: string,
+  isAr: boolean,
+  t: any
+) {
+  if (!msg) return "";
+
+  // 1) Collection notification pattern: "{productName}" was just added to a collection you follow. [{typeLabel}]
+  const collectionMatch = msg.match(
+    /^"?(.*?)"?\s+was just added to a collection you follow\.\s*(?:\[(.*?)\])?$/i
+  );
+  if (collectionMatch) {
+    const productName = collectionMatch[1];
+    let typeLabel = collectionMatch[2] || "";
+    if (isAr) {
+      typeLabel = typeLabel
+        .replace(/RETAIL/gi, "تجزئة")
+        .replace(/WHOLESALE/gi, "جملة")
+        .replace(/SHOP/gi, "متجر");
+      return typeLabel
+        ? `تمت إضافة "${productName}" إلى مجموعة تتابعها. [${typeLabel}]`
+        : `تمت إضافة "${productName}" إلى مجموعة تتابعها.`;
+    }
+    return typeLabel
+      ? `"${productName}" was just added to a collection you follow. [${typeLabel}]`
+      : `"${productName}" was just added to a collection you follow.`;
+  }
+
+  // 2) Restock notification pattern: Great news! "{productName}" is now back in stock. Grab it before it's gone!
+  const restockMatch = msg.match(
+    /Great news!\s*"?(.*?)"?\s*is now back in stock\.\s*Grab it before it's gone!/i
+  );
+  if (restockMatch) {
+    const productName = restockMatch[1];
+    if (isAr) {
+      return `أخبار سارة! "${productName}" متوفر الآن مجدداً. احصل عليه قبل نفاذ الكمية!`;
+    }
+    return `Great news! "${productName}" is now back in stock. Grab it before it's gone!`;
+  }
+
+  return t(msg, { defaultValue: msg });
+}
 
 function NotificationCard({
   notification,
@@ -28,13 +72,15 @@ function NotificationCard({
   onDelete,
   isDeleting,
 }: {
-  notification: any;
+  notification: AppNotification;
   onMarkRead: () => void;
   onDelete: () => void;
   isDeleting: boolean;
 }) {
   const navigate = useNavigate();
-  const { t } = useTranslation("notifications");
+  const { t, i18n } = useTranslation("notifications");
+  const isAr = i18n.language === "ar";
+  const rawMessage = notification.message || notification.body || "";
 
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
@@ -60,7 +106,7 @@ function NotificationCard({
         {notification.imageUrl ? (
           <img
             src={notification.imageUrl}
-            alt=""
+            alt={t(notification.title || "Notification", notification.title || "Notification")}
             className="h-full w-full object-cover"
             draggable={false}
           />
@@ -73,7 +119,7 @@ function NotificationCard({
       <div className="flex-1 flex flex-col gap-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
-            {notification.title}
+            {t(notification.title || "", notification.title || "")}
           </h3>
           {!notification.isRead && (
             <span className="shrink-0 h-2.5 w-2.5 rounded-full bg-primary mt-1.5" />
@@ -81,7 +127,7 @@ function NotificationCard({
         </div>
 
         <p className="font-['Montserrat'] text-xs sm:text-sm text-gray-text leading-relaxed">
-          {notification.message}
+          {formatNotificationMessage(rawMessage, isAr, t)}
         </p>
 
         <div className="flex items-center gap-3 mt-1">
@@ -94,7 +140,7 @@ function NotificationCard({
               type="button"
               onClick={() => {
                 const titleLower = (notification.title || "").toLowerCase();
-                const messageLower = (notification.message || "").toLowerCase();
+                const messageLower = rawMessage.toLowerCase();
 
                 if (titleLower.includes("wholesale") || messageLower.includes("wholesale")) {
                   navigate(`/wholesale/${notification.productId}`);
@@ -174,7 +220,7 @@ export default function NotificationsPage() {
 
   const { data: subscribedIds = [] } = useCategorySubscriptions();
   const { subscribe, unsubscribe } = useToggleCategorySubscription();
-  const unreadCount = notifications.filter((n: any) => !n.isRead).length;
+  const unreadCount = notifications.filter((n: AppNotification) => !n.isRead).length;
 
   if (isLoading) {
     return <LoadingSpinner containerClassName="py-20" />;
@@ -213,7 +259,7 @@ export default function NotificationsPage() {
         <LoadingSpinner containerClassName="py-20" className="h-8 w-8" />
       )}
       {!isCategoriesLoading && categories.length > 0 && (
-        <div className="flex gap-3">
+        <div className="flex sm:grid overflow-x-auto sm:grid-cols-2 md:grid-cols-3 gap-3 pb-2 sm:pb-0 scrollbar-none">
           {categories.map((cat) => {
             const enabled = subscribedIds.includes(cat.id);
             return (
@@ -224,11 +270,11 @@ export default function NotificationsPage() {
                 <img
                   src={cat.image ?? ""}
                   className="h-8 w-8 rounded-full object-cover object-top shrink-0"
-                  alt={cat.name}
+                  alt={t(cat.name, cat.name)}
                   draggable={false}
                 />
                 <span className="flex-1 font-['Montserrat'] text-sm font-medium text-foreground truncate">
-                  {t(cat.name)}
+                  {t(cat.name, cat.name)}
                 </span>
                 <Toggle
                   checked={enabled}
@@ -238,8 +284,8 @@ export default function NotificationsPage() {
                   size="sm"
                   aria-label={
                     enabled
-                      ? t("unsubscribeFrom", { name: t(cat.name) })
-                      : t("subscribeTo", { name: t(cat.name) })
+                      ? t("unsubscribeFrom", { name: t(cat.name, cat.name) })
+                      : t("subscribeTo", { name: t(cat.name, cat.name) })
                   }
                 />
               </div>
@@ -253,7 +299,7 @@ export default function NotificationsPage() {
         <EmptyNotifications />
       ) : (
         <div className="flex flex-col gap-3">
-          {notifications.map((notification: any) => (
+          {notifications.map((notification: AppNotification) => (
             <NotificationCard
               key={notification.id}
               notification={notification}

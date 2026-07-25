@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Outlet, useMatches, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { Navbar, AccountSidebar, Footer } from "../components/shared";
+import { AccountMobileNav } from "../components/shared/AccountSidebar";
 
 export type AccountFooterConfig = {
   top?: string;
@@ -49,6 +50,9 @@ export default function AccountLayout() {
         <Navbar />
       </div>
       <div className="flex flex-1 flex-col lg:flex-row gap-6 px-4 sm:px-6 py-3">
+        <div className="lg:hidden">
+          <AccountMobileNav />
+        </div>
         <div className="hidden lg:block">
           <AccountSidebar />
         </div>

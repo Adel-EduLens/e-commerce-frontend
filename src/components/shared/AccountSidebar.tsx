@@ -92,6 +92,50 @@ function SidebarRow({
   );
 }
 
+export function AccountMobileNav() {
+  const { t } = useTranslation("accountSidebar");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { clearAuth } = useAuthStore();
+
+  const handleSignOut = () => {
+    clearAuth();
+    navigate("/login");
+  };
+
+  return (
+    <div className="flex w-full items-center gap-2 overflow-x-auto py-2 scrollbar-none border-b border-stroke">
+      {items.map((item) => {
+        const Icon = item.icon;
+        const active = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+        return (
+          <button
+            key={item.labelKey}
+            type="button"
+            onClick={() => navigate(item.path)}
+            className={`flex shrink-0 items-center gap-2 rounded-xl px-3.5 py-2 font-['Montserrat'] text-xs font-semibold transition-all cursor-pointer ${
+              active
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "bg-card border border-stroke text-foreground hover:bg-gray-light"
+            }`}
+          >
+            <Icon className="h-4 w-4" strokeWidth={2} />
+            <span className="whitespace-nowrap">{t(item.labelKey)}</span>
+          </button>
+        );
+      })}
+      <button
+        type="button"
+        onClick={handleSignOut}
+        className="flex shrink-0 items-center gap-2 rounded-xl bg-urgent/10 border border-urgent/20 px-3.5 py-2 font-['Montserrat'] text-xs font-semibold text-urgent transition-all cursor-pointer hover:bg-urgent/20"
+      >
+        <LogOut className="h-4 w-4 text-urgent" strokeWidth={2} />
+        <span className="whitespace-nowrap">{t("signOut")}</span>
+      </button>
+    </div>
+  );
+}
+
 export default function AccountSidebar() {
   const { t } = useTranslation("accountSidebar");
   const navigate = useNavigate();
@@ -110,7 +154,7 @@ export default function AccountSidebar() {
           <SidebarRow
             key={item.labelKey}
             item={item}
-            active={location.pathname === item.path}
+            active={location.pathname === item.path || location.pathname.startsWith(`${item.path}/`)}
             onClick={() => navigate(item.path)}
           />
         ))}

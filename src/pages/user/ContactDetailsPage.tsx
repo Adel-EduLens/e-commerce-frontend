@@ -532,12 +532,12 @@ export default function ContactDetailsPage() {
             setContactDraft((current) => ({ ...current, phone: value }))
           }
         />
-        <div className="inline-flex items-center justify-start gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-3 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleSaveContact}
             disabled={!hasUnsavedContactChanges}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3.5 sm:py-4 font-['Montserrat'] text-base font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Check className="h-5 w-5" strokeWidth={2} />
             {t("Save Changes")}
@@ -546,7 +546,7 @@ export default function ContactDetailsPage() {
             type="button"
             onClick={handleResetContact}
             disabled={!hasUnsavedContactChanges}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-4 font-['Montserrat'] text-base font-semibold text-foreground outline outline-1 outline-offset-[-1px] outline-stroke disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 sm:py-4 font-['Montserrat'] text-base font-semibold text-foreground outline outline-1 outline-offset-[-1px] outline-stroke disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="h-5 w-5" strokeWidth={2} />
             {t("Reset")}

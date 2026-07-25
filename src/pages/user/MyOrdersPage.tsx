@@ -106,13 +106,13 @@ function OrderTabs({
   ];
 
   return (
-    <div className="relative">
-      <div className="flex gap-6">
+    <div className="relative overflow-x-auto scrollbar-none">
+      <div className="flex gap-4 sm:gap-6 min-w-max">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`pb-4 font-['Montserrat'] text-base font-bold cursor-pointer transition-all duration-200 ${activeTab === tab.key
+            className={`pb-3 sm:pb-4 font-['Montserrat'] text-sm sm:text-base font-bold cursor-pointer transition-all duration-200 whitespace-nowrap ${activeTab === tab.key
               ? "text-foreground border-b-[3px] border-secondary"
               : "text-gray-text hover:text-foreground"
               }`}
@@ -414,7 +414,7 @@ export default function MyOrdersPage() {
       ) : (
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Orders list selection sidebar */}
-          <div className="w-full lg:w-72 shrink-0 flex flex-col gap-3 max-h-[600px] overflow-y-auto pr-1">
+          <div className="w-full lg:w-72 shrink-0 flex flex-col gap-3 max-h-[300px] lg:max-h-[600px] overflow-y-auto pr-1">
             <span className="font-['Montserrat'] text-xs font-bold text-gray-text uppercase tracking-wider px-1">
               {t("Select Order to Track")}
             </span>

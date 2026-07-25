@@ -135,7 +135,7 @@ function SettingsPanel() {
           <div className="font-['Montserrat'] text-base font-medium leading-4 tracking-tight text-foreground">
             {t("selectTheme")}
           </div>
-          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-lg w-full">
             <ThemeCard
               label={t("lightMode")}
               selected={theme === "light"}

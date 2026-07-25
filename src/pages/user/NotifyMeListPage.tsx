@@ -42,7 +42,7 @@ function ProductRequestCard({
       <button
         type="button"
         onClick={handleProductClick}
-        className="h-32 w-28 sm:h-40 sm:w-36 rounded-xl overflow-hidden bg-gray-light shrink-0 cursor-pointer"
+        className="h-24 w-24 sm:h-36 sm:w-36 rounded-xl overflow-hidden bg-gray-light shrink-0 cursor-pointer"
       >
         {mainImage ? (
           <img
