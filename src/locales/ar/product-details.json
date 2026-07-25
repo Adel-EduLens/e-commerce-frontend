@@ -2,83 +2,57 @@
   "loading": "جاري التحميل...",
   "productNotFound": "المنتج غير موجود.",
   "home": "الرئيسية",
-
   "openProductImage": "فتح صورة المنتج {{number}}",
   "previousImage": "الصورة السابقة",
   "nextImage": "الصورة التالية",
-
   "showLess": "عرض أقل",
   "readMore": "اقرأ المزيد",
-
   "reviews": "التقييمات",
   "review": "تقييم",
-
   "share": "مشاركة",
-
   "color": "اللون",
   "size": "المقاس",
   "sizeGuide": "دليل المقاسات",
-
   "quantity": "الكمية",
-
   "addToFavorite": "إضافة للمفضلة",
   "removeFromFavorite": "إزالة من المفضلة",
   "addToCart": "اضف للعربه",
   "removeFromCart": "أزل من العربة",
   "buyNow": "اشترِ الآن",
-
   "deliveryTitle": "يصلك غدًا، 29 سبتمبر",
   "deliverySubtitle": "اطلب خلال 3 ساعات و26 دقيقة",
-
   "freeReturns": "إرجاع مجاني خلال 14 يومًا",
-
   "sizeGuideUnavailable": "دليل المقاسات غير متوفر لهذا المنتج.",
-
   "copiedLink": "تم نسخ رابط المنتج",
   "copyFailed": "تعذر نسخ رابط المنتج",
-
   "favoriteAdded": "تمت الإضافة إلى المفضلة",
   "favoriteRemoved": "تمت الإزالة من المفضلة",
-
   "addedToBag": "تمت إضافة {{count}} منتج إلى السلة ({{size}}، {{color}})",
   "addedToBagPlural": "تمت إضافة {{count}} منتجات إلى السلة ({{size}}، {{color}})",
-
   "checkout": "جاري الانتقال إلى الدفع",
-
   "decreaseQuantity": "تقليل الكمية",
   "increaseQuantity": "زيادة الكمية",
-
   "selectColor": "اختر اللون {{color}}",
-
   "helpful": "مفيد",
-
   "noComment": "لا يوجد تعليق",
-
   "couldNotLoadReviews": "تعذر تحميل التقييمات.",
-
   "editYourReview": "تعديل تقييمك",
   "writeReview": "اكتب تقييمًا",
-
   "noReviews": "لا توجد تقييمات حتى الآن. كن أول من يقيم هذا المنتج!",
-
   "showingAllReviews": "عرض جميع التقييمات ({{count}})",
   "showingOneReview": "عرض 1 من {{count}} تقييم",
-
   "allReviews": "كل التقييمات",
   "fiveStars": "5 نجوم",
   "fourStars": "4 نجوم",
   "threeStars": "3 نجوم",
   "twoStars": "نجمتان",
   "oneStar": "نجمة واحدة",
-
   "newest": "الأحدث",
   "oldest": "الأقدم",
   "highestRating": "الأعلى تقييمًا",
   "lowestRating": "الأقل تقييمًا",
-
   "viewAll": "عرض الكل",
   "viewLess": "عرض أقل",
-
   "addToCompare": "أضف إلى المقارنة",
   "removeFromCompare": "أزل من المقارنة",
   "wholesale": "البيع بالجملة",
@@ -128,7 +102,6 @@
   "removedFromCartToast": "تمت الإزالة من العربة",
   "securityDeposit": "التأمين",
   "depositAmount": "قيمة العربون",
-
   "reviewsCount": "تقييم",
   "showingReviews": "عرض {{shown}} من أصل {{total}} تقييم",
   "noCommentProvided": "لا يوجد تعليق.",

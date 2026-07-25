@@ -74,7 +74,7 @@ export function ProductInfoPanel({
   const targetId = String(item.id);
 
   const { data: checkData } = useNotifyMeCheck(targetType, targetId);
-  const isSubscribed = checkData?.isSubscribed ?? false;
+  const isSubscribed = typeof checkData === 'boolean' ? checkData : checkData?.isSubscribed ?? false;
 
   const subscribeMutation = useNotifyMeSubscribe();
   const unsubscribeMutation = useNotifyMeUnsubscribe();
@@ -110,28 +110,30 @@ export function ProductInfoPanel({
 
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = isWholesale
-    ? rawProduct?.wholesaleColors?.find(
-      (c: any) =>
-        c.color &&
-        selectedColor &&
-        c.color.toLowerCase() === selectedColor.toLowerCase()
-    )
-    : rawProduct?.colors?.find(
-      (c: any) =>
-        (c.colorName || c.color) &&
-        selectedColor &&
-        (c.colorName || c.color).toLowerCase() === selectedColor.toLowerCase()
-    );
+    ? (rawProduct?.wholesaleColors || rawProduct?.colors || [])?.find((c: any) => {
+        const name = c.color || c.colorName || "";
+        return selectedColor && name.toLowerCase() === selectedColor.toLowerCase();
+      }) || (rawProduct?.wholesaleColors || rawProduct?.colors || [])[0]
+    : (rawProduct?.colors || [])?.find((c: any) => {
+        const name = c.colorName || c.color || "";
+        return selectedColor && name.toLowerCase() === selectedColor.toLowerCase();
+      }) || (rawProduct?.colors || [])[0];
 
   // Retail products have a flat `sizes` array with quantity per size+color combo,
-  // whereas shop products nest variants under each color object.
+  // whereas shop/wholesale products nest variants/sizes under each color object.
   const colorVariants = isWholesale
-    ? (colorObj?.sizes || []).map((s: any) => ({ size: s.size, quantity: s.quantity ?? colorObj?.stock ?? 0 }))
+    ? ((colorObj?.sizes || colorObj?.variants || []) as any[]).map((s: any) => ({
+        size: typeof s === "string" ? s : s.size,
+        quantity: s.quantity ?? colorObj?.stock ?? 0,
+      }))
     : isRetail
       ? ((rawProduct?.sizes || []) as any[]).filter(
         (s: any) => !s.color || !selectedColor || s.color.toLowerCase() === selectedColor.toLowerCase()
       ).map((s: any) => ({ size: s.size, quantity: s.quantity ?? 0 }))
-      : colorObj?.variants || [];
+      : ((colorObj?.variants || colorObj?.sizes || []) as any[]).map((s: any) => ({
+        size: typeof s === "string" ? s : s.size,
+        quantity: s.quantity ?? 0,
+      }));
 
   // Find currently selected size variant info
   const selectedVariant = colorVariants.find((v: any) => v.size === selectedSize);
@@ -147,17 +149,25 @@ export function ProductInfoPanel({
   }, [selectedColor, colorVariants, selectedSize, setSelectedSize]);
 
   const hasColors = isWholesale
-    ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.length > 0
+    ? ((Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.length > 0) ||
+       (Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0))
     : Array.isArray(rawProduct?.colors) && rawProduct.colors.length > 0;
 
   const hasSizes = isWholesale
-    ? Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.some((c: any) => c.sizes && c.sizes.length > 0)
+    ? ((Array.isArray(rawProduct?.wholesaleColors) && rawProduct.wholesaleColors.some((c: any) => (c.sizes && c.sizes.length > 0) || (c.variants && c.variants.length > 0))) ||
+       (Array.isArray(rawProduct?.colors) && rawProduct.colors.some((c: any) => c.variants && c.variants.length > 0)))
     : Array.isArray(rawProduct?.sizes) && rawProduct.sizes.length > 0;
 
   const availableStock = (() => {
     const stockVal = (() => {
       if (isWholesale) {
-        return colorObj?.stock ?? 0;
+        if (colorVariants && colorVariants.length > 0) {
+          const minSizeQty = Math.min(...colorVariants.map((v: any) => v.quantity ?? 0));
+          return colorObj?.stock !== undefined && colorObj?.stock !== null
+            ? Math.min(colorObj.stock, minSizeQty)
+            : minSizeQty;
+        }
+        return colorObj?.stock ?? (rawProduct?.stock as number) ?? item.stock ?? 0;
       }
       if (isRetail) {
         // Retail: use size-level quantity if a variant is selected, otherwise product-level stock
@@ -171,27 +181,33 @@ export function ProductInfoPanel({
       }
       return rawProduct?.stock ?? 0;
     })();
-    // For wholesale, if stock is less than 1, it's effectively 0 (insufficient stock)
-    const minQty = isWholesale ? 1 : (item.minOrder || 1);
-    if (isWholesale && minQty && stockVal < minQty) {
+    // For wholesale, if min size quantity is less than minOrder requirement, stock is effectively 0 (insufficient to satisfy minimum order)
+    const requiredMinOrder = isWholesale
+      ? (colorObj?.minOrder ?? item.minOrder ?? rawProduct?.minOrder ?? 1)
+      : (item.minOrder || 1);
+
+    if (isWholesale && stockVal < requiredMinOrder) {
       return 0;
     }
     return stockVal;
   })();
 
-  // Guard quantity: cannot exceed availableStock or fall below minOrder (for retail) / 1 (for wholesale)
+  // Guard quantity: cannot exceed availableStock or fall below requiredMinOrder
   useEffect(() => {
-    const minQty = isWholesale ? 1 : (item.minOrder || 1);
+    const requiredMinOrder = isWholesale
+      ? (colorObj?.minOrder ?? item.minOrder ?? rawProduct?.minOrder ?? 1)
+      : (item.minOrder || 1);
+
     if (availableStock > 0) {
       if (quantity > availableStock) {
         setQuantity(availableStock);
-      } else if (quantity < minQty) {
-        setQuantity(minQty);
+      } else if (quantity < requiredMinOrder) {
+        setQuantity(requiredMinOrder);
       }
     } else {
-      setQuantity(minQty);
+      setQuantity(requiredMinOrder);
     }
-  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale]);
+  }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale, rawProduct]);
 
   // Flash deal price calculation
   const basePrice =
@@ -539,6 +555,16 @@ export function ProductInfoPanel({
           </div>
           <div className="flex flex-wrap gap-2">
             {colorVariants.map((variant: any) => {
+              if (isWholesale) {
+                return (
+                  <span
+                    key={variant.size}
+                    className="h-9 min-w-[36px] px-3 rounded-md font-semibold text-xs border border-stroke bg-card text-foreground flex items-center justify-center cursor-default select-none"
+                  >
+                    {variant.size}
+                  </span>
+                );
+              }
               const isSelected = variant.size === selectedSize;
               const isOutOfStock = variant.quantity <= 0;
               return (
@@ -574,8 +600,8 @@ export function ProductInfoPanel({
         <div className="inline-flex items-center border border-stroke rounded-md bg-card">
           <button
             type="button"
-            disabled={availableStock <= 0 || quantity <= (isWholesale ? 1 : (item.minOrder || 1))}
-            onClick={() => setQuantity(Math.max(isWholesale ? 1 : (item.minOrder || 1), quantity - 1))}
+            disabled={availableStock <= 0 || quantity <= (isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1))}
+            onClick={() => setQuantity(Math.max(isWholesale ? (colorObj?.minOrder ?? item.minOrder ?? 1) : (item.minOrder || 1), quantity - 1))}
             className="w-8 h-8 flex items-center justify-center font-bold text-foreground/80 hover:bg-background disabled:opacity-40 rounded-l-md"
           >
             −
@@ -640,19 +666,19 @@ export function ProductInfoPanel({
             type="button"
             onClick={externalNotifyMe ?? handleNotifyMeToggle}
             disabled={subscribeMutation.isPending || unsubscribeMutation.isPending}
-            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition border-2 shadow-sm disabled:opacity-75 disabled:cursor-not-allowed ${(isNotifySubscribed ?? isSubscribed)
-              ? "bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-700 hover:bg-emerald-100/80 active:scale-[0.98]"
+            className={`flex-1 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition-colors duration-200 border-2 shadow-sm disabled:opacity-75 disabled:cursor-not-allowed ${(isNotifySubscribed ?? isSubscribed)
+              ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700 shadow-md active:scale-[0.98]"
               : "border-primary text-primary bg-transparent hover:bg-primary/10 active:scale-[0.98]"
               }`}
           >
             {subscribeMutation.isPending || unsubscribeMutation.isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                <Loader2 className="h-4 w-4 animate-spin text-current" />
                 <span>{t("loading") ?? "Loading..."}</span>
               </>
             ) : (isNotifySubscribed ?? isSubscribed) ? (
               <>
-                <BellRing className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <Check className="h-4 w-4 stroke-[3] text-white" />
                 <span>{t("subscribedForRestock")}</span>
               </>
             ) : (

@@ -270,7 +270,6 @@ export default function RetailProductDetailsPage() {
             rawProduct={typedProduct as unknown as Record<string, unknown>}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
-            onNotifyMe={handleNotifyMe}
             isAddingToCart={addProductToCart.isPending}
           />
         </div>

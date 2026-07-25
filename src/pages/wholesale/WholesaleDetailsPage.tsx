@@ -40,18 +40,18 @@ export default function WholesaleDetailsPage() {
 
   // Initialize selected values on wholesale product load
   useEffect(() => {
-    if (wholesale && wholesale.wholesaleColors && wholesale.wholesaleColors.length > 0) {
-      const firstColor = wholesale.wholesaleColors[0];
-      setSelectedColor(firstColor.color || "");
+    if (wholesale) {
+      const colorsList = wholesale.wholesaleColors || (wholesale.colors as any[]) || [];
+      if (colorsList.length > 0) {
+        const firstColor = colorsList[0];
+        const colorName = firstColor.color || firstColor.colorName || "";
+        setSelectedColor(colorName);
 
-      const firstAvailableSize = firstColor.sizes?.[0]?.size || "";
-      setSelectedSize(firstAvailableSize);
+        const sizesList = firstColor.sizes || firstColor.variants || [];
+        const firstAvailableSize = sizesList[0]?.size || "";
+        setSelectedSize(firstAvailableSize);
+      }
 
-      const firstImage = wholesale.images?.[0]?.url || "";
-      setSelectedImage(firstImage);
-
-      setQuantity(wholesale.minOrder || 1);
-    } else if (wholesale) {
       const firstImage = wholesale.images?.[0]?.url || "";
       setSelectedImage(firstImage);
       setQuantity(wholesale.minOrder || 1);
@@ -60,9 +60,13 @@ export default function WholesaleDetailsPage() {
 
   const handleColorChange = (colorName: string) => {
     setSelectedColor(colorName);
-    const colorObj = wholesale?.wholesaleColors?.find((c) => c.color === colorName);
+    const colorsList = wholesale?.wholesaleColors || (wholesale?.colors as any[]) || [];
+    const colorObj = colorsList.find(
+      (c: any) => (c.color || c.colorName || "").toLowerCase() === colorName.toLowerCase()
+    );
     if (colorObj) {
-      const firstAvailableSize = colorObj.sizes?.[0]?.size || "";
+      const sizesList = colorObj.sizes || colorObj.variants || [];
+      const firstAvailableSize = sizesList[0]?.size || "";
       setSelectedSize(firstAvailableSize);
     }
   };

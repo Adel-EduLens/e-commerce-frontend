@@ -2,83 +2,57 @@
   "loading": "Loading...",
   "productNotFound": "Product not found.",
   "home": "Home",
-
   "openProductImage": "Open product image {{number}}",
   "previousImage": "Previous image",
   "nextImage": "Next image",
-
   "showLess": "Show Less",
   "readMore": "Read More",
-
   "reviews": "Reviews",
   "review": "Review",
-
   "share": "Share",
-
   "color": "Color",
   "size": "Size",
   "sizeGuide": "Size Guide",
-
   "quantity": "Quantity",
-
   "addToFavorite": "Add to Favorite",
   "removeFromFavorite": "Remove from Fav",
   "addToCart": "Add to Cart",
   "removeFromCart": "Remove from Cart",
   "buyNow": "Buy Now",
-
   "deliveryTitle": "Get it Tomorrow, 29th Sep,",
   "deliverySubtitle": "Order within 3 Hours & 26 minutes",
-
   "freeReturns": "Free online returns within 14 days",
-
   "sizeGuideUnavailable": "Size guide not available for this product.",
-
   "copiedLink": "Product link copied to clipboard",
   "copyFailed": "Unable to copy the product link",
-
   "favoriteAdded": "Added to favorites",
   "favoriteRemoved": "Removed from favorites",
-
   "addedToBag": "{{count}} item added to bag ({{size}}, {{color}})",
   "addedToBagPlural": "{{count}} items added to bag ({{size}}, {{color}})",
-
   "checkout": "Taking you to checkout",
-
   "decreaseQuantity": "Decrease quantity",
   "increaseQuantity": "Increase quantity",
-
   "selectColor": "Select {{color}} color",
-
   "helpful": "Helpful",
-
   "noComment": "No comment",
-
   "couldNotLoadReviews": "Could not load reviews.",
-
   "editYourReview": "Edit Your Review",
   "writeReview": "Write a Review",
-
   "noReviews": "No reviews found. Be the first to review this product!",
-
   "showingAllReviews": "Showing all {{count}} reviews",
   "showingOneReview": "Showing 1 of {{count}} reviews",
-
   "allReviews": "All Reviews",
   "fiveStars": "5 Stars",
   "fourStars": "4 Stars",
   "threeStars": "3 Stars",
   "twoStars": "2 Stars",
   "oneStar": "1 Star",
-
   "newest": "Newest",
   "oldest": "Oldest",
   "highestRating": "Highest Rating",
   "lowestRating": "Lowest Rating",
-
   "viewAll": "View All",
   "viewLess": "View Less",
-
   "addToCompare": "Add to Compare",
   "removeFromCompare": "Remove from Compare",
   "wholesale": "Wholesale",
@@ -126,10 +100,8 @@
   "pleaseLoginFirst": "Please log in first",
   "addedToCartToast": "Added to cart",
   "removedFromCartToast": "Removed from cart",
-
   "securityDeposit": "Security Deposit",
   "depositAmount": "Deposit Amount",
-
   "reviewsCount": "Reviews",
   "showingReviews": "Showing {{shown}} of {{total}} reviews",
   "noCommentProvided": "No comment provided.",

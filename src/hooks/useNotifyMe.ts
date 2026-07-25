@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifyMeApi, type NotifyMeTargetType } from '../services/notifyMeApi'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '../store/useAuthStore'
 
 export const notifyMeKeys = {
   all: ['notifyMe'] as const,
@@ -20,13 +21,17 @@ export function useNotifyMeList() {
 }
 
 export function useNotifyMeCheck(targetType: NotifyMeTargetType, targetId: string) {
+  const token = useAuthStore((state) => state.token);
   return useQuery({
     queryKey: notifyMeKeys.check(targetType, targetId),
     queryFn: async () => {
       const data = await notifyMeApi.check(targetType, targetId)
-      return data.data as { isSubscribed: boolean }
+      const resVal = data.data
+      const isSubscribed = typeof resVal === 'object' && resVal !== null ? Boolean(resVal.isSubscribed) : Boolean(resVal)
+      return { isSubscribed }
     },
-    enabled: !!targetId,
+    enabled: !!targetId && !!token,
+    staleTime: 1000 * 60 * 5, // 5 minutes cache to eliminate refetch flickering
   })
 }
 
@@ -36,8 +41,9 @@ export function useNotifyMeSubscribe() {
   return useMutation({
     mutationFn: ({ targetType, targetId }: { targetType: NotifyMeTargetType; targetId: string }) =>
       notifyMeApi.subscribe(targetType, targetId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: notifyMeKeys.all })
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(notifyMeKeys.check(variables.targetType, variables.targetId), { isSubscribed: true })
+      queryClient.invalidateQueries({ queryKey: notifyMeKeys.list() })
       toast.success(t('youWillBeNotified'))
     },
     onError: (error: any) => {
@@ -52,8 +58,9 @@ export function useNotifyMeUnsubscribe() {
   return useMutation({
     mutationFn: ({ targetType, targetId }: { targetType: NotifyMeTargetType; targetId: string }) =>
       notifyMeApi.unsubscribe(targetType, targetId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: notifyMeKeys.all })
+    onSuccess: (_, variables) => {
+      queryClient.setQueryData(notifyMeKeys.check(variables.targetType, variables.targetId), { isSubscribed: false })
+      queryClient.invalidateQueries({ queryKey: notifyMeKeys.list() })
       toast.success(t('unsubscribedToast'))
     },
     onError: (error: any) => {
