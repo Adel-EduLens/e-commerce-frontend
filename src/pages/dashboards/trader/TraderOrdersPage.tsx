@@ -174,7 +174,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
             </div>
             {order.couponCode && (
               <div className="flex justify-between items-center py-1.5 border-b border-stroke">
-                <span className="text-gray-text font-medium">{t("appliedCoupon", "الكوبون المطبق")}</span>
+                <span className="text-gray-text font-medium">{t("appliedCoupon", "Applied Coupon")}</span>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-xl bg-amber-50 text-amber-700 font-bold text-xs border border-amber-200">
                   <Tag className="h-3 w-3 text-amber-600" />
                   {order.couponCode}
