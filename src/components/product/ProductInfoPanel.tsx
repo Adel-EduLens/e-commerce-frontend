@@ -107,6 +107,32 @@ export function ProductInfoPanel({
 
   const isWholesale = productType === 'WHOLESALE';
   const isRetail = productType === 'RETAIL' || productType === 'RENTAL';
+  const isGiftCard =
+    (productType as string) === 'GIFT_CARD' ||
+    Boolean(rawProduct?.giftCardAmounts) ||
+    Boolean(item?.giftCardAmounts) ||
+    (Array.isArray(rawProduct?.productTypes) &&
+      rawProduct.productTypes.some(
+        (pt: any) => (typeof pt === 'string' ? pt : pt?.type) === 'GIFT_CARD'
+      ));
+
+  const parsedAmounts = (() => {
+    const rawStr = rawProduct?.giftCardAmounts || item?.giftCardAmounts;
+    if (!rawStr) return [10, 15, 50, 75, 100, 150, 200];
+    const list = String(rawStr)
+      .split(',')
+      .map((s: string) => Number(s.trim()))
+      .filter((n: number) => !isNaN(n) && n > 0);
+    return list.length > 0 ? list : [10, 15, 50, 75, 100, 150, 200];
+  })();
+
+  const [selectedAmount, setSelectedAmount] = useState<number>(() => parsedAmounts[0] || 1000);
+  const [isCustomAmount, setIsCustomAmount] = useState<boolean>(false);
+  const [customAmountInput, setCustomAmountInput] = useState<string>("10");
+
+  const [recipientName, setRecipientName] = useState("");
+  const [recipientEmail, setRecipientEmail] = useState("");
+  const [giftMessage, setGiftMessage] = useState("");
 
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = isWholesale
@@ -222,7 +248,9 @@ export function ProductInfoPanel({
     rawProduct?.flashDealPrice &&
     rawProduct?.flashDealPrice < basePrice;
 
-  const activePrice = Number(hasFlashDeal ? rawProduct.flashDealPrice : basePrice);
+  const activePrice = isGiftCard
+    ? selectedAmount
+    : Number(hasFlashDeal ? rawProduct.flashDealPrice : basePrice);
   const oldPrice = hasFlashDeal ? basePrice : null;
   const discountPercent = hasFlashDeal && basePrice > 0
     ? Math.round(((basePrice - Number(rawProduct.flashDealPrice)) / basePrice) * 100)
@@ -292,6 +320,24 @@ export function ProductInfoPanel({
 
     if (externalAddToCart) {
       externalAddToCart();
+      return;
+    }
+
+    if (isGiftCard) {
+      addItem({
+        id: `${item.id}-${selectedAmount}-giftcard`,
+        productId: String(item.id),
+        title: item.name,
+        unitPrice: selectedAmount,
+        currency: "EGP",
+        size: `$${selectedAmount}`,
+        color: "Gift Card",
+        colorHex: "#000000",
+        imageSrc: item.images?.[0]?.url || "",
+        quantity,
+        productType: "GIFT_CARD",
+      });
+      toast.success(t("addedToBag", { count: quantity, size: `$${selectedAmount}`, color: "Gift Card" }) || "Added gift card to cart!");
       return;
     }
 
@@ -511,8 +557,120 @@ export function ProductInfoPanel({
         </div>
       )}
 
+      {/* GIFT CARD OPTIONS */}
+      {isGiftCard && (
+        <div className="flex flex-col gap-5 py-2 border-t border-stroke">
+          {/* Amount selector */}
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
+              {t("amount") || "Amount"}
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {parsedAmounts.map((amt) => {
+                const isSelected = !isCustomAmount && selectedAmount === amt;
+                return (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => {
+                      setSelectedAmount(amt);
+                      setIsCustomAmount(false);
+                    }}
+                    className={`h-9 min-w-[50px] px-3.5 rounded-lg font-bold text-xs border transition-all ${
+                      isSelected
+                        ? "bg-foreground text-background border-foreground shadow-sm scale-105"
+                        : "bg-card text-foreground border-stroke hover:border-foreground/50 hover:bg-gray-50 cursor-pointer"
+                    }`}
+                  >
+                    ${amt}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCustomAmount(true);
+                  const parsedCustom = Number(customAmountInput) || 10;
+                  setSelectedAmount(parsedCustom);
+                }}
+                className={`h-9 px-3.5 rounded-lg font-bold text-xs border transition-all ${
+                  isCustomAmount
+                    ? "bg-foreground text-background border-foreground shadow-sm scale-105"
+                    : "bg-card text-foreground border-stroke hover:border-foreground/50 hover:bg-gray-50 cursor-pointer"
+                }`}
+              >
+                Custom
+              </button>
+            </div>
+            {isCustomAmount && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-xs font-semibold text-gray-text">$</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={customAmountInput}
+                  onChange={(e) => {
+                    setCustomAmountInput(e.target.value);
+                    const val = Number(e.target.value) || 0;
+                    if (val > 0) setSelectedAmount(val);
+                  }}
+                  className="w-32 rounded-lg border border-stroke px-3 py-1.5 text-xs outline-none focus:border-primary bg-card text-foreground"
+                  placeholder="Enter amount"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Send as a gift form container matching design */}
+          <div className="flex flex-col gap-3 rounded-xl border border-stroke p-4 bg-card/60 shadow-xs">
+            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+              {t("sendAsGift") || "Send as a gift"}
+            </span>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-gray-text">
+                {t("toName") || "To"}
+              </label>
+              <input
+                type="text"
+                placeholder="Name"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="w-full rounded-lg border border-stroke px-3 py-2 text-xs outline-none focus:border-primary text-foreground bg-card"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-gray-text">
+                {t("toEmail") || "Email"}
+              </label>
+              <input
+                type="email"
+                placeholder="Email"
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                className="w-full rounded-lg border border-stroke px-3 py-2 text-xs outline-none focus:border-primary text-foreground bg-card"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-gray-text">
+                {t("giftMessage") || "Message"}
+              </label>
+              <textarea
+                rows={3}
+                placeholder="(Optional)"
+                value={giftMessage}
+                onChange={(e) => setGiftMessage(e.target.value)}
+                className="w-full rounded-lg border border-stroke px-3 py-2 text-xs outline-none focus:border-primary text-foreground bg-card resize-none"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Colors */}
-      {item.colors.length > 0 && (
+      {item.colors.length > 0 && !isGiftCard && (
         <div className="flex flex-col gap-2">
           <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">
             {isWholesale ? t("packageColor") : t("colorLabel")} <span className="text-foreground normal-case font-bold">{selectedColor}</span>
@@ -547,7 +705,7 @@ export function ProductInfoPanel({
       )}
 
       {/* Sizes */}
-      {colorVariants.length > 0 && (
+      {colorVariants.length > 0 && !isGiftCard && (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <div className="text-xs font-bold text-foreground/80 uppercase tracking-wider">

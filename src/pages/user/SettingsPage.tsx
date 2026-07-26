@@ -120,6 +120,139 @@ function ThemeCard({
   );
 }
 
+import { Gift, Copy, Check } from "lucide-react";
+import { useReceivedGiftCards } from "../../hooks/queries/giftCardsQuery";
+
+export function ReceivedGiftCardsPanel() {
+  const { data: giftCards = [], isLoading, isError } = useReceivedGiftCards();
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  return (
+    <div className="flex w-full flex-col gap-6 font-['Montserrat']">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+            My Gift Cards
+          </h2>
+          <p className="text-xs text-gray-text mt-1">
+            Gift cards you have received
+          </p>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="py-12 text-center text-xs text-gray-text">Loading gift cards...</div>
+      ) : isError ? (
+        <div className="py-12 text-center text-xs text-red-500">Failed to load received gift cards.</div>
+      ) : giftCards.length === 0 ? (
+        <div className="rounded-2xl border border-stroke bg-card p-12 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-secondary text-primary mx-auto flex items-center justify-center">
+            <Gift className="w-6 h-6" />
+          </div>
+          <h3 className="font-bold text-foreground text-sm">No Gift Cards Received Yet</h3>
+          <p className="text-xs text-gray-text max-w-sm mx-auto">
+            When someone sends you a gift card, it will appear here with your balance and redemption details.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {giftCards.map((gc) => {
+            const formattedDate = gc.createdAt
+              ? new Date(gc.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "Aug 15, 2025";
+
+            const displayStatus =
+              gc.status === "ACTIVE" || gc.status === "SENT" ? "Delivered" : gc.status;
+
+            return (
+              <div
+                key={gc.id}
+                className="relative flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl border border-stroke bg-card shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-all font-['Montserrat']"
+              >
+                {/* Left Visual Artwork / Box */}
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-2xl bg-[#1A1A1E] dark:bg-[#121214] text-white flex items-center justify-center overflow-hidden shadow-inner">
+                  {gc.image ? (
+                    <img
+                      src={gc.image}
+                      alt={gc.name}
+                      className="w-full h-full object-cover rounded-2xl"
+                    />
+                  ) : (
+                    <span className="font-bold text-white text-lg sm:text-xl tracking-widest uppercase [writing-mode:vertical-rl] rotate-180 select-none">
+                      GENZ
+                    </span>
+                  )}
+                </div>
+
+                {/* Right Info Details */}
+                <div className="flex flex-col justify-center gap-1 min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight truncate">
+                      {gc.name || "Gift Card"}
+                    </h3>
+
+                    {gc.code && (
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(gc.code)}
+                        className="inline-flex items-center gap-1 text-[11px] font-mono text-gray-text hover:text-primary transition shrink-0 bg-background px-2 py-0.5 rounded-md border border-stroke"
+                        title="Copy Redemption Code"
+                      >
+                        {copiedCode === gc.code ? (
+                          <>
+                            <Check className="w-3 h-3 text-green-500" />
+                            <span className="text-green-600 font-sans font-medium">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>{gc.code}</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="text-xs sm:text-sm text-foreground truncate mt-0.5">
+                    <span className="text-gray-text font-normal">Sent from: </span>
+                    <span className="font-bold text-foreground">
+                      {gc.senderName || gc.senderEmail || "Store"}
+                    </span>
+                  </div>
+
+                  <div className="text-xs sm:text-sm text-foreground">
+                    <span className="text-gray-text font-normal">Value: </span>
+                    <span className="font-bold text-foreground">${gc.balance || gc.amount}</span>
+                  </div>
+
+                  <div className="text-xs sm:text-sm text-foreground">
+                    <span className="text-gray-text font-normal">status: </span>
+                    <span className="font-bold text-foreground capitalize">{displayStatus}</span>
+                  </div>
+
+                  <div className="text-xs text-gray-text mt-1 font-normal">
+                    Date: {formattedDate}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SettingsPanel() {
   const { t } = useTranslation("setting");
   const { theme, setTheme } = useThemeStore();

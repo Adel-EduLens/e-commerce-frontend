@@ -6,7 +6,7 @@ export const asset = (file: string) =>
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 export type InventoryStatus = "Active" | "Low Stock" | "Out of Stock";
-export type ProductType = "product" | "wholesale" | "retail" | "blank";
+export type ProductType = "product" | "wholesale" | "retail" | "blank" | "gift_card";
 
 export interface InventoryItem {
   id: string;
@@ -19,6 +19,7 @@ export interface InventoryItem {
   sku: string;
   price: string;
   priceNum: number;
+  giftCardAmounts?: string | null;
   depositAmount?: number;
   securityDeposit?: number;
   date: string;

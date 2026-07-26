@@ -33,6 +33,7 @@ import TraderCouponsPage from "../pages/dashboards/trader/TraderCouponsPage";
 import UserDashboard from "../pages/dashboards/user/UserDashboard";
 import RecentlyViewedPage from "../pages/shop/RecentlyViewedPage";
 import MyOrdersPage from "../pages/user/MyOrdersPage";
+import MyGiftCardsPage from "../pages/user/MyGiftCardsPage";
 import HelpCenterPage from "../pages/help/HelpCenterPage";
 import WalletRewardsPage from "../pages/user/WalletRewardsPage";
 import CheckoutPage from "../pages/cart/CheckoutPage";
@@ -72,6 +73,8 @@ import InfluencerCouponUsersPage from "../pages/dashboards/influencer/Influencer
 import InfluencerEarningsPage from "../pages/dashboards/influencer/InfluencerEarningsPage";
 import TraderInfluencersPage from "../pages/dashboards/trader/TraderInfluencersPage";
 import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
+import GiftCardDetailsPage from "../pages/shop/GiftCardDetailsPage";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -94,6 +97,22 @@ export const router = createBrowserRouter([
         element: (
           <UserLayout>
             <ProductDetailsPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "giftcard/:id",
+        element: (
+          <UserLayout>
+            <GiftCardDetailsPage />
+          </UserLayout>
+        ),
+      },
+      {
+        path: "gift-card/:id",
+        element: (
+          <UserLayout>
+            <GiftCardDetailsPage />
           </UserLayout>
         ),
       },
@@ -243,6 +262,15 @@ export const router = createBrowserRouter([
             handle: {
               footer: {
                 top: "top-[950px]",
+              },
+            },
+          },
+          {
+            path: "my-gift-cards",
+            element: <MyGiftCardsPage />,
+            handle: {
+              footer: {
+                top: "top-[917px]",
               },
             },
           },

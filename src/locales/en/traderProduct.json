@@ -65,7 +65,9 @@
   "sizeVariantRequired": "Please add at least one size variant for the new color.",
 
   "productsTable": "Products Table",
+  "giftCardsTable": "Gift Cards Table",
   "addProduct": "Add Product",
+  "addGiftCard": "Add Gift Card",
   "addItem": "Add Item",
   "search": "Search",
   "category": "Category",

@@ -80,8 +80,8 @@ export function UnifiedProductModal({
     isEditing && (item as any)?.collections
       ? (item as any).collections.map((c: any) => String(c.id))
       : (isEditing && (item as any)?.collectionIds
-      ? (item as any).collectionIds.map((id: any) => String(id))
-      : []),
+        ? (item as any).collectionIds.map((id: any) => String(id))
+        : []),
   );
   const [description, setDescription] = useState(item?.description || "");
   const [sku, setSku] = useState(item?.sku || "");
@@ -135,14 +135,14 @@ export function UnifiedProductModal({
   const [productColors, setProductColors] = useState<ProductColor[]>(
     isEditing
       ? (item?.colors || []).filter(Boolean).map((color) => ({
-          color,
-          images:
-            item?.imagesByColor
-              ?.filter((img) => img.color === color)
-              .map((img) => ({ url: img.url, direction: img.direction })) || [],
-          variants: [],
-          stock: 0,
-        }))
+        color,
+        images:
+          item?.imagesByColor
+            ?.filter((img) => img.color === color)
+            .map((img) => ({ url: img.url, direction: img.direction })) || [],
+        variants: [],
+        stock: 0,
+      }))
       : [],
   );
 
@@ -390,7 +390,7 @@ export function UnifiedProductModal({
     try {
       setUploading(true);
 
-      const colorsData = await Promise.all(
+      let colorsData = await Promise.all(
         productColors.map(async (pc) => {
           const uploadedUrls = await Promise.all(
             pc.images.map(async (img) => {
@@ -518,6 +518,8 @@ export function UnifiedProductModal({
         payload.blankPrice = null;
       }
 
+
+
       if (isEditing) {
         await updateProduct.mutateAsync({ id: item.id, ...payload });
       } else {
@@ -569,12 +571,12 @@ export function UnifiedProductModal({
               prev.map((pc, idx) =>
                 pc.color === col || String(idx) === col
                   ? {
-                      ...pc,
-                      images: [
-                        ...pc.images,
-                        { file: croppedFile, direction: "" },
-                      ],
-                    }
+                    ...pc,
+                    images: [
+                      ...pc.images,
+                      { file: croppedFile, direction: "" },
+                    ],
+                  }
                   : pc,
               ),
             );
@@ -818,520 +820,520 @@ export function UnifiedProductModal({
                   </div>
                 )}
               </div>
-
-              {/* WHOLESALE */}
-              <div className="border border-stroke rounded-lg p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">
-                    {tShared("wholesaleProduct") || "Wholesale Product"}
-                  </span>
-                  <Toggle
-                    checked={isWholesale}
-                    onChange={setIsWholesale}
-                    size="md"
+            </div>
+            {/* WHOLESALE */}
+            <div className="border border-stroke rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm">
+                  {tShared("wholesaleProduct") || "Wholesale Product"}
+                </span>
+                <Toggle
+                  checked={isWholesale}
+                  onChange={setIsWholesale}
+                  size="md"
+                />
+              </div>
+              {isWholesale && (
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
+                  <div className="col-span-2 space-y-1">
+                    <label className="text-xs font-semibold text-gray-text">
+                      {tShared("wholesaleCategories") ||
+                        "Wholesale Categories *"}
+                    </label>
+                    <MultiSelect
+                      label={tShared("selectCategory")}
+                      options={wholesaleCategories.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      selected={wholesaleCategoryIds}
+                      onChange={setWholesaleCategoryIds}
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder={
+                      tShared("wholesalePrice") || "Wholesale Price"
+                    }
+                    value={wholesalePrice}
+                    onChange={(e) => setWholesalePrice(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
                   />
-                </div>
-                {isWholesale && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
-                    <div className="col-span-2 space-y-1">
-                      <label className="text-xs font-semibold text-gray-text">
-                        {tShared("wholesaleCategories") ||
-                          "Wholesale Categories *"}
-                      </label>
-                      <MultiSelect
-                        label={tShared("selectCategory")}
-                        options={wholesaleCategories.map((c) => ({
-                          value: c.id,
-                          label: c.name,
-                        }))}
-                        selected={wholesaleCategoryIds}
-                        onChange={setWholesaleCategoryIds}
-                      />
-                    </div>
-                    <input
-                      type="number"
-                      placeholder={
-                        tShared("wholesalePrice") || "Wholesale Price"
-                      }
-                      value={wholesalePrice}
-                      onChange={(e) => setWholesalePrice(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="number"
-                      placeholder={tShared("minOrder") || "Min Order"}
-                      value={minOrder}
-                      onChange={(e) => setMinOrder(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
+                  <input
+                    type="number"
+                    placeholder={tShared("minOrder") || "Min Order"}
+                    value={minOrder}
+                    onChange={(e) => setMinOrder(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
 
-                    <div className="col-span-2 flex items-center gap-6 mt-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("bestDeal") || "Best Deal"}
-                        </span>
-                        <Toggle
-                          checked={isBestDeal}
-                          onChange={setIsBestDeal}
-                          size="sm"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("mostPopular") || "Most Popular"}
-                        </span>
-                        <Toggle
-                          checked={isMostPopular}
-                          onChange={setIsMostPopular}
-                          size="sm"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("premiumCollection") || "Premium Collection"}
-                        </span>
-                        <Toggle
-                          checked={isPremiumCollection}
-                          onChange={setIsPremiumCollection}
-                          size="sm"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* RETAIL */}
-              <div className="border border-stroke rounded-lg p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">
-                    {tShared("retailProduct") || "Retail Product"}
-                  </span>
-                  <Toggle checked={isRetail} onChange={setIsRetail} size="md" />
-                </div>
-                {isRetail && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
-                    <div className="col-span-2 space-y-1">
-                      <label className="text-xs font-semibold text-gray-text">
-                        {tShared("retailCategories") || "Retail Categories *"}
-                      </label>
-                      <MultiSelect
-                        label={tShared("selectCategory")}
-                        options={retailCategories.map((c) => ({
-                          value: c.id,
-                          label: c.name,
-                        }))}
-                        selected={retailCategoryIds}
-                        onChange={setRetailCategoryIds}
-                      />
-                    </div>
-                    <input
-                      type="number"
-                      placeholder={tShared("retailPrice") || "Retail Price"}
-                      value={retailPrice}
-                      onChange={(e) => setRetailPrice(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="number"
-                      placeholder={tShared("depositAmount") || "Deposit Amount"}
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="number"
-                      placeholder={
-                        tShared("securityDeposit") || "Security Deposit"
-                      }
-                      value={securityDeposit}
-                      onChange={(e) => setSecurityDeposit(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="text"
-                      placeholder={
-                        tShared("termsAndConditions") || "Terms & Conditions"
-                      }
-                      value={termsAndConditions}
-                      onChange={(e) => setTermsAndConditions(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="text"
-                      placeholder={tShared("privacyPolicy") || "Privacy Policy"}
-                      value={privacyPolicy}
-                      onChange={(e) => setPrivacyPolicy(e.target.value)}
-                      className="col-span-2 rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <div className="col-span-2 flex items-center gap-2 mt-2">
+                  <div className="col-span-2 flex items-center gap-6 mt-2">
+                    <div className="flex items-center gap-2">
                       <span className="text-xs">
-                        {tShared("featuredRetailProduct") ||
-                          "Featured Retail Product"}
+                        {tShared("bestDeal") || "Best Deal"}
                       </span>
                       <Toggle
-                        checked={isFeatured}
-                        onChange={setIsFeatured}
+                        checked={isBestDeal}
+                        onChange={setIsBestDeal}
+                        size="sm"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">
+                        {tShared("mostPopular") || "Most Popular"}
+                      </span>
+                      <Toggle
+                        checked={isMostPopular}
+                        onChange={setIsMostPopular}
+                        size="sm"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">
+                        {tShared("premiumCollection") || "Premium Collection"}
+                      </span>
+                      <Toggle
+                        checked={isPremiumCollection}
+                        onChange={setIsPremiumCollection}
                         size="sm"
                       />
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* BLANK */}
-              <div className="border border-stroke rounded-lg p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">
-                    {tShared("blankProduct") || "Blank Product"}
-                  </span>
-                  <Toggle checked={isBlank} onChange={setIsBlank} size="md" />
                 </div>
-                {isBlank && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
-                    <input
-                      type="number"
-                      placeholder={tShared("blankPrice") || "Blank Price"}
-                      value={blankPrice}
-                      onChange={(e) => setBlankPrice(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <input
-                      type="text"
-                      placeholder={tShared("materials") || "Materials"}
-                      value={materials}
-                      onChange={(e) => setMaterials(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                    />
-                    <div className="col-span-2 flex items-center gap-2 mt-2">
-                      <span className="text-xs">
-                        {tShared("isActive") || "Is Active"}
-                      </span>
-                      <Toggle
-                        checked={isActive}
-                        onChange={setIsActive}
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                )}
+              )}
+            </div>
+
+            {/* RETAIL */}
+            <div className="border border-stroke rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm">
+                  {tShared("retailProduct") || "Retail Product"}
+                </span>
+                <Toggle checked={isRetail} onChange={setIsRetail} size="md" />
               </div>
+              {isRetail && (
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
+                  <div className="col-span-2 space-y-1">
+                    <label className="text-xs font-semibold text-gray-text">
+                      {tShared("retailCategories") || "Retail Categories *"}
+                    </label>
+                    <MultiSelect
+                      label={tShared("selectCategory")}
+                      options={retailCategories.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      selected={retailCategoryIds}
+                      onChange={setRetailCategoryIds}
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder={tShared("retailPrice") || "Retail Price"}
+                    value={retailPrice}
+                    onChange={(e) => setRetailPrice(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <input
+                    type="number"
+                    placeholder={tShared("depositAmount") || "Deposit Amount"}
+                    value={depositAmount}
+                    onChange={(e) => setDepositAmount(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <input
+                    type="number"
+                    placeholder={
+                      tShared("securityDeposit") || "Security Deposit"
+                    }
+                    value={securityDeposit}
+                    onChange={(e) => setSecurityDeposit(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <input
+                    type="text"
+                    placeholder={
+                      tShared("termsAndConditions") || "Terms & Conditions"
+                    }
+                    value={termsAndConditions}
+                    onChange={(e) => setTermsAndConditions(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <input
+                    type="text"
+                    placeholder={tShared("privacyPolicy") || "Privacy Policy"}
+                    value={privacyPolicy}
+                    onChange={(e) => setPrivacyPolicy(e.target.value)}
+                    className="col-span-2 rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <div className="col-span-2 flex items-center gap-2 mt-2">
+                    <span className="text-xs">
+                      {tShared("featuredRetailProduct") ||
+                        "Featured Retail Product"}
+                    </span>
+                    <Toggle
+                      checked={isFeatured}
+                      onChange={setIsFeatured}
+                      size="sm"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* BLANK */}
+            <div className="border border-stroke rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm">
+                  {tShared("blankProduct") || "Blank Product"}
+                </span>
+                <Toggle checked={isBlank} onChange={setIsBlank} size="md" />
+              </div>
+              {isBlank && (
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
+                  <input
+                    type="number"
+                    placeholder={tShared("blankPrice") || "Blank Price"}
+                    value={blankPrice}
+                    onChange={(e) => setBlankPrice(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <input
+                    type="text"
+                    placeholder={tShared("materials") || "Materials"}
+                    value={materials}
+                    onChange={(e) => setMaterials(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <div className="col-span-2 flex items-center gap-2 mt-2">
+                    <span className="text-xs">
+                      {tShared("isActive") || "Is Active"}
+                    </span>
+                    <Toggle
+                      checked={isActive}
+                      onChange={setIsActive}
+                      size="sm"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <MultiSelect
-              label={tShared("selectColors")}
-              options={COLOR_OPTIONS}
-              selected={selectedColors}
-              onChange={handleColorsChange}
-            />
+                  label={tShared("selectColors")}
+                  options={COLOR_OPTIONS}
+                  selected={selectedColors}
+                  onChange={handleColorsChange}
+                />
 
-            {productColors.map((pc) => (
-              <div
-                key={pc.color}
-                className="rounded-xl border border-stroke p-4 space-y-3 bg-background"
-              >
-                <div className="flex items-center justify-between border-b border-stroke pb-2">
-                  <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
-                    <span
-                      className="inline-block w-3 h-3 rounded-full border border-stroke"
-                      style={{ backgroundColor: getColorVar(pc.color) }}
-                    />
-                    {pc.color}
-                  </h4>
-                </div>
+                {productColors.map((pc) => (
+                  <div
+                    key={pc.color}
+                    className="rounded-xl border border-stroke p-4 space-y-3 bg-background"
+                  >
+                    <div className="flex items-center justify-between border-b border-stroke pb-2">
+                      <h4 className="font-['Montserrat'] text-sm font-bold text-foreground flex items-center gap-2">
+                        <span
+                          className="inline-block w-3 h-3 rounded-full border border-stroke"
+                          style={{ backgroundColor: getColorVar(pc.color) }}
+                        />
+                        {pc.color}
+                      </h4>
+                    </div>
 
-                <div className="space-y-2">
-                  <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                    Upload Images
-                  </p>
-                  <div className="flex flex-wrap gap-2 items-center">
-                    {pc.images.map((imgItem, imgIdx) => {
-                      const previewUrl =
-                        imgItem.url ||
-                        (imgItem.file ? URL.createObjectURL(imgItem.file) : "");
-                      return (
-                        <div
-                          key={imgIdx}
-                          className="flex flex-col gap-1 items-center"
-                        >
-                          <div className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
-                            <img
-                              src={previewUrl}
-                              alt="preview"
-                              className="w-full h-full object-cover"
-                            />
+                    <div className="space-y-2">
+                      <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                        Upload Images
+                      </p>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        {pc.images.map((imgItem, imgIdx) => {
+                          const previewUrl =
+                            imgItem.url ||
+                            (imgItem.file ? URL.createObjectURL(imgItem.file) : "");
+                          return (
+                            <div
+                              key={imgIdx}
+                              className="flex flex-col gap-1 items-center"
+                            >
+                              <div className="relative w-16 h-16 rounded-lg border border-stroke overflow-hidden group">
+                                <img
+                                  src={previewUrl}
+                                  alt="preview"
+                                  className="w-full h-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (imgItem.file)
+                                      URL.revokeObjectURL(previewUrl);
+                                    setProductColors((prev) =>
+                                      prev.map((item) =>
+                                        item.color === pc.color
+                                          ? {
+                                            ...item,
+                                            images: item.images.filter(
+                                              (_, idx) => idx !== imgIdx,
+                                            ),
+                                          }
+                                          : item,
+                                      ),
+                                    );
+                                  }}
+                                  className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                              {isBlank && (
+                                <select
+                                  value={imgItem.direction || ""}
+                                  onChange={(e) => {
+                                    const newDir = e.target.value;
+                                    setProductColors((prev) =>
+                                      prev.map((item) =>
+                                        item.color === pc.color
+                                          ? {
+                                            ...item,
+                                            images: item.images.map((i, idx) =>
+                                              idx === imgIdx
+                                                ? { ...i, direction: newDir }
+                                                : i,
+                                            ),
+                                          }
+                                          : item,
+                                      ),
+                                    );
+                                  }}
+                                  className="text-[10px] w-full p-1 border border-stroke rounded bg-card text-foreground"
+                                >
+                                  <option value="">Direction</option>
+                                  {[
+                                    { val: "FRONT", lbl: "Front" },
+                                    { val: "BACK", lbl: "Back" },
+                                    { val: "LEFT", lbl: "Left" },
+                                    { val: "RIGHT", lbl: "Right" },
+                                    { val: "TOP", lbl: "Top" },
+                                    { val: "BOTTOM", lbl: "Bottom" },
+                                  ].map((opt) => {
+                                    const isUsed = pc.images.some(
+                                      (i, idx) =>
+                                        idx !== imgIdx && i.direction === opt.val,
+                                    );
+                                    if (isUsed) return null;
+                                    return (
+                                      <option key={opt.val} value={opt.val}>
+                                        {opt.lbl}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                              )}
+                            </div>
+                          );
+                        })}
+                        <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-card">
+                          <span className="text-xl font-bold">+</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const err = await validateImageDimensions(file);
+                                if (err) {
+                                  toast.error(`Error: ${err}`);
+                                  return;
+                                }
+                                setCropState({
+                                  color: pc.color,
+                                  src: URL.createObjectURL(file),
+                                  name: file.name,
+                                });
+                              }
+                              e.target.value = "";
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
+                          Sizes & Quantities
+                        </p>
+                        {addingSizeForColor === pc.color ? (
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={newSizeSelections[pc.color] ?? "M"}
+                              onChange={(e) =>
+                                setNewSizeSelections((prev) => ({
+                                  ...prev,
+                                  [pc.color]: e.target.value,
+                                }))
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  const selectedSize = newSizeSelections[pc.color] ?? "M";
+                                  if (pc.variants.some((v) => v.size === selectedSize)) {
+                                    toast.error("Size already exists");
+                                    return;
+                                  }
+                                  setProductColors((prev) =>
+                                    prev.map((item) =>
+                                      item.color === pc.color
+                                        ? {
+                                          ...item,
+                                          variants: [
+                                            ...item.variants,
+                                            { size: selectedSize, quantity: 0 },
+                                          ],
+                                        }
+                                        : item,
+                                    ),
+                                  );
+                                  setAddingSizeForColor(null);
+                                }
+                              }}
+                              className="text-xs border border-stroke rounded px-2 py-1 outline-none focus:border-primary bg-white"
+                            >
+                              {["XXS", "XS", "S", "M", "L", "XL", "XXL"].map(
+                                (s) => (
+                                  <option key={s} value={s}>
+                                    {s}
+                                  </option>
+                                ),
+                              )}
+                            </select>
                             <button
                               type="button"
                               onClick={() => {
-                                if (imgItem.file)
-                                  URL.revokeObjectURL(previewUrl);
+                                const selectedSize = newSizeSelections[pc.color] ?? "M";
+                                if (pc.variants.some((v) => v.size === selectedSize)) {
+                                  toast.error("Size already exists");
+                                  return;
+                                }
                                 setProductColors((prev) =>
                                   prev.map((item) =>
                                     item.color === pc.color
                                       ? {
-                                          ...item,
-                                          images: item.images.filter(
-                                            (_, idx) => idx !== imgIdx,
-                                          ),
-                                        }
-                                      : item,
-                                  ),
-                                );
-                              }}
-                              className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs font-bold"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                          {isBlank && (
-                            <select
-                              value={imgItem.direction || ""}
-                              onChange={(e) => {
-                                const newDir = e.target.value;
-                                setProductColors((prev) =>
-                                  prev.map((item) =>
-                                    item.color === pc.color
-                                      ? {
-                                          ...item,
-                                          images: item.images.map((i, idx) =>
-                                            idx === imgIdx
-                                              ? { ...i, direction: newDir }
-                                              : i,
-                                          ),
-                                        }
-                                      : item,
-                                  ),
-                                );
-                              }}
-                              className="text-[10px] w-full p-1 border border-stroke rounded bg-card text-foreground"
-                            >
-                              <option value="">Direction</option>
-                              {[
-                                { val: "FRONT", lbl: "Front" },
-                                { val: "BACK", lbl: "Back" },
-                                { val: "LEFT", lbl: "Left" },
-                                { val: "RIGHT", lbl: "Right" },
-                                { val: "TOP", lbl: "Top" },
-                                { val: "BOTTOM", lbl: "Bottom" },
-                              ].map((opt) => {
-                                const isUsed = pc.images.some(
-                                  (i, idx) =>
-                                    idx !== imgIdx && i.direction === opt.val,
-                                );
-                                if (isUsed) return null;
-                                return (
-                                  <option key={opt.val} value={opt.val}>
-                                    {opt.lbl}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                          )}
-                        </div>
-                      );
-                    })}
-                    <label className="w-16 h-16 rounded-lg border-2 border-dashed border-stroke hover:border-primary hover:text-primary flex flex-col items-center justify-center cursor-pointer transition text-gray-text bg-card">
-                      <span className="text-xl font-bold">+</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const err = await validateImageDimensions(file);
-                            if (err) {
-                              toast.error(`Error: ${err}`);
-                              return;
-                            }
-                            setCropState({
-                              color: pc.color,
-                              src: URL.createObjectURL(file),
-                              name: file.name,
-                            });
-                          }
-                          e.target.value = "";
-                        }}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="font-['Montserrat'] text-xs font-semibold text-foreground">
-                      Sizes & Quantities
-                    </p>
-                    {addingSizeForColor === pc.color ? (
-                      <div className="flex items-center gap-2">
-                        <select
-                          value={newSizeSelections[pc.color] ?? "M"}
-                          onChange={(e) =>
-                            setNewSizeSelections((prev) => ({
-                              ...prev,
-                              [pc.color]: e.target.value,
-                            }))
-                          }
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              const selectedSize = newSizeSelections[pc.color] ?? "M";
-                              if (pc.variants.some((v) => v.size === selectedSize)) {
-                                toast.error("Size already exists");
-                                return;
-                              }
-                              setProductColors((prev) =>
-                                prev.map((item) =>
-                                  item.color === pc.color
-                                    ? {
                                         ...item,
                                         variants: [
                                           ...item.variants,
                                           { size: selectedSize, quantity: 0 },
                                         ],
                                       }
-                                    : item,
-                                ),
-                              );
-                              setAddingSizeForColor(null);
-                            }
-                          }}
-                          className="text-xs border border-stroke rounded px-2 py-1 outline-none focus:border-primary bg-white"
-                        >
-                          {["XXS", "XS", "S", "M", "L", "XL", "XXL"].map(
-                            (s) => (
-                              <option key={s} value={s}>
-                                {s}
-                              </option>
-                            ),
-                          )}
-                        </select>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const selectedSize = newSizeSelections[pc.color] ?? "M";
-                            if (pc.variants.some((v) => v.size === selectedSize)) {
-                              toast.error("Size already exists");
-                              return;
-                            }
-                            setProductColors((prev) =>
-                              prev.map((item) =>
-                                item.color === pc.color
-                                  ? {
-                                      ...item,
-                                      variants: [
-                                        ...item.variants,
-                                        { size: selectedSize, quantity: 0 },
-                                      ],
-                                    }
-                                  : item,
-                              ),
-                            );
-                            setAddingSizeForColor(null);
-                          }}
-                          className="text-xs bg-primary text-white px-2 py-1 rounded font-semibold hover:opacity-90"
-                        >
-                          Add
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setAddingSizeForColor(null)}
-                          className="text-xs border border-stroke text-gray-text px-2 py-1 rounded font-semibold hover:bg-gray-50"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddingSizeForColor(pc.color);
-                          setNewSizeSelections((prev) => ({
-                            ...prev,
-                            [pc.color]: prev[pc.color] ?? "M",
-                          }));
-                        }}
-                        className="text-xs text-primary font-semibold hover:opacity-80"
-                      >
-                        + Add Size
-                      </button>
-                    )}
-                  </div>
-                  {pc.variants.length > 0 && (
-                    <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
-                      <thead>
-                        <tr className="bg-secondary text-primary font-bold">
-                          <th className="p-2 border-b border-stroke">Size</th>
-                          <th className="p-2 border-b border-stroke">
-                            Quantity
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {pc.variants.map((v, vIdx) => (
-                          <tr
-                            key={vIdx}
-                            className="bg-card border-b border-stroke"
+                                      : item,
+                                  ),
+                                );
+                                setAddingSizeForColor(null);
+                              }}
+                              className="text-xs bg-primary text-white px-2 py-1 rounded font-semibold hover:opacity-90"
+                            >
+                              Add
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setAddingSizeForColor(null)}
+                              className="text-xs border border-stroke text-gray-text px-2 py-1 rounded font-semibold hover:bg-gray-50"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAddingSizeForColor(pc.color);
+                              setNewSizeSelections((prev) => ({
+                                ...prev,
+                                [pc.color]: prev[pc.color] ?? "M",
+                              }));
+                            }}
+                            className="text-xs text-primary font-semibold hover:opacity-80"
                           >
-                            <td className="p-2 font-semibold">{v.size}</td>
-                            <td className="p-2 flex items-center justify-between gap-2">
-                              <input
-                                type="number"
-                                min="0"
-                                value={v.quantity}
-                                onChange={(e) => {
-                                  const qty = Number(e.target.value);
-                                  setProductColors((prev) =>
-                                    prev.map((item) =>
-                                      item.color === pc.color
-                                        ? {
-                                            ...item,
-                                            variants: item.variants.map(
-                                              (variant, idx) =>
-                                                idx === vIdx
-                                                  ? {
+                            + Add Size
+                          </button>
+                        )}
+                      </div>
+                      {pc.variants.length > 0 && (
+                        <table className="w-full text-left font-['Montserrat'] text-xs border border-stroke rounded-lg overflow-hidden">
+                          <thead>
+                            <tr className="bg-secondary text-primary font-bold">
+                              <th className="p-2 border-b border-stroke">Size</th>
+                              <th className="p-2 border-b border-stroke">
+                                Quantity
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pc.variants.map((v, vIdx) => (
+                              <tr
+                                key={vIdx}
+                                className="bg-card border-b border-stroke"
+                              >
+                                <td className="p-2 font-semibold">{v.size}</td>
+                                <td className="p-2 flex items-center justify-between gap-2">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    value={v.quantity}
+                                    onChange={(e) => {
+                                      const qty = Number(e.target.value);
+                                      setProductColors((prev) =>
+                                        prev.map((item) =>
+                                          item.color === pc.color
+                                            ? {
+                                              ...item,
+                                              variants: item.variants.map(
+                                                (variant, idx) =>
+                                                  idx === vIdx
+                                                    ? {
                                                       ...variant,
                                                       quantity: qty,
                                                     }
-                                                  : variant,
-                                            ),
-                                          }
-                                        : item,
-                                    ),
-                                  );
-                                }}
-                                className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setProductColors((prev) =>
-                                    prev.map((item) =>
-                                      item.color === pc.color
-                                        ? {
-                                            ...item,
-                                            variants: item.variants.filter(
-                                              (_, idx) => idx !== vIdx,
-                                            ),
-                                          }
-                                        : item,
-                                    ),
-                                  );
-                                }}
-                                className="text-red-500 hover:text-red-700 text-xs font-bold px-1"
-                                title="Delete size"
-                              >
-                                ✕
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-              </div>
-            ))}
+                                                    : variant,
+                                              ),
+                                            }
+                                            : item,
+                                        ),
+                                      );
+                                    }}
+                                    className="w-16 border border-stroke rounded px-1.5 py-0.5 outline-none focus:border-primary"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setProductColors((prev) =>
+                                        prev.map((item) =>
+                                          item.color === pc.color
+                                            ? {
+                                              ...item,
+                                              variants: item.variants.filter(
+                                                (_, idx) => idx !== vIdx,
+                                              ),
+                                            }
+                                            : item,
+                                        ),
+                                      );
+                                    }}
+                                    className="text-red-500 hover:text-red-700 text-xs font-bold px-1"
+                                    title="Delete size"
+                                  >
+                                    ✕
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </div>
+                ))}
+
 
             <div className="flex gap-2 pt-4">
               <button

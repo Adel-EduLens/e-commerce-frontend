@@ -20,6 +20,9 @@ export type CartItem = {
   minOrder?: number;
   productType?: string;
   depositAmount?: number;
+  recipientName?: string;
+  recipientEmail?: string;
+  giftMessage?: string;
 };
 
 type CartStore = {

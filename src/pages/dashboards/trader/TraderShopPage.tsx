@@ -3,12 +3,14 @@ import { useTranslation } from "react-i18next";
 import TraderProductsPage from "./TraderProductsPage";
 import TraderRetailProductsPage from "./TraderRetailProductsPage";
 import TraderBlankProductsPage from "./TraderBlankProductsPage";
+import TraderGiftCardsPage from "./TraderGiftCardsPage";
 import { TraderWholeSaleProductsTable } from "../../../components/trader/TraderWholeSaleProductsTable";
 import { UnifiedProductModal } from "../../../components/trader/UnifiedProductModal";
+import { GiftCardModal } from "../../../components/trader/GiftCardModal";
 import type { InventoryItem } from "../../../components/trader/inventoryUtils";
 import { asset } from "../../../components/trader/inventoryUtils";
 
-type ShopTab = "products" | "retail" | "wholesale" | "blank";
+type ShopTab = "products" | "retail" | "wholesale" | "blank" | "giftCards";
 
 export default function TraderShopPage() {
   const { t } = useTranslation("traderShopPage");
@@ -16,16 +18,28 @@ export default function TraderShopPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
 
+  const isGiftCardModal = activeTab === "giftCards" || editItem?.type === "gift_card";
+
   return (
     <div className="space-y-4">
       {(showAddModal || editItem) && (
-        <UnifiedProductModal
-          item={editItem}
-          onClose={() => {
-            setShowAddModal(false);
-            setEditItem(null);
-          }}
-        />
+        isGiftCardModal ? (
+          <GiftCardModal
+            item={editItem}
+            onClose={() => {
+              setShowAddModal(false);
+              setEditItem(null);
+            }}
+          />
+        ) : (
+          <UnifiedProductModal
+            item={editItem}
+            onClose={() => {
+              setShowAddModal(false);
+              setEditItem(null);
+            }}
+          />
+        )
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -35,6 +49,7 @@ export default function TraderShopPage() {
             { value: "retail" as const, label: t("retail") },
             { value: "wholesale" as const, label: t("wholesale") },
             { value: "blank" as const, label: t("blankProducts") },
+            { value: "giftCards" as const, label: t("giftCards") || "Gift Cards" },
           ].map((tab) => (
             <button
               key={tab.value}
@@ -77,6 +92,9 @@ export default function TraderShopPage() {
         )}
         {activeTab === "blank" && (
           <TraderBlankProductsPage onEdit={setEditItem} />
+        )}
+        {activeTab === "giftCards" && (
+          <TraderGiftCardsPage onEdit={setEditItem} />
         )}
       </div>
     </div>

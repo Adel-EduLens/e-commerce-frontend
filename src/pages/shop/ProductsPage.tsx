@@ -6,6 +6,7 @@ import ShopBanner from "../../components/product/ShopBanner";
 import { useProducts } from "../../hooks/queries/productsQuery";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
+import { useGiftCards } from "../../hooks/queries/giftCardsQuery";
 import type { FilterValues } from "../../components/shared/CatalogFilters";
 import { useHomeFilters } from "../../hooks/utils/HomeFilters";
 
@@ -76,7 +77,10 @@ export default function ProductsPage() {
     useProducts(filters.search ? { search: filters.search, type: "WHOLESALE" } : { type: "WHOLESALE" });
   const wholesales = filters.search ? wholesalesData?.products || [] : [];
 
-  const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading);
+  const { data: giftCards = [], isLoading: isGiftCardsLoading } =
+    useGiftCards(filters.search ? filters.search : undefined);
+
+  const isAnyLoading = isLoading || (!!filters.search && isWholesaleLoading) || isGiftCardsLoading;
 
   useEffect(() => {
     const func = () => {
@@ -137,8 +141,48 @@ export default function ProductsPage() {
     return Array.from(sizes);
   }, [data, wholesales]);
 
+  const allCategories = useMemo(() => {
+    const hasGiftCardsCategory = categories.some(
+      (c) =>
+        c.name.toLowerCase() === "gift cards" ||
+        c.name.toLowerCase() === "gift card"
+    );
+    if (!hasGiftCardsCategory) {
+      return [...categories, { id: "gift-cards", name: "Gift Cards" }];
+    }
+    return categories;
+  }, [categories]);
+
   const combinedProducts = useMemo(() => {
     const items: React.ReactNode[] = [];
+
+    const isGiftCardCategory = effectiveCategoryName?.toLowerCase().includes("gift");
+    const showGiftCards = !effectiveCategoryName || isGiftCardCategory;
+
+    if (showGiftCards && giftCards && giftCards.length > 0) {
+      giftCards.forEach((gc) => {
+        if (filters.priceMin && gc.amount < Number(filters.priceMin)) return;
+        if (filters.priceMax && gc.amount > Number(filters.priceMax)) return;
+
+        items.push(
+          <ProductCard
+            key={`giftcard-${gc.id}`}
+            title={gc.name}
+            productId={gc.id}
+            price={`${gc.amount} EGP`}
+            imageSrc={gc.image || undefined}
+            subtitle={gc.description || "Gift Card"}
+            rating={5}
+            productType="SHOP"
+            showTypeBadge={!!filters.search}
+            to={`/giftcard/${gc.id}`}
+            stock={gc.stock ?? 100}
+            hideAddToCart={true}
+          />
+        );
+      });
+    }
+
     if (data?.products) {
       data.products.forEach((product) => {
         items.push(
@@ -219,7 +263,7 @@ export default function ProductsPage() {
       });
     }
     return items;
-  }, [data, wholesales, filters.search]);
+  }, [data, wholesales, giftCards, filters.search, effectiveCategoryName, filters.priceMin, filters.priceMax]);
 
   if (isError) {
     return (
@@ -246,7 +290,7 @@ export default function ProductsPage() {
         availableSizes={availableSizes.length > 0 ? availableSizes : undefined}
         isWholesale={false}
         isShop={true}
-        categories={categories}
+        categories={allCategories}
       />
     </div>
   );

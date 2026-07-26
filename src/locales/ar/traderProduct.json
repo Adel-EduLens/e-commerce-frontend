@@ -65,7 +65,9 @@
   "sizeVariantRequired": "من فضلك أضف مقاس واحد على الأقل للون الجديد.",
 
   "productsTable": "جدول المنتجات",
+  "giftCardsTable": "جدول بطاقات الهدايا",
   "addProduct": "إضافة منتج",
+  "addGiftCard": "إضافة بطاقة هدايا",
   "addItem": "إضافة عنصر",
   "search": "بحث",
   "category": "التصنيف",

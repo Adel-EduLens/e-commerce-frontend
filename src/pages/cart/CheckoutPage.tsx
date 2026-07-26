@@ -790,9 +790,20 @@ export default function CheckoutPage() {
   const queryClient = useQueryClient();
   const user = useUser();
   const initialCoupon = (location.state?.appliedCoupon as Coupon | null) || null;
-  const items = useCartStore((state) => state.items);
+  const cartItems = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isDirectBuy = !!(location.state?.directBuyItem || location.state?.items);
+  const checkoutItems: CartItem[] = useMemo(() => {
+    if (location.state?.items && Array.isArray(location.state.items) && location.state.items.length > 0) {
+      return location.state.items;
+    }
+    if (location.state?.directBuyItem) {
+      return [location.state.directBuyItem];
+    }
+    return cartItems;
+  }, [location.state, cartItems]);
 
   // Dynamic Shipping Queries
   const { data: countries = [], isLoading: isCountriesLoading } = useShippingCountries();
@@ -874,9 +885,9 @@ export default function CheckoutPage() {
   // Redirect back to bag if any wholesale item doesn't meet minimum order
   useEffect(() => {
     if (isCartLoading) return;
-    if (items.length === 0) return;
+    if (checkoutItems.length === 0) return;
 
-    const wholesaleItems = items.filter(
+    const wholesaleItems = checkoutItems.filter(
       (item) => item.productType === "WHOLESALE" || item.id.includes("-wholesale")
     );
     const groupedWholesale = wholesaleItems.reduce(
@@ -904,7 +915,7 @@ export default function CheckoutPage() {
         return;
       }
     }
-  }, [items, isCartLoading, navigate]);
+  }, [checkoutItems, isCartLoading, navigate]);
 
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState(initialCoupon?.code || "");
@@ -912,8 +923,8 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState("");
 
   const subtotal = useMemo(
-    () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
-    [items]
+    () => checkoutItems.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
+    [checkoutItems]
   );
 
   const discountAmount = useMemo(() => {
@@ -925,7 +936,7 @@ export default function CheckoutPage() {
 
     let qualifyingSubtotal = 0;
     let hasMatchingItem = false;
-    items.forEach((item) => {
+    checkoutItems.forEach((item) => {
       if (couponAppliesToItem(appliedCoupon, item)) {
         qualifyingSubtotal += item.unitPrice * item.quantity;
         hasMatchingItem = true;
@@ -937,7 +948,7 @@ export default function CheckoutPage() {
     }
 
     return (qualifyingSubtotal * appliedCoupon.discount) / 100;
-  }, [appliedCoupon, items, subtotal]);
+  }, [appliedCoupon, checkoutItems, subtotal]);
 
   if (isCartLoading || isAddressesLoading) {
     return (
@@ -1007,7 +1018,7 @@ export default function CheckoutPage() {
         total,
         couponCode: appliedCoupon?.code || null,
         paymentMethod: "COD",
-        items: items.map((item) => ({
+        items: checkoutItems.map((item) => ({
           productId: item.productId,
           title: item.title,
           unitPrice: item.unitPrice,
@@ -1016,15 +1027,20 @@ export default function CheckoutPage() {
           color: item.color || null,
           imageSrc: item.imageSrc || null,
           productType: item.productType || null,
+          recipientName: item.recipientName || null,
+          recipientEmail: item.recipientEmail || null,
+          giftMessage: item.giftMessage || null,
         })),
       };
 
       await api.post("/orders", orderPayload);
 
-      await clearCart();
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      if (!isDirectBuy) {
+        await clearCart();
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+      }
 
-      toast.success("Order placed successfully! Your cart has been cleared.");
+      toast.success(isDirectBuy ? "Order placed successfully!" : "Order placed successfully! Your cart has been cleared.");
       navigate("/my-orders");
     } catch (err) {
       console.error("Order creation failed:", err);
@@ -1070,7 +1086,7 @@ export default function CheckoutPage() {
         </div>
         <div className="w-full lg:w-[480px] xl:w-[566px] shrink-0 lg:sticky lg:top-24 lg:self-start">
           <OrderSummary
-            items={items}
+            items={checkoutItems}
             subtotal={subtotal}
             shipping={shipping}
             discountAmount={discountAmount}

@@ -2416,6 +2416,8 @@ interface InventoryTablePanelProps {
   onEdit: (item: InventoryItem) => void;
   onDelete: (item: InventoryItem) => void;
   showTypeFilter?: boolean;
+  showCategoryFilter?: boolean;
+  showCategoryColumn?: boolean;
   showRetailColumns?: boolean;
   title?: string;
   addLabel?: string;
@@ -2429,6 +2431,8 @@ export function InventoryTablePanel({
   onEdit,
   onDelete,
   showTypeFilter = true,
+  showCategoryFilter = true,
+  showCategoryColumn = true,
   showRetailColumns = false,
   title = "Products Table",
   addLabel = "Add Item",
@@ -2522,32 +2526,19 @@ export function InventoryTablePanel({
   const allSelected =
     paginated.length > 0 && selected.size === paginated.length;
 
-  const tableColumns = showTypeFilter
-    ? [
-      "image",
-      "product",
-      "category",
-      "type",
-      "stock",
-      "sku",
-      "price",
-      ...(showRetailColumns ? ["Deposit", "Security"] : []),
-      "date",
-      "status",
-      "actions",
-    ]
-    : [
-      "image",
-      "product",
-      "category",
-      "stock",
-      "sku",
-      "price",
-      ...(showRetailColumns ? ["Deposit", "Security"] : []),
-      "date",
-      "status",
-      "actions",
-    ];
+  const tableColumns = [
+    "image",
+    "product",
+    ...(showCategoryColumn ? ["category"] : []),
+    ...(showTypeFilter ? ["type"] : []),
+    "stock",
+    "sku",
+    "price",
+    ...(showRetailColumns ? ["Deposit", "Security"] : []),
+    "date",
+    "status",
+    "actions",
+  ];
 
   const filterBtn = (key: string, label: string, active: boolean) => (
     <button
@@ -2610,31 +2601,33 @@ export function InventoryTablePanel({
             </h2>
 
             {/* Category */}
-            <div className="relative">
-              {filterBtn(
-                "category",
-                filterCategory === "all" ? t("category") : filterCategory,
-                filterCategory !== "all",
-              )}
-              {openFilter === "category" && (
-                <div className="absolute left-0 top-full z-20 mt-1 min-w-32 rounded-xl border border-stroke bg-white shadow-lg py-1">
-                  {["all", ...uniqueCategories].map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => {
-                        setFilterCategory(opt);
-                        setOpenFilter(null);
-                        setPage(1);
-                      }}
-                      className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterCategory === opt ? "text-primary" : "text-foreground"}`}
-                    >
-                      {opt === "all" ? "All Categories" : opt}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {showCategoryFilter && (
+              <div className="relative">
+                {filterBtn(
+                  "category",
+                  filterCategory === "all" ? t("category") : filterCategory,
+                  filterCategory !== "all",
+                )}
+                {openFilter === "category" && (
+                  <div className="absolute left-0 top-full z-20 mt-1 min-w-32 rounded-xl border border-stroke bg-white shadow-lg py-1">
+                    {["all", ...uniqueCategories].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => {
+                          setFilterCategory(opt);
+                          setOpenFilter(null);
+                          setPage(1);
+                        }}
+                        className={`w-full px-3 py-2 text-left font-['Montserrat'] text-xs font-medium capitalize transition hover:bg-background ${filterCategory === opt ? "text-primary" : "text-foreground"}`}
+                      >
+                        {opt === "all" ? "All Categories" : opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Status */}
             <div className="relative">
@@ -2783,52 +2776,28 @@ export function InventoryTablePanel({
             <button
               type="button"
               onClick={() => {
-                const headers = showTypeFilter
-                  ? [
-                    "Product",
-                    "Category",
-                    "Type",
-                    "Stock",
-                    "SKU",
-                    "Price",
-                    ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
-                    "Date",
-                    "Status",
-                  ]
-                  : [
-                    "Product",
-                    "Category",
-                    "Stock",
-                    "SKU",
-                    "Price",
-                    ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
-                    "Date",
-                    "Status",
-                  ];
-                const rows = filtered.map((i) =>
-                  showTypeFilter
-                    ? [
-                      i.product,
-                      i.categories?.map((c) => c.name).join(", ") || "",
-                      i.type,
-                      i.stock,
-                      i.sku,
-                      i.priceNum,
-                      ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
-                      i.date,
-                      i.status,
-                    ]
-                    : [
-                      i.product,
-                      i.categories?.map((c) => c.name).join(", ") || "",
-                      i.stock,
-                      i.sku,
-                      i.priceNum,
-                      ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
-                      i.date,
-                      i.status,
-                    ],
-                );
+                const headers = [
+                  "Product",
+                  ...(showCategoryColumn ? ["Category"] : []),
+                  ...(showTypeFilter ? ["Type"] : []),
+                  "Stock",
+                  "SKU",
+                  "Price",
+                  ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
+                  "Date",
+                  "Status",
+                ];
+                const rows = filtered.map((i) => [
+                  i.product,
+                  ...(showCategoryColumn ? [i.categories?.map((c) => c.name).join(", ") || ""] : []),
+                  ...(showTypeFilter ? [i.type] : []),
+                  i.stock,
+                  i.sku,
+                  i.priceNum,
+                  ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
+                  i.date,
+                  i.status,
+                ]);
                 const csv = [headers, ...rows]
                   .map((r) =>
                     r
@@ -3051,9 +3020,11 @@ export function InventoryTablePanel({
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                         {item.product}
                       </td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                        {item.categories?.map(c => c.name).join(", ")}
-                      </td>
+                      {showCategoryColumn && (
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                          {item.categories?.map((c) => c.name).join(", ")}
+                        </td>
+                      )}
                       {showTypeFilter && (
                         <td className="px-3 py-3 text-center">
                           <span

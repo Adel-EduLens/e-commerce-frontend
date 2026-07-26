@@ -145,6 +145,7 @@ export default function ProductCard({
   hideAddToCart = false,
   hideQuickActions = false,
   stock,
+  depositAmount,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)

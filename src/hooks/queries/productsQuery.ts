@@ -91,6 +91,7 @@ export interface Product {
   retailPrice?: number;
   wholesalePrice?: number;
   blankPrice?: number;
+  giftCardAmounts?: string | null;
   depositAmount?: number;
   securityDeposit?: number;
   termsAndConditions?: string;
@@ -358,6 +359,7 @@ export interface ProductFormData {
   isPremiumCollection?: boolean;
   sizeguide?: string;
   blankPrice?: number | null;
+  giftCardAmounts?: string | null;
   rentalPrice?: number | null;
   retailPrice?: number | null;
 }
