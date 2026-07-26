@@ -39,7 +39,8 @@ function formatNotificationMessage(
     let typeLabel = collectionMatch[2] || "";
     if (isAr) {
       typeLabel = typeLabel
-        .replace(/RETAIL/gi, "تجزئة")
+        .replace(/RENTAL/gi, "تأجير")
+        .replace(/RETAIL/gi, "تأجير")
         .replace(/WHOLESALE/gi, "جملة")
         .replace(/SHOP/gi, "متجر");
       return typeLabel
@@ -144,8 +145,8 @@ function NotificationCard({
 
                 if (titleLower.includes("wholesale") || messageLower.includes("wholesale")) {
                   navigate(`/wholesale/${notification.productId}`);
-                } else if (titleLower.includes("retail") || messageLower.includes("retail")) {
-                  navigate(`/retail/${notification.productId}`);
+                } else if (titleLower.includes("rental") || titleLower.includes("retail") || messageLower.includes("rental") || messageLower.includes("retail")) {
+                  navigate(`/rental/${notification.productId}`);
                 } else {
                   navigate(`/product-details/${notification.productId}`);
                 }

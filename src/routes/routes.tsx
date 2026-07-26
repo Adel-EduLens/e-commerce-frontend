@@ -27,7 +27,7 @@ import TraderBrandPartnersPage from "../pages/dashboards/trader/TraderBrandPartn
 import TraderNotificationsPage from "../pages/dashboards/trader/TraderNotificationsPage";
 import TraderStoreSettingsPage from "../pages/dashboards/trader/TraderStoreSettingsPage";
 import TraderPreferencesPage from "../pages/dashboards/trader/TraderPreferencesPage";
-import TraderRetailPage from "../pages/dashboards/trader/TraderRetailPage";
+import TraderRentalPage from "../pages/dashboards/trader/TraderRentalPage";
 import TraderLayout from "../components/layout/TraderLayout";
 import TraderCouponsPage from "../pages/dashboards/trader/TraderCouponsPage";
 import UserDashboard from "../pages/dashboards/user/UserDashboard";
@@ -49,8 +49,8 @@ import TraderDesignPage from "../pages/dashboards/trader/TraderDesignPage";
 import TraderLoginPage from "../pages/auth/TraderLoginPage";
 
 import ProductsPage from "../pages/shop/ProductsPage";
-import RetailPage from "../pages/retail/RetailPage";
-import RetailProductDetailsPage from "../pages/retail/RetailProductDetailsPage";
+import RentalPage from "../pages/rental/RentalPage";
+import RentalProductDetailsPage from "../pages/rental/RentalProductDetailsPage";
 
 import ComparePage from "../pages/shop/ComparePage";
 
@@ -60,10 +60,10 @@ import TraderWebsiteSettingsPage from "../pages/dashboards/trader/TraderWebsiteS
 import CreateYourDesignPage from "../pages/custom-design/CreateYourDesignPage";
 import CreateYourDesignDetailPage from "../pages/custom-design/CreateYourDesignDetailPage";
 
-import TraderRetailProductsPage from "../pages/dashboards/trader/TraderRetailProductsPage";
+import TraderRentalProductsPage from "../pages/dashboards/trader/TraderRentalProductsPage";
 import TraderCollectionsPage from "../pages/dashboards/trader/TraderCollectionsPage";
 import TraderBlankProductsPage from "../pages/dashboards/trader/TraderBlankProductsPage";
-import RetailShopPage from "../pages/retail/RetailShopPage";
+import RentalShopPage from "../pages/rental/RentalShopPage";
 
 import InfluencerLoginPage from "../pages/auth/InfluencerLoginPage";
 import InfluencerLayout from "../components/layout/InfluencerLayout";
@@ -138,26 +138,26 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "retail",
+        path: "rental",
         element: (
           <UserLayout>
-            <RetailPage />
+            <RentalPage />
           </UserLayout>
         ),
       },
       {
-        path: "retail/shop",
+        path: "rental/shop",
         element: (
           <UserLayout>
-            <RetailShopPage />
+            <RentalShopPage />
           </UserLayout>
         ),
       },
       {
-        path: "retail/shop/:id",
+        path: "rental/shop/:id",
         element: (
           <UserLayout>
-            <RetailProductDetailsPage />
+            <RentalProductDetailsPage />
           </UserLayout>
         ),
       },
@@ -295,8 +295,8 @@ export const router = createBrowserRouter([
             element: <TraderDashboard />,
           },
           {
-            path: "retail",
-            element: <TraderRetailPage />,
+            path: "rental",
+            element: <TraderRentalPage />,
           },
           {
             path: "blank-products",
@@ -311,8 +311,8 @@ export const router = createBrowserRouter([
             element: <TraderWebsiteSettingsPage defaultTab="faqs" />,
           },
           {
-            path: "retailProducts",
-            element: <TraderRetailProductsPage />,
+            path: "rentalProducts",
+            element: <TraderRentalProductsPage />,
           },
           {
             path: "products",

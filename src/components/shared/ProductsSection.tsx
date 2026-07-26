@@ -2,7 +2,7 @@ type ProductsSectionProps = {
   title: string;
   navigateTo: string;
   query?: ProductsQuery;
-  productType?: "SHOP" | "RETAIL" | "WHOLESALE";
+  productType?: "SHOP" | "RENTAL" | "RETAIL" | "WHOLESALE";
 };
 import { useMemo, useState } from "react";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
@@ -29,7 +29,7 @@ export default function ProductsSection({
 }: ProductsSectionProps) {
   const { t } = useTranslation("productSection");
   const navigate = useNavigate();
-  const isRetail = productType === "RETAIL";
+  const isRetail = productType === "RETAIL" || productType === "RENTAL";
   const isWholesale = productType === "WHOLESALE";
 
   const [filterValues, setFilterValues] = useState<FilterValues>({
@@ -218,7 +218,7 @@ export default function ProductsSection({
                 stock={product.stock}
                 to={
                   isRetail
-                    ? `/retail/shop/${product.id}`
+                    ? `/rental/shop/${product.id}`
                     : `/product-details/${product.id}`
                 }
               />

@@ -30,8 +30,8 @@ function ProductRequestCard({
     if (!product) return;
     if (notification.targetType === "WHOLESALE_RESTOCK") {
       navigate(`/wholesale/${product.id}`);
-    } else if (notification.targetType === "RETAIL_RESTOCK") {
-      navigate(`/retail/${product.slug || product.id}`);
+    } else if (notification.targetType === "RENTAL_RESTOCK" || notification.targetType === "RETAIL_RESTOCK") {
+      navigate(`/rental/${product.slug || product.id}`);
     } else {
       navigate(`/product-details/${product.id}`);
     }

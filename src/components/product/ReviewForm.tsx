@@ -10,7 +10,7 @@ import type { Review } from "../../hooks/queries/reviewQuery";
 
 interface ReviewFormProps {
   productId: string;
-  productType?: "PRODUCT" | "RETAIL" | "WHOLESALE";
+  productType?: "PRODUCT" | "RENTAL" | "RETAIL" | "WHOLESALE";
   existingReview?: Review;
   onDone: () => void;
 }

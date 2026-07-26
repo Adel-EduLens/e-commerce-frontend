@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { api } from '../lib/axios'
 
-export type RatingProductType = 'SHOP' | 'RETAIL' | 'WHOLESALE'
+export type RatingProductType = 'SHOP' | 'RENTAL' | 'RETAIL' | 'WHOLESALE'
 
 export type RateProductPayload = {
   productType: RatingProductType
@@ -29,9 +29,9 @@ function normalizeRatingResponse(response: { data?: Record<string, unknown> } | 
 async function postFallbackRating(payload: RateProductPayload) {
   const { productType, productId, rating } = payload
 
-  if (productType === 'RETAIL') {
+  if (productType === 'RENTAL' || productType === 'RETAIL') {
 
-    const response = await api.post(`/retail/products/${productId}/rating`, { rating })
+    const response = await api.post(`/rental/products/${productId}/rating`, { rating })
     return normalizeRatingResponse(response.data)
   }
 
@@ -48,8 +48,8 @@ export async function rateProduct(payload: RateProductPayload) {
 
 
   try {
-    if (payload.productType === 'RETAIL') {
-      const response = await api.post(`/retail/products/${payload.productId}/rating`, { rating: payload.rating })
+    if (payload.productType === 'RENTAL' || payload.productType === 'RETAIL') {
+      const response = await api.post(`/rental/products/${payload.productId}/rating`, { rating: payload.rating })
       return normalizeRatingResponse(response.data)
     }
 

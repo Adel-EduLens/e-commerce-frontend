@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useTraderCustomers, useTraderDashboardOrders, type TraderCustomer } from "../../../hooks/queries/ordersQuery";
 import LoadingSpinner from "../../../components/shared/LoadingSpinner";
@@ -84,8 +84,15 @@ function DonutChart({ total, completed, cancelled, pending }: {
 function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack: () => void }) {
   const { t } = useTranslation("traderCustomers");
   const { data: allOrders = [], isLoading } = useTraderDashboardOrders({ type: "ALL" });
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
   const customerOrders = useMemo(
-    () => allOrders.filter((o) => o.customerEmail === customer.email),
+    () =>
+      allOrders.filter(
+        (o) =>
+          o.customerEmail &&
+          o.customerEmail.trim().toLowerCase() === customer.email.trim().toLowerCase()
+      ),
     [allOrders, customer.email]
   );
   const totalSpentNum = customerOrders.reduce((sum, o) => {
@@ -103,7 +110,7 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
 
   return (
     <div className="space-y-4">
-      <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background">
+      <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer">
         <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
           <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -124,8 +131,10 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
         <div className="flex flex-col gap-4">
           {[{ label: t("name"), value: customer.name }, { label: t("email"), value: customer.email }, { label: t("phone"), value: customer.phone || "—" }].map((row) => (
             <div key={row.label} className="flex items-center gap-1.5">
-              <div className="h-6 w-6 shrink-0 rounded bg-gray-light" />
-              <span className="font-['Montserrat'] text-base font-semibold text-gray-text">{row.label} </span>
+              <div className="h-6 w-6 shrink-0 rounded bg-gray-light flex items-center justify-center font-['Montserrat'] text-xs font-bold text-foreground">
+                {row.label.charAt(0)}
+              </div>
+              <span className="font-['Montserrat'] text-base font-semibold text-gray-text">{row.label}: </span>
               <span className="font-['Montserrat'] text-base font-semibold text-foreground">{row.value}</span>
             </div>
           ))}
@@ -154,26 +163,93 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
               <tbody>
                 {customerOrders.map((order, idx) => {
                   const pill = getStatusPillInfo(order.status, t);
+                  const isExpanded = expandedOrderId === order.id;
+
                   return (
-                    <tr key={order.id} className={idx % 2 === 0 ? "bg-white" : "bg-background"}>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
-                        <div className="flex items-center gap-2">
-                          <span>{order.orderId}</span>
-                          {order.orderType === "WHOLESALE" && (
-                            <span className="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
-                              {t("wholesale")}
+                    <React.Fragment key={order.id}>
+                      <tr
+                        className={`${idx % 2 === 0 ? "bg-white" : "bg-background"} transition cursor-pointer hover:bg-background/80`}
+                        onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
+                      >
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold">{order.orderId}</span>
+                            {order.orderType === "WHOLESALE" && (
+                              <span className="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
+                                {t("wholesale", "Wholesale")}
+                              </span>
+                            )}
+                            {order.orderType === "RETAIL" && (
+                              <span className="inline-flex items-center rounded-lg bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
+                                {t("retail", "Retail")}
+                              </span>
+                            )}
+                            {order.orderType === "SHOP" && (
+                              <span className="inline-flex items-center rounded-lg bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                                {t("shop", "Shop")}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground whitespace-nowrap">{order.date}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
+                          <div className="flex flex-col gap-0.5 max-w-[280px]">
+                            <span className="font-semibold text-foreground">
+                              {order.items.length} {order.items.length === 1 ? "item" : "items"}
                             </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.date}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.items.length}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.payment || "—"}</td>
-                      <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.total}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
-                      </td>
-                    </tr>
+                            <span className="text-[11px] text-gray-text truncate">
+                              {order.items.map((i) => `${i.title || i.name || i.product || "Product"} (${i.quantity})`).join(", ")}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.payment || "—"}</td>
+                        <td className="px-4 py-3 font-['Montserrat'] text-xs font-semibold text-foreground whitespace-nowrap">{order.total}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
+                        </td>
+                      </tr>
+                      {isExpanded && (
+                        <tr className="bg-gray-50/90">
+                          <td colSpan={6} className="px-6 py-4">
+                            <div className="rounded-xl border border-stroke bg-white p-4 space-y-3 shadow-sm font-['Montserrat']">
+                              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stroke pb-2 text-xs font-semibold text-foreground">
+                                <span>Address: {order.address || "N/A"}</span>
+                                <span>Payment: {order.payment || "COD"}</span>
+                              </div>
+                              <div className="space-y-2">
+                                <p className="text-xs font-bold text-foreground">Order Items:</p>
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                  {order.items.map((item, iIdx) => (
+                                    <div key={iIdx} className="flex items-center gap-3 rounded-lg border border-stroke/60 bg-card p-2 text-xs">
+                                      {item.imageSrc || item.image ? (
+                                        <img src={item.imageSrc || item.image} alt={item.title || item.product} className="h-10 w-10 rounded object-cover shrink-0" />
+                                      ) : (
+                                        <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center font-bold text-gray-400 shrink-0">
+                                          P
+                                        </div>
+                                      )}
+                                      <div className="flex-1 min-w-0">
+                                        <p className="font-semibold text-foreground truncate">{item.title || item.product}</p>
+                                        <p className="text-gray-text text-[11px]">
+                                          Qty: {item.quantity} {item.size ? `| Size: ${item.size}` : ""} {item.color ? `| Color: ${item.color}` : ""}
+                                        </p>
+                                      </div>
+                                      <span className="font-bold text-foreground shrink-0">{item.price}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center justify-end gap-4 text-xs font-semibold text-foreground pt-2 border-t border-stroke">
+                                {order.subtotal && <span>Subtotal: {order.subtotal}</span>}
+                                {order.shipping && <span>Shipping: {order.shipping}</span>}
+                                {order.discount && <span>Discount: -{order.discount}</span>}
+                                <span className="text-primary font-bold text-sm">Total: {order.total}</span>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

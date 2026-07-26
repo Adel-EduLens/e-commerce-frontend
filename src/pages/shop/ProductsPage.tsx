@@ -148,7 +148,7 @@ export default function ProductsPage() {
             productId={product.id}
             colors={product.colors?.map((c) => c.colorName)}
             images={product.images}
-            price={`${product.shopPrice ?? product.retailPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
+            price={`${product.rentalPrice ?? product.retailPrice ?? product.shopPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
             imageSrc={
               product.colors?.[0]?.images?.[0]?.imageUrl ||
               product.colors?.[0]?.images?.[0]?.url ||

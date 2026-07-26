@@ -58,13 +58,13 @@ export default function RecentlyViewedPage() {
                 Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(' - ');
 
             const targetUrl =
-              p.productType === 'RETAIL'
-                ? `/retail/shop/${item.id}`
+              p.productType === 'RENTAL' || p.productType === 'RETAIL'
+                ? `/rental/shop/${item.id}`
                 : isWholesale
                   ? `/wholesale/${item.id}`
                   : `/product-details/${item.id}`;
 
-            const displayPrice = item.shopPrice ?? item.wholesalePrice ?? item.retailPrice ?? item.blankPrice ?? item.price ?? 0;
+            const displayPrice = item.rentalPrice ?? item.retailPrice ?? item.shopPrice ?? item.wholesalePrice ?? item.blankPrice ?? item.price ?? 0;
             const computedImageSrc =
               item.images?.[0]?.url ||
               item.images?.[0]?.imageUrl ||

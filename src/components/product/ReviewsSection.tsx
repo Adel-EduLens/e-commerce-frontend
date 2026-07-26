@@ -8,7 +8,7 @@ import { ReviewForm } from "./ReviewForm";
 import { useTranslation } from "react-i18next";
 
 interface ReviewsSectionProps {
-  productType?: "PRODUCT" | "RETAIL" | "WHOLESALE";
+  productType?: "PRODUCT" | "RENTAL" | "RETAIL" | "WHOLESALE";
 }
 
 type ReviewFilterValue = "all" | "5" | "4" | "3" | "2" | "1";

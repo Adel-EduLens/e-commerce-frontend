@@ -353,28 +353,6 @@ export default function AuthPage({ mode }: AuthPageProps) {
                       )}
                     </div>
 
-                    {/* Role */}
-                    <div className="flex flex-col gap-[8px]">
-                      <label className="font-['Montserrat'] text-[15px] font-semibold leading-none tracking-[0.15px] text-foreground">
-                        {t('fields.role.label')}
-                      </label>
-                      <select
-                        className="h-[56px] w-full cursor-pointer appearance-none rounded-[16px] border-[0.5px] border-stroke bg-gray-light px-[16px] font-['Inter'] text-[15px] leading-[20px] text-foreground outline-none"
-                        {...registerSignup('role')}
-                      >
-                        <option value="user">
-                          {t('fields.role.options.user')}
-                        </option>
-                        <option value="trader">
-                          {t('fields.role.options.trader')}
-                        </option>
-                      </select>
-                      {signupErrors.role && (
-                        <p className="text-[13px] text-red-500">
-                          {signupErrors.role.message}
-                        </p>
-                      )}
-                    </div>
 
                     {/* Password */}
                     <div className="flex flex-col gap-[8px]">

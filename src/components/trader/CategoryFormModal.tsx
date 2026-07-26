@@ -26,7 +26,7 @@ interface CategoryFormModalProps {
     appearOnHome: boolean;
     isShop: boolean;
     isWholesale: boolean;
-    isRetail: boolean;
+    isRental: boolean;
   }) => void;
   onClose: () => void;
 }
@@ -42,7 +42,7 @@ export function CategoryFormModal({
   const [appearOnHome, setAppearOnHome] = useState(category?.appearOnHome ?? false);
   const [isShop, setIsShop] = useState(category?.isShop ?? (defaultType === "product" ? true : false));
   const [isWholesale, setIsWholesale] = useState(category?.isWholesale ?? (defaultType === "wholesale" ? true : false));
-  const [isRetail, setIsRetail] = useState(category?.isRetail ?? (defaultType === "retail" ? true : false));
+  const [isRental, setIsRental] = useState(category?.isRental ?? category?.isRetail ?? (defaultType === "retail" ? true : false));
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const { t } = useTranslation("traderCategoriesPage");
@@ -131,9 +131,9 @@ export function CategoryFormModal({
 
           <div className="flex justify-between">
             <label className="block font-['Montserrat'] text-xs font-semibold text-foreground">
-              {t("isRetail", "Retail Category")}
+              {t("isRental", t("isRetail", "Rental Category"))}
             </label>
-            <Toggle checked={isRetail} onChange={setIsRetail} size="sm" />
+            <Toggle checked={isRental} onChange={setIsRental} size="sm" />
           </div>
 
           <div className="space-y-2">
@@ -170,11 +170,11 @@ export function CategoryFormModal({
               type="button"
               disabled={uploading || !name}
               onClick={() => {
-                if (!isShop && !isWholesale && !isRetail) {
-                  toast.error(t("atLeastOneType", "Please select at least one category type (Shop, Wholesale, or Retail)"));
+                if (!isShop && !isWholesale && !isRental) {
+                  toast.error(t("atLeastOneType", "Please select at least one category type (Shop, Wholesale, or Rental)"));
                   return;
                 }
-                onSave({ name, image, appearOnHome, isShop, isWholesale, isRetail });
+                onSave({ name, image, appearOnHome, isShop, isWholesale, isRental });
               }}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >

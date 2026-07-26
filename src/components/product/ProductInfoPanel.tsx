@@ -29,7 +29,7 @@ type ProductInfoPanelProps = {
   setQuantity: (qty: number) => void;
   item: DetailItem;
   reviewCount?: number;
-  productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
+  productType?: 'SHOP' | 'WHOLESALE' | 'RENTAL' | 'RETAIL';
   rawProduct?: any;
   /** When provided, overrides the internal add-to-cart logic */
   onAddToCart?: () => void;
@@ -70,7 +70,7 @@ export function ProductInfoPanel({
   const isFavorite = Boolean(wishlistStatus?.isWishlisted);
 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : productType === "RETAIL" ? "RETAIL_RESTOCK" : "SHOP_RESTOCK";
+  const targetType = productType === "WHOLESALE" ? "WHOLESALE_RESTOCK" : (productType === "RENTAL" || productType === "RETAIL") ? "RENTAL_RESTOCK" : "SHOP_RESTOCK";
   const targetId = String(item.id);
 
   const { data: checkData } = useNotifyMeCheck(targetType, targetId);
@@ -106,7 +106,7 @@ export function ProductInfoPanel({
   }, [item.id, productType]);
 
   const isWholesale = productType === 'WHOLESALE';
-  const isRetail = productType === 'RETAIL';
+  const isRetail = productType === 'RETAIL' || productType === 'RENTAL';
 
   // Retrieve sizes & stock quantity for the currently selected color
   const colorObj = isWholesale

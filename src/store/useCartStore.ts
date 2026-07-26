@@ -95,7 +95,7 @@ type CartDbItem = {
   color?: string;
   quantity: number;
   image?: string;
-  productType?: "SHOP" | "RETAIL" | "WHOLESALE" | "BLANK";
+  productType?: "SHOP" | "RENTAL" | "RETAIL" | "WHOLESALE" | "BLANK";
 };
 
         if (res && res.data && res.data.items) {
@@ -249,24 +249,28 @@ export const useCartSubtotal = () =>
 
 
 
-export const useRetailCartItems = () => {
+export const useRentalCartItems = () => {
   const items = useCartStore((state) => state.items);
   return items.filter((item) => item.productType !== "WHOLESALE");
 };
 
-export const useRetailCartCount = () => {
+export const useRentalCartCount = () => {
   const items = useCartStore((state) => state.items);
   return items
     .filter((item) => item.productType !== "WHOLESALE")
     .reduce((total, item) => total + item.quantity, 0);
 };
 
-export const useRetailCartSubtotal = () => {
+export const useRentalCartSubtotal = () => {
   const items = useCartStore((state) => state.items);
   return items
     .filter((item) => item.productType !== "WHOLESALE")
     .reduce((total, item) => total + item.unitPrice * item.quantity, 0);
 };
+
+export const useRetailCartItems = useRentalCartItems;
+export const useRetailCartCount = useRentalCartCount;
+export const useRetailCartSubtotal = useRentalCartSubtotal;
 
 // Clear cart items when user logs out
 useAuthStore.subscribe((state) => {
