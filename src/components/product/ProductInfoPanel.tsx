@@ -342,6 +342,9 @@ export function ProductInfoPanel({
           image.color.toLowerCase() === selectedColor.toLowerCase()
       );
 
+      const rentalDeposit = rawProduct?.depositAmount !== undefined && rawProduct?.depositAmount !== null ? Number(rawProduct.depositAmount) : undefined;
+      const rentalUnitPrice = rentalDeposit !== undefined ? rentalDeposit : activePrice;
+
       addItem({
         id: `${item.id}-${selectedSize}-${selectedColor}-${productType === "SHOP" ? "STANDARD" : productType}`,
         productId: String(item.id),
@@ -349,7 +352,7 @@ export function ProductInfoPanel({
         category: item.category || item.categories?.[0] || undefined,
         categories: item.categories || (item.category ? [item.category] : undefined),
         title: item.name,
-        unitPrice: productType === "RENTAL" ? (rawProduct?.depositAmount || 0) : activePrice,
+        unitPrice: productType === "RENTAL" ? rentalUnitPrice : activePrice,
         currency: "EGP",
         size: selectedSize,
         color: selectedColor,
@@ -358,7 +361,7 @@ export function ProductInfoPanel({
         quantity,
         minOrder: item.minOrder || 1,
         productType: productType === "SHOP" ? "STANDARD" : productType,
-        depositAmount: rawProduct?.depositAmount || 0,
+        depositAmount: rentalDeposit || 0,
       });
 
       toast.success(

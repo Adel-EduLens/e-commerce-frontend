@@ -166,7 +166,8 @@ export default function RentalShopPage() {
             id: String(img.id),
             productId: img.productId ? String(img.productId) : undefined 
           }))}
-          price={`${product.rentalPrice ?? product.retailPrice ?? product.shopPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
+          price={`${product.depositAmount ?? product.rentalPrice ?? product.retailPrice ?? product.shopPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
+          depositAmount={product.depositAmount}
           imageSrc={imageSrc}
           sizeLabel={Array.from(new Set(sizeLabels)).join(" - ")}
           featured={product.isFeatured ?? (product.rating >= 4)}

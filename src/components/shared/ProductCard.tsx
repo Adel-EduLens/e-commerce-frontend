@@ -79,6 +79,7 @@ export type ProductCardProps = {
   hideAddToCart?: boolean;
   hideQuickActions?: boolean;
   stock?: number;
+  depositAmount?: number;
 };
 
 function useCountdown(endsAt?: string) {
@@ -263,7 +264,10 @@ export default function ProductCard({
         return;
       }
 
-      const numPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
+      const baseNumPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
+      const unitPriceForCart = (productType === "RENTAL" && depositAmount !== undefined && depositAmount !== null)
+        ? Number(depositAmount)
+        : baseNumPrice;
 
       if (isWholesale) {
         const allColorsStr = safeColors.join(", ") || "All Colors";
@@ -274,7 +278,7 @@ export default function ProductCard({
           id: `${actualProductId}-${selectedColor.toLowerCase()}-wholesale`,
           productId: actualProductId,
           title,
-          unitPrice: numPrice,
+          unitPrice: baseNumPrice,
           currency: "EGP",
           size: allSizesStr, // Use all sizes as requested ("add the color selected an there sizes")
           color: useWholesaleCard ? selectedColor : allColorsStr,
@@ -300,7 +304,7 @@ export default function ProductCard({
           id: `${actualProductId}-${firstSize}-${firstColor}`,
           productId: actualProductId,
           title,
-          unitPrice: numPrice,
+          unitPrice: unitPriceForCart,
           currency: "EGP",
           size: firstSize,
           color: firstColor,
@@ -309,6 +313,7 @@ export default function ProductCard({
           quantity: 1,
           minOrder: 1,
           productType: productType === "SHOP" ? "STANDARD" : productType,
+          depositAmount,
         });
       }
 

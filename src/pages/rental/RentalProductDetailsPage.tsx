@@ -141,7 +141,10 @@ export default function RentalProductDetailsPage() {
     const sizes = colors.flatMap(c => c.variants || []);
     const mainImage = images[0];
 
-    const priceNumber = toNumber(typedProduct.rentalPrice ?? typedProduct.retailPrice ?? typedProduct.price);
+    const depositAmt = (typedProduct.depositAmount !== undefined && typedProduct.depositAmount !== null)
+      ? toNumber(typedProduct.depositAmount)
+      : undefined;
+    const priceNumber = depositAmt ?? toNumber(typedProduct.rentalPrice ?? typedProduct.retailPrice ?? typedProduct.price);
     const discountNumber =
       typedProduct.flashDealPrice !== null &&
       typedProduct.flashDealPrice !== undefined
