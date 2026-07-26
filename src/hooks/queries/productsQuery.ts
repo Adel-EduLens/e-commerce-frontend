@@ -82,6 +82,7 @@ export interface Product {
   colors: ProductColor[];
   price?: number;
   shopPrice?: number;
+  rentalPrice?: number;
   retailPrice?: number;
   wholesalePrice?: number;
   blankPrice?: number;
@@ -350,6 +351,7 @@ export interface ProductFormData {
   isPremiumCollection?: boolean;
   sizeguide?: string;
   blankPrice?: number | null;
+  rentalPrice?: number | null;
   retailPrice?: number | null;
 }
 

@@ -13,7 +13,7 @@ export interface BagProduct {
   imageUrl?: string;
   featured?: boolean;
   rating?: number;
-  _productType?: 'SHOP' | 'WHOLESALE' | 'RETAIL';
+  _productType?: 'SHOP' | 'WHOLESALE' | 'RENTAL' | 'RETAIL';
   [key: string]: unknown;
 }
 

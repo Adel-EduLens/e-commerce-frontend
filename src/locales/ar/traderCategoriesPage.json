@@ -5,7 +5,7 @@
   "allCategories": "كل الفئات",
   "productCategories": "فئات المنتجات",
   "wholesaleCategories": "فئات الجملة",
-  "retailCategories": "فئات التجزئة",
+  "retailCategories": "فئات التأجير",
   "selectCategoryType": "اختر تبويب نوع الفئة قبل إضافة فئة.",
   "sortBy": "فرز حسب",
   "noSort": "بدون فرز",
@@ -38,6 +38,10 @@
   "disableAppearOnHome": "تعطيل الظهور في الرئيسية",
   "enableAppearOnHome": "تفعيل الظهور في الرئيسية",
   "categoryImage": "صورة الفئة",
+  "isShop": "فئة متجر",
+  "isWholesale": "فئة جملة",
+  "isRetail": "فئة تأجير",
+  "isRental": "فئة تأجير",
   "uploading": "جاري الرفع...",
   "save": "حفظ"
 }

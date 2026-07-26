@@ -3,6 +3,7 @@ import type { Product } from './product'
 export interface CartItem {
   id: string
   productId?: string | number | null
+  rentalProductId?: string | number | null
   retailProductId?: string | number | null
   productType?: string
   categoryId?: string
@@ -16,6 +17,8 @@ export interface CartItem {
   imageSrc: string
   quantity: number
   minOrder?: number
+  rentalColorId?: string | number | null
+  rentalSizeId?: string | number | null
   retailColorId?: string | number | null
   retailSizeId?: string | number | null
   product?: Product | null

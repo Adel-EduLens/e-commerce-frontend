@@ -51,7 +51,7 @@ export function CategoryTablePanel({
   const filtered = categories
     .filter((c) => {
       if (categoryFilter === "wholesale") return !!c.isWholesale;
-      if (categoryFilter === "retail") return !!c.isRetail;
+      if (categoryFilter === "retail") return !!c.isRental || !!c.isRetail;
       // "product" -> isShop
       return !!c.isShop;
     })
@@ -524,7 +524,7 @@ export default function TraderCategoriesPage() {
                   appearOnHome: formData.appearOnHome,
                   isShop: formData.isShop,
                   isWholesale: formData.isWholesale,
-                  isRetail: formData.isRetail,
+                  isRental: formData.isRental,
                 },
               });
               setEditCategory(null);

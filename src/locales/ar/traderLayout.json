@@ -1,6 +1,6 @@
 {
     "overview": "نظرة عامة",
-    "retail": "التجزئة",
+    "retail": "التأجير",
     "dropshipping": "دروبشيبينج",
     "wholesale": "الجملة",
     "brandPartners": "شركاء العلامات التجارية",
@@ -26,8 +26,8 @@
     "Home Page Banner": "بانر الصفحة الرئيسية",
     "Collections": "المجموعات",
     "designs": "التصاميم",
-    "Retail Categories": "فئات التجزئة",
-    "Retail Products": "منتجات التجزئة",
+    "Retail Categories": "فئات التأجير",
+    "Retail Products": "منتجات التأجير",
     "defaultTraderName": "معن حسن",
     "blankProduct": "منتج جمله",
     "faqs": "الأسئلة الشائعة",

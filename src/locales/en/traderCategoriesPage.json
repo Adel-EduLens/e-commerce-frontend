@@ -5,7 +5,7 @@
   "allCategories": "All Categories",
   "productCategories": "Product Categories",
   "wholesaleCategories": "Wholesale Categories",
-  "retailCategories": "Retail Categories",
+  "retailCategories": "Rental Categories",
   "selectCategoryType": "Select a category type tab before adding a category.",
   "sortBy": "Sort by",
   "noSort": "No sort",
@@ -38,6 +38,10 @@
   "disableAppearOnHome": "disable appear on home",
   "enableAppearOnHome": "enable appear on home",
   "categoryImage": "Category Image",
+  "isShop": "Shop Category",
+  "isWholesale": "Wholesale Category",
+  "isRetail": "Rental Category",
+  "isRental": "Rental Category",
   "uploading": "Uploading...",
   "save": "Save"
 }

@@ -1,0 +1,9 @@
+{
+  "additionalInformation": "Additional Information",
+  "sku": "SKU:",
+  "depositAmount": "Deposit Amount:",
+  "securityDeposit": "Security Deposit:",
+  "termsAndConditions": "Terms & Conditions",
+  "privacyPolicy": "Privacy Policy",
+  "rentalPricePerDay": "/ day (Rental price per day)"
+}

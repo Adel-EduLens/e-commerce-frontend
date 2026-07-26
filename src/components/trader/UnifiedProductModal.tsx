@@ -158,7 +158,7 @@ export function UnifiedProductModal({
   const { data: categories = [] } = useCategories();
   const shopCategories = categories.filter((c) => c.isShop);
   const wholesaleCategories = categories.filter((c) => c.isWholesale);
-  const retailCategories = categories.filter((c) => c.isRetail);
+  const retailCategories = categories.filter((c) => c.isRental || c.isRetail);
   const { data: brands = [] } = useBrands();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
@@ -178,12 +178,12 @@ export function UnifiedProductModal({
         if (pTypes.length > 0) {
           setIsShop(pTypes.includes("SHOP"));
           setIsWholesale(pTypes.includes("WHOLESALE"));
-          setIsRetail(pTypes.includes("RETAIL"));
+          setIsRetail(pTypes.includes("RENTAL") || pTypes.includes("RETAIL"));
           setIsBlank(pTypes.includes("BLANK"));
         } else {
           setIsShop(fullProduct.shopPrice != null);
           setIsWholesale(fullProduct.wholesalePrice != null);
-          setIsRetail(fullProduct.retailPrice != null);
+          setIsRetail(fullProduct.rentalPrice != null || fullProduct.retailPrice != null);
           setIsBlank(fullProduct.blankPrice != null);
         }
 
@@ -191,8 +191,8 @@ export function UnifiedProductModal({
           setShopPrice(fullProduct.shopPrice.toString());
         if (fullProduct.wholesalePrice != null)
           setWholesalePrice(fullProduct.wholesalePrice.toString());
-        if (fullProduct.retailPrice != null)
-          setRetailPrice(fullProduct.retailPrice.toString());
+        if (fullProduct.rentalPrice != null || fullProduct.retailPrice != null)
+          setRetailPrice((fullProduct.rentalPrice ?? fullProduct.retailPrice)!.toString());
         if (fullProduct.blankPrice != null)
           setBlankPrice(fullProduct.blankPrice.toString());
 
@@ -419,7 +419,7 @@ export function UnifiedProductModal({
       const productTypes: string[] = [];
       if (isShop) productTypes.push("SHOP");
       if (isWholesale) productTypes.push("WHOLESALE");
-      if (isRetail) productTypes.push("RETAIL");
+      if (isRetail) productTypes.push("RENTAL");
       if (isBlank) productTypes.push("BLANK");
 
       const payload: ProductFormData = {
@@ -472,14 +472,14 @@ export function UnifiedProductModal({
       }
 
       if (isRetail) {
-        payload.retailPrice = Number(retailPrice);
+        payload.rentalPrice = Number(retailPrice);
         payload.depositAmount = Number(depositAmount);
         payload.securityDeposit = Number(securityDeposit);
         payload.termsAndConditions = termsAndConditions;
         payload.privacyPolicy = privacyPolicy;
         payload.isFeatured = isFeatured;
       } else {
-        payload.retailPrice = null;
+        payload.rentalPrice = null;
       }
 
       if (isBlank) {

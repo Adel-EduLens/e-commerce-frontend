@@ -1,6 +1,6 @@
 import { api } from '../lib/axios'
 
-export type NotifyMeTargetType = 'SHOP_RESTOCK' | 'RETAIL_RESTOCK' | 'WHOLESALE_RESTOCK' | 'CATEGORY'
+export type NotifyMeTargetType = 'SHOP_RESTOCK' | 'RENTAL_RESTOCK' | 'RETAIL_RESTOCK' | 'WHOLESALE_RESTOCK' | 'CATEGORY'
 
 export const notifyMeApi = {
   async getSubscriptions() {

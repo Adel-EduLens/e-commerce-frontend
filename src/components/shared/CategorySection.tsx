@@ -4,12 +4,13 @@ import LoadingSpinner from "./LoadingSpinner";
 import { useTranslation } from "react-i18next";
 interface CategoriesSectionProps {
   isWholesale?: boolean;
+  isRental?: boolean;
   isRetail?: boolean;
   isShop?: boolean;
 }
 
-function CategoriesSection({ isWholesale = false, isRetail = false, isShop = false }: CategoriesSectionProps) {
-  const typeFilter = isWholesale ? "WHOLESALE" : isRetail ? "RETAIL" : isShop ? "SHOP" : undefined;
+function CategoriesSection({ isWholesale = false, isRental = false, isRetail = false, isShop = false }: CategoriesSectionProps) {
+  const typeFilter = isWholesale ? "WHOLESALE" : isRental || isRetail ? "RENTAL" : isShop ? "SHOP" : undefined;
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories(typeFilter);
   const { t } = useTranslation("ui");
 
@@ -31,8 +32,8 @@ function CategoriesSection({ isWholesale = false, isRetail = false, isShop = fal
                 to={
                   isWholesale
                     ? `/wholesale?category=${category.name}`
-                    : isRetail
-                    ? `/retail/shop?category=${category.name}`
+                    : isRental || isRetail
+                    ? `/rental/shop?category=${category.name}`
                     : `/products?category=${category.name}`
                 }
                 className="relative w-full overflow-hidden rounded-2xl bg-white no-underline aspect-[448/547]"

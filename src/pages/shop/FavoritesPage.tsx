@@ -4,6 +4,8 @@ import ProductCard from '../../components/shared/ProductCard'
 import { Link } from 'react-router-dom'
 import type { RetailProduct } from '../../types/retail'
 
+import type { WishlistProductType } from '../../types/wishlist'
+
 type WholesaleColor = {
   color: string
   sizes: { size: string }[]
@@ -27,7 +29,7 @@ type FavoriteProduct = {
 
 type FavoriteItem = {
   id: string
-  productType: 'RETAIL' | 'SHOP' | 'WHOLESALE'
+  productType: WishlistProductType
   product?: FavoriteProduct
 }
 
@@ -98,7 +100,7 @@ export default function FavoritesPage() {
             // Determine routing path based on the type it was favorited as
             let route = `/product-details/${p.id}`;
             if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
-            else if (item.productType === 'RETAIL') route = `/retail/${p.id}`;
+            else if (item.productType === 'RENTAL' || item.productType === 'RETAIL') route = `/rental/${p.id}`;
 
             return (
               <ProductCard
@@ -107,7 +109,7 @@ export default function FavoritesPage() {
                 productType={item.productType as any}
                 title={p.name}
                 subtitle={p.description || undefined}
-                price={`${p.shopPrice ?? p.retailPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0} EGP`}
+                price={`${p.rentalPrice ?? p.retailPrice ?? p.shopPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0} EGP`}
                 to={route}
                 imageSrc={p.images?.[0]?.url}
                 images={p.images}

@@ -17,7 +17,7 @@ const sidebarItems = [
   // {
   //   label: "retail",
   //   icon: "fluent_building-retail-20-regular.svg",
-  //   path: "/dashboard/trader/retail",
+  //   path: "/dashboard/trader/rental",
   // },
   // {
   //   label: "dropshipping",

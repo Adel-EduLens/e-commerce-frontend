@@ -522,14 +522,14 @@ export default function BagPage() {
           if (!item) return;
 
           const isWholesale = item.productType === "WHOLESALE" || item.id.includes("-wholesale");
-          const isRetail = item.productType === "RETAIL" || item.id.includes("retail-") || !isNaN(Number(productId));
+          const isRentalOrRetail = item.productType === "RENTAL" || item.productType === "RETAIL" || item.id.includes("rental-") || item.id.includes("retail-") || !isNaN(Number(productId));
 
           if (isWholesale) {
             const { data } = await api.get(`/wholesales/${productId}`);
             productDetailsMap[productId] = { type: "WHOLESALE", data: data.data };
-          } else if (isRetail) {
-            const { data } = await api.get(`/retail-products/${productId}`);
-            productDetailsMap[productId] = { type: "RETAIL", data: data.data };
+          } else if (isRentalOrRetail) {
+            const { data } = await api.get(`/products/${productId}`);
+            productDetailsMap[productId] = { type: "RENTAL", data: data.data };
           } else {
             const { data } = await api.get(`/products/${productId}`);
             productDetailsMap[productId] = { type: "SHOP", data: data.data };
