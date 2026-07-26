@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useWholesaleCartItems, useWholesaleCartStore } from "../../store/useWholesaleCartStore";
+import { useUser } from "../../store/useAuthStore";
 import GoogleMapPicker from "../../components/shared/GoogleMap";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
@@ -103,22 +104,29 @@ function FormInput({
   value,
   onChange,
   className = "",
+  disabled = false,
 }: {
   placeholder: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
     <div
-      className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+      className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${
+        disabled ? "opacity-60 bg-gray-100 dark:bg-zinc-800 cursor-not-allowed" : ""
+      } ${className}`}
     >
       <input
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none"
+        disabled={disabled}
+        className={`w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none ${
+          disabled ? "cursor-not-allowed text-gray-500" : ""
+        }`}
       />
     </div>
   );
@@ -222,6 +230,7 @@ function DeliverySection({
           placeholder="Email Address"
           value={data.email}
           onChange={(e) => onChange("email", e.target.value)}
+          disabled={true}
         />
 
         {isAddressesLoading && (
@@ -444,6 +453,7 @@ function OrderSummary({
 export default function WholesaleCheckoutPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const user = useUser();
   const items = useWholesaleCartItems();
   const clearCart = useWholesaleCartStore((s) => s.clearCart);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -453,7 +463,7 @@ export default function WholesaleCheckoutPage() {
     firstName: "",
     lastName: "",
     phone: "",
-    email: "",
+    email: user?.email || "",
     country: "Egypt",
     city: "",
     area: "",
@@ -463,6 +473,15 @@ export default function WholesaleCheckoutPage() {
     latitude: "",
     longitude: "",
   });
+
+  useEffect(() => {
+    if (user?.email) {
+      setFormData((prev) => ({
+        ...prev,
+        email: user.email || "",
+      }));
+    }
+  }, [user?.email]);
 
   const { data: addresses = [], isLoading: isAddressesLoading } = useMyAddresses();
 

@@ -21,6 +21,7 @@ interface OrderItem {
 interface Order {
   id: string;
   orderId: string;
+  orderType?: string;
   customer: string;
   customerEmail: string;
   customerPhone: string;
@@ -383,7 +384,9 @@ export default function TraderOrdersPage() {
     setError(null);
     try {
       const res = await api.get("/orders/trader");
-      setOrders(res.data?.data || []);
+      const rawOrders: Order[] = res.data?.data || [];
+      const nonWholesaleOrders = rawOrders.filter((o) => o.orderType !== "WHOLESALE");
+      setOrders(nonWholesaleOrders);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t("fetchOrdersError", "Failed to load orders");
       setError(errorMessage);
