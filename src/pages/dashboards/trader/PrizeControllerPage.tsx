@@ -1,80 +1,101 @@
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { handleApiError } from '../../../lib/utils';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { prizeSchema } from "../../../schemas";
 import { toast } from "sonner";
-import type { PrizeFormValues } from "../../../schemas";
 import {
   usePrizes,
   useAddPrize,
   useDeletePrize,
 } from "../../../hooks/queries/prizequery";
-
-
+import { useTranslation } from "react-i18next";
 
 const PrizeControllerPage = () => {
+  const { t, i18n } = useTranslation("traderPrizes");
   const { data: prizes = [], isLoading } = usePrizes();
   const addPrize = useAddPrize();
   const deletePrize = useDeletePrize();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<PrizeFormValues>({
-    resolver: zodResolver(prizeSchema),
-  });
+  const isRTL = i18n.language?.startsWith("ar");
 
-  const onSubmit = async (data: PrizeFormValues) => {
+  const [name, setName] = useState("");
+  const [weight, setWeight] = useState("");
+  const [errors, setErrors] = useState<{ name?: string; weight?: string }>({});
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const validate = () => {
+    const tempErrors: { name?: string; weight?: string } = {};
+    if (!name.trim()) {
+      tempErrors.name = "nameRequired";
+    }
+    const weightNum = Number(weight);
+    if (!weight || isNaN(weightNum) || weightNum < 1) {
+      tempErrors.weight = "weightMin";
+    }
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
     try {
       await addPrize.mutateAsync({
-        name: data.name,
-        weight: data.weight,
+        name,
+        weight: Number(weight),
       });
 
-      toast.success("Prize added successfully");
-      reset();
+      toast.success(t("addSuccess"));
+      setName("");
+      setWeight("");
+      setErrors({});
     } catch (error) {
-      handleApiError(error, "حدث خطأ أثناء إضافة الجائزة");
+      handleApiError(error, t("addError"));
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deletePrize.mutateAsync(id);
-      toast.success("Prize deleted successfully");
+      toast.success(t("deleteSuccess"));
     } catch (error) {
-      handleApiError(error, "حدث خطأ أثناء حذف الجائزة");
+      handleApiError(error, t("deleteError"));
     }
   };
 
-  if (isLoading) return <p className="p-6 text-gray-text">Loading...</p>;
+  if (isLoading) return <p className="p-6 text-gray-text">{t("loading")}</p>;
 
   return (
-    <div className="min-h-screen bg-background p-6 flex flex-col gap-6">
+    <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen bg-background p-6 flex flex-col gap-6">
       {/* FORM */}
-      <form onSubmit={handleSubmit(onSubmit)} className="p-4 ">
+      <form onSubmit={onSubmit} className="p-4 ">
         <div className="flex flex-col gap-1">
           <input
-            placeholder="Name"
-            {...register("name")}
+            placeholder={t("namePlaceholder")}
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+            }}
             className="border border-stroke bg-background text-foreground placeholder:text-gray-text p-2 rounded-lg outline-none focus:border-primary transition-colors"
           />
           <p className="text-red-500 text-xs min-h-[1rem]">
-            {errors.name?.message}
+            {errors.name ? t(errors.name) : ""}
           </p>
         </div>
 
         <div className="flex flex-col gap-1">
           <input
             type="number"
-            placeholder="Weight"
-            {...register("weight", { valueAsNumber: true })}
+            placeholder={t("weightPlaceholder")}
+            value={weight}
+            onChange={(e) => {
+              setWeight(e.target.value);
+              if (errors.weight) setErrors((prev) => ({ ...prev, weight: undefined }));
+            }}
             className="border border-stroke bg-background text-foreground placeholder:text-gray-text p-2 rounded-lg outline-none focus:border-primary transition-colors"
           />
           <p className="text-red-500 text-xs min-h-[1rem]">
-            {errors.weight?.message}
+            {errors.weight ? t(errors.weight) : ""}
           </p>
         </div>
 
@@ -83,7 +104,7 @@ const PrizeControllerPage = () => {
           disabled={addPrize.isPending}
           className="bg-primary text-foreground font-semibold px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
         >
-          {addPrize.isPending ? "Adding..." : "Add"}
+          {addPrize.isPending ? t("adding") : t("add")}
         </button>
       </form>
 
@@ -96,29 +117,57 @@ const PrizeControllerPage = () => {
           >
             <div>
               <p className="font-bold text-foreground">{prize.name}</p>
-              <p className="text-sm text-gray-text">Weight: {prize.weight}</p>
+              <p className="text-sm text-gray-text">{t("weightLabel")}{prize.weight}</p>
             </div>
 
             <button
-              onClick={() => {
-                if (window.confirm("Are you sure you want to delete this prize?")) {
-                  handleDelete(prize.id);
-                }
-              }}
+              onClick={() => setDeleteId(prize.id)}
               disabled={deletePrize.isPending}
               className="border border-stroke text-foreground hover:bg-gray-light px-3 py-1 rounded-lg transition-colors disabled:opacity-50 cursor-pointer hover:bg-red-300"
             >
-              Delete
+              {t("delete")}
             </button>
           </div>
         ))}
 
         {prizes.length === 0 && (
           <p className="text-gray-text text-sm text-center py-6">
-            No prizes yet.
+            {t("noPrizes")}
           </p>
         )}
       </div>
+
+      {deleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-card p-6 space-y-4 shadow-xl border border-stroke/50">
+            <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
+              {t("delete")}
+            </h3>
+            <p className="font-['Montserrat'] text-sm text-gray-text">
+              {t("confirmDelete")}
+            </p>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-white dark:bg-background cursor-pointer"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleDelete(deleteId);
+                  setDeleteId(null);
+                }}
+                className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700 cursor-pointer"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

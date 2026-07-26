@@ -139,6 +139,9 @@ import traderAnalyticsAr from "./locales/ar/traderAnalytics.json";
 import traderShippingEn from "./locales/en/traderShipping.json";
 import traderShippingAr from "./locales/ar/traderShipping.json";
 
+import traderPrizesEn from "./locales/en/traderPrizes.json";
+import traderPrizesAr from "./locales/ar/traderPrizes.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -192,6 +195,7 @@ i18n
         traderShopPage: traderShopPageEn,
         traderAnalytics: traderAnalyticsEn,
         traderShipping: traderShippingEn,
+        traderPrizes: traderPrizesEn,
       },
       ar: {
         dropshipping: dropshippingAr,
@@ -241,6 +245,7 @@ i18n
         traderShopPage: traderShopPageAr,
         traderAnalytics: traderAnalyticsAr,
         traderShipping: traderShippingAr,
+        traderPrizes: traderPrizesAr,
       },
     },
 

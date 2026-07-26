@@ -72,6 +72,8 @@ import InfluencerCouponUsersPage from "../pages/dashboards/influencer/Influencer
 import InfluencerEarningsPage from "../pages/dashboards/influencer/InfluencerEarningsPage";
 import TraderInfluencersPage from "../pages/dashboards/trader/TraderInfluencersPage";
 import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
+import PrizeControllerPage from "../pages/dashboards/trader/PrizeControllerPage";
+import PrizeWheel from "../components/ui/PrizeWheel";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -195,6 +197,10 @@ export const router = createBrowserRouter([
           {
             path: "dashboard/user",
             element: <UserDashboard />,
+          },
+          {
+            path: "prize-wheel",
+            element: <PrizeWheel />,
           },
           {
             path: "recently-viewed",
@@ -394,6 +400,10 @@ export const router = createBrowserRouter([
           {
             path: "designs",
             element: <TraderDesignPage />,
+          },
+          {
+            path: "prizes",
+            element: <PrizeControllerPage />,
           },
         ],
       },

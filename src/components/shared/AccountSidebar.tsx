@@ -1,6 +1,7 @@
 import {
   Bell,
   Clock,
+  Gift,
   HelpCircle,
   LayoutDashboard,
   LogOut,
@@ -35,6 +36,11 @@ const items: SidebarItem[] = [
     icon: Wallet,
     labelKey: "walletRewards",
     path: "/wallet-rewards",
+  },
+  {
+    icon: Gift,
+    labelKey: "prizeWheel",
+    path: "/prize-wheel",
   },
   {
     icon: User,
