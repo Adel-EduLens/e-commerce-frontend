@@ -2315,13 +2315,13 @@ export function EditItemModal({
                     </div>
                   </div>
 
-                  {color.variants.length > 0 && (
+                  {wc.variants.length > 0 && (
                     <div className="pt-1.5 flex items-center gap-1.5">
                       <span className="font-['Montserrat'] text-[10px] font-semibold text-gray-text">
                         {tShared("sizes")}:
                       </span>
                       <span className="font-['Montserrat'] text-[10px] font-bold text-foreground bg-gray-200/60 px-2 py-0.5 rounded-md">
-                        {color.variants.map((v) => v.size).join(", ")}
+                        {wc.variants.map((v) => v.size).join(", ")}
                       </span>
                     </div>
                   )}
