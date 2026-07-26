@@ -1,19 +1,11 @@
 import { useState } from "react";
-import { api } from "../../lib/axios";
 import { type Collection } from "../../hooks/queries/collectionsQuery";
 import { useTraderProducts } from "../../hooks/queries/productsQuery";
 import ImageCropModal, {
   validateImageDimensions,
 } from "./ImageCropModal";
-
-const uploadImageFile = async (file: File): Promise<string> => {
-  const formData = new FormData();
-  formData.append("image", file);
-  const { data } = await api.post("/upload/category-image", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return data.data.url;
-};
+import { Toggle } from "../ui/toggle";
+import { uploadImageFile } from "./inventoryUtils";
 
 interface CollectionFormModalProps {
   collection?: Collection;
@@ -48,7 +40,7 @@ export function CollectionFormModal({
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: traderProducts, isLoading: loadingProducts } = useTraderProducts();
+  const { data: traderProducts, isLoading: loadingProducts } = useTraderProducts("SHOP");
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,7 +78,14 @@ export function CollectionFormModal({
     );
   };
 
-  const filteredProducts = traderProducts?.filter((p) =>
+  const shopProducts = traderProducts?.filter((p) => {
+    if (Array.isArray(p.productTypes)) {
+      return p.productTypes.some((pt: any) => (typeof pt === "string" ? pt === "SHOP" : pt?.type === "SHOP"));
+    }
+    return true;
+  });
+
+  const filteredProducts = shopProducts?.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.sku?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -138,24 +137,16 @@ export function CollectionFormModal({
               Appear on Home Page
             </label>
 
-            <button
-              type="button"
-              onClick={() => setAppearOnHome(!appearOnHome)}
+            <Toggle
+              checked={appearOnHome}
+              onChange={setAppearOnHome}
+              size="sm"
               aria-label={
                 appearOnHome
-                  ? `disable appear on home`
-                  : `enable appear on home`
+                  ? "disable appear on home"
+                  : "enable appear on home"
               }
-              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
-                appearOnHome ? "bg-primary" : "bg-stroke"
-              }`}
-            >
-              <span
-                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-300 ${
-                  appearOnHome ? "translate-x-4" : "translate-x-0.5"
-                }`}
-              />
-            </button>
+            />
           </div>
 
           <div className="space-y-2">
@@ -168,17 +159,16 @@ export function CollectionFormModal({
               onChange={handleFile}
               className="w-full text-sm text-gray-text file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gray-light file:text-foreground hover:file:bg-stroke cursor-pointer"
             />
+            {image && (
+              <div className="relative w-full h-40 rounded-xl border border-stroke overflow-hidden mt-2 bg-gray-50 flex items-center justify-center">
+                <img
+                  src={image}
+                  className="h-full max-w-full object-contain"
+                  alt="Preview"
+                />
+              </div>
+            )}
           </div>
-
-          {image && (
-            <div className="relative w-32 h-20 rounded-xl border border-stroke overflow-hidden mt-1">
-              <img
-                src={image}
-                className="h-full w-full object-cover"
-                alt="Preview"
-              />
-            </div>
-          )}
 
           {/* Product selection list */}
           <div className="border-t border-stroke pt-4 mt-2">
@@ -187,7 +177,7 @@ export function CollectionFormModal({
             </label>
 
             <input
-              placeholder="Search trader products by name or SKU..."
+              placeholder="Search shop products by name or SKU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full mb-3 rounded-xl border border-stroke px-4 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary text-foreground bg-white"
