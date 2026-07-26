@@ -19,6 +19,7 @@ export type CartItem = {
   quantity: number;
   minOrder?: number;
   productType?: string;
+  depositAmount?: number;
 };
 
 type CartStore = {

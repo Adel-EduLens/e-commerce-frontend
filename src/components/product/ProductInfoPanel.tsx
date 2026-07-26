@@ -210,8 +210,10 @@ export function ProductInfoPanel({
   }, [selectedSize, selectedColor, availableStock, quantity, setQuantity, item.minOrder, colorObj, isWholesale, rawProduct]);
 
   // Flash deal price calculation
+  const isRentalInfo = productType === 'RENTAL';
   const basePrice =
     isWholesale ? (rawProduct?.wholesalePrice ?? rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
+      isRentalInfo ? (rawProduct?.rentalPrice ?? rawProduct?.retailPrice ?? rawProduct?.shopPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
       isRetail ? (rawProduct?.retailPrice ?? rawProduct?.shopPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0) :
         (rawProduct?.shopPrice ?? rawProduct?.retailPrice ?? rawProduct?.wholesalePrice ?? rawProduct?.blankPrice ?? item.price ?? 0);
 
@@ -347,7 +349,7 @@ export function ProductInfoPanel({
         category: item.category || item.categories?.[0] || undefined,
         categories: item.categories || (item.category ? [item.category] : undefined),
         title: item.name,
-        unitPrice: activePrice,
+        unitPrice: productType === "RENTAL" ? (rawProduct?.depositAmount || 0) : activePrice,
         currency: "EGP",
         size: selectedSize,
         color: selectedColor,
@@ -356,6 +358,7 @@ export function ProductInfoPanel({
         quantity,
         minOrder: item.minOrder || 1,
         productType: productType === "SHOP" ? "STANDARD" : productType,
+        depositAmount: rawProduct?.depositAmount || 0,
       });
 
       toast.success(

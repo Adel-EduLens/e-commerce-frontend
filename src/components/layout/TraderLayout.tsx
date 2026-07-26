@@ -64,16 +64,6 @@ const sidebarItems = [
     icon: "dashicons_money-alt.svg",
     path: "/dashboard/trader/coupons",
   },
-  {
-    label: "finance",
-    icon: "material-symbols_finance-rounded.svg",
-    path: "/dashboard/trader/finance",
-  },
-  {
-    label: "notifications",
-    icon: "ion_notifications-outline.svg",
-    path: "/dashboard/trader/notifications",
-  },
   // {
   //   label: "analytics",
   //   icon: "grommet-icons_analytics.svg",
@@ -109,7 +99,16 @@ const sidebarItems = [
   //   icon: "solar_settings-linear.svg",
   //   path: "/dashboard/trader/settings",
   // }
-
+  {
+    label: "finance",
+    icon: "material-symbols_finance-rounded.svg",
+    path: "/dashboard/trader/finance",
+  },
+  {
+    label: "notifications",
+    icon: "ion_notifications-outline.svg",
+    path: "/dashboard/trader/notifications",
+  },
 ] as const;
 
 export default function TraderLayout() {

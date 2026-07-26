@@ -202,7 +202,7 @@ function VoteSection() {
   }
 
   async function handleVote() {
-    if (!current || voting) return
+    if (!current || voting || current.hasVoted) return
     setVoting(true)
     try {
       const res = await api.put(`/trader/designs/vote/${current.id}`)
@@ -211,7 +211,7 @@ function VoteSection() {
         queryClient.setQueryData(['designs'], (prev: VoteDesign[] | undefined) =>
           prev?.map((design) =>
             design.id === current.id
-              ? { ...design, votes: (design.votes ?? 0) + 1 }
+              ? { ...design, votes: (design.votes ?? 0) + 1, hasVoted: true }
               : design
           )
         )
@@ -261,11 +261,18 @@ function VoteSection() {
                 <button
                   type="button"
                   onClick={handleVote}
-                  disabled={voting}
+                  disabled={voting || Boolean(current?.hasVoted)}
                   className="inline-flex items-center gap-2 rounded-2xl bg-card px-6 py-3 font-['Montserrat'] text-xl font-medium text-foreground shadow-sm hover:bg-card/90 transition disabled:opacity-60 cursor-pointer"
                 >
                   {voting ? (
                     <span className="h-6 w-6 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground" />
+                  ) : current.hasVoted ? (
+                    <div className="flex items-center gap-2 text-green-600 font-semibold">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      {t('votedButton', 'Voted')}
+                    </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <svg width="24" height="24" viewBox="0 0 32 32" fill="none" className="text-foreground">
@@ -338,11 +345,18 @@ function VoteSection() {
               <button
                 type="button"
                 onClick={handleVote}
-                disabled={voting}
+                disabled={voting || Boolean(current?.hasVoted)}
                 className="absolute left-[1222px] top-[669px] inline-flex items-center justify-center gap-2 rounded-3xl bg-card p-4 font-['Montserrat'] text-3xl font-medium text-foreground shadow-lg hover:bg-card/90 transition disabled:opacity-60 cursor-pointer"
               >
                 {voting ? (
                   <span className="h-8 w-8 animate-spin rounded-full border-4 border-foreground/20 border-t-foreground" />
+                ) : current.hasVoted ? (
+                  <div className="flex items-center gap-2 text-green-600 font-semibold">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {t('votedButton', 'Voted')}
+                  </div>
                 ) : (
                   <div className="flex items-center gap-2">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className="text-foreground">

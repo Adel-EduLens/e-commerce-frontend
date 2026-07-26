@@ -478,8 +478,8 @@ export default function TraderOrdersPage() {
             type="button"
             onClick={() => handleTabChange("retail")}
             className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${activeTab === "retail"
-                ? "bg-primary text-white"
-                : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
+              ? "bg-primary text-white"
+              : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
               }`}
           >
             {t("retailOrders", "Retail Orders")}
@@ -488,8 +488,8 @@ export default function TraderOrdersPage() {
             type="button"
             onClick={() => handleTabChange("wholesale")}
             className={`rounded-lg px-4 py-2 text-sm font-semibold transition cursor-pointer ${activeTab === "wholesale"
-                ? "bg-primary text-white"
-                : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
+              ? "bg-primary text-white"
+              : "bg-card text-gray-text hover:bg-background hover:text-foreground border border-stroke"
               }`}
           >
             {t("wholesaleOrders", "Wholesale Orders")}

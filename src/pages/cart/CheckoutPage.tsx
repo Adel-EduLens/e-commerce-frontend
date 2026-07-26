@@ -1015,6 +1015,7 @@ export default function CheckoutPage() {
           size: item.size || null,
           color: item.color || null,
           imageSrc: item.imageSrc || null,
+          productType: item.productType || null,
         })),
       };
 

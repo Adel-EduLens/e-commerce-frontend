@@ -29,7 +29,8 @@ export default function ProductsSection({
 }: ProductsSectionProps) {
   const { t } = useTranslation("productSection");
   const navigate = useNavigate();
-  const isRetail = productType === "RETAIL" || productType === "RENTAL";
+  const isRental = productType === "RENTAL";
+  const isRetail = productType === "RETAIL" || isRental;
   const isWholesale = productType === "WHOLESALE";
 
   const [filterValues, setFilterValues] = useState<FilterValues>({
@@ -168,10 +169,10 @@ export default function ProductsSection({
               <ProductCard
                 key={product.id}
                 productId={product.id}
-                productType={isRetail ? "RETAIL" : "SHOP"}
+                productType={isRental ? "RENTAL" : isRetail ? "RETAIL" : "SHOP"}
                 title={product.name}
                 subtitle={product.description}
-                price={`${isRetail ? product.retailPrice ?? product.price ?? 0 : isWholesale ? product.wholesalePrice ?? product.price ?? 0 : product.shopPrice ?? product.price ?? 0} EGP`}
+                price={`${isRental ? product.rentalPrice ?? product.retailPrice ?? product.price ?? 0 : isRetail ? product.retailPrice ?? product.price ?? 0 : isWholesale ? product.wholesalePrice ?? product.price ?? 0 : product.shopPrice ?? product.price ?? 0} EGP`}
                 imageSrc={
                   product.colors?.[0]?.images?.[0]?.imageUrl ||
                   product.colors?.[0]?.images?.[0]?.url ||

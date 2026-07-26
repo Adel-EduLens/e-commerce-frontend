@@ -6,6 +6,7 @@ export type VoteDesign = {
   title: string;
   imagePath: string;
   votes?: number;
+  hasVoted?: boolean;
 };
 
 export const useDesigns = () => {
