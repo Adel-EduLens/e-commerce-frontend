@@ -250,7 +250,8 @@ export default function Navbar() {
       ? location.pathname === "/"
       : item.label === "shop"
         ? location.pathname.startsWith(item.path) ||
-        location.pathname.startsWith("/collections/")
+        location.pathname.startsWith("/collections/") ||
+        location.pathname.startsWith("/product-details/")
         : location.pathname.startsWith(item.path);
 
   return (

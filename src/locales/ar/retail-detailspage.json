@@ -4,5 +4,6 @@
   "depositAmount": "قيمة العربون:",
   "securityDeposit": "التأمين:",
   "termsAndConditions": "الشروط والأحكام",
-  "privacyPolicy": "سياسة الخصوصية"
+  "privacyPolicy": "سياسة الخصوصية",
+  "rentalPricePerDay": "/ يوم (سعر التأجير في اليوم)"
 }

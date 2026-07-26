@@ -466,6 +466,11 @@ export function ProductInfoPanel({
         <span className="text-2xl font-extrabold text-foreground">
           {activePrice.toLocaleString()} {t("egp")}
         </span>
+        {isRetail && (
+          <span className="text-sm font-medium text-gray-text">
+            {t("rentalPricePerDay")}
+          </span>
+        )}
         {oldPrice && (
           <>
             <span className="text-base text-gray-text line-through">{oldPrice.toLocaleString()} {t("egp")}</span>

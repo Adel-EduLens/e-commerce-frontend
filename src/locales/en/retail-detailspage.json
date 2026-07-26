@@ -4,5 +4,6 @@
   "depositAmount": "Deposit Amount:",
   "securityDeposit": "Security Deposit:",
   "termsAndConditions": "Terms & Conditions",
-  "privacyPolicy": "Privacy Policy"
+  "privacyPolicy": "Privacy Policy",
+  "rentalPricePerDay": "/ day (Rental price per day)"
 }
