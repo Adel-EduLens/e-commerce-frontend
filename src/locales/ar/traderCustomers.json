@@ -28,6 +28,8 @@
   "colTotal": "الإجمالي",
   "colStatus": "الحالة",
   "wholesale": "جملة",
+  "retail": "تجزئة",
+  "shop": "متجر",
   "searchPlaceholder": "البحث عن العملاء...",
   "customerActivity": "نشاط العملاء",
   "customersCount": "{{count}} عملاء",

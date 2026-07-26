@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCartStore, type CartItem } from "../../store/useCartStore";
 import { useCart } from "../../hooks/useCart";
+import { useUser } from "../../store/useAuthStore";
 import GoogleMapPicker from "../../components/shared/GoogleMap";
 import { api } from "../../lib/axios";
 import { toast } from "sonner";
@@ -64,6 +65,7 @@ type FormInputProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
+  disabled?: boolean;
 };
 
 type CheckoutFormData = {
@@ -376,17 +378,25 @@ function FormInput({
   value,
   onChange,
   className = "",
+  disabled = false,
 }: FormInputProps) {
   return (
     <div
-      className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${className}`}
+      className={`flex h-14 sm:h-16 items-center rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden transition-colors ${
+        disabled
+          ? "bg-gray-100 dark:bg-zinc-800/80 cursor-not-allowed"
+          : "bg-card"
+      } ${className}`}
     >
       <input
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none"
+        disabled={disabled}
+        className={`w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium placeholder:text-gray-text outline-none disabled:cursor-not-allowed bg-transparent ${
+          disabled ? "text-gray-500 dark:text-gray-400 font-semibold" : "text-foreground"
+        }`}
       />
     </div>
   );
@@ -490,6 +500,7 @@ function DeliverySection({
           placeholder="Email Address"
           value={data.email}
           onChange={(e) => onChange("email", e.target.value)}
+          disabled={true}
         />
 
         {isAddressesLoading && (
@@ -777,6 +788,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const user = useUser();
   const initialCoupon = (location.state?.appliedCoupon as Coupon | null) || null;
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
@@ -790,7 +802,7 @@ export default function CheckoutPage() {
     firstName: "",
     lastName: "",
     phone: "",
-    email: "",
+    email: user?.email || "",
     country: "",
     city: "",
     area: "",
@@ -803,6 +815,16 @@ export default function CheckoutPage() {
 
   const { isLoading: isCartLoading } = useCart();
   const { data: addresses = [], isLoading: isAddressesLoading } = useMyAddresses();
+
+  // Auto-populate user email when user is available
+  useEffect(() => {
+    if (user?.email) {
+      setFormData((prev) => ({
+        ...prev,
+        email: user.email || "",
+      }));
+    }
+  }, [user?.email]);
 
   // Auto-set initial country once countries load if none selected yet
   useEffect(() => {

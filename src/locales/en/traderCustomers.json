@@ -28,6 +28,8 @@
   "colTotal": "Total",
   "colStatus": "Status",
   "wholesale": "Wholesale",
+  "retail": "Retail",
+  "shop": "Shop",
   "searchPlaceholder": "Search customers...",
   "customerActivity": "Customer Activity",
   "customersCount": "{{count}} customers",
