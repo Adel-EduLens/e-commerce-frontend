@@ -43,6 +43,11 @@ const items: SidebarItem[] = [
     path: "/wallet-rewards",
   },
   {
+    icon: Gift,
+    labelKey: "prizeWheel",
+    path: "/prize-wheel",
+  },
+  {
     icon: User,
     labelKey: "myInfo",
     path: "/contact-details",

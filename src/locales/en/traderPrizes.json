@@ -1,0 +1,23 @@
+{
+  "title": "Prizes Control",
+  "namePlaceholder": "Name",
+  "weightPlaceholder": "Weight",
+  "adding": "Adding...",
+  "add": "Add",
+  "weightLabel": "Weight: ",
+  "delete": "Delete",
+  "confirmDelete": "Are you sure you want to delete this prize?",
+  "noPrizes": "No prizes yet.",
+  "loading": "Loading...",
+  "addSuccess": "Prize added successfully",
+  "addError": "An error occurred while adding the prize",
+  "deleteSuccess": "Prize deleted successfully",
+  "deleteError": "An error occurred while deleting the prize",
+  "nameRequired": "Name is required",
+  "weightMin": "Weight must be > 0",
+  "cancel": "Cancel",
+  "spinError": "Failed to spin the wheel. Please try again.",
+  "winnerMsg": "Winner: {{name}}",
+  "spinning": "Spinning...",
+  "spin": "Spin"
+}

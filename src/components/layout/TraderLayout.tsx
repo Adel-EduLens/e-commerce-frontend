@@ -109,6 +109,11 @@ const sidebarItems = [
     icon: "ion_notifications-outline.svg",
     path: "/dashboard/trader/notifications",
   },
+  {
+    label: "prizes",
+    icon: "solar_box-linear.svg",
+    path: "/dashboard/trader/prizes",
+  },
 ] as const;
 
 export default function TraderLayout() {
