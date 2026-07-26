@@ -9,6 +9,7 @@ export interface Category {
   image?: string;
   appearOnHome: boolean;
   isWholesale?: boolean;
+  isRental?: boolean;
   isRetail?: boolean;
   isShop?: boolean;
   type?: string;
@@ -50,6 +51,7 @@ const createCategory = async (data: {
   image?: string;
   appearOnHome: boolean;
   isWholesale?: boolean;
+  isRental?: boolean;
   isRetail?: boolean;
   isShop?: boolean;
   type?: string;
@@ -89,6 +91,7 @@ const updateCategory = async ({
     image?: string;
     appearOnHome?: boolean;
     isWholesale?: boolean;
+    isRental?: boolean;
     isRetail?: boolean;
     isShop?: boolean;
     type?: string;

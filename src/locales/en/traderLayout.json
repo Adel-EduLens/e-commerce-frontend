@@ -1,6 +1,6 @@
 {
     "overview": "Overview",
-    "retail": "Retail",
+    "retail": "Rental",
     "dropshipping": "Dropshipping",
     "wholesale": "Wholesale",
     "brandPartners": "Brand Partners",
@@ -26,8 +26,8 @@
     "Home Page Banner": "Home Page Banner",
     "Collections": "Collections",
     "designs": "Designs",
-    "Retail Categories": "Retail Categories",
-    "Retail Products": "Retail Products",
+    "Retail Categories": "Rental Categories",
+    "Retail Products": "Rental Products",
     "defaultTraderName": "Maan Hassan",
     "blankProduct": "Blank Products",
     "faqs": "FAQs",

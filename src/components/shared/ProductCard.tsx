@@ -48,7 +48,7 @@ type ImageType = {
   color?: string;
   productId?: string;
 };
-type CompareProductType = "SHOP" | "WHOLESALE" | "RETAIL";
+type CompareProductType = "SHOP" | "WHOLESALE" | "RENTAL" | "RETAIL";
 export type ProductCardProps = {
   title?: string;
   subtitle?: string;
@@ -69,7 +69,7 @@ export type ProductCardProps = {
   description?: string;
   isFlashDeals?: boolean;
   productId?: string;
-  productType?: "SHOP" | "WHOLESALE" | "RETAIL";
+  productType?: "SHOP" | "WHOLESALE" | "RENTAL" | "RETAIL";
   showTypeBadge?: boolean;
   brand?: string;
   category?: string;
@@ -165,8 +165,8 @@ export default function ProductCard({
     "unknown-id";
 
   const computedTo =
-    productType === "RETAIL"
-      ? `/retail/shop/${actualProductId}`
+    productType === "RENTAL" || productType === "RETAIL"
+      ? `/rental/shop/${actualProductId}`
       : productType === "WHOLESALE"
         ? `/wholesale/${actualProductId}`
         : `/product-details/${actualProductId}`;

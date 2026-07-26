@@ -16,7 +16,7 @@ const navLinks = [
   { label: "home", path: "/" },
   { label: "shop", path: "/products" },
   { label: "wholesale", path: "/wholesale" },
-  { label: "retail", path: "/retail" },
+  { label: "retail", path: "/rental" },
   { label: "designLab", path: "/createYourDesign" },
   { label: "dropshipping", path: "/dropshipping" },
 ];
@@ -122,8 +122,8 @@ function NotificationBell() {
                   const msgLower = ((n.message ?? n.body) || "").toLowerCase();
                   if (titleLower.includes("wholesale") || msgLower.includes("wholesale")) {
                     navigate(`/wholesale/${n.productId}`);
-                  } else if (titleLower.includes("retail") || msgLower.includes("retail")) {
-                    navigate(`/retail/${n.productId}`);
+                  } else if (titleLower.includes("rental") || titleLower.includes("retail") || msgLower.includes("rental") || msgLower.includes("retail")) {
+                    navigate(`/rental/${n.productId}`);
                   } else {
                     navigate(`/product-details/${n.productId}`);
                   }

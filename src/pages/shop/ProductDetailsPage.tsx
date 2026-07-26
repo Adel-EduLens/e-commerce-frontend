@@ -94,6 +94,7 @@ export default function ProductDetailsPage() {
     price:
       product.price ??
       product.shopPrice ??
+      product.rentalPrice ??
       product.retailPrice ??
       product.wholesalePrice ??
       0,

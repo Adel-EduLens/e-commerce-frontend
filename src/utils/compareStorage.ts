@@ -1,4 +1,4 @@
-export type CompareProductType = "SHOP" | "RETAIL" | "WHOLESALE";
+export type CompareProductType = "SHOP" | "RENTAL" | "RETAIL" | "WHOLESALE";
 
 export interface CompareItem {
   id: string;
