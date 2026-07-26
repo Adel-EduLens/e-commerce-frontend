@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
+import { useCollections } from "../../hooks/queries/collectionsQuery";
 import {
   useCreateProduct,
   useUpdateProduct,
@@ -75,6 +76,13 @@ export function UnifiedProductModal({
     isEditing && item.type === "retail" ? item.categoryIds || [] : [],
   );
   const [brandId, setBrandId] = useState(item?.brandId || "");
+  const [collectionIds, setCollectionIds] = useState<string[]>(
+    isEditing && (item as any)?.collections
+      ? (item as any).collections.map((c: any) => String(c.id))
+      : (isEditing && (item as any)?.collectionIds
+      ? (item as any).collectionIds.map((id: any) => String(id))
+      : []),
+  );
   const [description, setDescription] = useState(item?.description || "");
   const [sku, setSku] = useState(item?.sku || "");
 
@@ -160,6 +168,7 @@ export function UnifiedProductModal({
   const wholesaleCategories = categories.filter((c) => c.isWholesale);
   const retailCategories = categories.filter((c) => c.isRental || c.isRetail);
   const { data: brands = [] } = useBrands();
+  const { data: collections = [] } = useCollections();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
 
@@ -276,6 +285,12 @@ export function UnifiedProductModal({
             mappedColors.map((c: { color: string }) => c.color),
           );
         }
+
+        if ((fullProduct as any).collections && Array.isArray((fullProduct as any).collections)) {
+          setCollectionIds((fullProduct as any).collections.map((c: any) => String(c.id)));
+        } else if ((fullProduct as any).collectionIds && Array.isArray((fullProduct as any).collectionIds)) {
+          setCollectionIds((fullProduct as any).collectionIds.map((id: any) => String(id)));
+        }
       } else if (isEditing && item) {
         const catIds = item.categoryIds || [];
         if (catIds.length > 0) {
@@ -285,6 +300,11 @@ export function UnifiedProductModal({
         }
         if (item.flashDealEndsAt) {
           setFlashDealEndsAt(formatForDateTimeLocal(item.flashDealEndsAt));
+        }
+        if ((item as any).collections && Array.isArray((item as any).collections)) {
+          setCollectionIds((item as any).collections.map((c: any) => String(c.id)));
+        } else if ((item as any).collectionIds && Array.isArray((item as any).collectionIds)) {
+          setCollectionIds((item as any).collectionIds.map((id: any) => String(id)));
         }
       }
     };
@@ -457,8 +477,14 @@ export function UnifiedProductModal({
             payload.sizeguide = await uploadImageFile(sizeguide);
           }
         }
+        if (collectionIds && collectionIds.length > 0) {
+          payload.collectionIds = collectionIds;
+        } else {
+          payload.collectionIds = [];
+        }
       } else {
         payload.shopPrice = null;
+        payload.collectionIds = [];
       }
 
       if (isWholesale) {
@@ -694,6 +720,20 @@ export function UnifiedProductModal({
                         }))}
                         selected={shopCategoryIds}
                         onChange={setShopCategoryIds}
+                      />
+                    </div>
+                    <div className="col-span-2 space-y-1">
+                      <label className="text-xs font-semibold text-gray-text">
+                        {tShared("collections") || "Collections (Optional)"}
+                      </label>
+                      <MultiSelect
+                        label={tShared("selectCollection") || "Select Collection(s)"}
+                        options={collections.map((c) => ({
+                          value: c.id,
+                          label: c.name,
+                        }))}
+                        selected={collectionIds}
+                        onChange={setCollectionIds}
                       />
                     </div>
                     <input

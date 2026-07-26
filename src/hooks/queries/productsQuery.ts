@@ -71,6 +71,11 @@ export interface Product {
     id: string;
     material: string;
   }[];
+  collections?: {
+    id: string;
+    name: string;
+  }[];
+  collectionIds?: string[];
 
   images: {
     id: string;
@@ -328,6 +333,8 @@ export interface ProductFormData {
   wholesalePrice?: number | null;
   categoryIds?: string[];
   brandId?: string;
+  collectionId?: string | null;
+  collectionIds?: string[] | null;
   images: { url: string; color: string; direction?: string }[];
   sizes?: string[] | { size: string; quantity: number }[];
   colors: string[] | ProductColorPayload[];
