@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Gift, Send } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   useReceivedGiftCards,
   useSentGiftCards,
@@ -17,6 +18,7 @@ function GiftCardCard({
   gc: GiftCard;
   type: GiftCardTab;
 }) {
+  const { t } = useTranslation("productSection");
   const redeemMutation = useRedeemGiftCard();
 
   const formattedDate = gc.createdAt
@@ -28,7 +30,9 @@ function GiftCardCard({
     : "Aug 15, 2025";
 
   const isRedeemed = gc.status === "REDEEMED";
-  const displayStatus = isRedeemed ? "Redeemed" : "Delivered";
+  const displayStatus = isRedeemed
+    ? t("redeemed", "Redeemed")
+    : t("delivered", "Delivered");
 
   return (
     <div className="relative flex items-start sm:items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl border border-stroke bg-card shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:shadow-md transition-all font-['Montserrat']">
@@ -51,22 +55,22 @@ function GiftCardCard({
       <div className="flex flex-col justify-center gap-1 min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight truncate">
-            {gc.name || "Gift Card"}
+            {gc.name || t("giftCard", "Gift Card")}
           </h3>
         </div>
 
         {type === "received" ? (
           <div className="text-xs sm:text-sm text-foreground truncate mt-0.5">
-            <span className="text-gray-text font-normal">Sent from: </span>
+            <span className="text-gray-text font-normal">{t("sentFrom", "Sent from:")} </span>
             <span className="font-bold text-foreground">
-              {gc.senderName || gc.senderEmail || "Store"}
+              {gc.senderName || gc.senderEmail || t("store", "Store")}
             </span>
           </div>
         ) : (
           <div className="text-xs sm:text-sm text-foreground truncate mt-0.5">
-            <span className="text-gray-text font-normal">Sent to: </span>
+            <span className="text-gray-text font-normal">{t("sentTo", "Sent to:")} </span>
             <span className="font-bold text-foreground">
-              {gc.recipientName || gc.recipientEmail || "Recipient"}
+              {gc.recipientName || gc.recipientEmail || t("recipient", "Recipient")}
             </span>
             {gc.recipientEmail && gc.recipientName && (
               <span className="text-gray-text font-normal"> ({gc.recipientEmail})</span>
@@ -75,12 +79,12 @@ function GiftCardCard({
         )}
 
         <div className="text-xs sm:text-sm text-foreground">
-          <span className="text-gray-text font-normal">Value: </span>
-          <span className="font-bold text-foreground">{gc.balance || gc.amount} EGP</span>
+          <span className="text-gray-text font-normal">{t("value", "Value:")} </span>
+          <span className="font-bold text-foreground">{gc.balance || gc.amount} {t("egp", "EGP")}</span>
         </div>
 
         <div className="text-xs sm:text-sm text-foreground">
-          <span className="text-gray-text font-normal">Status: </span>
+          <span className="text-gray-text font-normal">{t("status", "Status:")} </span>
           <span className="font-bold text-foreground capitalize">{displayStatus}</span>
         </div>
 
@@ -91,14 +95,14 @@ function GiftCardCard({
         )}
 
         <div className="text-xs text-gray-text mt-1 font-normal">
-          Date: {formattedDate}
+          {t("date", "Date:")} {formattedDate}
         </div>
 
         {type === "received" && (
           <div className="pt-2">
             {isRedeemed ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
-                ✓ Redeemed
+                {t("redeemedBadge", "✓ Redeemed")}
               </span>
             ) : (
               <button
@@ -107,7 +111,9 @@ function GiftCardCard({
                 disabled={redeemMutation.isPending}
                 className="w-full sm:w-auto rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition hover:opacity-90 active:scale-95 disabled:opacity-50"
               >
-                {redeemMutation.isPending ? "Redeeming..." : "Redeem Gift Card"}
+                {redeemMutation.isPending
+                  ? t("redeeming", "Redeeming...")
+                  : t("redeemGiftCard", "Redeem Gift Card")}
               </button>
             )}
           </div>
@@ -118,6 +124,7 @@ function GiftCardCard({
 }
 
 export default function MyGiftCardsPage() {
+  const { t } = useTranslation("productSection");
   const location = useLocation();
   const initialTab: GiftCardTab = (location.state?.activeTab as GiftCardTab) || "sent";
   const [activeTab, setActiveTab] = useState<GiftCardTab>(initialTab);
@@ -126,8 +133,8 @@ export default function MyGiftCardsPage() {
   const sentQuery = useSentGiftCards();
 
   const tabs: { key: GiftCardTab; label: string; icon: typeof Gift }[] = [
-    { key: "received", label: "My Gift Cards", icon: Gift },
-    { key: "sent", label: "Gift Cards I Sent", icon: Send },
+    { key: "received", label: t("myGiftCards", "My Gift Cards"), icon: Gift },
+    { key: "sent", label: t("giftCardsISent", "Gift Cards I Sent"), icon: Send },
   ];
 
   const currentQuery = activeTab === "received" ? receivedQuery : sentQuery;
@@ -138,9 +145,9 @@ export default function MyGiftCardsPage() {
       {/* Header & Tabs */}
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Gift Cards</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t("giftCards", "Gift Cards")}</h1>
           <p className="text-xs sm:text-sm text-gray-text mt-1">
-            Manage gift cards you have received or sent to friends and family
+            {t("manageGiftCardsSubtitle", "Manage gift cards you have received or sent to friends and family")}
           </p>
         </div>
 
@@ -173,11 +180,11 @@ export default function MyGiftCardsPage() {
       {/* Content Section */}
       {isLoading ? (
         <div className="py-12 text-center text-xs sm:text-sm text-gray-text">
-          Loading gift cards...
+          {t("loadingGiftCards", "Loading gift cards...")}
         </div>
       ) : isError ? (
         <div className="py-12 text-center text-xs sm:text-sm text-red-500">
-          Failed to load gift cards. Please try again.
+          {t("failedToLoadGiftCards", "Failed to load gift cards. Please try again.")}
         </div>
       ) : giftCards.length === 0 ? (
         <div className="rounded-2xl border border-stroke bg-card p-12 text-center space-y-3">
@@ -186,13 +193,13 @@ export default function MyGiftCardsPage() {
           </div>
           <h3 className="font-bold text-foreground text-sm sm:text-base">
             {activeTab === "received"
-              ? "No Gift Cards Received Yet"
-              : "No Gift Cards Sent Yet"}
+              ? t("noGiftCardsReceivedYet", "No Gift Cards Received Yet")
+              : t("noGiftCardsSentYet", "No Gift Cards Sent Yet")}
           </h3>
           <p className="text-xs sm:text-sm text-gray-text max-w-sm mx-auto">
             {activeTab === "received"
-              ? "When someone sends you a gift card, it will appear here with your balance and redemption details."
-              : "Gift cards you purchase and send to others will be displayed here."}
+              ? t("noGiftCardsReceivedSubtitle", "When someone sends you a gift card, it will appear here with your balance and redemption details.")
+              : t("noGiftCardsSentSubtitle", "Gift cards you purchase and send to others will be displayed here.")}
           </p>
         </div>
       ) : (
