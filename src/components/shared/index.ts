@@ -7,4 +7,4 @@ export { default as AccountSidebar } from './AccountSidebar'
 export { default as CollapsibleFAQ } from './CollapsibleFAQ'
 export { default as LoadingSpinner } from './LoadingSpinner'
 export { default as FilterCategory } from './FilterCategory'
-
+export { default as TermsModal } from './TermsModal'

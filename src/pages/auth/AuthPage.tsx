@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next'
 import { Globe, ChevronDown } from 'lucide-react'
 import { handleApiError } from '../../lib/utils';
 import { Toggle } from '../../components/ui'
+import { TermsModal } from '../../components/shared'
+
 
 interface AuthPageProps {
   mode: 'login' | 'signup'
@@ -25,7 +27,9 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
+  const [showTermsModal, setShowTermsModal] = useState(false)
   const navigate = useNavigate()
+
   const setAuth = useAuthStore((state) => state.setAuth)
   const { t, i18n } = useTranslation('auth')
   const isRTL = i18n.language?.startsWith('ar')
@@ -392,8 +396,31 @@ export default function AuthPage({ mode }: AuthPageProps) {
                             size="sm"
                           />
                           <span className="font-['Montserrat'] text-[13px] font-medium leading-[20px] tracking-[0.3px] text-foreground">
-                            {t('agreeTerms')}
+                            {isRTL ? (
+                              <>
+                                أوافق على{" "}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowTermsModal(true)}
+                                  className="text-info underline hover:text-primary transition font-semibold cursor-pointer"
+                                >
+                                  الشروط والأحكام
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                I agree to the{" "}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowTermsModal(true)}
+                                  className="text-info underline hover:text-primary transition font-semibold cursor-pointer"
+                                >
+                                  Terms & Conditions
+                                </button>
+                              </>
+                            )}
                           </span>
+
                         </div>
                       </div>
                     </div>
@@ -454,6 +481,10 @@ export default function AuthPage({ mode }: AuthPageProps) {
           </div>
         </div>
       </div>
+      {showTermsModal && (
+        <TermsModal onClose={() => setShowTermsModal(false)} />
+      )}
     </div>
+
   )
 }

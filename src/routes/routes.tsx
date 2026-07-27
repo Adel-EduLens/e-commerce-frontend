@@ -76,6 +76,7 @@ import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
 import GiftCardDetailsPage from "../pages/shop/GiftCardDetailsPage";
 import PrizeWheel from "../components/ui/PrizeWheel";
 import PrizeControllerPage from "../pages/dashboards/trader/PrizeControllerPage";
+import TraderTermsPage from "../pages/dashboards/trader/TraderTermsPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -431,6 +432,10 @@ export const router = createBrowserRouter([
           {
             path: "prizes",
             element: <PrizeControllerPage />,
+          },
+          {
+            path: "terms",
+            element: <TraderTermsPage />,
           },
         ],
       },
