@@ -47,6 +47,7 @@ type OrderSummaryProps = {
   setAppliedCoupon: (val: Coupon | null) => void;
   couponError: string;
   setCouponError: (val: string) => void;
+  isGiftCardOnly?: boolean;
 };
 
 type SelectOption = { label: string; value: string } | string;
@@ -95,6 +96,7 @@ type DeliverySectionProps = {
   availableCities: ShippingCity[];
   isCountriesLoading: boolean;
   isCitiesLoading: boolean;
+  isGiftCardOnly?: boolean;
 };
 
 // =======================================================
@@ -185,6 +187,7 @@ function OrderSummary({
   setAppliedCoupon,
   couponError,
   setCouponError,
+  isGiftCardOnly = false,
 }: OrderSummaryProps) {
   const [isValidating, setIsValidating] = useState(false);
 
@@ -258,9 +261,15 @@ function OrderSummary({
               <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
                 {item.title}
               </div>
-              <div className="font-['Montserrat'] text-sm font-medium text-gray-500">
-                Size: {item.size} &middot; Color: {item.color}
-              </div>
+              {item.productType !== "GIFT_CARD" &&
+                item.size &&
+                item.color &&
+                item.size !== "Default" &&
+                item.color !== "Default" && (
+                  <div className="font-['Montserrat'] text-sm font-medium text-gray-500">
+                    Size: {item.size} &middot; Color: {item.color}
+                  </div>
+                )}
               <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
                 {formatCurrency(item.unitPrice * item.quantity)}
               </div>
@@ -269,48 +278,52 @@ function OrderSummary({
         ))}
       </div>
       <div className="flex flex-col gap-4">
-        <div className="flex items-center overflow-hidden rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke">
-          <input
-            placeholder="Enter discount code"
-            value={couponCode}
-            onChange={(e) => setCouponCode(e.target.value)}
-            disabled={isValidating || !!appliedCoupon}
-            className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-card disabled:bg-gray-50"
-          />
-          {appliedCoupon ? (
-            <button
-              onClick={() => {
-                setAppliedCoupon(null);
-                setCouponCode("");
-                setCouponError("");
-              }}
-              className="flex h-14 sm:h-16 items-center justify-center bg-red-500 px-4 sm:px-6"
-            >
-              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
-                Remove
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={handleApplyCoupon}
-              disabled={isValidating || !couponCode.trim()}
-              className="flex h-14 sm:h-16 items-center justify-center bg-primary px-4 sm:px-6 disabled:opacity-50"
-            >
-              <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
-                {isValidating ? "Applying..." : "Apply"}
-              </span>
-            </button>
-          )}
-        </div>
-        {couponError && (
-          <div className="text-red-500 text-xs font-semibold px-1">
-            {couponError}
-          </div>
-        )}
-        {appliedCoupon && (
-          <div className="text-green-600 text-xs font-semibold px-1">
-            Discount Applied: {appliedCoupon.discount}% OFF
-          </div>
+        {!isGiftCardOnly && (
+          <>
+            <div className="flex items-center overflow-hidden rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke">
+              <input
+                placeholder="Enter discount code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={isValidating || !!appliedCoupon}
+                className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-card disabled:bg-gray-50"
+              />
+              {appliedCoupon ? (
+                <button
+                  onClick={() => {
+                    setAppliedCoupon(null);
+                    setCouponCode("");
+                    setCouponError("");
+                  }}
+                  className="flex h-14 sm:h-16 items-center justify-center bg-red-500 px-4 sm:px-6"
+                >
+                  <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
+                    Remove
+                  </span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleApplyCoupon}
+                  disabled={isValidating || !couponCode.trim()}
+                  className="flex h-14 sm:h-16 items-center justify-center bg-primary px-4 sm:px-6 disabled:opacity-50"
+                >
+                  <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
+                    {isValidating ? "Applying..." : "Apply"}
+                  </span>
+                </button>
+              )}
+            </div>
+            {couponError && (
+              <div className="text-red-500 text-xs font-semibold px-1">
+                {couponError}
+              </div>
+            )}
+            {appliedCoupon && (
+              <div className="text-green-600 text-xs font-semibold px-1">
+                Discount Applied: {appliedCoupon.discount}% OFF
+              </div>
+            )}
+          </>
         )}
         <div className="flex flex-col gap-3 border-b border-stroke pb-4">
           <div className="flex items-center justify-between">
@@ -331,14 +344,16 @@ function OrderSummary({
               </span>
             </div>
           )}
-          <div className="flex items-center justify-between">
-            <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
-              Estimated Shipping
-            </span>
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
-              {formatCurrency(shipping)}
-            </span>
-          </div>
+          {!isGiftCardOnly && (
+            <div className="flex items-center justify-between">
+              <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
+                Estimated Shipping
+              </span>
+              <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+                {formatCurrency(shipping)}
+              </span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
               Estimated Taxes
@@ -458,6 +473,7 @@ function DeliverySection({
   availableCities,
   isCountriesLoading,
   isCitiesLoading,
+  isGiftCardOnly = false,
 }: DeliverySectionProps) {
   const countryOptions = useMemo(() => {
     return countries.map((c) => ({
@@ -476,7 +492,7 @@ function DeliverySection({
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
       <h2 className="font-['Montserrat'] text-2xl sm:text-4xl font-bold text-foreground">
-        DELIVERY
+        {isGiftCardOnly ? "USER INFORMATION" : "DELIVERY"}
       </h2>
       <div className="flex flex-col gap-4 sm:gap-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -503,137 +519,141 @@ function DeliverySection({
           disabled={true}
         />
 
-        {isAddressesLoading && (
-          <div className="p-6 text-center text-sm text-gray-text">
-            Saved Addresses are loading...
-          </div>
-        )}
-        {!isAddressesLoading && addresses && addresses.length > 0 && (
-          <SavedAddressesSection
-            addresses={addresses}
-            selectedAddressId={selectedAddressId}
-            onSelect={onSelectAddress}
-          />
-        )}
+        {!isGiftCardOnly && (
+          <>
+            {isAddressesLoading && (
+              <div className="p-6 text-center text-sm text-gray-text">
+                Saved Addresses are loading...
+              </div>
+            )}
+            {!isAddressesLoading && addresses && addresses.length > 0 && (
+              <SavedAddressesSection
+                addresses={addresses}
+                selectedAddressId={selectedAddressId}
+                onSelect={onSelectAddress}
+              />
+            )}
 
-        {/* Dynamic Country & City Select Options */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormSelect
-            placeholder={
-              isCountriesLoading ? "Loading countries..." : "Select Country"
-            }
-            value={data.country}
-            onChange={(e) => onCountryChange(e.target.value)}
-            options={countryOptions}
-            disabled={isCountriesLoading || countryOptions.length === 0}
-          />
-          <FormSelect
-            placeholder={
-              !data.country
-                ? "Select Country first"
-                : isCitiesLoading
-                ? "Loading cities..."
-                : cityOptions.length === 0
-                ? "No cities available"
-                : "Select City"
-            }
-            value={data.city}
-            onChange={(e) => onChange("city", e.target.value)}
-            options={cityOptions}
-            disabled={
-              !data.country || isCitiesLoading || cityOptions.length === 0
-            }
-          />
-        </div>
-
-        <FormInput
-          placeholder="Area"
-          value={data.area}
-          onChange={(e) => onChange("area", e.target.value)}
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          <FormInput
-            placeholder="Street Address"
-            value={data.streetAddress}
-            onChange={(e) => onChange("streetAddress", e.target.value)}
-          />
-          <FormInput
-            placeholder="Apartment"
-            value={data.apartment}
-            onChange={(e) => onChange("apartment", e.target.value)}
-          />
-        </div>
-
-        {/* Confirmed Map Location Field */}
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-secondary shrink-0" />
-            <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
-              Confirmed Delivery Coordinates
-            </span>
-          </div>
-
-          {!data.mapAddress ? (
-            <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-50/50 dark:bg-zinc-900/50 text-gray-text transition-all duration-300">
-              <Compass className="h-5 w-5 text-gray-400 animate-pulse shrink-0" />
-              <p className="font-['Montserrat'] text-xs sm:text-sm font-medium">
-                No location confirmed yet. Please select your delivery location
-                on the map below and click{" "}
-                <span className="font-semibold text-foreground">
-                  Confirm Location
-                </span>
-                .
-              </p>
+            {/* Dynamic Country & City Select Options */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <FormSelect
+                placeholder={
+                  isCountriesLoading ? "Loading countries..." : "Select Country"
+                }
+                value={data.country}
+                onChange={(e) => onCountryChange(e.target.value)}
+                options={countryOptions}
+                disabled={isCountriesLoading || countryOptions.length === 0}
+              />
+              <FormSelect
+                placeholder={
+                  !data.country
+                    ? "Select Country first"
+                    : isCitiesLoading
+                    ? "Loading cities..."
+                    : cityOptions.length === 0
+                    ? "No cities available"
+                    : "Select City"
+                }
+                value={data.city}
+                onChange={(e) => onChange("city", e.target.value)}
+                options={cityOptions}
+                disabled={
+                  !data.country || isCitiesLoading || cityOptions.length === 0
+                }
+              />
             </div>
-          ) : (
-            <div className="relative overflow-hidden rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/10 dark:from-green-500/10 dark:to-emerald-500/10 p-4 sm:p-5 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] transition-all duration-300">
-              <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-green-500/5 blur-xl pointer-events-none" />
 
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
-                  <CheckCircle2 className="h-6 w-6" />
-                </div>
-                <div className="flex-1 space-y-1.5 min-w-0">
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="font-['Montserrat'] text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
-                      Confirmed Map Address
+            <FormInput
+              placeholder="Area"
+              value={data.area}
+              onChange={(e) => onChange("area", e.target.value)}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <FormInput
+                placeholder="Street Address"
+                value={data.streetAddress}
+                onChange={(e) => onChange("streetAddress", e.target.value)}
+              />
+              <FormInput
+                placeholder="Apartment"
+                value={data.apartment}
+                onChange={(e) => onChange("apartment", e.target.value)}
+              />
+            </div>
+
+            {/* Confirmed Map Location Field */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-secondary shrink-0" />
+                <span className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+                  Confirmed Delivery Coordinates
+                </span>
+              </div>
+
+              {!data.mapAddress ? (
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-50/50 dark:bg-zinc-900/50 text-gray-text transition-all duration-300">
+                  <Compass className="h-5 w-5 text-gray-400 animate-pulse shrink-0" />
+                  <p className="font-['Montserrat'] text-xs sm:text-sm font-medium">
+                    No location confirmed yet. Please select your delivery location
+                    on the map below and click{" "}
+                    <span className="font-semibold text-foreground">
+                      Confirm Location
                     </span>
-                    {data.latitude && data.longitude && (
-                      <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-green-700 dark:text-green-300">
-                        {parseFloat(data.latitude).toFixed(5)},{" "}
-                        {parseFloat(data.longitude).toFixed(5)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground leading-relaxed break-words">
-                    {data.mapAddress}
+                    .
                   </p>
                 </div>
-              </div>
-            </div>
-          )}
-        </div>
+              ) : (
+                <div className="relative overflow-hidden rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/10 dark:from-green-500/10 dark:to-emerald-500/10 p-4 sm:p-5 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] transition-all duration-300">
+                  <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-green-500/5 blur-xl pointer-events-none" />
 
-        <div className="flex flex-col gap-4">
-          <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
-            Select on Map
-          </div>
-          <GoogleMapPicker
-            onLocationPick={(loc) => {
-              const fullAddr =
-                loc.displayAddress ||
-                [loc.streetAddress, loc.area, loc.city]
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
+                      <CheckCircle2 className="h-6 w-6" />
+                    </div>
+                    <div className="flex-1 space-y-1.5 min-w-0">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="font-['Montserrat'] text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                          Confirmed Map Address
+                        </span>
+                        {data.latitude && data.longitude && (
+                          <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-green-700 dark:text-green-300">
+                            {parseFloat(data.latitude).toFixed(5)},{" "}
+                            {parseFloat(data.longitude).toFixed(5)}
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground leading-relaxed break-words">
+                        {data.mapAddress}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="font-['Montserrat'] text-sm sm:text-base font-bold text-foreground">
+                Select on Map
+              </div>
+              <GoogleMapPicker
+                onLocationPick={(loc) => {
+                  const fullAddr =
+                    loc.displayAddress ||
+                    [loc.streetAddress, loc.area, loc.city]
+                      .filter(Boolean)
+                      .join(", ");
+                  onChange("mapAddress", fullAddr);
+                  if (loc.lat) onChange("latitude", loc.lat.toString());
+                  if (loc.lng) onChange("longitude", loc.lng.toString());
+                }}
+                searchQuery={[data.streetAddress, data.city, data.country]
                   .filter(Boolean)
-                  .join(", ");
-              onChange("mapAddress", fullAddr);
-              if (loc.lat) onChange("latitude", loc.lat.toString());
-              if (loc.lng) onChange("longitude", loc.lng.toString());
-            }}
-            searchQuery={[data.streetAddress, data.city, data.country]
-              .filter(Boolean)
-              .join(", ")}
-          />
-        </div>
+                  .join(", ")}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -866,6 +886,13 @@ export default function CheckoutPage() {
     return cities.filter((c) => c.countryId === selectedCountryObj.id);
   }, [cities, selectedCountryObj]);
 
+  const isGiftCardOnly = useMemo(() => {
+    if (checkoutItems.length === 0) return false;
+    return checkoutItems.every(
+      (item) => item.productType === "GIFT_CARD" || item.id?.includes("gift-card") || item.productId?.includes("gift-card")
+    );
+  }, [checkoutItems]);
+
   // Match selected city object for dynamic shipping cost
   const selectedCityObj = useMemo(() => {
     if (!formData.city) return undefined;
@@ -876,11 +903,12 @@ export default function CheckoutPage() {
 
   // Calculate dynamic shipping cost based on selected city
   const shipping = useMemo(() => {
+    if (isGiftCardOnly) return 0;
     if (selectedCityObj && typeof selectedCityObj.shippingCost === "number") {
       return selectedCityObj.shippingCost;
     }
     return 50; // Fallback shipping cost
-  }, [selectedCityObj]);
+  }, [isGiftCardOnly, selectedCityObj]);
 
   // Redirect back to bag if any wholesale item doesn't meet minimum order
   useEffect(() => {
@@ -994,22 +1022,59 @@ export default function CheckoutPage() {
       toast.error("Please fill in all required contact details");
       return;
     }
-    if (
-      !formData.country ||
-      !formData.city ||
-      !formData.area ||
-      !formData.streetAddress
-    ) {
-      toast.error("Please fill in all delivery address details");
-      return;
-    }
-    if (!formData.mapAddress) {
-      toast.error("Please select and confirm your delivery location on the map");
-      return;
+
+    if (!isGiftCardOnly) {
+      if (
+        !formData.country ||
+        !formData.city ||
+        !formData.area ||
+        !formData.streetAddress
+      ) {
+        toast.error("Please fill in all delivery address details");
+        return;
+      }
+      if (!formData.mapAddress) {
+        toast.error("Please select and confirm your delivery location on the map");
+        return;
+      }
     }
 
     try {
       setIsSubmitting(true);
+
+      if (isGiftCardOnly) {
+        const giftCardPayload = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          email: formData.email,
+          items: checkoutItems.map((item) => ({
+            id: item.id,
+            productId: item.productId,
+            title: item.title,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            recipientName: item.recipientName || null,
+            recipientEmail: item.recipientEmail || null,
+            giftMessage: item.giftMessage || null,
+          })),
+        };
+
+        await api.post("/gift-cards/purchase", giftCardPayload);
+
+        if (!isDirectBuy) {
+          await clearCart();
+          queryClient.invalidateQueries({ queryKey: ["cart"] });
+        }
+
+        queryClient.invalidateQueries({ queryKey: ["sentGiftCards"] });
+        queryClient.invalidateQueries({ queryKey: ["receivedGiftCards"] });
+
+        toast.success("Gift card sent successfully!");
+        navigate("/my-gift-cards", { state: { activeTab: "sent" } });
+        return;
+      }
+
       const orderPayload = {
         ...formData,
         subtotal,
@@ -1080,6 +1145,7 @@ export default function CheckoutPage() {
             availableCities={availableCities}
             isCountriesLoading={isCountriesLoading}
             isCitiesLoading={isCitiesLoading}
+            isGiftCardOnly={isGiftCardOnly}
           />
           <PaymentMethodSection />
           <RememberMeSection onPay={handleCheckout} loading={isSubmitting} />
@@ -1097,6 +1163,7 @@ export default function CheckoutPage() {
             setAppliedCoupon={setAppliedCoupon}
             couponError={couponError}
             setCouponError={setCouponError}
+            isGiftCardOnly={isGiftCardOnly}
           />
         </div>
       </div>

@@ -20,7 +20,6 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
   const isEditing = !!item;
 
   const [name, setName] = useState(item?.product || "Gift Card");
-  const [sku, setSku] = useState(item?.sku || "");
   const [amounts, setAmounts] = useState(
     item?.giftCardAmounts || "10,15,50,75,100,150,200"
   );
@@ -42,7 +41,6 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
   useEffect(() => {
     if (isEditing && fullGiftCard) {
       if (fullGiftCard.name) setName(fullGiftCard.name);
-      if (fullGiftCard.code) setSku(fullGiftCard.code);
       if (fullGiftCard.description) setDescription(fullGiftCard.description);
       if (fullGiftCard.amount != null) setPrice(fullGiftCard.amount.toString());
       if (fullGiftCard.amounts != null) setAmounts(fullGiftCard.amounts);
@@ -93,13 +91,6 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
       return;
     }
 
-    if (!sku.trim()) {
-      const msg = "Code / SKU is required.";
-      setError(msg);
-      toast.error(msg);
-      return;
-    }
-
     if (!amounts.trim()) {
       const msg = "Preset Denominations (Amounts) are required.";
       setError(msg);
@@ -113,7 +104,6 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
       const payload: GiftCardFormData = {
         name,
         description,
-        code: sku,
         amount: Number(price) || 1000,
         amounts,
         stock: stock ? Number(stock) : 100,
@@ -196,19 +186,6 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
                 placeholder="e.g. GENZ Gift Card"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
-              />
-            </div>
-
-            {/* Code / SKU */}
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-text">
-                Code / SKU *
-              </label>
-              <input
-                placeholder="e.g. GC-1000"
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
                 className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
               />
             </div>

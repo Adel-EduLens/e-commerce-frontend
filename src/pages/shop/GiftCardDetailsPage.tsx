@@ -1,61 +1,33 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Star, MessageSquare, X } from "lucide-react";
+import { Star } from "lucide-react";
 import { ProductCard } from "../../components/shared";
 import { useGiftCard } from "../../hooks/queries/giftCardsQuery";
 import { useProducts } from "../../hooks/queries/productsQuery";
-import { useReviews, useCreateReview } from "../../hooks/queries/reviewQuery";
+import { useProductReviews } from "../../hooks/queries/reviewQuery";
+import { Star as StarIcon } from "../../components/ui/star";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useCartStore } from "../../store/useCartStore";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { api } from "../../lib/axios";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { ReviewsSection } from "../../components/product/ReviewsSection";
 
 export default function GiftCardDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation("productSection");
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   const { data: giftCard, isLoading, isError } = useGiftCard(id);
   const { data: recommendedData } = useProducts({ limit: 4, type: "SHOP" });
-  const { data: reviews = [], isLoading: isReviewsLoading } = useReviews(id);
-  const createReviewMutation = useCreateReview(id || "");
+  const { data: reviews = [] } = useProductReviews(id);
 
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [newRating, setNewRating] = useState(5);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [newComment, setNewComment] = useState("");
-
-  const handleAddReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isAuthenticated) {
-      toast.error("Please login to write a review");
-      navigate("/login");
-      return;
-    }
-    if (!id) return;
-
-    createReviewMutation.mutate(
-      {
-        productId: id,
-        rating: newRating,
-        comment: newComment.trim(),
-      },
-      {
-        onSuccess: () => {
-          toast.success("Thank you! Your review has been published.");
-          setShowReviewModal(false);
-          setNewComment("");
-          setNewRating(5);
-        },
-        onError: (err: any) => {
-          const errMsg = err?.response?.data?.message || "Failed to submit review";
-          toast.error(errMsg);
-        },
-      }
-    );
-  };
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return Number((sum / reviews.length).toFixed(1));
+  }, [reviews]);
 
   // Parsed amounts list from giftCard or defaults
   const parsedAmounts = useMemo(() => {
@@ -76,6 +48,7 @@ export default function GiftCardDetailsPage() {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<{ recipientName?: string; recipientEmail?: string; customAmount?: string }>({});
+  const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
     if (giftCard?.amount) {
@@ -93,8 +66,14 @@ export default function GiftCardDetailsPage() {
     return selectedAmount;
   }, [isCustom, customAmount, selectedAmount]);
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!giftCard) return;
+
+    if (!isAuthenticated) {
+      toast.error("Please login to send a gift card");
+      navigate("/login");
+      return;
+    }
 
     const newErrors: { recipientName?: string; recipientEmail?: string; customAmount?: string } = {};
 
@@ -109,12 +88,15 @@ export default function GiftCardDetailsPage() {
       newErrors.recipientName = "Recipient name is required";
     }
 
-    if (!recipientEmail.trim()) {
+    const recEmailFormatted = recipientEmail.trim().toLowerCase();
+    if (!recEmailFormatted) {
       newErrors.recipientEmail = "Recipient email address is required";
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(recipientEmail.trim())) {
+      if (!emailRegex.test(recEmailFormatted)) {
         newErrors.recipientEmail = "Please enter a valid email address";
+      } else if (user?.email && user.email.trim().toLowerCase() === recEmailFormatted) {
+        newErrors.recipientEmail = "You cannot send a gift card to yourself";
       }
     }
 
@@ -124,6 +106,19 @@ export default function GiftCardDetailsPage() {
       const firstError = Object.values(newErrors)[0];
       toast.error(firstError);
       return;
+    }
+
+    try {
+      setIsValidating(true);
+      await api.post("/gift-cards/validate-recipient", { recipientEmail: recEmailFormatted });
+    } catch (err: any) {
+      setIsValidating(false);
+      const errMsg = err?.response?.data?.message || "Recipient email validation failed";
+      setErrors((prev) => ({ ...prev, recipientEmail: errMsg }));
+      toast.error(errMsg);
+      return;
+    } finally {
+      setIsValidating(false);
     }
 
     const titleText = `${giftCard.name} (To: ${recipientName.trim()})`;
@@ -142,7 +137,7 @@ export default function GiftCardDetailsPage() {
       minOrder: 1,
       productType: "GIFT_CARD",
       recipientName: recipientName.trim(),
-      recipientEmail: recipientEmail.trim(),
+      recipientEmail: recEmailFormatted,
       giftMessage: message.trim() || undefined,
     };
 
@@ -214,15 +209,18 @@ export default function GiftCardDetailsPage() {
                 {giftCard.name}
               </h1>
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-sm font-semibold">4.8</span>
-                <div className="flex items-center text-amber-400">
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                <span className="text-sm font-semibold">
+                  {averageRating > 0 ? averageRating.toFixed(1) : "0.0"}
+                </span>
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, index) => {
+                    const fill = Math.min(1, Math.max(0, averageRating - index));
+                    return <StarIcon key={index} fill={fill} size={16} />;
+                  })}
                 </div>
-                <span className="text-xs text-gray-text">(104 Reviews)</span>
+                <span className="text-xs text-gray-text">
+                  ({reviews.length} {reviews.length === 1 ? "Review" : "Reviews"})
+                </span>
               </div>
             </div>
 
@@ -253,7 +251,7 @@ export default function GiftCardDetailsPage() {
                         : "border-stroke bg-card text-foreground hover:border-primary/50"
                         }`}
                     >
-                      ${amtStr}
+                      {amtStr} EGP
                     </button>
                   );
                 })}
@@ -356,9 +354,10 @@ export default function GiftCardDetailsPage() {
               <button
                 type="button"
                 onClick={handleBuyNow}
-                className="w-full rounded-xl bg-primary py-4 text-center text-sm font-bold text-primary-foreground shadow-md transition hover:opacity-90 active:scale-[0.99]"
+                disabled={isValidating}
+                className="w-full rounded-xl bg-primary py-4 text-center text-sm font-bold text-primary-foreground shadow-md transition hover:opacity-90 active:scale-[0.99] disabled:opacity-50"
               >
-                Buy Now
+                {isValidating ? "Validating Recipient..." : "Buy Now"}
               </button>
             </div>
           </div>
@@ -367,195 +366,8 @@ export default function GiftCardDetailsPage() {
 
       {/* Reviews Section */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 border-t border-stroke mt-12 font-['Montserrat']">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold text-foreground">Reviews</h2>
-            <div className="flex items-center gap-1.5 text-sm font-medium text-gray-text">
-              <span>{reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "4.8"}</span>
-              <div className="flex text-amber-400">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              </div>
-              <span>({reviews.length > 0 ? reviews.length : 1} reviews)</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                if (!isAuthenticated) {
-                  toast.error("Please login to write a review");
-                  navigate("/login");
-                  return;
-                }
-                setShowReviewModal(true);
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition hover:opacity-90 active:scale-95"
-            >
-              <MessageSquare className="w-4 h-4" />
-              Write a Review
-            </button>
-          </div>
-        </div>
-
-        {/* Reviews List */}
-        <div className="space-y-4">
-          {isReviewsLoading ? (
-            <div className="py-8 text-center text-xs text-gray-text">Loading reviews...</div>
-          ) : reviews.length === 0 ? (
-            <div className="space-y-4">
-              <div className="p-5 rounded-2xl bg-card border border-stroke space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-foreground border border-stroke">
-                      M
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">Mariam K.</h4>
-                      <p className="text-xs text-gray-text">Mar 20, 2025</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 text-amber-400">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                </div>
-
-                <h5 className="font-bold text-sm text-foreground">Amazing Gift!</h5>
-                <p className="text-xs text-gray-text leading-relaxed">
-                  I love this gift card! Literally amazing trust me if you are looking for a great present this is the one. It is so cute and the process was seamless.
-                </p>
-              </div>
-            </div>
-          ) : (
-            reviews.map((rev) => (
-              <div key={rev.id} className="p-5 rounded-2xl bg-card border border-stroke space-y-3 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold border border-stroke uppercase">
-                      {rev.user?.name ? rev.user.name.charAt(0) : "U"}
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">{rev.user?.name || "Customer"}</h4>
-                      <p className="text-[11px] text-gray-text">
-                        {new Date(rev.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 text-amber-400">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`h-3.5 w-3.5 ${star <= rev.rating ? "fill-amber-400 text-amber-400" : "text-gray-300 dark:text-zinc-700"
-                        }`}
-                    />
-                  ))}
-                </div>
-
-                {rev.comment && (
-                  <p className="text-xs text-foreground leading-relaxed">{rev.comment}</p>
-                )}
-              </div>
-            ))
-          )}
-        </div>
+        <ReviewsSection />
       </div>
-
-      {/* Write Review Modal */}
-      {showReviewModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 font-['Montserrat']">
-          <div className="relative w-full max-w-lg rounded-3xl bg-card border border-stroke p-6 sm:p-8 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-stroke pb-4">
-              <h3 className="text-lg font-bold text-foreground">Write a Review</h3>
-              <button
-                type="button"
-                onClick={() => setShowReviewModal(false)}
-                className="rounded-full p-1.5 text-gray-text hover:text-foreground hover:bg-secondary transition"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddReview} className="space-y-5">
-              {/* Star Rating Picker */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-foreground">
-                  Overall Rating <span className="text-red-500">*</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewRating(star)}
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      className="p-1 transition-transform hover:scale-125 focus:outline-none"
-                    >
-                      <Star
-                        className={`h-7 w-7 transition-colors ${star <= (hoverRating || newRating)
-                          ? "fill-amber-400 text-amber-400"
-                          : "text-gray-300 dark:text-zinc-700"
-                          }`}
-                      />
-                    </button>
-                  ))}
-                  <span className="ml-2 text-xs font-bold text-foreground">
-                    {hoverRating || newRating} / 5 Stars
-                  </span>
-                </div>
-              </div>
-
-              {/* Review Comment */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-foreground">
-                  Review Comment <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Share details of your experience with this gift card..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  className="w-full rounded-xl border border-stroke p-3.5 text-sm outline-none focus:border-primary bg-card text-foreground resize-none"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-stroke">
-                <button
-                  type="button"
-                  onClick={() => setShowReviewModal(false)}
-                  className="rounded-xl border border-stroke px-5 py-2.5 text-xs font-semibold text-foreground hover:bg-secondary transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createReviewMutation.isPending}
-                  className="rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90 active:scale-95 transition disabled:opacity-50"
-                >
-                  {createReviewMutation.isPending ? "Submitting..." : "Submit Review"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Recommended for You Section */}
       {recommendedData?.products && recommendedData.products.length > 0 && (

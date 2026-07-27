@@ -3,8 +3,9 @@ import { api } from '../../lib/axios';
 
 export type VoteDesign = {
   id: string;
-  title: string;
   imagePath: string;
+  description?: string;
+  title?: string;
   votes?: number;
   hasVoted?: boolean;
 };

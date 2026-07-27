@@ -4,7 +4,13 @@ import { InventoryTablePanel } from "../../../components/trader/InventoryShared"
 import { useTraderGiftCards, useDeleteGiftCard } from "../../../hooks/queries/giftCardsQuery";
 import { useTranslation } from "react-i18next";
 
-export default function TraderGiftCardsPage({ onEdit }: { onEdit: (item: InventoryItem) => void }) {
+export default function TraderGiftCardsPage({
+  onEdit,
+  onAdd,
+}: {
+  onEdit: (item: InventoryItem) => void;
+  onAdd?: () => void;
+}) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { t } = useTranslation("traderProduct");
 
@@ -27,8 +33,8 @@ export default function TraderGiftCardsPage({ onEdit }: { onEdit: (item: Invento
       categoryIds: [],
       brandId: "",
       stock: gc.stock ?? 100,
-      sku: gc.code ?? "",
-      price: `$${gc.amount}`,
+      sku: "",
+      price: `${gc.amount} EGP`,
       priceNum: gc.amount,
       giftCardAmounts: gc.amounts ?? "10,15,50,75,100,150,200",
       date: new Date(gc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
@@ -60,11 +66,13 @@ export default function TraderGiftCardsPage({ onEdit }: { onEdit: (item: Invento
         items={items}
         isLoading={isLoading}
         errorMessages={errorMessages}
+        onAdd={onAdd}
         onEdit={onEdit}
         onDelete={(item) => setDeleteId(item.id)}
         showTypeFilter={false}
         showCategoryFilter={false}
         showCategoryColumn={false}
+        showSkuColumn={false}
         title="giftCardsTable"
         addLabel="addGiftCard"
       />

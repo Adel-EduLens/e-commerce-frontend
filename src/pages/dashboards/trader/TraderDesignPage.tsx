@@ -7,7 +7,7 @@ import { handleApiError } from '../../../lib/utils';
 
 type UploadedImage = {
   id: string
-  title: string
+  description: string
   imagePath: string
 }
 
@@ -102,7 +102,7 @@ function ImageGrid({
           <div className="relative h-40 w-full overflow-hidden rounded-lg bg-gray-light">
             <img
               src={image.imagePath}
-              alt={image.title}
+              alt={image.description}
               className="h-full w-full object-cover"
             />
             <button
@@ -114,8 +114,8 @@ function ImageGrid({
               <FaTrash className="h-4 w-4" />
             </button>
           </div>
-          <div className="font-['Montserrat'] text-lg font-semibold text-foreground">
-            {image.title}
+          <div className="font-['Montserrat'] text-sm font-semibold text-foreground line-clamp-3 leading-relaxed">
+            {image.description}
           </div>
         </div>
       ))}
@@ -125,12 +125,12 @@ function ImageGrid({
 
 export default function TraderDesignPage() {
   const { t } = useTranslation('traderDesigns')
-  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
   const [image, setImage] = useState<File | null>(null)
   const [touched, setTouched] = useState(false)
   const [images, setImages] = useState<UploadedImage[]>([])
 
-  const canSubmit = title.trim() !== '' && !!image
+  const canSubmit = description.trim() !== '' && !!image
 
   const fetchImages = useCallback(async () => {
     try {
@@ -151,13 +151,13 @@ export default function TraderDesignPage() {
     setTouched(true)
     if (!canSubmit || !image) return
     const formData = new FormData()
-    formData.append('title', title)
+    formData.append('description', description.trim())
     formData.append('image', image)
     try {
       const res = await api.post('/trader/designs', formData)
       if (res.status === 200) {
         toast.success(t('uploadSuccess'))
-        setTitle('')
+        setDescription('')
         setImage(null)
         setTouched(false)
         fetchImages()
@@ -178,18 +178,18 @@ export default function TraderDesignPage() {
 
         <div className="flex flex-col gap-2">
           <label className="font-['Montserrat'] text-sm font-medium ">
-            {t('titleLabel')}
+            Description <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t('titlePlaceholder')}
-            className="w-full rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none"
+          <textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Enter design description..."
+            className="w-full rounded-2xl bg-gray-light p-4 font-['Montserrat'] text-base font-medium text-foreground placeholder:text-gray-text focus:outline-none resize-none"
           />
-          {touched && title.trim() === '' && (
+          {touched && description.trim() === '' && (
             <div className="font-['Montserrat'] text-sm font-medium text-red-500">
-              {t('titleRequired')}
+              Description is required
             </div>
           )}
         </div>

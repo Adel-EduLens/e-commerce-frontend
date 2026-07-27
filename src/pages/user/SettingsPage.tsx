@@ -120,18 +120,12 @@ function ThemeCard({
   );
 }
 
-import { Gift, Copy, Check } from "lucide-react";
-import { useReceivedGiftCards } from "../../hooks/queries/giftCardsQuery";
+import { Gift } from "lucide-react";
+import { useReceivedGiftCards, useRedeemGiftCard } from "../../hooks/queries/giftCardsQuery";
 
 export function ReceivedGiftCardsPanel() {
   const { data: giftCards = [], isLoading, isError } = useReceivedGiftCards();
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
-
-  const handleCopy = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
-  };
+  const redeemMutation = useRedeemGiftCard();
 
   return (
     <div className="flex w-full flex-col gap-6 font-['Montserrat']">
@@ -171,8 +165,8 @@ export function ReceivedGiftCardsPanel() {
                 })
               : "Aug 15, 2025";
 
-            const displayStatus =
-              gc.status === "ACTIVE" || gc.status === "SENT" ? "Delivered" : gc.status;
+            const isRedeemed = gc.status === "REDEEMED";
+            const displayStatus = isRedeemed ? "Redeemed" : "Delivered";
 
             return (
               <div
@@ -200,27 +194,6 @@ export function ReceivedGiftCardsPanel() {
                     <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight truncate">
                       {gc.name || "Gift Card"}
                     </h3>
-
-                    {gc.code && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(gc.code)}
-                        className="inline-flex items-center gap-1 text-[11px] font-mono text-gray-text hover:text-primary transition shrink-0 bg-background px-2 py-0.5 rounded-md border border-stroke"
-                        title="Copy Redemption Code"
-                      >
-                        {copiedCode === gc.code ? (
-                          <>
-                            <Check className="w-3 h-3 text-green-500" />
-                            <span className="text-green-600 font-sans font-medium">Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3" />
-                            <span>{gc.code}</span>
-                          </>
-                        )}
-                      </button>
-                    )}
                   </div>
 
                   <div className="text-xs sm:text-sm text-foreground truncate mt-0.5">
@@ -232,7 +205,7 @@ export function ReceivedGiftCardsPanel() {
 
                   <div className="text-xs sm:text-sm text-foreground">
                     <span className="text-gray-text font-normal">Value: </span>
-                    <span className="font-bold text-foreground">${gc.balance || gc.amount}</span>
+                    <span className="font-bold text-foreground">{gc.balance || gc.amount} EGP</span>
                   </div>
 
                   <div className="text-xs sm:text-sm text-foreground">
@@ -242,6 +215,23 @@ export function ReceivedGiftCardsPanel() {
 
                   <div className="text-xs text-gray-text mt-1 font-normal">
                     Date: {formattedDate}
+                  </div>
+
+                  <div className="pt-2">
+                    {isRedeemed ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
+                        ✓ Redeemed
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => redeemMutation.mutate(gc.id)}
+                        disabled={redeemMutation.isPending}
+                        className="w-full sm:w-auto rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm transition hover:opacity-90 active:scale-95 disabled:opacity-50"
+                      >
+                        {redeemMutation.isPending ? "Redeeming..." : "Redeem Gift Card"}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -94,7 +94,10 @@ export default function TraderShopPage() {
           <TraderBlankProductsPage onEdit={setEditItem} />
         )}
         {activeTab === "giftCards" && (
-          <TraderGiftCardsPage onEdit={setEditItem} />
+          <TraderGiftCardsPage
+            onEdit={setEditItem}
+            onAdd={() => setShowAddModal(true)}
+          />
         )}
       </div>
     </div>

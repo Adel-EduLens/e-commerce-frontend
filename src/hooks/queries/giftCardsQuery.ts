@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../lib/axios";
+import { toast } from "sonner";
 
 export interface GiftCard {
   id: string;
-  code: string;
   name: string;
   description?: string;
   amount: number;
@@ -13,11 +13,15 @@ export interface GiftCard {
   status: string;
   stock?: number;
   traderId: number;
+  recipientName?: string;
+  recipientEmail?: string;
+  senderName?: string;
+  senderEmail?: string;
+  message?: string;
   createdAt: string;
 }
 
 export interface GiftCardFormData {
-  code: string;
   name: string;
   description?: string;
   amount?: number;
@@ -43,6 +47,16 @@ export const useReceivedGiftCards = () => {
     queryKey: ["receivedGiftCards"],
     queryFn: async () => {
       const { data } = await api.get("/gift-cards/received/me");
+      return data.data as GiftCard[];
+    },
+  });
+};
+
+export const useSentGiftCards = () => {
+  return useQuery({
+    queryKey: ["sentGiftCards"],
+    queryFn: async () => {
+      const { data } = await api.get("/gift-cards/sent/me");
       return data.data as GiftCard[];
     },
   });
@@ -106,6 +120,26 @@ export const useDeleteGiftCard = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["traderGiftCards"] });
+    },
+  });
+};
+
+export const useRedeemGiftCard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data } = await api.post(`/gift-cards/${id}/redeem`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["receivedGiftCards"] });
+      queryClient.invalidateQueries({ queryKey: ["sentGiftCards"] });
+      queryClient.invalidateQueries({ queryKey: ["giftCards"] });
+      toast.success("Gift card redeemed successfully!");
+    },
+    onError: (err: any) => {
+      const errMsg = err?.response?.data?.message || "Failed to redeem gift card";
+      toast.error(errMsg);
     },
   });
 };

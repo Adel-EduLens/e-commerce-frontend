@@ -2418,6 +2418,7 @@ interface InventoryTablePanelProps {
   showTypeFilter?: boolean;
   showCategoryFilter?: boolean;
   showCategoryColumn?: boolean;
+  showSkuColumn?: boolean;
   showRetailColumns?: boolean;
   title?: string;
   addLabel?: string;
@@ -2433,6 +2434,7 @@ export function InventoryTablePanel({
   showTypeFilter = true,
   showCategoryFilter = true,
   showCategoryColumn = true,
+  showSkuColumn = true,
   showRetailColumns = false,
   title = "Products Table",
   addLabel = "Add Item",
@@ -2532,7 +2534,7 @@ export function InventoryTablePanel({
     ...(showCategoryColumn ? ["category"] : []),
     ...(showTypeFilter ? ["type"] : []),
     "stock",
-    "sku",
+    ...(showSkuColumn ? ["sku"] : []),
     "price",
     ...(showRetailColumns ? ["Deposit", "Security"] : []),
     "date",
@@ -2781,7 +2783,7 @@ export function InventoryTablePanel({
                   ...(showCategoryColumn ? ["Category"] : []),
                   ...(showTypeFilter ? ["Type"] : []),
                   "Stock",
-                  "SKU",
+                  ...(showSkuColumn ? ["SKU"] : []),
                   "Price",
                   ...(showRetailColumns ? ["Deposit", "Security Deposit"] : []),
                   "Date",
@@ -2792,7 +2794,7 @@ export function InventoryTablePanel({
                   ...(showCategoryColumn ? [i.categories?.map((c) => c.name).join(", ") || ""] : []),
                   ...(showTypeFilter ? [i.type] : []),
                   i.stock,
-                  i.sku,
+                  ...(showSkuColumn ? [i.sku] : []),
                   i.priceNum,
                   ...(showRetailColumns ? [i.depositAmount ?? 0, i.securityDeposit ?? 0] : []),
                   i.date,
@@ -2885,12 +2887,14 @@ export function InventoryTablePanel({
                       <p className="font-['Montserrat'] text-sm font-medium text-gray-text">
                         {item.categories?.map((c) => c.name).join(", ")}
                       </p>
-                      <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
-                        SKU:{" "}
-                        <span className="font-semibold text-foreground">
-                          {item.sku}
-                        </span>
-                      </p>
+                      {showSkuColumn && (
+                        <p className="shrink-0 font-['Montserrat'] text-sm text-gray-text">
+                          SKU:{" "}
+                          <span className="font-semibold text-foreground">
+                            {item.sku}
+                          </span>
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-['Montserrat'] text-sm font-semibold text-foreground">
@@ -3037,9 +3041,11 @@ export function InventoryTablePanel({
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                         {item.stock}
                       </td>
-                      <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
-                        {item.sku}
-                      </td>
+                      {showSkuColumn && (
+                        <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
+                          {item.sku}
+                        </td>
+                      )}
                       <td className="px-3 py-3 text-center font-['Montserrat'] text-xs font-medium text-foreground">
                         {item.price}
                       </td>
