@@ -56,7 +56,7 @@ const PrizeWheel = () => {
   }
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="rounded-full p-1 bg-primary shadow-lg">
+      <div className="rounded-full p-1 bg-primary shadow-lg" dir="ltr" style={{ direction: "ltr" }}>
         <Wheel
           mustStartSpinning={mustSpin}
           prizeNumber={prizeNumber}
