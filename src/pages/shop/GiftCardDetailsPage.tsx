@@ -70,7 +70,7 @@ export default function GiftCardDetailsPage() {
     if (!giftCard) return;
 
     if (!isAuthenticated) {
-      toast.error("Please login to send a gift card");
+      toast.error(t("loginToSendGiftCard", "Please login to send a gift card"));
       navigate("/login");
       return;
     }
@@ -80,23 +80,23 @@ export default function GiftCardDetailsPage() {
     if (isCustom) {
       const val = Number(customAmount);
       if (!customAmount || isNaN(val) || val <= 0) {
-        newErrors.customAmount = "Please enter a valid amount greater than 0 EGP";
+        newErrors.customAmount = t("invalidCustomAmount", "Please enter a valid amount greater than 0 EGP");
       }
     }
 
     if (!recipientName.trim()) {
-      newErrors.recipientName = "Recipient name is required";
+      newErrors.recipientName = t("recipientNameRequired", "Recipient name is required");
     }
 
     const recEmailFormatted = recipientEmail.trim().toLowerCase();
     if (!recEmailFormatted) {
-      newErrors.recipientEmail = "Recipient email address is required";
+      newErrors.recipientEmail = t("recipientEmailRequired", "Recipient email address is required");
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(recEmailFormatted)) {
-        newErrors.recipientEmail = "Please enter a valid email address";
+        newErrors.recipientEmail = t("invalidEmail", "Please enter a valid email address");
       } else if (user?.email && user.email.trim().toLowerCase() === recEmailFormatted) {
-        newErrors.recipientEmail = "You cannot send a gift card to yourself";
+        newErrors.recipientEmail = t("cannotSendToSelf", "You cannot send a gift card to yourself");
       }
     }
 
@@ -112,8 +112,8 @@ export default function GiftCardDetailsPage() {
       setIsValidating(true);
       await api.post("/gift-cards/validate-recipient", { recipientEmail: recEmailFormatted });
     } catch (err: any) {
-      setIsValidating(false);
-      const errMsg = err?.response?.data?.message || "Recipient email validation failed";
+      const rawMsg = err?.response?.data?.message || "Recipient email validation failed";
+      const errMsg = t(rawMsg, rawMsg);
       setErrors((prev) => ({ ...prev, recipientEmail: errMsg }));
       toast.error(errMsg);
       return;
@@ -155,9 +155,9 @@ export default function GiftCardDetailsPage() {
   if (isError || !giftCard) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-20 text-center text-gray-text">
-        <h2 className="text-2xl font-bold mb-4">{t("Gift Card Not Found") || "Gift Card Not Found"}</h2>
+        <h2 className="text-2xl font-bold mb-4">{t("giftCardNotFound", "Gift Card Not Found")}</h2>
         <Link to="/products" className="text-primary underline">
-          {t("Back to Products") || "Back to Products"}
+          {t("backToProducts", "Back to Products")}
         </Link>
       </div>
     );
@@ -168,9 +168,9 @@ export default function GiftCardDetailsPage() {
       {/* Breadcrumb */}
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <nav className="flex items-center gap-2 text-xs text-gray-text font-['Montserrat']">
-          <Link to="/" className="hover:text-foreground">Home</Link>
+          <Link to="/" className="hover:text-foreground">{t("home", "Home")}</Link>
           <span>/</span>
-          <Link to="/products" className="hover:text-foreground">Gift Cards</Link>
+          <Link to="/products" className="hover:text-foreground">{t("giftCards", "Gift Cards")}</Link>
           <span>/</span>
           <span className="text-foreground font-medium">{giftCard.name}</span>
         </nav>
@@ -180,9 +180,9 @@ export default function GiftCardDetailsPage() {
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-start">
           {/* Left: Visual Gift Card Artwork Preview */}
-          <div className="flex w-full items-center justify-center rounded-3xl bg-secondary p-8 sm:p-14 min-h-[460px] shadow-inner border border-stroke">
+          <div className="flex w-full items-center justify-center">
             {giftCard.image ? (
-              <div className="relative aspect-[3/4] w-full max-w-[280px] overflow-hidden rounded-2xl shadow-2xl transition-transform hover:scale-105 duration-300">
+              <div className="relative aspect-[3/4] w-full max-w-[420px] overflow-hidden rounded-2xl shadow-xl transition-transform hover:scale-105 duration-300 border border-stroke">
                 <img
                   src={giftCard.image}
                   alt={giftCard.name}
@@ -190,11 +190,11 @@ export default function GiftCardDetailsPage() {
                 />
               </div>
             ) : (
-              <div className="relative aspect-[3/5] w-full max-w-[260px] rounded-2xl bg-card p-6 text-foreground shadow-2xl flex flex-col justify-center items-center transition-transform hover:scale-105 duration-300 border border-stroke">
-                <div className="writing-vertical text-4xl sm:text-5xl font-black tracking-widest uppercase select-none text-primary drop-shadow-md">
+              <div className="relative aspect-[3/4] w-full max-w-[360px] rounded-2xl bg-card p-8 text-foreground shadow-xl flex flex-col justify-center items-center transition-transform hover:scale-105 duration-300 border border-stroke min-h-[400px]">
+                <div className="writing-vertical text-5xl font-black tracking-widest uppercase select-none text-primary drop-shadow-md">
                   GENZ
                 </div>
-                <div className="absolute bottom-6 text-[10px] tracking-widest text-gray-text uppercase font-semibold">
+                <div className="absolute bottom-8 text-xs tracking-widest text-gray-text uppercase font-semibold">
                   {giftCard.name}
                 </div>
               </div>
@@ -219,20 +219,20 @@ export default function GiftCardDetailsPage() {
                   })}
                 </div>
                 <span className="text-xs text-gray-text">
-                  ({reviews.length} {reviews.length === 1 ? "Review" : "Reviews"})
+                  ({reviews.length} {reviews.length === 1 ? t("review", "Review") : t("reviews", "Reviews")})
                 </span>
               </div>
             </div>
 
             {/* Price Header */}
             <div className="text-2xl font-bold text-foreground">
-              {currentPrice} EGP
+              {currentPrice} {t("egp", "EGP")}
             </div>
 
             {/* Amount Selection */}
             <div className="space-y-3">
               <label className="text-xs font-semibold text-foreground uppercase tracking-wider">
-                Amount
+                {t("amount", "Amount")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {parsedAmounts.map((amtStr) => {
@@ -251,7 +251,7 @@ export default function GiftCardDetailsPage() {
                         : "border-stroke bg-card text-foreground hover:border-primary/50"
                         }`}
                     >
-                      {amtStr} EGP
+                      {amtStr} {t("egp", "EGP")}
                     </button>
                   );
                 })}
@@ -263,7 +263,7 @@ export default function GiftCardDetailsPage() {
                     : "border-stroke bg-card text-foreground hover:border-primary/50"
                     }`}
                 >
-                  Custom
+                  {t("custom", "Custom")}
                 </button>
               </div>
 
@@ -271,7 +271,7 @@ export default function GiftCardDetailsPage() {
                 <div className="pt-2">
                   <input
                     type="number"
-                    placeholder="Enter custom amount in EGP"
+                    placeholder={t("enterCustomAmount", "Enter custom amount in EGP")}
                     value={customAmount}
                     onChange={(e) => {
                       setCustomAmount(e.target.value);
@@ -290,17 +290,17 @@ export default function GiftCardDetailsPage() {
             {/* Send as a gift Section */}
             <div className="space-y-4 pt-2 border-t border-stroke">
               <h3 className="text-xs font-semibold text-foreground uppercase tracking-wider">
-                Send as a gift
+                {t("sendAsGift", "Send as a gift")}
               </h3>
 
               <div className="space-y-3">
                 <div>
                   <label className="text-[11px] font-medium text-gray-text block mb-1">
-                    To <span className="text-red-500">*</span>
+                    {t("to", "To")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="Recipient Name"
+                    placeholder={t("recipientNamePlaceholder", "Recipient Name")}
                     value={recipientName}
                     onChange={(e) => {
                       setRecipientName(e.target.value);
@@ -316,11 +316,11 @@ export default function GiftCardDetailsPage() {
 
                 <div>
                   <label className="text-[11px] font-medium text-gray-text block mb-1">
-                    Email <span className="text-red-500">*</span>
+                    {t("email", "Email")} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
-                    placeholder="Recipient Email"
+                    placeholder={t("recipientEmailPlaceholder", "Recipient Email")}
                     value={recipientEmail}
                     onChange={(e) => {
                       setRecipientEmail(e.target.value);
@@ -336,11 +336,11 @@ export default function GiftCardDetailsPage() {
 
                 <div>
                   <label className="text-[11px] font-medium text-gray-text block mb-1">
-                    Message
+                    {t("message", "Message")}
                   </label>
                   <textarea
                     rows={3}
-                    placeholder="(Optional)"
+                    placeholder={t("optional", "(Optional)")}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     className="w-full rounded-xl border border-stroke px-4 py-2.5 text-sm outline-none focus:border-primary bg-card text-foreground resize-none"
@@ -357,7 +357,7 @@ export default function GiftCardDetailsPage() {
                 disabled={isValidating}
                 className="w-full rounded-xl bg-primary py-4 text-center text-sm font-bold text-primary-foreground shadow-md transition hover:opacity-90 active:scale-[0.99] disabled:opacity-50"
               >
-                {isValidating ? "Validating Recipient..." : "Buy Now"}
+                {isValidating ? t("validatingRecipient", "Validating Recipient...") : t("buyNow", "Buy Now")}
               </button>
             </div>
           </div>
@@ -372,14 +372,14 @@ export default function GiftCardDetailsPage() {
       {/* Recommended for You Section */}
       {recommendedData?.products && recommendedData.products.length > 0 && (
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 border-t border-stroke font-['Montserrat']">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Recommended for You</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">{t("Recommended for You", "Recommended for You")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {recommendedData.products.slice(0, 4).map((p) => (
               <ProductCard
                 key={`rec-${p.id}`}
                 title={p.name}
                 productId={p.id}
-                price={`${p.shopPrice ?? p.price ?? 0} EGP`}
+                price={`${p.shopPrice ?? p.price ?? 0} ${t("egp", "EGP")}`}
                 imageSrc={p.images?.[0]?.url}
                 rating={p.rating}
                 to={`/product-details/${p.id}`}
@@ -389,7 +389,7 @@ export default function GiftCardDetailsPage() {
 
           <div className="flex justify-center pt-8">
             <button className="rounded-full bg-primary px-8 py-2.5 text-xs font-bold text-primary-foreground hover:opacity-90 transition flex items-center gap-1">
-              View All <span>›</span>
+              {t("viewAll", "View All")} <span>›</span>
             </button>
           </div>
         </div>
@@ -398,14 +398,14 @@ export default function GiftCardDetailsPage() {
       {/* Complete the look Section */}
       {recommendedData?.products && recommendedData.products.length > 0 && (
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 border-t border-stroke font-['Montserrat']">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Complete the look</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">{t("completeTheLook", "Complete the look")}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             {recommendedData.products.slice(0, 4).map((p) => (
               <ProductCard
                 key={`ctl-${p.id}`}
                 title={p.name}
                 productId={p.id}
-                price={`${p.shopPrice ?? p.price ?? 0} EGP`}
+                price={`${p.shopPrice ?? p.price ?? 0} ${t("egp", "EGP")}`}
                 imageSrc={p.images?.[0]?.url}
                 rating={p.rating}
                 to={`/product-details/${p.id}`}
@@ -415,7 +415,7 @@ export default function GiftCardDetailsPage() {
 
           <div className="flex justify-center pt-8">
             <button className="rounded-full bg-primary px-8 py-2.5 text-xs font-bold text-primary-foreground hover:opacity-90 transition flex items-center gap-1">
-              View All <span>›</span>
+              {t("viewAll", "View All")} <span>›</span>
             </button>
           </div>
         </div>

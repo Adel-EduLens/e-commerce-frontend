@@ -142,6 +142,7 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
         <ImageCropModal
           imageSrc={cropSrc}
           fileName={fileName}
+          aspect={3 / 4}
           onConfirm={handleCropConfirm}
           onCancel={() => {
             URL.revokeObjectURL(cropSrc);
