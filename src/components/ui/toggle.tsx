@@ -67,7 +67,7 @@ export function Toggle({
     >
       <span
         className={cn(
-          "pointer-events-none -translate-y-[0.6px] inline-block transform rounded-full bg-primary-foreground shadow-md ring-0 transition-transform duration-300 ease-in-out",
+          "pointer-events-none inline-block transform rounded-full bg-primary-foreground shadow-md ring-0 transition-transform duration-300 ease-in-out",
           knobSizeClasses[size],
           knobTransformClasses[size]
         )}

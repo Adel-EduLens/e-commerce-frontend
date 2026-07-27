@@ -121,7 +121,7 @@ export function UnifiedProductModal({
   const [securityDeposit, setSecurityDeposit] = useState("");
   const [termsAndConditions, setTermsAndConditions] = useState("");
   const [privacyPolicy, setPrivacyPolicy] = useState("");
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [isFeatured, setIsFeatured] = useState((item as any)?.isFeatured || false);
 
   // Blank Fields
   const [blankPrice, setBlankPrice] = useState("");
@@ -232,6 +232,8 @@ export function UnifiedProductModal({
           setTermsAndConditions(fullProduct.termsAndConditions);
         if (fullProduct.privacyPolicy)
           setPrivacyPolicy(fullProduct.privacyPolicy);
+        if (fullProduct.isFeatured != null)
+          setIsFeatured(fullProduct.isFeatured);
 
         if (fullProduct.name) setName(fullProduct.name);
         if (fullProduct.description) setDescription(fullProduct.description);
@@ -318,6 +320,9 @@ export function UnifiedProductModal({
           setShopCategoryIds(catIds);
           setWholesaleCategoryIds(catIds);
           setRetailCategoryIds(catIds);
+        }
+        if ((item as any).isFeatured != null) {
+          setIsFeatured((item as any).isFeatured);
         }
         if (item.flashDealEndsAt) {
           setFlashDealEndsAt(formatForDateTimeLocal(item.flashDealEndsAt));
