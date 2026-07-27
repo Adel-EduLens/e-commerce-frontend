@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
 
-const typeFilters = ["ALL", "SHOP", "RETAIL", "WHOLESALE", "BLANK"] as const;
+const typeFilters = ["ALL", "SHOP", "RENTAL", "WHOLESALE", "BLANK"] as const;
 
 export type ProductTypeFilter = (typeof typeFilters)[number];
 
@@ -300,6 +300,10 @@ const getOrderTypes = (order: any, productsList: Product[]) => {
 
   const types = new Set<string>();
   order.items?.forEach((item: any) => {
+    if (item.productType) {
+      types.add(item.productType);
+      return;
+    }
     const product = productsList.find((p) => p.id === item.productId);
     if (product?.productTypes && Array.isArray(product.productTypes)) {
       product.productTypes.forEach((t) => {
@@ -334,9 +338,10 @@ export default function TraderDashboard() {
   // 1. Fetch categories
   const { data: categories = [] } = useCategories("all");
 
-  // 2. Fetch trader products with backend type filter parameter
+  // 2. Fetch trader products with backend type filter parameter and category filter parameter
   const { data: traderProducts = [], isLoading: productsLoading } = useTraderProducts(
-    typeFilter !== "ALL" ? typeFilter : undefined
+    typeFilter !== "ALL" ? typeFilter : undefined,
+    categoryFilter !== "ALL" ? categoryFilter : undefined
   );
 
   // 3. Construct Backend Query Params for Orders
@@ -380,6 +385,7 @@ export default function TraderDashboard() {
         // Category filter
         if (categoryFilter !== "ALL") {
           const hasMatchingProduct = order.items?.some((item) => {
+            if ((item as any).categoryId === categoryFilter) return true;
             const product = traderProducts.find((p) => p.id === item.productId);
             if (!product) return false;
             const inCategories = product.categories?.some((c) => c.id === categoryFilter);
@@ -698,7 +704,7 @@ export default function TraderDashboard() {
             >
               <option value="ALL">{t("allTypes", "All Types")}</option>
               <option value="SHOP">{t("typeShop", "Shop")}</option>
-              <option value="RETAIL">{t("typeRetail", "Retail")}</option>
+              <option value="RENTAL">{t("typeRental", "Rental")}</option>
               <option value="WHOLESALE">{t("typeWholesale", "Wholesale")}</option>
               <option value="BLANK">{t("typeBlank", "Blank")}</option>
             </select>
@@ -981,14 +987,14 @@ export default function TraderDashboard() {
                             {getOrderTypes(transaction, traderProducts).map((type) => {
                               let bgClass = "bg-gray-500/10 text-gray-400 border border-gray-500/20";
                               if (type === "WHOLESALE") bgClass = "bg-rose-500/10 text-rose-500 border border-rose-500/20";
-                              else if (type === "RETAIL") bgClass = "bg-purple-500/10 text-purple-400 border border-purple-500/20";
+                              else if (type === "RENTAL") bgClass = "bg-purple-500/10 text-purple-400 border border-purple-500/20";
                               else if (type === "SHOP") bgClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
                               else if (type === "BLANK") bgClass = "bg-amber-500/10 text-amber-500 border border-amber-500/20";
 
                               const label = type === "WHOLESALE"
                                 ? t("typeWholesale", "Wholesale")
-                                : type === "RETAIL"
-                                ? t("typeRetail", "Retail")
+                                : type === "RENTAL"
+                                ? t("typeRental", "Rental")
                                 : type === "SHOP"
                                 ? t("typeShop", "Shop")
                                 : type === "BLANK"

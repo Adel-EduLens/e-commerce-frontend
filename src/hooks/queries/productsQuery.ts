@@ -300,19 +300,20 @@ export const useCompareProducts = (ids: string[]) => {
 
 const getTraderProducts = async (
   traderId: string | number,
-  type?: string
+  type?: string,
+  categoryId?: string
 ): Promise<Product[]> => {
   const { data } = await api.get("/products", {
-    params: { traderId, limit: 1000, type },
+    params: { traderId, limit: 1000, type, categoryId },
   });
   return (data.data?.products ?? []).map(transformProduct);
 };
 
-export const useTraderProducts = (type?: string) => {
+export const useTraderProducts = (type?: string, categoryId?: string) => {
   const user = useAuthStore.getState().user;
   return useQuery({
-    queryKey: ["trader-products", user?.id, type],
-    queryFn: () => getTraderProducts(user!.id, type),
+    queryKey: ["trader-products", user?.id, type, categoryId],
+    queryFn: () => getTraderProducts(user!.id, type, categoryId),
     enabled: !!user?.id,
   });
 };
