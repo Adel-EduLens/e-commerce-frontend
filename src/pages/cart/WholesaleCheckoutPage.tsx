@@ -230,6 +230,7 @@ function DeliverySection({
           placeholder="Email Address"
           value={data.email}
           onChange={(e) => onChange("email", e.target.value)}
+          disabled
         />
 
         {isAddressesLoading && (
