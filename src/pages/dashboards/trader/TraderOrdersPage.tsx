@@ -16,6 +16,7 @@ interface OrderItem {
   size: string | null;
   color: string | null;
   image: string;
+  productType?: string;
 }
 
 interface Order {
@@ -315,6 +316,25 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
                             {t("colorLabel")}: {item.color}
                           </span>
                         )}
+                        {(() => {
+                          const pType = item.productType || order.orderType;
+                          if (!pType) return null;
+                          return (
+                            <span className={`inline-block px-1.5 py-0.5 text-[10px] font-bold rounded border ${
+                              pType === "RENTAL"
+                                ? "bg-purple-50 text-purple-700 border-purple-200"
+                                : pType === "WHOLESALE"
+                                ? "bg-amber-50 text-amber-700 border-amber-200"
+                                : "bg-blue-50 text-blue-700 border-blue-200"
+                            }`}>
+                              {pType === "RENTAL"
+                                ? t("orderTypeRental")
+                                : pType === "WHOLESALE"
+                                ? t("orderTypeWholesale")
+                                : t("orderTypeShop")}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </td>
                     <td className="px-4 py-4 text-center font-['Montserrat'] text-sm font-medium text-foreground">
