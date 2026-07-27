@@ -313,7 +313,7 @@ export default function ProductCard({
           imageSrc,
           quantity: 1,
           minOrder: 1,
-          productType: productType === "SHOP" ? "STANDARD" : productType,
+          productType: productType,
           depositAmount,
         });
       }

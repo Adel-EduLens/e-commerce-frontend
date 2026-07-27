@@ -241,7 +241,7 @@ function BagItemCard({
             </span>
             {item.productType && (
               <span className="rounded-xl border border-primary bg-primary/10 px-3 py-1 font-['Montserrat'] text-sm text-primary font-bold">
-                {item.productType === "STANDARD" ? "SHOP" : item.productType}
+                {item.productType === "STANDARD" || item.productType === "SHOP" ? "SHOP" : item.productType}
               </span>
             )}
           </div>

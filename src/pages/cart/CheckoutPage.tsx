@@ -1091,7 +1091,7 @@ export default function CheckoutPage() {
           size: item.size || null,
           color: item.color || null,
           imageSrc: item.imageSrc || null,
-          productType: item.productType || null,
+          productType: item.productType === "STANDARD" ? "SHOP" : (item.productType || null),
           recipientName: item.recipientName || null,
           recipientEmail: item.recipientEmail || null,
           giftMessage: item.giftMessage || null,

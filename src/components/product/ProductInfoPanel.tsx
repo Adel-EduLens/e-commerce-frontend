@@ -392,7 +392,7 @@ export function ProductInfoPanel({
       const rentalUnitPrice = rentalDeposit !== undefined ? rentalDeposit : activePrice;
 
       addItem({
-        id: `${item.id}-${selectedSize}-${selectedColor}-${productType === "SHOP" ? "STANDARD" : productType}`,
+        id: `${item.id}-${selectedSize}-${selectedColor}-${productType}`,
         productId: String(item.id),
         categoryId: item.category?.id ? String(item.category.id) : (item.categories?.[0]?.id ? String(item.categories[0].id) : undefined),
         category: item.category || item.categories?.[0] || undefined,
@@ -406,7 +406,7 @@ export function ProductInfoPanel({
         imageSrc: matchingImage?.url || item.images[0]?.url || "",
         quantity,
         minOrder: item.minOrder || 1,
-        productType: productType === "SHOP" ? "STANDARD" : productType,
+        productType: productType,
         depositAmount: rentalDeposit || 0,
       });
 

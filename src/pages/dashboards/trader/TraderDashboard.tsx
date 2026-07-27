@@ -301,7 +301,7 @@ const getOrderTypes = (order: any, productsList: Product[]) => {
   const types = new Set<string>();
   order.items?.forEach((item: any) => {
     if (item.productType) {
-      types.add(item.productType);
+      types.add(item.productType === "STANDARD" ? "SHOP" : item.productType);
       return;
     }
     const product = productsList.find((p) => p.id === item.productId);
@@ -415,7 +415,7 @@ export default function TraderDashboard() {
   // 5. Calculate total revenue & metrics directly from combined orders & products
   const totalRevenueNum = useMemo(() => {
     return combinedOrders.reduce((sum, order) => {
-      return sum + parsePrice(order.total);
+      return sum + parsePrice(order.subtotal);
     }, 0);
   }, [combinedOrders]);
 
@@ -1014,9 +1014,9 @@ export default function TraderDashboard() {
                         </td>
                       )}
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
-                        {typeof transaction.total === "number"
-                          ? `EGP ${transaction.total.toFixed(2)}`
-                          : String(transaction.total)}
+                        {typeof transaction.subtotal === "number"
+                          ? `EGP ${(transaction.subtotal as number).toFixed(2)}`
+                          : String(transaction.subtotal)}
                       </td>
                       <td className="px-4 py-3 text-start text-sm font-medium text-foreground">
                         {transaction.date ||
