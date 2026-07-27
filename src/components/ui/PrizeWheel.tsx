@@ -56,7 +56,7 @@ const PrizeWheel = () => {
   }
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="rounded-full p-1 bg-primary shadow-lg" dir="ltr" style={{ direction: "ltr" }}>
+      <div className="rounded-full p-1 shadow-lg" dir="ltr" style={{ direction: "ltr" }}>
         <Wheel
           mustStartSpinning={mustSpin}
           prizeNumber={prizeNumber}
@@ -89,50 +89,3 @@ const PrizeWheel = () => {
 };
 
 export default PrizeWheel;
-
-// Each prize has a "weight".
-// Higher weight = higher chance of being selected.
-// const prizes = [
-//   {
-//     option: "100 pounds",
-//     style: { backgroundColor: "#e0343f", textColor: "#ededed" },
-//     weight: 5, // 5% chance
-//   },
-//   {
-//     option: "prize",
-//     style: { backgroundColor: "#f2994a", textColor: "#ededed" },
-//     weight: 25, // 25% chance
-//   },
-//   {
-//     option: "500 point",
-//     style: { backgroundColor: "#2f80ed", textColor: "#ededed" },
-//     weight: 70, // 70% chance
-//   },
-// ];
-
-/**
- * Returns the index of the winning prize
- * based on the weight of each prize.
- */
-// function weightedRandom() {
-//   const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-//   let random = Math.random() * totalWeight;
-
-//   for (let i = 0; i < prizes.length; i++) {
-//     if (random < prizes[i].weight) {
-//       return i;
-//     }
-//     random -= prizes[i].weight;
-//   }
-//   return 0;
-// }
-
-// const handleSpin = () => {
-//   if (mustSpin) return;
-
-//   const winner = weightedRandom();
-
-
-//   setPrizeNumber(winner);
-//   setMustSpin(true);
-// };
