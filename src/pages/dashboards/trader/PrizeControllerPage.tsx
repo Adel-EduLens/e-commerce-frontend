@@ -102,7 +102,7 @@ const PrizeControllerPage = () => {
         <button
           type="submit"
           disabled={addPrize.isPending}
-          className="bg-primary text-foreground font-semibold px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          className="bg-primary text-white font-semibold px-4 py-2 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
         >
           {addPrize.isPending ? t("adding") : t("add")}
         </button>
