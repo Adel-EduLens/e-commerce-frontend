@@ -1,22 +1,30 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useActiveShopBanners } from "../../hooks/queries/shopBannerQuery";
-import { useNavigate } from "react-router-dom";
+
+function getBannerLinkProps(buttonLink?: string) {
+  const defaultLink = "/products";
+  const link = buttonLink?.trim() || defaultLink;
+
+  try {
+    if (link.startsWith("http://") || link.startsWith("https://")) {
+      const url = new URL(link);
+      if (url.origin === window.location.origin) {
+        return { isExternal: false, to: url.pathname + url.search + url.hash };
+      }
+      return { isExternal: true, href: link };
+    }
+  } catch {
+    // Ignore URL parse error for relative paths
+  }
+
+  const to = link.startsWith("/") ? link : `/${link}`;
+  return { isExternal: false, to };
+}
 
 const HomeBanner = () => {
-  const navigate = useNavigate();
   const { data: banners, isPending } = useActiveShopBanners("home");
-
   const [activeIndex, setActiveIndex] = useState(0);
-
-  const handleBannerClick = () => {
-    const link = banner.buttonLink || "/";
-
-    if (link.startsWith(window.location.origin)) {
-      navigate(new URL(link).pathname, { replace: true });
-    } else {
-      window.location.assign(link);
-    }
-  };
 
   if (isPending) {
     return (
@@ -31,6 +39,8 @@ const HomeBanner = () => {
   }
 
   const banner = banners[activeIndex];
+  const { isExternal, to, href } = getBannerLinkProps(banner.buttonLink);
+  const btnClassName = "inline-block bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-xl hover:opacity-90 transition shadow-lg font-['Montserrat'] text-center no-underline";
 
   return (
     <section
@@ -51,12 +61,20 @@ const HomeBanner = () => {
           </p>
 
           {banner.buttonText && (
-            <button
-              className="bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-xl hover:opacity-90 transition shadow-lg font-['Montserrat']"
-              onClick={handleBannerClick}
-            >
-              {banner.buttonText}
-            </button>
+            isExternal && href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={btnClassName}
+              >
+                {banner.buttonText}
+              </a>
+            ) : (
+              <Link to={to} className={btnClassName}>
+                {banner.buttonText}
+              </Link>
+            )
           )}
         </div>
 
@@ -76,8 +94,9 @@ const HomeBanner = () => {
           {banners.map((_, index) => (
             <button
               key={index}
+              type="button"
               onClick={() => setActiveIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`w-3 h-3 rounded-full transition-all cursor-pointer ${
                 activeIndex === index ? "bg-white scale-125" : "bg-white/50"
               }`}
             />
