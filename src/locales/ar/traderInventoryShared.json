@@ -6,7 +6,7 @@
   "descriptionPlaceholder": "الوصف",
   "pricePlaceholder": "السعر *",
   "stockPlaceholder": "المخزون (محسوب تلقائيا)",
-  "skuPlaceholder": "رمز المنتج (اختياري)",
+  "skuPlaceholder": "رمز المنتج",
   "productAttributes": "خصائص المنتج",
   "mustHave": "يجب اقتناؤه",
   "flashDeal": "عرض مميز",

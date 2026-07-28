@@ -6,7 +6,7 @@
   "descriptionPlaceholder": "Description",
   "pricePlaceholder": "Price *",
   "stockPlaceholder": "Stock (Calculated)",
-  "skuPlaceholder": "SKU (optional)",
+  "skuPlaceholder": "SKU",
   "productAttributes": "Product Attributes",
   "mustHave": "Must Have",
   "flashDeal": "Flash Deal",
