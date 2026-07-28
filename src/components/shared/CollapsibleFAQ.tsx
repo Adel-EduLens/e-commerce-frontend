@@ -6,9 +6,6 @@ export type FAQItem = {
   answer: string;
 };
 
-const asset = (file: string) =>
-  `/dropshipping/${file.split("/").map(encodeURIComponent).join("/")}`;
-
 export default function CollapsibleFAQ({
   faqs,
   defaultOpenIndex = 0,
@@ -19,24 +16,22 @@ export default function CollapsibleFAQ({
   const [openIndex, setOpenIndex] = useState(defaultOpenIndex);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 w-full">
       {faqs.map((faq, index) => {
         const isOpen = openIndex === index;
 
         return (
           <div
             key={`${faq.question}-${index}`}
-            className={`rounded-2xl p-4 sm:rounded-3xl sm:p-8 transition-colors duration-300 ${
-              isOpen ? "bg-secondary" : "bg-gray-light"
-            }`}
+            className="rounded-2xl p-4 sm:rounded-3xl sm:p-8 bg-gray-light transition-colors duration-300"
           >
             <button
               type="button"
               onClick={() => setOpenIndex(isOpen ? -1 : index)}
-              className="flex w-full items-center justify-between"
+              className="flex w-full items-center justify-between cursor-pointer text-start gap-4"
             >
               <h3
-                className={`text-base sm:text-xl lg:text-2xl font-medium text-start ${
+                className={`text-base sm:text-xl lg:text-2xl font-medium transition-colors duration-300 ${
                   isOpen ? "text-primary" : "text-foreground"
                 }`}
               >
@@ -44,15 +39,11 @@ export default function CollapsibleFAQ({
               </h3>
 
               <div
-                className={`rounded-full bg-card p-3 transition-transform duration-300 ${
+                className={`rounded-full bg-card p-3 transition-transform duration-300 flex items-center justify-center shrink-0 ${
                   isOpen ? "rotate-90" : ""
                 }`}
               >
-                <ChevronRight
-                  className={`h-6 w-6 transition-colors ${
-                    isOpen ? "text-primary" : "text-foreground"
-                  }`}
-                />
+                <ChevronRight className="h-6 w-6 text-foreground transition-colors" />
               </div>
             </button>
 
@@ -61,7 +52,7 @@ export default function CollapsibleFAQ({
                 isOpen ? "mt-6 max-h-[500px] opacity-100" : "max-h-0 opacity-0"
               }`}
             >
-              <p className={`text-sm sm:text-base lg:text-xl ${isOpen ? "text-secondary-foreground" : "text-foreground"}`}>
+              <p className="text-sm sm:text-base lg:text-xl text-gray-text leading-relaxed">
                 {faq.answer}
               </p>
             </div>
