@@ -77,6 +77,7 @@ import GiftCardDetailsPage from "../pages/shop/GiftCardDetailsPage";
 import PrizeWheel from "../components/ui/PrizeWheel";
 import PrizeControllerPage from "../pages/dashboards/trader/PrizeControllerPage";
 import TraderTermsPage from "../pages/dashboards/trader/TraderTermsPage";
+import TermsPage from "../pages/terms/TermsPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -314,6 +315,10 @@ export const router = createBrowserRouter([
       {
         path: "signup",
         element: <AuthPage mode="signup" />,
+      },
+      {
+        path: "terms",
+        element: <TermsPage />,
       },
 
       {

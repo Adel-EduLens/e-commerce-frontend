@@ -24,7 +24,7 @@ const footerLinks: Record<string, { label: string; path: string }[]> = {
   ],
   Legal: [
     { label: 'Privacy', path: '/' },
-    { label: 'Terms', path: '/' },
+    { label: 'Terms', path: '/terms' },
     { label: 'Cookies', path: '/' },
   ],
 }

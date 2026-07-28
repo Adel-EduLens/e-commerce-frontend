@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next'
 import { Globe, ChevronDown } from 'lucide-react'
 import { handleApiError } from '../../lib/utils';
 import { Toggle } from '../../components/ui'
-import { TermsModal } from '../../components/shared'
+
 
 
 interface AuthPageProps {
@@ -27,7 +27,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [agreeTerms, setAgreeTerms] = useState(false)
-  const [showTermsModal, setShowTermsModal] = useState(false)
+
   const navigate = useNavigate()
 
   const setAuth = useAuthStore((state) => state.setAuth)
@@ -399,24 +399,24 @@ export default function AuthPage({ mode }: AuthPageProps) {
                             {isRTL ? (
                               <>
                                 أوافق على{" "}
-                                <button
-                                  type="button"
-                                  onClick={() => setShowTermsModal(true)}
+                                <Link
+                                  to="/terms"
+                                  target="_blank"
                                   className="text-info underline hover:text-primary transition font-semibold cursor-pointer"
                                 >
                                   الشروط والأحكام
-                                </button>
+                                </Link>
                               </>
                             ) : (
                               <>
                                 I agree to the{" "}
-                                <button
-                                  type="button"
-                                  onClick={() => setShowTermsModal(true)}
+                                <Link
+                                  to="/terms"
+                                  target="_blank"
                                   className="text-info underline hover:text-primary transition font-semibold cursor-pointer"
                                 >
                                   Terms & Conditions
-                                </button>
+                                </Link>
                               </>
                             )}
                           </span>
@@ -481,9 +481,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
           </div>
         </div>
       </div>
-      {showTermsModal && (
-        <TermsModal onClose={() => setShowTermsModal(false)} />
-      )}
+
     </div>
 
   )
