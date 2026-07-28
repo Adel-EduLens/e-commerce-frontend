@@ -15,8 +15,13 @@ import {
   Package,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useMyAddresses } from "../../hooks/queries/addressQuery";
-import type { Address } from "../../hooks/queries/addressQuery";
+import { useMyAddresses, type Address } from "../../hooks/queries/addressQuery";
+import {
+  useShippingCountries,
+  useShippingCities,
+  type ShippingCountry,
+  type ShippingCity,
+} from "../../hooks/queries/shippingQuery";
 import { LoadingSpinner } from "../../components/shared";
 
 /* ─── Sub-components using index.css design tokens ─────────────────────────── */
@@ -143,50 +148,55 @@ function FormInput({
   );
 }
 
+type SelectOption = { label: string; value: string } | string;
+
 function FormSelect({
   placeholder,
   value,
   onChange,
   options = [],
   className = "",
-  translationCategory,
+  disabled = false,
 }: {
   placeholder: string;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options?: string[];
+  options?: SelectOption[];
   className?: string;
-  translationCategory?: "countries" | "cities";
+  disabled?: boolean;
 }) {
-  const { t } = useTranslation("bag");
-
-  const getOptionLabel = (opt: string) => {
-    if (!translationCategory) return opt;
-    return t(`wholesaleCheckout.${translationCategory}.${opt}`, opt);
-  };
-
   return (
     <div
-      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke focus-within:outline-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden interactive-transition ${className}`}
+      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke focus-within:outline-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden interactive-transition ${
+        disabled ? "opacity-60 bg-gray-light cursor-not-allowed" : ""
+      } ${className}`}
     >
       <select
         value={value}
         onChange={onChange}
-        className="w-full h-full px-4 appearance-none bg-card font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10 cursor-pointer"
+        disabled={disabled}
+        className="w-full h-full px-4 appearance-none bg-card font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10 disabled:cursor-not-allowed cursor-pointer"
       >
         <option value="" disabled className="text-gray-text bg-card">
           {placeholder}
         </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt} className="bg-card text-foreground">
-            {getOptionLabel(opt)}
-          </option>
-        ))}
-        {value && !options.includes(value) && (
-          <option value={value} className="bg-card text-foreground">
-            {getOptionLabel(value)}
-          </option>
-        )}
+        {options.map((opt) => {
+          const val = typeof opt === "string" ? opt : opt.value;
+          const lbl = typeof opt === "string" ? opt : opt.label;
+          return (
+            <option key={val} value={val} className="bg-card text-foreground">
+              {lbl}
+            </option>
+          );
+        })}
+        {value &&
+          !options.some(
+            (opt) => (typeof opt === "string" ? opt : opt.value) === value
+          ) && (
+            <option value={value} className="bg-card text-foreground">
+              {value}
+            </option>
+          )}
       </select>
       <div className="absolute right-4 z-0 pointer-events-none">
         <DropdownArrow />
@@ -213,19 +223,43 @@ type CheckoutFormData = {
 function DeliverySection({
   data,
   onChange,
+  onCountryChange,
   addresses,
   selectedAddressId,
   isAddressesLoading,
   onSelectAddress,
+  countries,
+  availableCities,
+  isCountriesLoading,
+  isCitiesLoading,
 }: {
   data: CheckoutFormData;
   onChange: (field: keyof CheckoutFormData, value: string) => void;
+  onCountryChange: (countryName: string) => void;
   addresses: Address[];
   isAddressesLoading?: boolean;
   selectedAddressId: string | null;
   onSelectAddress: (address: Address) => void;
+  countries: ShippingCountry[];
+  availableCities: ShippingCity[];
+  isCountriesLoading: boolean;
+  isCitiesLoading: boolean;
 }) {
   const { t } = useTranslation("bag");
+
+  const countryOptions = useMemo(() => {
+    return countries.map((c) => ({
+      label: c.code ? `${c.name} (${c.code})` : c.name,
+      value: c.name,
+    }));
+  }, [countries]);
+
+  const cityOptions = useMemo(() => {
+    return availableCities.map((c) => ({
+      label: `${c.name} (${c.shippingCost} EGP)`,
+      value: c.name,
+    }));
+  }, [availableCities]);
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
@@ -272,18 +306,30 @@ function DeliverySection({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <FormSelect
-            placeholder={t("wholesaleCheckout.country", "Country")}
+            placeholder={
+              isCountriesLoading
+                ? t("wholesaleCheckout.loadingCountries", "Loading countries...")
+                : t("wholesaleCheckout.country", "Select Country")
+            }
             value={data.country}
-            onChange={(e) => onChange("country", e.target.value)}
-            options={["Egypt", "Saudi Arabia", "UAE"]}
-            translationCategory="countries"
+            onChange={(e) => onCountryChange(e.target.value)}
+            options={countryOptions}
+            disabled={isCountriesLoading || countryOptions.length === 0}
           />
           <FormSelect
-            placeholder={t("wholesaleCheckout.city", "City")}
+            placeholder={
+              !data.country
+                ? t("wholesaleCheckout.selectCountryFirst", "Select Country first")
+                : isCitiesLoading
+                ? t("wholesaleCheckout.loadingCities", "Loading cities...")
+                : cityOptions.length === 0
+                ? t("wholesaleCheckout.noCitiesAvailable", "No cities available")
+                : t("wholesaleCheckout.city", "Select City")
+            }
             value={data.city}
             onChange={(e) => onChange("city", e.target.value)}
-            options={["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"]}
-            translationCategory="cities"
+            options={cityOptions}
+            disabled={!data.country || isCitiesLoading || cityOptions.length === 0}
           />
         </div>
         <FormInput
@@ -520,12 +566,17 @@ export default function WholesaleCheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
+  // Dynamic Shipping Queries
+  const { data: countries = [], isLoading: isCountriesLoading } = useShippingCountries();
+  const { data: cities = [], isLoading: isCitiesLoading } = useShippingCities();
+  const { data: addresses = [], isLoading: isAddressesLoading } = useMyAddresses();
+
   const [formData, setFormData] = useState<CheckoutFormData>({
     firstName: "",
     lastName: "",
     phone: "",
     email: user?.email || "",
-    country: "Egypt",
+    country: "",
     city: "",
     area: "",
     streetAddress: "",
@@ -544,14 +595,56 @@ export default function WholesaleCheckoutPage() {
     }
   }, [user?.email]);
 
-  const { data: addresses = [], isLoading: isAddressesLoading } = useMyAddresses();
+  // Auto-set initial country once countries load if none selected yet
+  useEffect(() => {
+    if (countries.length > 0 && !formData.country) {
+      const defaultCountry = countries[0];
+      const defaultCountryCities = cities.filter((c) => c.countryId === defaultCountry.id);
+      setFormData((prev) => ({
+        ...prev,
+        country: defaultCountry.name,
+        city: defaultCountryCities.length > 0 ? defaultCountryCities[0].name : "",
+      }));
+    }
+  }, [countries, cities, formData.country]);
+
+  // Match selected country object
+  const selectedCountryObj = useMemo(() => {
+    if (!formData.country) return undefined;
+    return countries.find(
+      (c) =>
+        c.name.toLowerCase() === formData.country.trim().toLowerCase() ||
+        (c.code && c.code.toLowerCase() === formData.country.trim().toLowerCase())
+    );
+  }, [countries, formData.country]);
+
+  // Available cities for currently selected country
+  const availableCities = useMemo(() => {
+    if (!selectedCountryObj) return [];
+    return cities.filter((c) => c.countryId === selectedCountryObj.id);
+  }, [cities, selectedCountryObj]);
+
+  // Match selected city object for dynamic shipping cost
+  const selectedCityObj = useMemo(() => {
+    if (!formData.city) return undefined;
+    return availableCities.find(
+      (c) => c.name.toLowerCase() === formData.city.trim().toLowerCase()
+    );
+  }, [availableCities, formData.city]);
+
+  // Calculate dynamic shipping cost based on selected city
+  const shipping = useMemo(() => {
+    if (selectedCityObj && typeof selectedCityObj.shippingCost === "number") {
+      return selectedCityObj.shippingCost;
+    }
+    return 50; // Fallback shipping cost
+  }, [selectedCityObj]);
 
   const subtotal = useMemo(
     () => items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
     [items]
   );
 
-  const shipping = 50;
   const total = subtotal + shipping;
 
   const productText =
@@ -561,6 +654,23 @@ export default function WholesaleCheckoutPage() {
 
   const handleChange = (field: keyof CheckoutFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCountryChange = (newCountryName: string) => {
+    const matchingCountry = countries.find(
+      (c) => c.name.toLowerCase() === newCountryName.toLowerCase()
+    );
+    const countryCities = matchingCountry
+      ? cities.filter((c) => c.countryId === matchingCountry.id)
+      : [];
+
+    const defaultCity = countryCities.length > 0 ? countryCities[0].name : "";
+
+    setFormData((prev) => ({
+      ...prev,
+      country: newCountryName,
+      city: defaultCity,
+    }));
   };
 
   if (isAddressesLoading) {
@@ -684,6 +794,7 @@ export default function WholesaleCheckoutPage() {
           <DeliverySection
             data={formData}
             onChange={handleChange}
+            onCountryChange={handleCountryChange}
             addresses={addresses}
             selectedAddressId={selectedAddressId}
             isAddressesLoading={isAddressesLoading}
@@ -698,6 +809,10 @@ export default function WholesaleCheckoutPage() {
                 apartment: address.apartment ?? "",
               }));
             }}
+            countries={countries}
+            availableCities={availableCities}
+            isCountriesLoading={isCountriesLoading}
+            isCitiesLoading={isCitiesLoading}
           />
 
           {/* Place order section */}
