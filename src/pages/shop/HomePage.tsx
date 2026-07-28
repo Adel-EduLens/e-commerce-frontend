@@ -138,36 +138,36 @@ function VoteSection() {
   const defaultDesigns: VoteDesign[] = [
     {
       id: "demo-1",
-      title: "Vote for next design",
-      description: "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.",
+      title: t("demo1Title", "Vote for next design"),
+      description: t("demo1Desc", "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort."),
       imagePath: asset("image 11.png"),
       votes: 1200,
     },
     {
       id: "demo-2",
-      title: "Urban Utility Oversized Hoodie",
-      description: "Heavyweight 450GSM organic cotton hoodie with modular cargo pockets and water-resistant finish.",
+      title: t("demo2Title", "Urban Utility Oversized Hoodie"),
+      description: t("demo2Desc", "Heavyweight 450GSM organic cotton hoodie with modular cargo pockets and water-resistant finish."),
       imagePath: asset("image 1.png"),
       votes: 980,
     },
     {
       id: "demo-3",
-      title: "Cyberpunk Techwear Windbreaker",
-      description: "Reflective multi-zipper shell jacket built for high mobility and extreme weather resistance.",
+      title: t("demo3Title", "Cyberpunk Techwear Windbreaker"),
+      description: t("demo3Desc", "Reflective multi-zipper shell jacket built for high mobility and extreme weather resistance."),
       imagePath: asset("image 2.png"),
       votes: 1450,
     },
     {
       id: "demo-4",
-      title: "Minimalist Essential Track Jacket",
-      description: "Sleek matte nylon jacket with hidden zip closure and custom embroidered branding.",
+      title: t("demo4Title", "Minimalist Essential Track Jacket"),
+      description: t("demo4Desc", "Sleek matte nylon jacket with hidden zip closure and custom embroidered branding."),
       imagePath: asset("image 4.png"),
       votes: 830,
     },
     {
       id: "demo-5",
-      title: "Vintage Washed Denim Outerwear",
-      description: "Artisanal distressed denim jacket with fleece lining and custom brass hardware.",
+      title: t("demo5Title", "Vintage Washed Denim Outerwear"),
+      description: t("demo5Desc", "Artisanal distressed denim jacket with fleece lining and custom brass hardware."),
       imagePath: asset("image 7.png"),
       votes: 1120,
     },
@@ -259,16 +259,16 @@ function VoteSection() {
           {/* Top/Middle Text Content */}
           <div className="relative z-10 flex flex-col items-start justify-center my-auto space-y-4 sm:space-y-6">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              {t("title", "Vote for next design")}
+              {current?.title || t("title", "Vote for next design")}
             </h2>
 
             <p className="text-sm sm:text-base text-white/85 font-normal leading-relaxed max-w-lg line-clamp-3">
               {current?.description ||
-                "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort."}
+                t("defaultDescription", "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.")}
             </p>
 
             <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wide">
-              {formattedVotes} Votes
+              {formattedVotes} {t("votes", "Votes")}
             </div>
 
             <button
@@ -278,9 +278,9 @@ function VoteSection() {
               className="rounded-xl border border-white bg-transparent px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-200 hover:bg-white hover:text-[#9B0F17] active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
             >
               {voting
-                ? "Voting..."
+                ? t("voting", "Voting...")
                 : current?.hasVoted
-                ? "Voted ✓"
+                ? t("voted", "Voted ✓")
                 : t("voteNow", "Vote Now")}
             </button>
           </div>

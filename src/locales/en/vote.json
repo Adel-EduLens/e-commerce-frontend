@@ -4,6 +4,20 @@
   "untitled": "Untitled design",
   "votes": "Votes",
   "voteButton": "Vote",
+  "voteNow": "Vote Now",
+  "voting": "Voting...",
+  "voted": "Voted ✓",
   "successMessage": "Your vote has been counted!",
-  "errorMessage": "Failed to submit vote"
+  "errorMessage": "Failed to submit vote",
+  "defaultDescription": "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.",
+  "demo1Title": "Vote for next design",
+  "demo1Desc": "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.",
+  "demo2Title": "Urban Utility Oversized Hoodie",
+  "demo2Desc": "Heavyweight 450GSM organic cotton hoodie with modular cargo pockets and water-resistant finish.",
+  "demo3Title": "Cyberpunk Techwear Windbreaker",
+  "demo3Desc": "Reflective multi-zipper shell jacket built for high mobility and extreme weather resistance.",
+  "demo4Title": "Minimalist Essential Track Jacket",
+  "demo4Desc": "Sleek matte nylon jacket with hidden zip closure and custom embroidered branding.",
+  "demo5Title": "Vintage Washed Denim Outerwear",
+  "demo5Desc": "Artisanal distressed denim jacket with fleece lining and custom brass hardware."
 }
