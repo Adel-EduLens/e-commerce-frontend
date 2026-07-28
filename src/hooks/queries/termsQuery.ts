@@ -30,8 +30,15 @@ export const useLatestTerms = () => {
   return useQuery<TermsAndConditions>({
     queryKey: ["terms", "latest"],
     queryFn: async () => {
-      const { data } = await api.get("/terms/latest");
-      return data?.data || null;
+      try {
+        const { data } = await api.get("/terms/latest");
+        return data?.data || null;
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          return null;
+        }
+        throw err;
+      }
     },
   });
 };

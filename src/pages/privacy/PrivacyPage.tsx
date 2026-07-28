@@ -1,14 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowRight, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLatestTerms } from "../../hooks/queries/termsQuery";
+import { useLatestPrivacy } from "../../hooks/queries/privacyQuery";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 
-export default function TermsPage() {
-  const { t, i18n } = useTranslation("traderTerms");
+export default function PrivacyPage() {
+  const { t, i18n } = useTranslation("traderPrivacy");
   const isRTL = i18n.language?.startsWith("ar");
   const navigate = useNavigate();
-  const { data: latestTerms, isLoading } = useLatestTerms();
+  const { data: latestPrivacy, isLoading } = useLatestPrivacy();
 
   const BackArrow = isRTL ? ArrowRight : ArrowLeft;
 
@@ -37,12 +37,12 @@ export default function TermsPage() {
             <Shield className="h-8 w-8 text-primary" />
           </div>
           <h1 className="terms-page__title">
-            {t("termsHeading")}
+            {t("privacyHeading")}
           </h1>
           <p className="terms-page__subtitle">
             {isRTL
-              ? "يرجى قراءة الشروط والأحكام بعناية قبل الاستمرار"
-              : "Please read our terms and conditions carefully before proceeding"}
+              ? "يرجى قراءة سياسة الخصوصية بعناية قبل الاستمرار"
+              : "Please read our privacy policy carefully before proceeding"}
           </p>
         </div>
 
@@ -50,13 +50,13 @@ export default function TermsPage() {
         <div className="terms-page__content">
           {isLoading ? (
             <LoadingSpinner text={t("loading")} containerClassName="py-20" className="h-10 w-10" />
-          ) : !latestTerms || !latestTerms.sections || latestTerms.sections.length === 0 ? (
+          ) : !latestPrivacy || !latestPrivacy.sections || latestPrivacy.sections.length === 0 ? (
             <div className="terms-page__empty">
-              <p>{t("noTermsFound")}</p>
+              <p>{t("noPrivacyFound")}</p>
             </div>
           ) : (
             <div className="terms-page__sections">
-              {[...latestTerms.sections]
+              {[...latestPrivacy.sections]
                 .sort((a, b) => a.order - b.order)
                 .map((section) => (
                   <div key={section.id} className="terms-page__section">

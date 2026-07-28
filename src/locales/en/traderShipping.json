@@ -6,7 +6,9 @@
     "homeBanners": "Homepage Banners",
     "faqs": "FAQs",
     "helpCenter": "Help Center",
-    "shipping": "Shipping & Delivery"
+    "shipping": "Shipping & Delivery",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
   },
   "title": "Shipping & Delivery Settings",
   "subtitle": "Manage shipping countries, cities, and local delivery rates for your store.",

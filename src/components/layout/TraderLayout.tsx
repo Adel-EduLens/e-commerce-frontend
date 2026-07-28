@@ -114,11 +114,7 @@ const sidebarItems = [
     icon: "wheel.svg",
     path: "/dashboard/trader/prizes",
   },
-  {
-    label: "terms",
-    icon: "carbon_follow-up-work-order.svg",
-    path: "/dashboard/trader/terms",
-  },
+
 ] as const;
 
 export default function TraderLayout() {
