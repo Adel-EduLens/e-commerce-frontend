@@ -66,7 +66,7 @@ export default function RecentlyViewedPage() {
 
             const displayPrice =
               p.productType === 'RENTAL'
-                ? item.depositAmount ?? item.rentalPrice ?? item.retailPrice ?? item.shopPrice ?? item.price ?? 0
+                ? item.rentalPrice ?? item.depositAmount ?? item.retailPrice ?? item.shopPrice ?? item.price ?? 0
                 : p.productType === 'RETAIL'
                   ? item.retailPrice ?? item.shopPrice ?? item.rentalPrice ?? item.price ?? 0
                   : isWholesale
@@ -87,9 +87,17 @@ export default function RecentlyViewedPage() {
                 to={targetUrl}
                 title={item.name}
                 shopPrice={item.shopPrice}
+                rentalPrice={item.rentalPrice}
                 depositAmount={item.depositAmount}
                 price={`${displayPrice} EGP`}
                 imageSrc={computedImageSrc}
+                colors={Array.from(
+                  new Set(
+                    item.colors
+                      ?.map((c: any) => (typeof c === "string" ? c : c.colorName || c.color || c.name || ""))
+                      .filter(Boolean) ?? [],
+                  ),
+                )}
                 sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name || Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ")}
                 rating={item.rating || item.averageRating}
               />

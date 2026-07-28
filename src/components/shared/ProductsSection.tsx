@@ -171,6 +171,7 @@ export default function ProductsSection({
                 title={product.name}
                 subtitle={product.description}
                 price={`${isRental ? (product.rentalPrice ?? product.retailPrice ?? product.price ?? 0) : isRetail ? (product.retailPrice ?? product.price ?? 0) : isWholesale ? (product.wholesalePrice ?? product.price ?? 0) : (product.shopPrice ?? product.price ?? 0)} EGP`}
+                rentalPrice={product.rentalPrice}
                 depositAmount={product.depositAmount}
                 imageSrc={
                   product.colors?.[0]?.images?.[0]?.imageUrl ||

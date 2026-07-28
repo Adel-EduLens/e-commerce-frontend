@@ -110,7 +110,7 @@ export default function FavoritesPage() {
 
             const favDisplayPrice =
               item.productType === 'RENTAL'
-                ? (p.depositAmount as number | undefined) ?? p.rentalPrice ?? p.retailPrice ?? p.shopPrice ?? p.price ?? 0
+                ? p.rentalPrice ?? (p.depositAmount as number | undefined) ?? p.retailPrice ?? p.shopPrice ?? p.price ?? 0
                 : item.productType === 'RETAIL'
                   ? p.retailPrice ?? p.shopPrice ?? p.rentalPrice ?? p.price ?? 0
                   : item.productType === 'WHOLESALE'
@@ -125,6 +125,7 @@ export default function FavoritesPage() {
                 title={p.name}
                 subtitle={p.description || undefined}
                 shopPrice={p.shopPrice}
+                rentalPrice={p.rentalPrice}
                 depositAmount={p.depositAmount ?? undefined}
                 price={`${favDisplayPrice} EGP`}
                 to={route}
@@ -136,7 +137,13 @@ export default function FavoritesPage() {
                 isFlashDeals={p.isFlashDeals ?? false}
                 brand={p.brand}
                 category={p.category?.name}
-                colors={wholesaleColors.map((wc) => wc.color)}
+                colors={Array.from(
+                  new Set(
+                    ((p.colors as any[])?.map((c) => (typeof c === "string" ? c : c.colorName || c.color || c.name || "")) ?? [])
+                      .concat(wholesaleColors.map((wc) => wc.color || (wc as any).colorName))
+                      .filter(Boolean),
+                  ),
+                )}
                 wholesaleSizes={wholesaleSizes}
                 sizeLabel={wholesaleSizes.slice(0, 4).join("-") || "All Sizes"}
                 minOrder={p.minOrder}

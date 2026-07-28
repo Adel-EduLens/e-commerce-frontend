@@ -80,6 +80,7 @@ export type ProductCardProps = {
   hideQuickActions?: boolean;
   stock?: number;
   depositAmount?: number;
+  rentalPrice?: number;
   shopPrice?: number;
 };
 
@@ -147,12 +148,36 @@ export default function ProductCard({
   hideQuickActions = false,
   stock,
   depositAmount,
+  rentalPrice,
   shopPrice,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
-  const safeColors = Array.isArray(colors)
-    ? colors.filter((c) => typeof c === "string" && c.trim() !== "")
+  const safeColorsFromProps = Array.isArray(colors) && colors.length > 0
+    ? Array.from(
+        new Set(
+          colors
+            .map((c) =>
+              typeof c === "string"
+                ? c
+                : typeof c === "object" && c !== null
+                  ? (c as any).colorName || (c as any).color || (c as any).colorCode || (c as any).name || ""
+                  : "",
+            )
+            .filter((c): c is string => typeof c === "string" && c.trim() !== ""),
+        ),
+      )
     : [];
+
+  const safeColorsFromImages = Array.from(
+    new Set(
+      (images || [])
+        .map((img) => img.color)
+        .filter((c): c is string => typeof c === "string" && c.trim() !== ""),
+    ),
+  );
+
+  const safeColors =
+    safeColorsFromProps.length > 0 ? safeColorsFromProps : safeColorsFromImages;
   const { label: countdownLabel, expired } = useCountdown(
     showFlashDeal ? flashDealEndsAt : undefined,
   );
@@ -589,24 +614,48 @@ export default function ProductCard({
               {rating}
             </span>
           </div>
-          <div
-            className={`${useWholesaleCard ? "text-end text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
-          >
-            {showFlashDeal && flashDealPrice
-              ? `${flashDealPrice.toLocaleString()} ${t("egp", "EGP")}`
-              : (!productType || productType === "SHOP") && shopPrice !== undefined && shopPrice !== null
-                ? `${shopPrice.toLocaleString()} ${t("egp", "EGP")}`
-                : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
-            {isWholesale && (
-              <span
-                className={
-                  useWholesaleCard ? "text-xs font-normal text-gray-text" : ""
-                }
+          {productType === "RENTAL" || productType === "RETAIL" ? (
+            <div className="flex flex-col items-end text-end">
+              {depositAmount !== undefined && depositAmount !== null && (
+                <span className="text-xs font-normal text-gray-text">
+                  {t("depositAmount", "قيمة العربون")}: {depositAmount.toLocaleString()} {t("egp", "EGP")}
+                </span>
+              )}
+              <div
+                className={`${useWholesaleCard ? "text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger flex items-baseline gap-1`}
               >
-                {` / ${t("pack", "Pack")}`}
-              </span>
-            )}
-          </div>
+                <span>
+                  {showFlashDeal && flashDealPrice
+                    ? `${flashDealPrice.toLocaleString()} ${t("egp", "EGP")}`
+                    : rentalPrice !== undefined && rentalPrice !== null
+                      ? `${rentalPrice.toLocaleString()} ${t("egp", "EGP")}`
+                      : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
+                </span>
+                <span className="text-xs sm:text-sm font-normal text-gray-text">
+                  {t("perDay", "في اليوم")}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div
+              className={`${useWholesaleCard ? "text-end text-xl font-extrabold leading-none" : "text-2xl font-bold"} text-danger`}
+            >
+              {showFlashDeal && flashDealPrice
+                ? `${flashDealPrice.toLocaleString()} ${t("egp", "EGP")}`
+                : (!productType || productType === "SHOP") && shopPrice !== undefined && shopPrice !== null
+                  ? `${shopPrice.toLocaleString()} ${t("egp", "EGP")}`
+                  : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
+              {isWholesale && (
+                <span
+                  className={
+                    useWholesaleCard ? "text-xs font-normal text-gray-text" : ""
+                  }
+                >
+                  {` / ${t("pack", "Pack")}`}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Add to cart button */}

@@ -190,7 +190,13 @@ export default function ProductsPage() {
             key={`retail-${product.id}`}
             title={product.name}
             productId={product.id}
-            colors={product.colors?.map((c) => c.colorName)}
+            colors={Array.from(
+              new Set(
+                product.colors
+                  ?.map((c) => (typeof c === "string" ? c : c.colorName || c.color || (c as any).name || ""))
+                  .filter(Boolean),
+              ),
+            )}
             images={product.images}
             shopPrice={product.shopPrice}
             price={`${product.shopPrice ?? product.retailPrice ?? product.rentalPrice ?? product.wholesalePrice ?? product.blankPrice ?? product.price ?? 0} EGP`}
