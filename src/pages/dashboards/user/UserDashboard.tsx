@@ -6,19 +6,7 @@ import { useRecentlyViewed } from "../../../hooks/useRecentlyViewed";
 import { useProducts } from "../../../hooks/queries/productsQuery";
 import { useNavigate } from "react-router-dom";
 
-function ViewAllButton({ onClick }: { onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4"
-    >
-      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
-        View All
-      </div>
-    </button>
-  );
-}
+import { ViewAllButton } from "../../../components/ui/ViewAllButton";
 
 type DashboardProduct = {
   image?: string;
