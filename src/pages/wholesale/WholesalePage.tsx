@@ -193,22 +193,7 @@ function HeroBanner() {
   )
 }
 
-function ViewAllButton({ to }: { to: string }) {
-  const { t } = useTranslation("productSection")
-  return (
-    <Link to={to} className="inline-flex items-center justify-start gap-2 rounded-2xl bg-primary p-4 no-underline">
-      <div className="font-['Montserrat'] text-xl font-semibold text-foreground">
-        {t("viewAll", "View All")}
-      </div>
-      <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white">
-        <AssetImage
-          file="weui_arrow-filled-3.svg"
-          className="absolute left-[14px] top-[8px] h-6 w-3"
-        />
-      </div>
-    </Link>
-  )
-}
+import { ViewAllButton } from '../../components/ui/ViewAllButton'
 
 function ProductSection({ title, baseFilters, viewAllLink }: { title: string; baseFilters?: ProductsQuery; viewAllLink?: string }) {
   const { t } = useTranslation("productSection")

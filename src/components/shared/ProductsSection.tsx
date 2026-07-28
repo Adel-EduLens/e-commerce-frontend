@@ -9,17 +9,12 @@ import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
 import type { FilterValues } from "./CatalogFilters";
 import { useNavigate } from "react-router-dom";
-import {
-  useProducts,
-  transformProduct,
-  type Product,
-} from "../../hooks/queries/productsQuery";
+import { useProducts, type Product } from "../../hooks/queries/productsQuery";
 import type { ProductsQuery } from "../../hooks/queries/productsQuery";
 import ProductCard from "../shared/ProductCard";
 import { ViewAllButton } from "../ui/ViewAllButton";
 import CatalogFilters from "./CatalogFilters";
 import { useTranslation } from "react-i18next";
-
 
 export default function ProductsSection({
   title,
@@ -43,11 +38,17 @@ export default function ProductsSection({
     priceMax: null,
   });
 
-  const { data: standardCategories = [] } = useCategories(isRetail ? "RETAIL" : undefined);
-  const categories: { id: string | number; name: string }[] = standardCategories as { id: string | number; name: string }[];
+  const { data: standardCategories = [] } = useCategories(
+    isRetail ? "RETAIL" : undefined,
+  );
+  const categories: { id: string | number; name: string }[] =
+    standardCategories as { id: string | number; name: string }[];
 
   const { data: standardBrands = [] } = useBrands();
-  const brands: { id: string | number; name: string }[] = standardBrands as { id: string | number; name: string }[];
+  const brands: { id: string | number; name: string }[] = standardBrands as {
+    id: string | number;
+    name: string;
+  }[];
 
   const categoryId = useMemo(() => {
     if (!filterValues.category) return "";
@@ -78,11 +79,7 @@ export default function ProductsSection({
     type: isRetail ? "RETAIL" : isWholesale ? "WHOLESALE" : "SHOP",
   };
 
-  const {
-    data: shopData,
-    isPending,
-    isError,
-  } = useProducts(shopQueryFilters);
+  const { data: shopData, isPending, isError } = useProducts(shopQueryFilters);
 
   const products: Product[] = shopData?.products || [];
 
@@ -91,9 +88,8 @@ export default function ProductsSection({
       new Set(
         products.flatMap(
           (p) =>
-            p.colors?.flatMap(
-              (c) => c.variants?.map((v) => v.size) ?? [],
-            ) ?? [],
+            p.colors?.flatMap((c) => c.variants?.map((v) => v.size) ?? []) ??
+            [],
         ),
       ),
     ).filter((x): x is string => Boolean(x));
@@ -116,7 +112,9 @@ export default function ProductsSection({
 
     const availableBrands = Array.from(
       new Set(
-        products.map((p) => p.brand?.name || (p.brand as unknown as string)).filter((x): x is string => Boolean(x)),
+        products
+          .map((p) => p.brand?.name || (p.brand as unknown as string))
+          .filter((x): x is string => Boolean(x)),
       ),
     );
 
@@ -172,12 +170,13 @@ export default function ProductsSection({
                 productType={isRental ? "RENTAL" : isRetail ? "RETAIL" : "SHOP"}
                 title={product.name}
                 subtitle={product.description}
-                price={`${isRental ? product.rentalPrice ?? product.retailPrice ?? product.price ?? 0 : isRetail ? product.retailPrice ?? product.price ?? 0 : isWholesale ? product.wholesalePrice ?? product.price ?? 0 : product.shopPrice ?? product.price ?? 0} EGP`}
+                price={`${isRental ? (product.rentalPrice ?? product.retailPrice ?? product.price ?? 0) : isRetail ? (product.retailPrice ?? product.price ?? 0) : isWholesale ? (product.wholesalePrice ?? product.price ?? 0) : (product.shopPrice ?? product.price ?? 0)} EGP`}
                 depositAmount={product.depositAmount}
                 imageSrc={
                   product.colors?.[0]?.images?.[0]?.imageUrl ||
                   product.colors?.[0]?.images?.[0]?.url ||
-                  (product.images?.[0] as Record<string, unknown>)?.imageUrl as string ||
+                  ((product.images?.[0] as Record<string, unknown>)
+                    ?.imageUrl as string) ||
                   product.images?.[0]?.url
                 }
                 colors={Array.from(
@@ -189,21 +188,30 @@ export default function ProductsSection({
                 )}
                 images={
                   product.images?.length > 0
-                      ? product.images.map((img) => ({
+                    ? product.images.map((img) => ({
                         ...img,
-                        url: img.url || (img as Record<string, unknown>).imageUrl as string,
+                        url:
+                          img.url ||
+                          ((img as Record<string, unknown>).imageUrl as string),
                       }))
                     : product.colors?.flatMap(
                         (c) =>
                           c.images?.map((img) => ({
                             ...img,
-                            url: img.url || (img as Record<string, unknown>).imageUrl as string,
+                            url:
+                              img.url ||
+                              ((img as Record<string, unknown>)
+                                .imageUrl as string),
                             color: c.colorName || c.color,
                           })) || [],
                       ) || []
                 }
-                brand={product.brand?.name || (product.brand as unknown as string)}
-                category={product.categories?.map((c) => c.name).join(", ") || ""}
+                brand={
+                  product.brand?.name || (product.brand as unknown as string)
+                }
+                category={
+                  product.categories?.map((c) => c.name).join(", ") || ""
+                }
                 sizeLabel={Array.from(
                   new Set(
                     product.colors?.flatMap(
@@ -213,9 +221,17 @@ export default function ProductsSection({
                 ).join(" - ")}
                 featured={product.rating >= 4}
                 isMustHave={product.isMustHave}
-                isFlashDeals={!isRetail && !isWholesale ? product.isFlashDeals : false}
-                flashDealPrice={!isRetail && !isWholesale ? product.flashDealPrice : undefined}
-                flashDealEndsAt={!isRetail && !isWholesale ? product.flashDealEndsAt : undefined}
+                isFlashDeals={
+                  !isRetail && !isWholesale ? product.isFlashDeals : false
+                }
+                flashDealPrice={
+                  !isRetail && !isWholesale ? product.flashDealPrice : undefined
+                }
+                flashDealEndsAt={
+                  !isRetail && !isWholesale
+                    ? product.flashDealEndsAt
+                    : undefined
+                }
                 rating={product.rating}
                 stock={product.stock}
                 to={
