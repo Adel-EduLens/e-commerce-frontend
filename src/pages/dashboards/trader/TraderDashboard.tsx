@@ -361,7 +361,7 @@ export default function TraderDashboard() {
     { enabled: typeFilter !== "WHOLESALE" }
   );
 
-  // 4b. Fetch wholesale orders separately
+  // 4b. Fetch wholesale orders separately using dedicated wholesale orders query hook
   const { data: wholesaleOrders = [], isLoading: wholesaleOrdersLoading } = useTraderWholesaleOrders({
     enabled: typeFilter === "ALL" || typeFilter === "WHOLESALE",
   });
@@ -575,8 +575,8 @@ export default function TraderDashboard() {
       { name: string; revenue: number; units: number; price: number; image: string }
     > = {};
 
-    orders.forEach((order) => {
-      (order.items || []).forEach((item) => {
+    combinedOrders.forEach((order) => {
+      (order.items || []).forEach((item: any) => {
         const pId = item.productId || item.id;
         const itemPrice = parsePrice(item.price);
         const itemQty = Number(item.quantity) || 1;
