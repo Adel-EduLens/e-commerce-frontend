@@ -21,8 +21,12 @@ interface CompareCardProps {
 
 export function CompareCard({ product, onRemove }: CompareCardProps) {
   const pType = product.productType || "SHOP";
+  const isRentalType = pType === "RENTAL" || pType === "RETAIL";
+  const rentalPrice = product.rentalPrice ?? product.retailPrice ?? product.price ?? 0;
+  const depositAmt = product.depositAmount;
+
   const displayPrice = pType === "SHOP" ? product.shopPrice ?? product.price ?? 0
-                     : pType === "RETAIL" ? product.retailPrice ?? product.price ?? 0
+                     : isRentalType ? (depositAmt ?? rentalPrice)
                      : pType === "WHOLESALE" ? product.wholesalePrice ?? product.price ?? 0
                      : product.blankPrice ?? product.price ?? 0;
 
@@ -92,7 +96,7 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
         <div className="absolute right-3 bottom-3 flex flex-col gap-2">
           <span className="flex w-fit items-center gap-1 rounded-full bg-black/70 px-2 py-1 text-xs font-semibold text-white">
             {pType === "SHOP" ? t("card.typeShop", "Shop") 
-             : pType === "RETAIL" ? t("card.typeRetail", "Retail") 
+             : isRentalType ? t("card.typeRental", "Rental")
              : pType === "WHOLESALE" ? t("card.typeWholesale", "Wholesale") 
              : t("card.typeBlank", "Blank")}
           </span>
@@ -110,7 +114,28 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
           </h2>
 
           <div className="shrink-0 text-end">
-            {hasFlashDeal ? (
+            {isRentalType ? (
+              <div className="flex flex-col items-end gap-1">
+                {depositAmt !== undefined && depositAmt !== null && (
+                  <div className="text-end">
+                    <span className="block text-[11px] font-medium text-gray-text">
+                      {t("card.depositLabel", "Deposit")}:
+                    </span>
+                    <span className="block text-base font-bold text-primary">
+                      ${depositAmt}
+                    </span>
+                  </div>
+                )}
+                <div className="text-end">
+                  <span className="block text-[11px] font-medium text-gray-text">
+                    {t("card.rentalPriceLabel", "Rental Price")}:
+                  </span>
+                  <span className="block text-sm font-semibold text-foreground">
+                    ${rentalPrice}
+                  </span>
+                </div>
+              </div>
+            ) : hasFlashDeal ? (
               <>
                 <span className="block text-lg font-bold text-primary">
                   ${product.flashDealPrice}
@@ -243,7 +268,13 @@ export function CompareCard({ product, onRemove }: CompareCardProps) {
 
         <div className="mt-auto pt-5">
           <Link
-            to={`/product-details/${product.id}`}
+            to={
+              isRentalType
+                ? `/rental/shop/${product.id}`
+                : pType === "WHOLESALE"
+                ? `/wholesale/${product.id}`
+                : `/product-details/${product.id}`
+            }
             className="
               flex
               w-full

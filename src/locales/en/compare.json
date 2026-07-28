@@ -24,8 +24,11 @@
     "remove": "Remove",
     "noData": "—",
     "typeShop": "Shop",
+    "typeRental": "Rental",
     "typeRetail": "Rental",
     "typeWholesale": "Wholesale",
-    "typeBlank": "Blank"
+    "typeBlank": "Blank",
+    "depositLabel": "Deposit Amount",
+    "rentalPriceLabel": "Rental Price"
   }
 }

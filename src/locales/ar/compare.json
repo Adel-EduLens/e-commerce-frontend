@@ -24,8 +24,11 @@
     "remove": "إزالة",
     "noData": "—",
     "typeShop": "المتجر",
+    "typeRental": "تأجير",
     "typeRetail": "تأجير",
     "typeWholesale": "جملة",
-    "typeBlank": "أساسي"
+    "typeBlank": "أساسي",
+    "depositLabel": "مبلغ العربون",
+    "rentalPriceLabel": "سعر التأجير"
   }
 }
