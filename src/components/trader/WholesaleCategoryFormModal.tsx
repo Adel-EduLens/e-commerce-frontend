@@ -120,7 +120,7 @@ export function WholesaleCategoryFormModal({
             </button>
             <button
               type="button"
-              disabled={uploading || !name.trim() || !image}
+              disabled={uploading || !name.trim()}
               onClick={() => onSave({ name: name.trim(), image, appearOnHome: false, isWholesale: true })}
               className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
             >
