@@ -1,5 +1,20 @@
 {
   "categoriesSection": {
     "title": "Explore Our Categories"
+  },
+  "map": {
+    "unknownCity": "Unknown City",
+    "unknownArea": "Unknown Area",
+    "unknownStreet": "Unknown Street",
+    "geoNotSupported": "Geolocation is not supported by your browser.",
+    "locationDenied": "Location access was denied. Please enable location permissions for this site in your browser settings (usually the lock icon in the address bar).",
+    "locationError": "Unable to retrieve your location. Please ensure your GPS is enabled.",
+    "pinYourLocation": "Pin your location on the map",
+    "locating": "Locating...",
+    "useCurrentLocation": "Use my current location",
+    "searchPlaceholder": "Search for a specific place...",
+    "pinDroppedAt": "Pin dropped at: {{lat}}, {{lng}}",
+    "clickToDropPin": "Click anywhere on the map to drop a pin.",
+    "confirmLocation": "Confirm Location"
   }
 }

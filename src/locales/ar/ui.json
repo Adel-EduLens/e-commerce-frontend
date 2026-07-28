@@ -1,5 +1,20 @@
 {
   "categoriesSection": {
     "title": "استكشف فئاتنا"
+  },
+  "map": {
+    "unknownCity": "مدينة غير معروفة",
+    "unknownArea": "منطقة غير معروفة",
+    "unknownStreet": "شارع غير معروف",
+    "geoNotSupported": "تحديد الموقع غير مدعوم بواسطة متصفحك.",
+    "locationDenied": "تم رفض الإذن للوصول إلى الموقع. يرجى تفعيل إذن الموقع لهذا الموقع من إعدادات المتصفح (عادةً رمز القفل في شريط العنوان).",
+    "locationError": "تعذر استرداد موقعك. يرجى التأكد من تفعيل خدمة GPS.",
+    "pinYourLocation": "حدد موقعك على الخريطة",
+    "locating": "جارٍ التحديد...",
+    "useCurrentLocation": "استخدام موقعي الحالي",
+    "searchPlaceholder": "البحث عن مكان محدد...",
+    "pinDroppedAt": "تم تحديد النقطة عند: {{lat}}، {{lng}}",
+    "clickToDropPin": "انقر في أي مكان على الخريطة لتحديد موقع.",
+    "confirmLocation": "تأكيد الموقع"
   }
 }

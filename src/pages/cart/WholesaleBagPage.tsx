@@ -2,19 +2,20 @@ import { useMemo, useState } from "react";
 import { Trash2, Package, ShoppingCart } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { api } from "../../lib/axios";
-import { type CartItem, } from "../../store/useCartStore";
+import { type CartItem } from "../../store/useCartStore";
 import {
   useWholesaleCartItems,
   useWholesaleCartStore,
 } from "../../store/useWholesaleCartStore";
 import { useAuthStore } from "../../store/useAuthStore";
 
-const formatCurrency = (amount: number) =>
-  `EGP ${new Intl.NumberFormat("en-US", {
+const formatCurrency = (amount: number, currencySuffix = "EGP") =>
+  `${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(amount)}`;
+  }).format(amount)} ${currencySuffix}`;
 
 function PlusIcon() {
   return (
@@ -44,6 +45,7 @@ function WholesaleItemCard({
   onIncrease: () => void;
   onDecrease: () => void;
 }) {
+  const { t } = useTranslation("bag");
   const minOrder = item.minOrder ?? 1;
 
   return (
@@ -53,7 +55,7 @@ function WholesaleItemCard({
         type="button"
         onClick={onRemove}
         className="absolute top-4 right-4 h-10 w-10 flex items-center justify-center rounded-full border border-stroke bg-card hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition text-foreground"
-        aria-label={`Remove ${item.title}`}
+        aria-label={t("wholesaleBag.removeItem", "Remove {{title}}", { title: item.title })}
       >
         <Trash2 className="h-5 w-5" strokeWidth={1.5} />
       </button>
@@ -77,11 +79,11 @@ function WholesaleItemCard({
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider">
-              Wholesale
+              {t("wholesaleBag.wholesale", "Wholesale")}
             </span>
             {minOrder > 1 && (
               <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[10px] font-semibold text-amber-600 dark:bg-amber-950 dark:border-amber-800 dark:text-amber-400">
-                Min. {minOrder} pcs
+                {t("wholesaleBag.minOrderPcs", "Min. {{count}} pcs", { count: minOrder })}
               </span>
             )}
           </div>
@@ -91,19 +93,21 @@ function WholesaleItemCard({
           </h3>
 
           <span className="font-['Montserrat'] text-2xl font-bold text-foreground">
-            {formatCurrency(item.unitPrice)}
-            <span className="text-sm font-normal text-gray-text ml-1">/ unit</span>
+            {formatCurrency(item.unitPrice, t("EGP", "EGP"))}
+            <span className="text-sm font-normal text-gray-text ml-1">
+              / {t("wholesaleBag.perUnit", "unit")}
+            </span>
           </span>
 
           <div className="flex flex-wrap gap-2 mt-1">
             {item.color && (
               <span className="rounded-xl border border-stroke bg-background px-3 py-1 font-['Montserrat'] text-sm text-foreground">
-                Color: <strong className="font-bold">{item.color}</strong>
+                {t("wholesaleBag.color", "Color:")} <strong className="font-bold">{item.color}</strong>
               </span>
             )}
             {item.size && (
               <span className="rounded-xl border border-stroke bg-background px-3 py-1 font-['Montserrat'] text-sm text-foreground">
-                Sizes: <strong className="font-bold">{item.size}</strong>
+                {t("wholesaleBag.sizes", "Sizes:")} <strong className="font-bold">{item.size}</strong>
               </span>
             )}
           </div>
@@ -115,7 +119,7 @@ function WholesaleItemCard({
             <button
               type="button"
               onClick={onDecrease}
-              disabled={item.quantity <= (minOrder)}
+              disabled={item.quantity <= minOrder}
               className="h-8 w-8 flex items-center justify-center rounded-full bg-background hover:bg-stroke transition text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <MinusIcon />
@@ -133,9 +137,9 @@ function WholesaleItemCard({
           </div>
 
           <div className="font-['Montserrat'] text-base font-semibold text-gray-text">
-            Total:{" "}
+            {t("wholesaleBag.total", "Total:")}{" "}
             <span className="text-foreground font-bold">
-              {formatCurrency(item.unitPrice * item.quantity)}
+              {formatCurrency(item.unitPrice * item.quantity, t("EGP", "EGP"))}
             </span>
           </div>
         </div>
@@ -145,6 +149,8 @@ function WholesaleItemCard({
 }
 
 function EmptyState({ onBrowse }: { onBrowse: () => void }) {
+  const { t } = useTranslation("bag");
+
   return (
     <div className="flex flex-col items-center justify-center gap-6 rounded-2xl bg-card border border-stroke p-16 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
       <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
@@ -152,10 +158,13 @@ function EmptyState({ onBrowse }: { onBrowse: () => void }) {
       </div>
       <div className="text-center">
         <h2 className="font-['Montserrat'] text-2xl font-bold text-foreground mb-2">
-          Your wholesale cart is empty
+          {t("wholesaleBag.emptyTitle", "Your wholesale cart is empty")}
         </h2>
         <p className="font-['Montserrat'] text-base text-gray-text max-w-sm">
-          Browse wholesale products and add them to your cart to place a bulk order.
+          {t(
+            "wholesaleBag.emptyDescription",
+            "Browse wholesale products and add them to your cart to place a bulk order."
+          )}
         </p>
       </div>
       <button
@@ -163,7 +172,7 @@ function EmptyState({ onBrowse }: { onBrowse: () => void }) {
         onClick={onBrowse}
         className="rounded-2xl bg-primary px-8 py-4 font-['Montserrat'] text-base font-semibold text-white hover:opacity-90 transition"
       >
-        Browse Wholesale Products
+        {t("wholesaleBag.browseButton", "Browse Wholesale Products")}
       </button>
     </div>
   );
@@ -180,30 +189,34 @@ function SummaryCard({
   disabled: boolean;
   itemCount: number;
 }) {
+  const { t } = useTranslation("bag");
+
   return (
     <div className="rounded-2xl bg-card p-6 border border-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)] flex flex-col gap-5 lg:sticky lg:top-24">
       <h2 className="font-['Montserrat'] text-xl font-bold text-foreground">
-        Order Summary
+        {t("wholesaleBag.orderSummary", "Order Summary")}
       </h2>
 
       <div className="flex flex-col gap-3 border-b border-stroke pb-4">
         <div className="flex justify-between font-['Montserrat'] text-base text-foreground">
-          <span className="text-gray-text">Items ({itemCount})</span>
-          <span className="font-bold">{formatCurrency(subtotal)}</span>
+          <span className="text-gray-text">
+            {t("wholesaleBag.itemsCount", "Items ({{count}})", { count: itemCount })}
+          </span>
+          <span className="font-bold">{formatCurrency(subtotal, t("EGP", "EGP"))}</span>
         </div>
         <div className="flex justify-between font-['Montserrat'] text-sm text-gray-text">
-          <span>Shipping</span>
-          <span>Calculated at checkout</span>
+          <span>{t("wholesaleBag.shipping", "Shipping")}</span>
+          <span>{t("wholesaleBag.calculatedAtCheckout", "Calculated at checkout")}</span>
         </div>
         <div className="flex justify-between font-['Montserrat'] text-sm text-gray-text">
-          <span>Taxes</span>
-          <span>Included</span>
+          <span>{t("wholesaleBag.taxes", "Taxes")}</span>
+          <span>{t("wholesaleBag.included", "Included")}</span>
         </div>
       </div>
 
       <div className="flex justify-between items-center font-['Montserrat'] text-xl font-bold text-foreground">
-        <span>Subtotal</span>
-        <span>{formatCurrency(subtotal)}</span>
+        <span>{t("wholesaleBag.subtotal", "Subtotal")}</span>
+        <span>{formatCurrency(subtotal, t("EGP", "EGP"))}</span>
       </div>
 
       <button
@@ -213,20 +226,21 @@ function SummaryCard({
         className="w-full h-14 rounded-xl bg-primary text-white font-['Montserrat'] text-base font-semibold hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
       >
         <ShoppingCart className="h-5 w-5" />
-        Proceed to complete order
+        {t("wholesaleBag.proceedToComplete", "Proceed to complete order")}
       </button>
 
       <Link
         to="/wholesale"
         className="text-center font-['Montserrat'] text-sm text-primary hover:underline"
       >
-        ← Continue Shopping
+        {t("wholesaleBag.continueShopping", "← Continue Shopping")}
       </Link>
     </div>
   );
 }
 
 export default function WholesaleBagPage() {
+  const { t } = useTranslation("bag");
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const items = useWholesaleCartItems();
@@ -245,21 +259,28 @@ export default function WholesaleBagPage() {
     [items]
   );
 
+  const unitText =
+    itemCount === 1 ? t("wholesaleBag.unit", "unit") : t("wholesaleBag.units", "units");
+  const productText =
+    items.length === 1
+      ? t("wholesaleBag.product", "product")
+      : t("wholesaleBag.products", "products");
+
   const handleCheckout = async () => {
     if (!user) {
       sessionStorage.setItem("redirectAfterLogin", "/wholesale-bag");
-      toast.error("Please login to proceed to checkout");
+      toast.error(t("wholesaleBag.toast.loginRequired", "Please login to proceed to checkout"));
       navigate("/login");
       return;
     }
 
     if (!items.length) {
-      toast.error("Your wholesale cart is empty");
+      toast.error(t("wholesaleBag.toast.emptyCart", "Your wholesale cart is empty"));
       return;
     }
 
     setIsValidating(true);
-    const toastId = toast.loading("Validating stock...");
+    const toastId = toast.loading(t("wholesaleBag.toast.validatingStock", "Validating stock..."));
 
     try {
       // Validate stock for each product
@@ -279,15 +300,31 @@ export default function WholesaleBagPage() {
                 item.color &&
                 (c.colorName || c.color).toLowerCase() === item.color.toLowerCase()
             );
-            const availableStock = colorObj && colorObj.stock !== undefined ? colorObj.stock : (product.stock ?? 999999);
+            const availableStock =
+              colorObj && colorObj.stock !== undefined
+                ? colorObj.stock
+                : (product.stock ?? 999999);
 
             if (availableStock > 0 && item.quantity > availableStock) {
               errors.push(
-                `"${item.title}" (${item.color}) — requested ${item.quantity} but only ${availableStock} available.`
+                t(
+                  "wholesaleBag.toast.stockError",
+                  "\"{{title}}\" ({{color}}) — requested {{requested}} but only {{available}} available.",
+                  {
+                    title: item.title,
+                    color: item.color,
+                    requested: item.quantity,
+                    available: availableStock,
+                  }
+                )
               );
             }
           } catch {
-            errors.push(`Could not verify stock for "${item?.title}"`);
+            errors.push(
+              t("wholesaleBag.toast.stockVerifyError", "Could not verify stock for \"{{title}}\"", {
+                title: item?.title,
+              })
+            );
           }
         })
       );
@@ -313,7 +350,15 @@ export default function WholesaleBagPage() {
         const { sum, minOrder, title } = grouped[productId];
         if (sum < minOrder) {
           toast.error(
-            `"${title}" requires a minimum order of ${minOrder} units (you have ${sum}).`
+            t(
+              "wholesaleBag.toast.minOrderError",
+              "\"{{title}}\" requires a minimum order of {{minOrder}} units (you have {{sum}}).",
+              {
+                title,
+                minOrder,
+                sum,
+              }
+            )
           );
           setIsValidating(false);
           return;
@@ -323,7 +368,7 @@ export default function WholesaleBagPage() {
       navigate("/wholesale-checkout");
     } catch {
       toast.dismiss(toastId);
-      toast.error("Failed to validate your cart. Please try again.");
+      toast.error(t("wholesaleBag.toast.validateError", "Failed to validate your cart. Please try again."));
     } finally {
       setIsValidating(false);
     }
@@ -339,11 +384,19 @@ export default function WholesaleBagPage() {
           </div>
           <div>
             <h1 className="font-['Montserrat'] text-3xl font-bold text-foreground">
-              Wholesale Cart
+              {t("wholesaleBag.headerTitle", "Wholesale Cart")}
             </h1>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              {itemCount} {itemCount === 1 ? "unit" : "units"} across {items.length}{" "}
-              {items.length === 1 ? "product" : "products"}
+              {t(
+                "wholesaleBag.headerSubtitle",
+                "{{itemCount}} {{unitText}} across {{productCount}} {{productText}}",
+                {
+                  itemCount,
+                  unitText,
+                  productCount: items.length,
+                  productText,
+                }
+              )}
             </p>
           </div>
         </div>
@@ -351,7 +404,7 @@ export default function WholesaleBagPage() {
           to="/wholesale"
           className="inline-flex items-center gap-2 rounded-2xl border border-stroke bg-card px-4 py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground hover:bg-background transition"
         >
-          ← Browse Wholesale
+          {t("wholesaleBag.browseWholesale", "← Browse Wholesale")}
         </Link>
       </div>
 
@@ -367,7 +420,11 @@ export default function WholesaleBagPage() {
                 item={item}
                 onRemove={() => {
                   removeItem(item.id);
-                  toast.success(`"${item.title}" removed from wholesale cart`);
+                  toast.success(
+                    t("wholesaleBag.toast.itemRemoved", "\"{{title}}\" removed from wholesale cart", {
+                      title: item.title,
+                    })
+                  );
                 }}
                 onIncrease={() => incrementQuantity(item.id)}
                 onDecrease={() => decrementQuantity(item.id)}

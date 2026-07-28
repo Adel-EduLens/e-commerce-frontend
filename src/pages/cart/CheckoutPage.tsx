@@ -111,11 +111,11 @@ function SavedAddressesSection({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-stroke bg-card">
+    <div className="rounded-2xl border border-stroke bg-card shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between p-5"
+        className="flex w-full items-center justify-between p-5 interactive-transition hover:bg-gray-light/40"
       >
         <div>
           <h3 className="font-semibold text-foreground">Saved Addresses</h3>
@@ -125,7 +125,7 @@ function SavedAddressesSection({
           </p>
         </div>
 
-        <ChevronDown className={`transition ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
@@ -139,10 +139,10 @@ function SavedAddressesSection({
                   key={address.id}
                   type="button"
                   onClick={() => onSelect(address)}
-                  className={`rounded-xl border p-4 text-left transition-all duration-300 ${
+                  className={`rounded-xl border p-4 text-left interactive-transition ${
                     active
                       ? "border-primary bg-primary/10 ring-2 ring-primary/30 shadow-md"
-                      : "border-stroke bg-card hover:border-primary/40"
+                      : "border-stroke bg-card hover:border-primary/40 hover:shadow-sm"
                   }`}
                 >
                   <div className="flex justify-between items-start">
@@ -163,7 +163,7 @@ function SavedAddressesSection({
                       </p>
                     </div>
 
-                    {active && <CheckCircle2 className="text-primary" />}
+                    {active && <CheckCircle2 className="text-primary h-5 w-5" />}
                   </div>
                 </button>
               );
@@ -238,40 +238,65 @@ function OrderSummary({
   const formatCurrency = (v: number) => `EGP ${v.toFixed(2)}`;
 
   return (
-    <div className="w-full flex flex-col gap-8 rounded-2xl bg-card px-4 py-6 outline outline-1 outline-offset-[-1px] outline-stroke">
-      <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
+    <div className="w-full flex flex-col gap-8 rounded-2xl bg-card px-4 py-6 outline outline-1 outline-offset-[-1px] outline-stroke shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+      <div className="flex flex-col gap-4 border-b border-stroke pb-4 max-h-[360px] overflow-y-auto pr-2 no-scrollbar">
         {items.map((item) => (
           <div
             key={`${item.productId}-${item.size || "none"}-${item.color || "none"}`}
-            className="relative flex items-start gap-4 rounded-lg bg-card shadow-[0px_6px_20px_-2px_rgba(30,37,45,0.10)] p-2"
+            className="relative flex items-start gap-4 rounded-xl bg-card border border-stroke p-3 interactive-transition hover:border-primary/40 hover:shadow-md"
           >
             <div className="relative shrink-0">
-              <img
-                className="h-24 w-20 sm:h-28 sm:w-24 rounded object-cover bg-gray-100"
-                src={item.imageSrc || "/checkout/Rectangle%203.png"}
-                alt={item.title}
-              />
-              <div className="absolute -right-2 -top-1 h-6 w-6 overflow-hidden rounded-lg bg-secondary flex items-center justify-center">
-                <span className="font-['Montserrat'] text-sm font-semibold text-primary">
+              <div className="h-24 w-20 sm:h-28 sm:w-24 overflow-hidden rounded-xl bg-background border border-stroke flex items-center justify-center">
+                {item.imageSrc ? (
+                  <img
+                    className="h-full w-full object-contain"
+                    src={item.imageSrc}
+                    alt={item.title}
+                  />
+                ) : (
+                  <Package className="h-8 w-8 text-gray-text" strokeWidth={1.5} />
+                )}
+              </div>
+              <div className="absolute -right-2 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-primary shadow-xs">
+                <span className="font-['Montserrat'] text-xs font-bold text-white">
                   {item.quantity}
                 </span>
               </div>
             </div>
-            <div className="flex flex-col gap-2 py-1">
-              <div className="font-['Montserrat'] text-base sm:text-xl font-medium text-foreground">
-                {item.title}
-              </div>
-              {item.productType !== "GIFT_CARD" &&
-                item.size &&
-                item.color &&
-                item.size !== "Default" &&
-                item.color !== "Default" && (
-                  <div className="font-['Montserrat'] text-sm font-medium text-gray-500">
-                    Size: {item.size} &middot; Color: {item.color}
+            <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
+              <div className="flex flex-col gap-1">
+                {item.productType && item.productType !== "STANDARD" && (
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary uppercase tracking-wider">
+                      {item.productType.replace("_", " ")}
+                    </span>
                   </div>
                 )}
-              <div className="font-['Montserrat'] text-lg sm:text-2xl font-semibold text-foreground">
-                {formatCurrency(item.unitPrice * item.quantity)}
+                <h4 className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground line-clamp-2 leading-snug">
+                  {item.title}
+                </h4>
+                {item.productType !== "GIFT_CARD" && (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {item.size && item.size !== "Default" && (
+                      <span className="inline-flex items-center rounded-lg border border-stroke bg-background px-2.5 py-0.5 font-['Montserrat'] text-xs font-medium text-foreground">
+                        Size: <strong className="font-semibold ml-1">{item.size}</strong>
+                      </span>
+                    )}
+                    {item.color && item.color !== "Default" && (
+                      <span className="inline-flex items-center rounded-lg border border-stroke bg-background px-2.5 py-0.5 font-['Montserrat'] text-xs font-medium text-foreground">
+                        Color: <strong className="font-semibold ml-1">{item.color}</strong>
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-baseline justify-between gap-2 mt-2 pt-2 border-t border-stroke/50">
+                <span className="font-['Montserrat'] text-xs font-medium text-gray-text">
+                  {formatCurrency(item.unitPrice)} × {item.quantity}
+                </span>
+                <span className="font-['Montserrat'] text-base sm:text-lg font-bold text-foreground">
+                  {formatCurrency(item.unitPrice * item.quantity)}
+                </span>
               </div>
             </div>
           </div>
@@ -280,13 +305,13 @@ function OrderSummary({
       <div className="flex flex-col gap-4">
         {!isGiftCardOnly && (
           <>
-            <div className="flex items-center overflow-hidden rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke">
+            <div className="flex items-center overflow-hidden rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke focus-within:outline-primary focus-within:ring-2 focus-within:ring-primary/20 interactive-transition bg-card">
               <input
                 placeholder="Enter discount code"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value)}
                 disabled={isValidating || !!appliedCoupon}
-                className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-card disabled:bg-gray-50"
+                className="flex-1 h-14 sm:h-16 px-4 font-['Montserrat'] text-sm sm:text-base font-medium text-foreground placeholder:text-gray-text outline-none bg-transparent disabled:bg-gray-light disabled:cursor-not-allowed"
               />
               {appliedCoupon ? (
                 <button
@@ -295,7 +320,7 @@ function OrderSummary({
                     setCouponCode("");
                     setCouponError("");
                   }}
-                  className="flex h-14 sm:h-16 items-center justify-center bg-red-500 px-4 sm:px-6"
+                  className="flex h-14 sm:h-16 items-center justify-center bg-red-500 hover:bg-red-600 active:scale-[0.98] interactive-transition px-4 sm:px-6 cursor-pointer"
                 >
                   <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
                     Remove
@@ -305,7 +330,7 @@ function OrderSummary({
                 <button
                   onClick={handleApplyCoupon}
                   disabled={isValidating || !couponCode.trim()}
-                  className="flex h-14 sm:h-16 items-center justify-center bg-primary px-4 sm:px-6 disabled:opacity-50"
+                  className="flex h-14 sm:h-16 items-center justify-center bg-primary hover:opacity-95 active:scale-[0.98] interactive-transition px-4 sm:px-6 disabled:opacity-50 cursor-pointer"
                 >
                   <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-white">
                     {isValidating ? "Applying..." : "Apply"}
@@ -319,7 +344,7 @@ function OrderSummary({
               </div>
             )}
             {appliedCoupon && (
-              <div className="text-green-600 text-xs font-semibold px-1">
+              <div className="text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-1">
                 Discount Applied: {appliedCoupon.discount}% OFF
               </div>
             )}
@@ -335,7 +360,7 @@ function OrderSummary({
             </span>
           </div>
           {discountAmount > 0 && (
-            <div className="flex items-center justify-between text-green-600">
+            <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
               <span className="font-['Montserrat'] text-sm sm:text-base font-medium">
                 Discount ({appliedCoupon?.discount}%)
               </span>
@@ -397,10 +422,8 @@ function FormInput({
 }: FormInputProps) {
   return (
     <div
-      className={`flex h-14 sm:h-16 items-center rounded-lg outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden transition-colors ${
-        disabled
-          ? "bg-gray-100 dark:bg-zinc-800/80 cursor-not-allowed"
-          : "bg-card"
+      className={`flex h-14 sm:h-16 items-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke focus-within:outline-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden interactive-transition ${
+        disabled ? "opacity-60 bg-gray-light cursor-not-allowed" : "bg-card"
       } ${className}`}
     >
       <input
@@ -409,8 +432,8 @@ function FormInput({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium placeholder:text-gray-text outline-none disabled:cursor-not-allowed bg-transparent ${
-          disabled ? "text-gray-500 dark:text-gray-400 font-semibold" : "text-foreground"
+        className={`w-full h-full px-4 font-['Montserrat'] text-sm sm:text-base font-medium placeholder:text-gray-text outline-none bg-transparent ${
+          disabled ? "text-gray-text cursor-not-allowed font-semibold" : "text-foreground"
         }`}
       />
     </div>
@@ -427,24 +450,24 @@ function FormSelect({
 }: FormSelectProps) {
   return (
     <div
-      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden ${
-        disabled ? "opacity-60 cursor-not-allowed" : ""
+      className={`relative flex h-14 sm:h-16 items-center justify-between rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke focus-within:outline-primary focus-within:ring-2 focus-within:ring-primary/20 overflow-hidden interactive-transition ${
+        disabled ? "opacity-60 bg-gray-light cursor-not-allowed" : "bg-card"
       } ${className}`}
     >
       <select
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className="w-full h-full px-4 appearance-none bg-transparent font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10 disabled:cursor-not-allowed"
+        className="w-full h-full px-4 appearance-none bg-card font-['Montserrat'] text-sm sm:text-base font-medium text-foreground outline-none z-10 disabled:cursor-not-allowed cursor-pointer"
       >
-        <option value="" disabled className="text-gray-text">
+        <option value="" disabled className="text-gray-text bg-card">
           {placeholder}
         </option>
         {options.map((opt) => {
           const val = typeof opt === "string" ? opt : opt.value;
           const lbl = typeof opt === "string" ? opt : opt.label;
           return (
-            <option key={val} value={val}>
+            <option key={val} value={val} className="bg-card text-foreground">
               {lbl}
             </option>
           );
@@ -452,7 +475,11 @@ function FormSelect({
         {value &&
           !options.some(
             (opt) => (typeof opt === "string" ? opt : opt.value) === value
-          ) && <option value={value}>{value}</option>}
+          ) && (
+            <option value={value} className="bg-card text-foreground">
+              {value}
+            </option>
+          )}
       </select>
       <div className="absolute right-4 z-0 pointer-events-none">
         <DropdownArrow />
@@ -522,7 +549,7 @@ function DeliverySection({
         {!isGiftCardOnly && (
           <>
             {isAddressesLoading && (
-              <div className="p-6 text-center text-sm text-gray-text">
+              <div className="p-6 text-center text-sm text-gray-text font-['Montserrat']">
                 Saved Addresses are loading...
               </div>
             )}
@@ -592,8 +619,8 @@ function DeliverySection({
               </div>
 
               {!data.mapAddress ? (
-                <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-50/50 dark:bg-zinc-900/50 text-gray-text transition-all duration-300">
-                  <Compass className="h-5 w-5 text-gray-400 animate-pulse shrink-0" />
+                <div className="flex items-center gap-3 p-4 rounded-xl border border-dashed border-stroke bg-gray-light/30 text-gray-text interactive-transition">
+                  <Compass className="h-5 w-5 text-gray-text animate-pulse shrink-0" />
                   <p className="font-['Montserrat'] text-xs sm:text-sm font-medium">
                     No location confirmed yet. Please select your delivery location
                     on the map below and click{" "}
@@ -604,20 +631,20 @@ function DeliverySection({
                   </p>
                 </div>
               ) : (
-                <div className="relative overflow-hidden rounded-xl border border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/10 dark:from-green-500/10 dark:to-emerald-500/10 p-4 sm:p-5 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] transition-all duration-300">
-                  <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-green-500/5 blur-xl pointer-events-none" />
+                <div className="relative overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-r from-emerald-500/5 to-emerald-500/10 p-4 sm:p-5 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] interactive-transition">
+                  <div className="absolute right-0 top-0 -mr-6 -mt-6 h-24 w-24 rounded-full bg-emerald-500/5 blur-xl pointer-events-none" />
 
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-green-500/10 text-green-600 dark:text-green-400">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                       <CheckCircle2 className="h-6 w-6" />
                     </div>
                     <div className="flex-1 space-y-1.5 min-w-0">
                       <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <span className="font-['Montserrat'] text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                        <span className="font-['Montserrat'] text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                           Confirmed Map Address
                         </span>
                         {data.latitude && data.longitude && (
-                          <span className="inline-flex items-center rounded-full bg-green-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-green-700 dark:text-green-300">
+                          <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 font-['Montserrat'] text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
                             {parseFloat(data.latitude).toFixed(5)},{" "}
                             {parseFloat(data.longitude).toFixed(5)}
                           </span>
@@ -670,8 +697,8 @@ function PaymentMethodSection() {
           All transactions are secure and encrypted.
         </p>
       </div>
-      <div className="rounded-lg bg-gray-light outline outline-1 outline-offset-[-1px] outline-stroke overflow-hidden">
-        <div className="flex items-center justify-between p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-secondary">
+      <div className="rounded-lg bg-card border border-stroke overflow-hidden shadow-xs">
+        <div className="flex items-center justify-between p-3 sm:p-4 bg-primary/5 border-b border-stroke">
           <div className="flex items-center gap-2.5">
             <img
               src="/checkout/ri_radio-button-line.svg"
@@ -693,14 +720,14 @@ function PaymentMethodSection() {
               className="h-6 w-8 sm:h-8 sm:w-10"
               alt="Mastercard"
             />
-            <div className="flex h-6 w-8 sm:h-8 sm:w-10 items-center justify-center rounded-lg bg-card outline outline-1 outline-offset-[-1px] outline-stroke">
+            <div className="flex h-6 w-8 sm:h-8 sm:w-10 items-center justify-center rounded-lg bg-card border border-stroke">
               <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
                 +3
               </span>
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 p-4 bg-card">
           <FormInput placeholder="Card number" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormInput placeholder="Expiration date (MM / YY)" />
@@ -708,7 +735,7 @@ function PaymentMethodSection() {
           </div>
           <FormInput placeholder="Name on card" />
         </div>
-        <div className="flex items-center justify-between rounded-b-lg bg-card p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+        <div className="flex items-center justify-between rounded-b-lg bg-card p-3 sm:p-4 border-t border-stroke">
           <div className="flex items-center gap-2.5">
             <img
               src="/checkout/ri_radio-button-line.svg"
@@ -738,7 +765,7 @@ function RememberMeSection({
         REMEMBER ME
       </h2>
       <div className="flex flex-col gap-4">
-        <div className="flex items-center rounded-lg bg-card p-3 sm:p-4 outline outline-1 outline-offset-[-1px] outline-stroke">
+        <div className="flex items-center rounded-lg bg-card p-3 sm:p-4 border border-stroke shadow-xs">
           <div className="flex items-center gap-2.5">
             <img
               src="/checkout/ri_radio-button-line.svg"
@@ -766,31 +793,31 @@ function RememberMeSection({
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
             By submitting your order, you agree to our{" "}
           </span>
-          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info underline">
+          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info hover:underline cursor-pointer">
             Terms of Service
           </span>
           <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-foreground">
             {" "}
             &amp;{" "}
           </span>
-          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info underline">
+          <span className="font-['Montserrat'] text-sm sm:text-base font-semibold text-info hover:underline cursor-pointer">
             Privacy Policy
           </span>
         </div>
         <button
           onClick={onPay}
           disabled={loading}
-          className="w-full h-14 sm:h-16 flex items-center justify-center rounded-2xl bg-primary disabled:opacity-70 disabled:cursor-not-allowed gap-2.5 transition-all"
+          className="w-full h-14 sm:h-16 flex items-center justify-center rounded-2xl bg-primary hover:opacity-95 active:scale-[0.99] interactive-transition text-white disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100 gap-2.5 shadow-md shadow-primary/20 cursor-pointer"
         >
           {loading ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin text-foreground" />
-              <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">
+              <Loader2 className="h-5 w-5 animate-spin text-white" />
+              <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-white">
                 Processing...
               </span>
             </>
           ) : (
-            <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-foreground">
+            <span className="font-['Montserrat'] text-lg sm:text-xl font-semibold text-white">
               Pay now
             </span>
           )}
@@ -983,7 +1010,7 @@ export default function CheckoutPage() {
       <LoadingSpinner
         text="Preparing checkout..."
         containerClassName="h-[75vh]"
-        className="h-12 w-12"
+        className="h-12 w-12 text-primary"
       />
     );
   }
@@ -1120,7 +1147,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 bg-background min-h-screen">
       <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12">
         <div className="flex-1 flex flex-col gap-8 sm:gap-12">
           <DeliverySection
