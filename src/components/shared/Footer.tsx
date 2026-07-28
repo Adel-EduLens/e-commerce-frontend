@@ -135,7 +135,7 @@ export default function Footer({
         </div>
 
         <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
-          {t("copyright")}
+          {t("copyright", { year: new Date().getFullYear() })}
         </div>
       </div>
     </div >
