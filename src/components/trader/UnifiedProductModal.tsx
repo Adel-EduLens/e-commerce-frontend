@@ -121,7 +121,9 @@ export function UnifiedProductModal({
   const [securityDeposit, setSecurityDeposit] = useState("");
   const [termsAndConditions, setTermsAndConditions] = useState("");
   const [privacyPolicy, setPrivacyPolicy] = useState("");
-  const [isFeatured, setIsFeatured] = useState((item as any)?.isFeatured || false);
+  const [isFeatured, setIsFeatured] = useState(
+    (item as any)?.isFeatured || false,
+  );
 
   // Blank Fields
   const [blankPrice, setBlankPrice] = useState("");
@@ -733,129 +735,129 @@ export function UnifiedProductModal({
                 {tShared("productTypes") ||
                   "Product Types (Select at least one)"}
               </h3>
+            </div>
 
-              {/* SHOP */}
-              <div className="border border-stroke rounded-lg p-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm">
-                    {tShared("shopProduct") || "Shop Product"}
-                  </span>
-                  <Toggle checked={isShop} onChange={setIsShop} size="md" />
-                </div>
-                {isShop && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
-                    <div className="col-span-2 space-y-1">
-                      <label className="text-xs font-semibold text-gray-text">
-                        {tShared("shopCategories") || "Shop Categories *"}
-                      </label>
-                      <MultiSelect
-                        label={tShared("selectCategory")}
-                        options={shopCategories.map((c) => ({
-                          value: c.id,
-                          label: c.name,
-                        }))}
-                        selected={shopCategoryIds}
-                        onChange={setShopCategoryIds}
-                      />
-                    </div>
-                    <div className="col-span-2 space-y-1">
-                      <label className="text-xs font-semibold text-gray-text">
-                        {tShared("collections") || "Collections (Optional)"}
-                      </label>
-                      <MultiSelect
-                        label={
-                          tShared("selectCollection") || "Select Collection(s)"
-                        }
-                        options={collections.map((c) => ({
-                          value: c.id,
-                          label: c.name,
-                        }))}
-                        selected={collectionIds}
-                        onChange={setCollectionIds}
-                      />
-                    </div>
-                    <input
-                      type="number"
-                      placeholder={tShared("shopPrice") || "Shop Price"}
-                      value={shopPrice}
-                      onChange={(e) => setShopPrice(e.target.value)}
-                      className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+            {/* SHOP */}
+            <div className="border border-stroke rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-sm">
+                  {tShared("shopProduct") || "Shop Product"}
+                </span>
+                <Toggle checked={isShop} onChange={setIsShop} size="md" />
+              </div>
+              {isShop && (
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stroke">
+                  <div className="col-span-2 space-y-1">
+                    <label className="text-xs font-semibold text-gray-text">
+                      {tShared("shopCategories") || "Shop Categories *"}
+                    </label>
+                    <MultiSelect
+                      label={tShared("selectCategory")}
+                      options={shopCategories.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      selected={shopCategoryIds}
+                      onChange={setShopCategoryIds}
                     />
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("mustHave") || "Must Have"}
-                        </span>
-                        <Toggle
-                          checked={isMustHave}
-                          onChange={setIsMustHave}
-                          size="sm"
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("sizeGuideImage") || "Size Guide Image"}
-                        </span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="text-xs w-full text-foreground"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const err = await validateImageDimensions(file);
-                              if (err) {
-                                toast.error(`Image dimensions error: ${err}`);
-                                e.target.value = "";
-                                return;
-                              }
-                              const src = URL.createObjectURL(file);
-                              setSizeCropState({ src, name: file.name });
-                            }
-                          }}
-                        />
-                        {sizeguide && (
-                          <span className="text-xs text-green-600">
-                            {tShared("selected") || "Selected"}
-                          </span>
-                        )}
-                      </div>
+                  </div>
+                  <div className="col-span-2 space-y-1">
+                    <label className="text-xs font-semibold text-gray-text">
+                      {tShared("collections") || "Collections (Optional)"}
+                    </label>
+                    <MultiSelect
+                      label={
+                        tShared("selectCollection") || "Select Collection(s)"
+                      }
+                      options={collections.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      selected={collectionIds}
+                      onChange={setCollectionIds}
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    placeholder={tShared("shopPrice") || "Shop Price"}
+                    value={shopPrice}
+                    onChange={(e) => setShopPrice(e.target.value)}
+                    className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                  />
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">
+                        {tShared("mustHave") || "Must Have"}
+                      </span>
+                      <Toggle
+                        checked={isMustHave}
+                        onChange={setIsMustHave}
+                        size="sm"
+                      />
                     </div>
-                    <div className="col-span-2 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs">
-                          {tShared("flashDeal") || "Flash Deal"}
-                        </span>
-                        <Toggle
-                          checked={isFlashDeals}
-                          onChange={setIsFlashDeals}
-                          size="sm"
-                        />
-                      </div>
-                      {isFlashDeals && (
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="number"
-                            placeholder={
-                              tShared("dealPricePlaceholder") ||
-                              "Flash Deal Price"
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">
+                        {tShared("sizeGuideImage") || "Size Guide Image"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="text-xs w-full text-foreground"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const err = await validateImageDimensions(file);
+                            if (err) {
+                              toast.error(`Image dimensions error: ${err}`);
+                              e.target.value = "";
+                              return;
                             }
-                            value={flashDealPrice}
-                            onChange={(e) => setFlashDealPrice(e.target.value)}
-                            className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                          />
-                          <input
-                            type="datetime-local"
-                            value={flashDealEndsAt}
-                            onChange={(e) => setFlashDealEndsAt(e.target.value)}
-                            className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
-                          />
-                        </div>
+                            const src = URL.createObjectURL(file);
+                            setSizeCropState({ src, name: file.name });
+                          }
+                        }}
+                      />
+                      {sizeguide && (
+                        <span className="text-xs text-green-600">
+                          {tShared("selected") || "Selected"}
+                        </span>
                       )}
                     </div>
                   </div>
-                )}
-              </div>
+                  <div className="col-span-2 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs">
+                        {tShared("flashDeal") || "Flash Deal"}
+                      </span>
+                      <Toggle
+                        checked={isFlashDeals}
+                        onChange={setIsFlashDeals}
+                        size="sm"
+                      />
+                    </div>
+                    {isFlashDeals && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <input
+                          type="number"
+                          placeholder={
+                            tShared("dealPricePlaceholder") ||
+                            "Flash Deal Price"
+                          }
+                          value={flashDealPrice}
+                          onChange={(e) => setFlashDealPrice(e.target.value)}
+                          className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                        />
+                        <input
+                          type="datetime-local"
+                          value={flashDealEndsAt}
+                          onChange={(e) => setFlashDealEndsAt(e.target.value)}
+                          className="rounded-xl border border-stroke px-4 py-2 text-sm outline-none focus:border-primary text-foreground bg-card"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             {/* WHOLESALE */}
             <div className="border border-stroke rounded-lg p-3 space-y-3">
