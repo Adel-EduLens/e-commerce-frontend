@@ -48,11 +48,11 @@ function CollectionCard({ c, big }: { c: any; big?: boolean }) {
         <div className="absolute left-6 sm:left-8 top-6 sm:top-8 inline-flex w-64 sm:w-80 flex-col items-start justify-start gap-5 sm:gap-7">
           <div className="flex flex-col items-start justify-start gap-3 sm:gap-5">
             <div className="font-['Inter'] text-4xl sm:text-6xl lg:text-8xl font-normal leading-tight text-white">
-              {c.name.split(' ').map((word: string, i: number) => (
+              {(c?.name || '').split(' ').map((word: string, i: number) => (
                 <span key={i}>{word}<br /></span>
               ))}
             </div>
-            {c.description && (
+            {c?.description && (
               <div className="font-['Inter'] text-sm sm:text-lg font-normal leading-6 text-white opacity-80 line-clamp-3">
                 {c.description}
               </div>
@@ -73,13 +73,13 @@ function CollectionCard({ c, big }: { c: any; big?: boolean }) {
       className="relative block h-48 sm:h-64 lg:h-[380px] flex-1 lg:flex-initial overflow-hidden rounded-2xl lg:rounded-[40px] bg-gray-light no-underline"
     >
       <AssetImage
-        key={c.id + '-' + c.image}
-        file={c.image}
+        key={(c?.id ?? '') + '-' + (c?.image ?? '')}
+        file={c?.image || ''}
         className="absolute inset-0 h-full w-full object-cover animate-swap-fade"
       />
       <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/10 to-transparent pointer-events-none" />
       <div className="absolute left-4 sm:left-[30px] top-4 sm:top-[30px] font-['Inter'] text-2xl sm:text-4xl font-normal leading-tight text-white drop-shadow-md">
-        {c.name.split(' ').map((word: string, i: number) => (
+        {(c?.name || '').split(' ').map((word: string, i: number) => (
           <span key={i}>{word}<br /></span>
         ))}
       </div>
@@ -130,60 +130,25 @@ import ProductsSection from '../../components/shared/ProductsSection'
 
 function VoteSection() {
   const queryClient = useQueryClient();
-  const { data: designs = [] } = useDesigns();
+  const { data: designs = [], isLoading } = useDesigns();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [voting, setVoting] = useState(false);
   const { t } = useTranslation("vote");
 
-  const defaultDesigns: VoteDesign[] = [
-    {
-      id: "demo-1",
-      title: t("demo1Title", "Vote for next design"),
-      description: t("demo1Desc", "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort."),
-      imagePath: asset("image 11.png"),
-      votes: 1200,
-    },
-    {
-      id: "demo-2",
-      title: t("demo2Title", "Urban Utility Oversized Hoodie"),
-      description: t("demo2Desc", "Heavyweight 450GSM organic cotton hoodie with modular cargo pockets and water-resistant finish."),
-      imagePath: asset("image 1.png"),
-      votes: 980,
-    },
-    {
-      id: "demo-3",
-      title: t("demo3Title", "Cyberpunk Techwear Windbreaker"),
-      description: t("demo3Desc", "Reflective multi-zipper shell jacket built for high mobility and extreme weather resistance."),
-      imagePath: asset("image 2.png"),
-      votes: 1450,
-    },
-    {
-      id: "demo-4",
-      title: t("demo4Title", "Minimalist Essential Track Jacket"),
-      description: t("demo4Desc", "Sleek matte nylon jacket with hidden zip closure and custom embroidered branding."),
-      imagePath: asset("image 4.png"),
-      votes: 830,
-    },
-    {
-      id: "demo-5",
-      title: t("demo5Title", "Vintage Washed Denim Outerwear"),
-      description: t("demo5Desc", "Artisanal distressed denim jacket with fleece lining and custom brass hardware."),
-      imagePath: asset("image 7.png"),
-      votes: 1120,
-    },
-  ];
-
-  const activeDesigns = designs.length > 0 ? designs : defaultDesigns;
-  const safeIndex = currentIndex % activeDesigns.length;
-  const current = activeDesigns[safeIndex];
-
   useEffect(() => {
-    if (activeDesigns.length <= 1) return;
+    if (designs.length <= 1) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % activeDesigns.length);
+      setCurrentIndex((prev) => (prev + 1) % designs.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [activeDesigns.length]);
+  }, [designs.length]);
+
+  if (isLoading || designs.length === 0) {
+    return null;
+  }
+
+  const safeIndex = currentIndex % designs.length;
+  const current = designs[safeIndex];
 
   async function handleVote() {
     if (!current || voting || current.hasVoted) return;
@@ -219,7 +184,7 @@ function VoteSection() {
     }
   }
 
-  const rawVotes = current?.votes ?? 1200;
+  const rawVotes = current?.votes ?? 0;
   const formattedVotes =
     rawVotes >= 1000 ? `+${(rawVotes / 1000).toFixed(1)}K` : `+${rawVotes}`;
 
@@ -287,7 +252,7 @@ function VoteSection() {
 
           {/* Carousel Dots at Bottom Center */}
           <div className="relative z-10 flex items-center justify-center gap-2 pt-6 sm:pt-10">
-            {activeDesigns.map((_, idx) => (
+            {designs.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
