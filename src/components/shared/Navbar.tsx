@@ -187,7 +187,7 @@ function NotificationBell() {
           strokeWidth={1.5}
         />
         {unread > 0 && (
-          <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
+          <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-primary text-[10px] font-bold text-white">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -421,7 +421,7 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 text-foreground"
               >
-                <Bell className="h-5 w-5" strokeWidth={1.5} />
+                <Bell className="h-5 w-5 " strokeWidth={1.5} />
                 <span className="font-['Montserrat'] text-sm font-medium">
                   {t("notifications", "Notifications")}
                 </span>
