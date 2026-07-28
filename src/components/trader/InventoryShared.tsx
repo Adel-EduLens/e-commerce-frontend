@@ -2450,6 +2450,13 @@ export function InventoryTablePanel({
   const [sortBy, setSortBy] = useState("date-desc");
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const { t } = useTranslation("traderProduct");
+
+  const getTranslatedStatus = (status: string) => {
+    if (status === "Active") return t("active");
+    if (status === "Low Stock") return t("lowStock");
+    if (status === "Out of Stock") return t("outOfStock");
+    return status;
+  };
   useEffect(() => {
     const handleClickOutside = () => setOpenFilter(null);
     if (openFilter) document.addEventListener("click", handleClickOutside);
@@ -2869,7 +2876,7 @@ export function InventoryTablePanel({
                     <span
                       className={`absolute right-3 top-3 inline-flex rounded-2xl px-2 py-1 text-sm font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
                     >
-                      {item.status}
+                      {getTranslatedStatus(item.status)}
                     </span>
                     {showTypeFilter && (
                       <span
@@ -3066,7 +3073,7 @@ export function InventoryTablePanel({
                         <span
                           className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}
                         >
-                          {item.status}
+                          {getTranslatedStatus(item.status)}
                         </span>
                       </td>
                       <td className="px-3 py-3 text-center">

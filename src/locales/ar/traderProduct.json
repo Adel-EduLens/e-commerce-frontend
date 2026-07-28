@@ -152,5 +152,8 @@
   "productDeletedSuccess": "تم حذف المنتج بنجاح",
   "failedToDeleteProduct": "فشل في حذف المنتج",
   "deleteProduct": "حذف المنتج",
-  "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء."
+  "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+  "deleteGiftCard": "حذف بطاقة الهدايا",
+  "deleteGiftCardConfirmation": "هل أنت تأكد من أنك تريد حذف بطاقة الهدايا هذه؟ لا يمكن التراجع عن هذا الإجراء.",
+  "failedToLoadGiftCards": "فشل في تحميل بطاقات الهدايا"
 }

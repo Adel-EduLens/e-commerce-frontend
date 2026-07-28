@@ -19,7 +19,9 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
   const { t: tShared } = useTranslation("traderInventoryShared");
   const isEditing = !!item;
 
-  const [name, setName] = useState(item?.product || "Gift Card");
+  const [name, setName] = useState(
+    item?.product || tShared("defaultGiftCardName", "Gift Card")
+  );
   const [amounts, setAmounts] = useState(
     item?.giftCardAmounts || "10,15,50,75,100,150,200"
   );
@@ -55,7 +57,12 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
 
     const dimErr = await validateImageDimensions(file);
     if (dimErr) {
-      toast.error(`Image dimension error: ${dimErr}`);
+      toast.error(
+        tShared("imageDimensionError", {
+          err: dimErr,
+          defaultValue: `Image dimension error: ${dimErr}`,
+        })
+      );
       e.target.value = "";
       return;
     }
@@ -72,9 +79,13 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
       setUploading(true);
       const url = await uploadImageFile(croppedFile);
       setImageUrl(url);
-      toast.success("Gift card image uploaded successfully!");
+      toast.success(
+        tShared("giftCardImageUploaded", "Gift card image uploaded successfully!")
+      );
     } catch (err: any) {
-      toast.error(err?.message || "Failed to upload image");
+      toast.error(
+        err?.message || tShared("failedToUploadImage", "Failed to upload image")
+      );
     } finally {
       setUploading(false);
     }
@@ -85,14 +96,17 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
     setError("");
 
     if (!name.trim()) {
-      const msg = "Gift Card Name is required.";
+      const msg = tShared("giftCardNameRequired", "Gift Card Name is required.");
       setError(msg);
       toast.error(msg);
       return;
     }
 
     if (!amounts.trim()) {
-      const msg = "Preset Denominations (Amounts) are required.";
+      const msg = tShared(
+        "presetDenominationsRequired",
+        "Preset Denominations (Amounts) are required."
+      );
       setError(msg);
       toast.error(msg);
       return;
@@ -154,7 +168,9 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
       <div className="w-full max-w-lg rounded-2xl bg-card shadow-xl max-h-[90vh] flex flex-col text-foreground">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
-            {isEditing ? "Edit Gift Card" : "Add Gift Card"}
+            {isEditing
+              ? tShared("editGiftCard", "Edit Gift Card")
+              : tShared("addGiftCard", "Add Gift Card")}
           </h2>
           <button
             type="button"
@@ -181,10 +197,13 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
             {/* Gift Card Name */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-text">
-                Gift Card Name *
+                {tShared("giftCardName", "Gift Card Name *")}
               </label>
               <input
-                placeholder="e.g. GENZ Gift Card"
+                placeholder={tShared(
+                  "giftCardNamePlaceholder",
+                  "e.g. GENZ Gift Card"
+                )}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
@@ -195,26 +214,38 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1 col-span-2">
                 <label className="text-xs font-semibold text-gray-text">
-                  Preset Denominations (Amounts) *
+                  {tShared(
+                    "presetDenominations",
+                    "Preset Denominations (Amounts) *"
+                  )}
                 </label>
                 <input
-                  placeholder="10, 15, 50, 75, 100, 150, 200"
+                  placeholder={tShared(
+                    "presetDenominationsPlaceholder",
+                    "10, 15, 50, 75, 100, 150, 200"
+                  )}
                   value={amounts}
                   onChange={(e) => setAmounts(e.target.value)}
                   className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
                 />
                 <p className="text-[11px] text-gray-text">
-                  Comma-separated amounts displayed on the product page
+                  {tShared(
+                    "presetDenominationsHelp",
+                    "Comma-separated amounts displayed on the product page"
+                  )}
                 </p>
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-gray-text">
-                  Starting / Default Price (EGP) *
+                  {tShared(
+                    "startingDefaultPrice",
+                    "Starting / Default Price (EGP) *"
+                  )}
                 </label>
                 <input
                   type="number"
-                  placeholder="1000"
+                  placeholder={tShared("startingPricePlaceholder", "1000")}
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
@@ -223,11 +254,14 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-gray-text">
-                  Total Available Quantity (Stock)
+                  {tShared(
+                    "totalAvailableQuantity",
+                    "Total Available Quantity (Stock)"
+                  )}
                 </label>
                 <input
                   type="number"
-                  placeholder="100"
+                  placeholder={tShared("stockQuantityPlaceholder", "100")}
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
                   className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-card"
@@ -238,10 +272,13 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
             {/* Description */}
             <div className="space-y-1">
               <label className="text-xs font-semibold text-gray-text">
-                Description
+                {tShared("description", "Description")}
               </label>
               <textarea
-                placeholder="Gift card description or terms..."
+                placeholder={tShared(
+                  "giftCardDescriptionPlaceholder",
+                  "Gift card description or terms..."
+                )}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
@@ -252,13 +289,16 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
             {/* Gift Card Image Upload */}
             <div className="space-y-2 border-t border-stroke pt-3">
               <label className="text-xs font-semibold text-gray-text">
-                Gift Card Artwork / Preview Image
+                {tShared(
+                  "giftCardArtwork",
+                  "Gift Card Artwork / Preview Image"
+                )}
               </label>
               {imageUrl && (
                 <div className="relative w-32 h-44 rounded-xl border border-stroke overflow-hidden mb-2 bg-black">
                   <img
                     src={imageUrl}
-                    alt="Gift Card Artwork"
+                    alt={tShared("giftCardArtworkAlt", "Gift Card Artwork")}
                     className="w-full h-full object-cover"
                   />
                   <button
@@ -285,7 +325,7 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
                 onClick={onClose}
                 className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground bg-card hover:bg-background transition"
               >
-                {tShared("cancel") || "Cancel"}
+                {tShared("cancel", "Cancel")}
               </button>
               <button
                 type="submit"
@@ -293,10 +333,10 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
                 className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-white hover:opacity-90 disabled:opacity-50 transition"
               >
                 {uploading
-                  ? tShared("saving") || "Saving..."
+                  ? tShared("saving", "Saving...")
                   : isEditing
-                    ? "Save Changes"
-                    : "Create Gift Card"}
+                    ? tShared("saveChanges", "Save Changes")
+                    : tShared("createGiftCard", "Create Gift Card")}
               </button>
             </div>
           </form>

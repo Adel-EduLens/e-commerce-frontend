@@ -76,7 +76,7 @@ export default function TraderShopPage() {
             src={asset("ic_round-plus.svg")}
             alt=""
           />
-          {t("addProduct")}
+          {activeTab === "giftCards" ? t("addGiftCard") : t("addProduct")}
         </button>
       </div>
 
@@ -94,10 +94,7 @@ export default function TraderShopPage() {
           <TraderBlankProductsPage onEdit={setEditItem} />
         )}
         {activeTab === "giftCards" && (
-          <TraderGiftCardsPage
-            onEdit={setEditItem}
-            onAdd={() => setShowAddModal(true)}
-          />
+          <TraderGiftCardsPage onEdit={setEditItem} />
         )}
       </div>
     </div>

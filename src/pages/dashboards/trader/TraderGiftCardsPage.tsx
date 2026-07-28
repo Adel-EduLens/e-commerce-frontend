@@ -12,7 +12,8 @@ export default function TraderGiftCardsPage({
   onAdd?: () => void;
 }) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const { t } = useTranslation("traderProduct");
+  const { t, i18n } = useTranslation("traderProduct");
+  const { t: tShared } = useTranslation("traderInventoryShared");
 
   const {
     data: traderGiftCards = [],
@@ -22,6 +23,8 @@ export default function TraderGiftCardsPage({
   } = useTraderGiftCards();
 
   const deleteGiftCard = useDeleteGiftCard();
+
+  const isAr = i18n.language.startsWith("ar");
 
   const items: InventoryItem[] = traderGiftCards.map((gc) => {
     return {
@@ -34,10 +37,10 @@ export default function TraderGiftCardsPage({
       brandId: "",
       stock: gc.stock ?? 100,
       sku: "",
-      price: `${gc.amount} EGP`,
+      price: isAr ? `${gc.amount} ج.م` : `${gc.amount} EGP`,
       priceNum: gc.amount,
       giftCardAmounts: gc.amounts ?? "10,15,50,75,100,150,200",
-      date: new Date(gc.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      date: new Date(gc.createdAt).toLocaleDateString(isAr ? "ar-EG" : "en-US", { month: "short", day: "numeric", year: "numeric" }),
       createdAtRaw: new Date(gc.createdAt).getTime(),
       status: "Active",
       type: "gift_card" as const,
@@ -57,7 +60,7 @@ export default function TraderGiftCardsPage({
 
   const errRes = errorMsg as { response?: { data?: { message?: string } }; message?: string } | null;
   const errorMessages = isError
-    ? [errRes?.response?.data?.message ?? errRes?.message ?? "Failed to load gift cards"]
+    ? [errRes?.response?.data?.message ?? errRes?.message ?? t("failedToLoadGiftCards", "Failed to load gift cards")]
     : [];
 
   return (
@@ -81,10 +84,10 @@ export default function TraderGiftCardsPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-card p-6 space-y-4 shadow-xl">
             <h3 className="font-['Montserrat'] text-lg font-bold text-foreground">
-              {t("deleteProduct") || "Delete Item"}
+              {t("deleteGiftCard", "Delete Gift Card")}
             </h3>
             <p className="font-['Montserrat'] text-sm text-gray-text">
-              {t("deleteConfirmation") || "Are you sure you want to delete this gift card?"}
+              {t("deleteGiftCardConfirmation", "Are you sure you want to delete this gift card?")}
             </p>
             <div className="flex gap-2 pt-2">
               <button
@@ -92,7 +95,7 @@ export default function TraderGiftCardsPage({
                 onClick={() => setDeleteId(null)}
                 className="flex-1 rounded-xl border border-stroke py-2.5 font-['Montserrat'] text-sm font-semibold text-foreground bg-card hover:bg-background transition"
               >
-                {t("cancel") || "Cancel"}
+                {tShared("cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -102,7 +105,7 @@ export default function TraderGiftCardsPage({
                 }}
                 className="flex-1 rounded-xl bg-red-600 py-2.5 font-['Montserrat'] text-sm font-bold text-white transition hover:bg-red-700"
               >
-                {t("delete") || "Delete"}
+                {tShared("delete", "Delete")}
               </button>
             </div>
           </div>
