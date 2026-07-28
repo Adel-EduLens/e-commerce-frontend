@@ -76,7 +76,8 @@ import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
 import GiftCardDetailsPage from "../pages/shop/GiftCardDetailsPage";
 import PrizeWheel from "../components/ui/PrizeWheel";
 import PrizeControllerPage from "../pages/dashboards/trader/PrizeControllerPage";
-import TraderTermsPage from "../pages/dashboards/trader/TraderTermsPage";
+import TermsPage from "../pages/terms/TermsPage";
+import PrivacyPage from "../pages/privacy/PrivacyPage";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -315,6 +316,14 @@ export const router = createBrowserRouter([
         path: "signup",
         element: <AuthPage mode="signup" />,
       },
+      {
+        path: "terms",
+        element: <TermsPage />,
+      },
+      {
+        path: "privacy",
+        element: <PrivacyPage />,
+      },
 
       {
         path: "dashboard/trader",
@@ -433,10 +442,7 @@ export const router = createBrowserRouter([
             path: "prizes",
             element: <PrizeControllerPage />,
           },
-          {
-            path: "terms",
-            element: <TraderTermsPage />,
-          },
+
         ],
       },
       {

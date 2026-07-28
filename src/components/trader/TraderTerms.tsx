@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { LoadingSpinner } from "../../../components/shared";
+import { LoadingSpinner } from "../../components/shared";
 import { Plus, Edit3, Trash2, X, ChevronDown, ChevronUp } from "lucide-react";
 import {
   type TermsAndConditions,
@@ -12,8 +12,8 @@ import {
   useUpdateTerms,
   useDeleteTerms,
   useActivateTerms,
-} from "../../../hooks/queries/termsQuery";
-import { Toggle } from "../../../components/ui";
+} from "../../hooks/queries/termsQuery";
+import { Toggle } from "../../components/ui";
 
 
 // Component for a Form Modal to Add or Edit Terms and Conditions

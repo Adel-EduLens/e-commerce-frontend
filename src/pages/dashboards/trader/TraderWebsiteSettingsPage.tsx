@@ -5,13 +5,17 @@ import TraderHomeBannerPage from "./TraderHomeBannerPage";
 import TraderFAQsPage from "./TraderFAQsPage";
 import TraderHelpCenterPage from "./TraderHelpCenterPage";
 import TraderShippingSettings from "./TraderShippingSettings";
+import TraderTerms from "../../../components/trader/TraderTerms";
+import TraderPrivacy from "../../../components/trader/TraderPrivacy";
 
 type WebsiteSettingsTab =
   | "shop-banners"
   | "home-banners"
   | "faqs"
   | "help-center"
-  | "shipping";
+  | "shipping"
+  | "terms"
+  | "privacy";
 
 interface TraderWebsiteSettingsPageProps {
   defaultTab?: WebsiteSettingsTab;
@@ -29,6 +33,8 @@ export default function TraderWebsiteSettingsPage({
     { id: "faqs", label: t("tabs.faqs") },
     { id: "help-center", label: t("tabs.helpCenter") },
     { id: "shipping", label: t("tabs.shipping") },
+    { id: "terms", label: t("tabs.terms", "Terms & Conditions") },
+    { id: "privacy", label: t("tabs.privacy", "Privacy Policy") },
   ];
 
   useEffect(() => {
@@ -73,6 +79,8 @@ export default function TraderWebsiteSettingsPage({
       {activeTab === "faqs" && <TraderFAQsPage />}
       {activeTab === "help-center" && <TraderHelpCenterPage />}
       {activeTab === "shipping" && <TraderShippingSettings />}
+      {activeTab === "terms" && <TraderTerms />}
+      {activeTab === "privacy" && <TraderPrivacy />}
     </section>
   );
 }

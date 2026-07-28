@@ -2,18 +2,14 @@ import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { asset } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { useCategories } from '../../hooks/queries/categoriesQuery';
 
 
-const footerLinks: Record<string, { label: string; path: string }[]> = {
+const staticFooterLinks: Record<string, { label: string; path: string }[]> = {
   About: [
     { label: 'About Us', path: '/' },
-    { label: 'Design Lab', path: '/' },
+    { label: 'Design Lab', path: '/createYourDesign' },
     { label: 'Dropship', path: '/dropshipping' },
-  ],
-  Shop: [
-    { label: 'Men', path: '/season-must-haves' },
-    { label: 'Kids', path: '/season-must-haves' },
-    { label: 'Women', path: '/season-must-haves' },
   ],
   Help: [
     { label: 'FAQ', path: '/help-center' },
@@ -23,9 +19,8 @@ const footerLinks: Record<string, { label: string; path: string }[]> = {
     { label: 'Track Order', path: '/my-orders' },
   ],
   Legal: [
-    { label: 'Privacy', path: '/' },
-    { label: 'Terms', path: '/' },
-    { label: 'Cookies', path: '/' },
+    { label: 'Privacy', path: '/privacy' },
+    { label: 'Terms', path: '/terms' },
   ],
 }
 
@@ -73,6 +68,21 @@ export default function Footer({
   style,
 }: FooterProps) {
   const { t } = useTranslation("footer");
+  const { data: shopCategories = [] } = useCategories("SHOP");
+
+  // Build dynamic Shop links from first 3 SHOP categories
+  const shopLinks = shopCategories.slice(0, 3).map((cat) => ({
+    label: cat.name,
+    path: `/products?category=${cat.name}`,
+  }));
+
+  // Merge in order: About → Shop → Help → Legal
+  const footerLinks: Record<string, { label: string; path: string }[]> = {
+    About: staticFooterLinks.About,
+    ...(shopLinks.length > 0 ? { Shop: shopLinks } : {}),
+    Help: staticFooterLinks.Help,
+    Legal: staticFooterLinks.Legal,
+  };
   return (
     <div
       className="relative w-full overflow-hidden border-t border-stroke py-8 px-4 sm:px-6 lg:px-8"
@@ -125,7 +135,7 @@ export default function Footer({
         </div>
 
         <div className="font-['Montserrat'] text-sm sm:text-base font-medium text-foreground">
-          {t("copyright")}
+          {t("copyright", { year: new Date().getFullYear() })}
         </div>
       </div>
     </div >
