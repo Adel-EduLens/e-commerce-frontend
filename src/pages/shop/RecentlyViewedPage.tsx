@@ -64,7 +64,14 @@ export default function RecentlyViewedPage() {
                   ? `/wholesale/${item.id}`
                   : `/product-details/${item.id}`;
 
-            const displayPrice = item.rentalPrice ?? item.retailPrice ?? item.shopPrice ?? item.wholesalePrice ?? item.blankPrice ?? item.price ?? 0;
+            const displayPrice =
+              p.productType === 'RENTAL'
+                ? item.depositAmount ?? item.rentalPrice ?? item.retailPrice ?? item.shopPrice ?? item.price ?? 0
+                : p.productType === 'RETAIL'
+                  ? item.retailPrice ?? item.shopPrice ?? item.rentalPrice ?? item.price ?? 0
+                  : isWholesale
+                    ? item.wholesalePrice ?? item.shopPrice ?? item.price ?? 0
+                    : item.shopPrice ?? item.retailPrice ?? item.rentalPrice ?? item.wholesalePrice ?? item.blankPrice ?? item.price ?? 0;
             const computedImageSrc =
               item.images?.[0]?.url ||
               item.images?.[0]?.imageUrl ||
@@ -79,6 +86,8 @@ export default function RecentlyViewedPage() {
                 productType={p.productType}
                 to={targetUrl}
                 title={item.name}
+                shopPrice={item.shopPrice}
+                depositAmount={item.depositAmount}
                 price={`${displayPrice} EGP`}
                 imageSrc={computedImageSrc}
                 sizeLabel={item.sizes?.[0]?.size || item.sizes?.[0]?.name || Array.from(new Set(item.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ")}

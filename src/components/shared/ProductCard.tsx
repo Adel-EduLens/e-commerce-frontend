@@ -80,6 +80,7 @@ export type ProductCardProps = {
   hideQuickActions?: boolean;
   stock?: number;
   depositAmount?: number;
+  shopPrice?: number;
 };
 
 function useCountdown(endsAt?: string) {
@@ -146,6 +147,7 @@ export default function ProductCard({
   hideQuickActions = false,
   stock,
   depositAmount,
+  shopPrice,
 }: ProductCardProps) {
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColors = Array.isArray(colors)
@@ -265,7 +267,10 @@ export default function ProductCard({
         return;
       }
 
-      const baseNumPrice = Number(price.replace(/[^0-9.-]+/g, "")) || 0;
+      const isShopType = !productType || productType === "SHOP";
+      const baseNumPrice = (isShopType && shopPrice !== undefined && shopPrice !== null)
+        ? shopPrice
+        : (Number(price.replace(/[^0-9.-]+/g, "")) || 0);
       const unitPriceForCart = (productType === "RENTAL" && depositAmount !== undefined && depositAmount !== null)
         ? Number(depositAmount)
         : baseNumPrice;
@@ -589,7 +594,9 @@ export default function ProductCard({
           >
             {showFlashDeal && flashDealPrice
               ? `${flashDealPrice.toLocaleString()} ${t("egp", "EGP")}`
-              : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
+              : (!productType || productType === "SHOP") && shopPrice !== undefined && shopPrice !== null
+                ? `${shopPrice.toLocaleString()} ${t("egp", "EGP")}`
+                : price.replace(/\$|EGP/gi, ` ${t("egp", "EGP")}`).trim()}
             {isWholesale && (
               <span
                 className={

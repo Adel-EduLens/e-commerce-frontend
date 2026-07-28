@@ -15,6 +15,12 @@ type FavoriteProduct = {
   id: string
   name: string
   price: number
+  shopPrice?: number
+  rentalPrice?: number
+  retailPrice?: number
+  wholesalePrice?: number
+  blankPrice?: number
+  depositAmount?: number | null
   images?: { id: string; url: string; color?: string }[]
   rating?: number
   description?: string
@@ -100,7 +106,16 @@ export default function FavoritesPage() {
             // Determine routing path based on the type it was favorited as
             let route = `/product-details/${p.id}`;
             if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
-            else if (item.productType === 'RENTAL' || item.productType === 'RETAIL') route = `/rental/${p.id}`;
+            else if (item.productType === 'RENTAL' || item.productType === 'RETAIL') route = `/rental/shop/${p.id}`;
+
+            const favDisplayPrice =
+              item.productType === 'RENTAL'
+                ? (p.depositAmount as number | undefined) ?? p.rentalPrice ?? p.retailPrice ?? p.shopPrice ?? p.price ?? 0
+                : item.productType === 'RETAIL'
+                  ? p.retailPrice ?? p.shopPrice ?? p.rentalPrice ?? p.price ?? 0
+                  : item.productType === 'WHOLESALE'
+                    ? p.wholesalePrice ?? p.shopPrice ?? p.price ?? 0
+                    : p.shopPrice ?? p.retailPrice ?? p.rentalPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0;
 
             return (
               <ProductCard
@@ -109,7 +124,9 @@ export default function FavoritesPage() {
                 productType={item.productType as any}
                 title={p.name}
                 subtitle={p.description || undefined}
-                price={`${p.rentalPrice ?? p.retailPrice ?? p.shopPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0} EGP`}
+                shopPrice={p.shopPrice}
+                depositAmount={p.depositAmount ?? undefined}
+                price={`${favDisplayPrice} EGP`}
                 to={route}
                 imageSrc={p.images?.[0]?.url}
                 images={p.images}
