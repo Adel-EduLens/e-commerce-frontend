@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../../lib/axios";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { ReviewsSection } from "../../components/product/ReviewsSection";
+import WishlistHeartButton from "../../components/wishlist/WishlistHeartButton";
 
 export default function GiftCardDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -205,9 +206,14 @@ export default function GiftCardDetailsPage() {
           <div className="flex flex-col space-y-6 font-['Montserrat']">
             {/* Header Title & Rating */}
             <div>
-              <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">
-                {giftCard.name}
-              </h1>
+              <div className="flex items-center justify-between gap-4">
+                <h1 className="text-2xl font-extrabold text-foreground sm:text-3xl">
+                  {giftCard.name}
+                </h1>
+                <div className="relative h-10 w-10 shrink-0">
+                  <WishlistHeartButton productType="GIFT_CARD" productId={giftCard.id} className="!relative !right-0 !top-0" />
+                </div>
+              </div>
               <div className="mt-2 flex items-center gap-2">
                 <span className="text-sm font-semibold">
                   {averageRating > 0 ? averageRating.toFixed(1) : "0.0"}

@@ -103,25 +103,35 @@ export default function FavoritesPage() {
             const wholesaleColors = (p.wholesaleColors ?? []) as WholesaleColor[]
             const wholesaleSizes = Array.from(new Set(wholesaleColors.flatMap((wc) => wc.sizes.map((s) => s.size))))
 
+            const isGiftCard = item.productType === 'GIFT_CARD' || (p as any).productType === 'GIFT_CARD' || Boolean(p.giftCardAmounts);
+
             // Determine routing path based on the type it was favorited as
             let route = `/product-details/${p.id}`;
-            if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
+            if (isGiftCard) route = `/gift-card/${p.id}`;
+            else if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
             else if (item.productType === 'RENTAL' || item.productType === 'RETAIL') route = `/rental/shop/${p.id}`;
 
+            const firstGiftCardAmount = p.giftCardAmounts ? p.giftCardAmounts.split(',')[0]?.trim() : undefined;
+
             const favDisplayPrice =
-              item.productType === 'RENTAL'
-                ? p.rentalPrice ?? (p.depositAmount as number | undefined) ?? p.retailPrice ?? p.shopPrice ?? p.price ?? 0
-                : item.productType === 'RETAIL'
-                  ? p.retailPrice ?? p.shopPrice ?? p.rentalPrice ?? p.price ?? 0
-                  : item.productType === 'WHOLESALE'
-                    ? p.wholesalePrice ?? p.shopPrice ?? p.price ?? 0
-                    : p.shopPrice ?? p.retailPrice ?? p.rentalPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0;
+              isGiftCard
+                ? p.price ?? p.shopPrice ?? (firstGiftCardAmount ? Number(firstGiftCardAmount) : 0)
+                : item.productType === 'RENTAL'
+                  ? p.rentalPrice ?? (p.depositAmount as number | undefined) ?? p.retailPrice ?? p.shopPrice ?? p.price ?? 0
+                  : item.productType === 'RETAIL'
+                    ? p.retailPrice ?? p.shopPrice ?? p.rentalPrice ?? p.price ?? 0
+                    : item.productType === 'WHOLESALE'
+                      ? p.wholesalePrice ?? p.shopPrice ?? p.price ?? 0
+                      : p.shopPrice ?? p.retailPrice ?? p.rentalPrice ?? p.wholesalePrice ?? p.blankPrice ?? p.price ?? 0;
+
+            const cardProductType = isGiftCard ? 'GIFT_CARD' : item.productType;
 
             return (
               <ProductCard
                 key={item.id}
                 productId={p.id}
-                productType={item.productType as any}
+                productType={cardProductType as any}
+                showTypeBadge={true}
                 title={p.name}
                 subtitle={p.description || undefined}
                 shopPrice={p.shopPrice}
@@ -129,13 +139,13 @@ export default function FavoritesPage() {
                 depositAmount={p.depositAmount ?? undefined}
                 price={`${favDisplayPrice} EGP`}
                 to={route}
-                imageSrc={p.images?.[0]?.url}
+                imageSrc={p.images?.[0]?.url || (p as any).image}
                 images={p.images}
                 rating={p.rating ?? 0}
                 flashDealPrice={p.flashDealPrice ?? undefined}
                 flashDealEndsAt={p.flashDealEndsAt ?? undefined}
                 isFlashDeals={p.isFlashDeals ?? false}
-                brand={p.brand}
+                brand={typeof p.brand === "string" ? p.brand : (p.brand as any)?.name}
                 category={p.category?.name}
                 colors={Array.from(
                   new Set(
@@ -145,7 +155,7 @@ export default function FavoritesPage() {
                   ),
                 )}
                 wholesaleSizes={wholesaleSizes}
-                sizeLabel={wholesaleSizes.slice(0, 4).join("-") || "All Sizes"}
+                sizeLabel={isGiftCard ? "Gift Card" : (wholesaleSizes.slice(0, 4).join("-") || "All Sizes")}
                 minOrder={p.minOrder}
                 wholesaleCard={item.productType === 'WHOLESALE'}
               />

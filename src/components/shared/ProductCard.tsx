@@ -69,10 +69,10 @@ export type ProductCardProps = {
   description?: string;
   isFlashDeals?: boolean;
   productId?: string;
-  productType?: "SHOP" | "WHOLESALE" | "RENTAL" | "RETAIL";
+  productType?: "SHOP" | "WHOLESALE" | "RENTAL" | "RETAIL" | "GIFT_CARD" | "BLANK";
   showTypeBadge?: boolean;
-  brand?: string;
-  category?: string;
+  brand?: string | Record<string, any> | null;
+  category?: string | Record<string, any> | null;
   wholesaleSizes?: string[];
   minOrder?: number;
   wholesaleCard?: boolean;
@@ -178,6 +178,20 @@ export default function ProductCard({
 
   const safeColors =
     safeColorsFromProps.length > 0 ? safeColorsFromProps : safeColorsFromImages;
+
+  const brandName =
+    typeof brand === "string"
+      ? brand
+      : typeof brand === "object" && brand !== null
+        ? ((brand as any).name || (brand as any).brandName || (brand as any).title || "")
+        : "";
+
+  const categoryName =
+    typeof category === "string"
+      ? category
+      : typeof category === "object" && category !== null
+        ? ((category as any).name || (category as any).title || "")
+        : "";
   const { label: countdownLabel, expired } = useCountdown(
     showFlashDeal ? flashDealEndsAt : undefined,
   );
@@ -194,11 +208,13 @@ export default function ProductCard({
     "unknown-id";
 
   const computedTo =
-    productType === "RENTAL" || productType === "RETAIL"
-      ? `/rental/shop/${actualProductId}`
-      : productType === "WHOLESALE"
-        ? `/wholesale/${actualProductId}`
-        : `/product-details/${actualProductId}`;
+    productType === "GIFT_CARD"
+      ? `/gift-card/${actualProductId}`
+      : productType === "RENTAL" || productType === "RETAIL"
+        ? `/rental/shop/${actualProductId}`
+        : productType === "WHOLESALE"
+          ? `/wholesale/${actualProductId}`
+          : `/product-details/${actualProductId}`;
 
   const targetTo = to && to !== "/product-details" ? to : computedTo;
 
@@ -384,6 +400,11 @@ export default function ProductCard({
               Wholesale
             </div>
           )}
+          {showTypeBadge && productType === "GIFT_CARD" && (
+            <div className="rounded-full px-3 py-1 font-['Montserrat'] text-xs font-semibold text-white shadow-sm bg-purple-600">
+              Gift Card
+            </div>
+          )}
           {/* Flash deal countdown badge */}
           {showFlashDeal && countdownLabel && (
             <div
@@ -495,20 +516,20 @@ export default function ProductCard({
         className={`flex flex-col font-['Montserrat'] ${useWholesaleCard ? "gap-2 p-4" : "p-5"}`}
       >
         {/* Brand row for Wholesale */}
-        {isWholesale && brand && (
+        {isWholesale && brandName && (
           <div
             className={`flex items-center gap-2 ${useWholesaleCard ? "" : "mb-2"}`}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 text-[10px] font-black text-foreground shrink-0">
-              {brand.slice(0, 1).toUpperCase()}
+              {brandName.slice(0, 1).toUpperCase()}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-foreground uppercase tracking-wide truncate underline">
-                {brand}
+                {brandName}
               </p>
-              {category && (
+              {categoryName && (
                 <p className="text-[11px] text-gray-text truncate">
-                  {category}
+                  {categoryName}
                 </p>
               )}
             </div>

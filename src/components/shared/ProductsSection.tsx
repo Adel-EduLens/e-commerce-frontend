@@ -113,7 +113,7 @@ export default function ProductsSection({
     const availableBrands = Array.from(
       new Set(
         products
-          .map((p) => p.brand?.name || (p.brand as unknown as string))
+          .map((p) => p.brand?.name || (typeof p.brand === "string" ? p.brand : ""))
           .filter((x): x is string => Boolean(x)),
       ),
     );
@@ -208,7 +208,7 @@ export default function ProductsSection({
                       ) || []
                 }
                 brand={
-                  product.brand?.name || (product.brand as unknown as string)
+                  product.brand?.name || (typeof product.brand === "string" ? product.brand : undefined)
                 }
                 category={
                   product.categories?.map((c) => c.name).join(", ") || ""

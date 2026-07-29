@@ -1,6 +1,6 @@
 import type { Product } from './product'
 
-export type WishlistProductType = 'RENTAL' | 'RETAIL' | 'WHOLESALE' | 'SHOP' | 'BLANK'
+export type WishlistProductType = 'RENTAL' | 'RETAIL' | 'WHOLESALE' | 'SHOP' | 'BLANK' | 'GIFT_CARD'
 
 export interface WishlistItem {
   id: number | string
