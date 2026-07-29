@@ -14,6 +14,7 @@ export type DetailItem = {
   sizeguide?: string | null;
   minOrder?: number;
   stock?: number;
+  giftCardAmounts?: string | null;
 
   categories?: {
     id: string | number;

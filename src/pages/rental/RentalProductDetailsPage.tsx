@@ -106,13 +106,27 @@ export default function RentalProductDetailsPage() {
         const sizes = colors.flatMap(c => c.variants || []);
 
         if (colors.length > 0) {
-          setSelectedColor(colors[0].colorName || colors[0].color || "");
+          const firstColorName = colors[0].colorName || colors[0].color || "";
+          setSelectedColor(firstColorName);
+
+          const firstColorImg =
+            images.find(
+              (img) => img.color && firstColorName && img.color.toLowerCase() === firstColorName.toLowerCase(),
+            )?.url ||
+            colors[0].images?.[0]?.url ||
+            colors[0].images?.[0]?.imageUrl ||
+            images[0]?.url ||
+            "";
+
+          if (firstColorImg) {
+            setSelectedImage(firstColorImg);
+          }
+        } else if (images.length > 0) {
+          setSelectedImage(images[0].url);
         }
+
         if (sizes.length > 0) {
           setSelectedSize(sizes[0].size);
-        }
-        if (images.length > 0) {
-          setSelectedImage(images[0].url);
         }
         setQuantity(1);
       }
@@ -122,14 +136,21 @@ export default function RentalProductDetailsPage() {
 
   const handleColorChange = (colorName: string) => {
     setSelectedColor(colorName);
-    // Update image to match selected color
     const images = typedProduct?.images ?? [];
-    const colorImage = images.find(
-      (img) =>
-        img.color && img.color.toLowerCase() === colorName.toLowerCase(),
+    const colors = typedProduct?.colors ?? [];
+    const colorObj = colors.find(
+      (c) => (c.colorName || c.color || "").toLowerCase() === colorName.toLowerCase(),
     );
+
+    const colorImage =
+      images.find(
+        (img) => img.color && colorName && img.color.toLowerCase() === colorName.toLowerCase(),
+      )?.url ||
+      colorObj?.images?.[0]?.url ||
+      (colorObj?.images?.[0] as any)?.imageUrl;
+
     if (colorImage) {
-      setSelectedImage(colorImage.url);
+      setSelectedImage(colorImage);
     }
   };
 

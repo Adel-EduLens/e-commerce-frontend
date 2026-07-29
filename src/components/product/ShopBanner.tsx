@@ -81,7 +81,7 @@ const ShopBanner = () => {
                 {banner.buttonText}
               </a>
             ) : (
-              <Link to={to} className={btnClassName}>
+              <Link to={to || "#"} className={btnClassName}>
                 {banner.buttonText}
               </Link>
             )

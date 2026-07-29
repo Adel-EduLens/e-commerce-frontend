@@ -111,7 +111,7 @@ export default function FavoritesPage() {
             else if (item.productType === 'WHOLESALE') route = `/wholesale/${p.id}`;
             else if (item.productType === 'RENTAL' || item.productType === 'RETAIL') route = `/rental/shop/${p.id}`;
 
-            const firstGiftCardAmount = p.giftCardAmounts ? p.giftCardAmounts.split(',')[0]?.trim() : undefined;
+            const firstGiftCardAmount = typeof p.giftCardAmounts === 'string' ? p.giftCardAmounts.split(',')[0]?.trim() : undefined;
 
             const favDisplayPrice =
               isGiftCard

@@ -114,7 +114,7 @@ export default function GiftCardDetailsPage() {
       await api.post("/gift-cards/validate-recipient", { recipientEmail: recEmailFormatted });
     } catch (err: any) {
       const rawMsg = err?.response?.data?.message || "Recipient email validation failed";
-      const errMsg = t(rawMsg, rawMsg);
+      const errMsg = String(t(rawMsg, rawMsg));
       setErrors((prev) => ({ ...prev, recipientEmail: errMsg }));
       toast.error(errMsg);
       return;

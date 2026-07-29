@@ -41,31 +41,54 @@ export default function WholesaleDetailsPage() {
   // Initialize selected values on wholesale product load
   useEffect(() => {
     if (wholesale) {
-      const colorsList = wholesale.wholesaleColors || [];
+      const colorsList = wholesale.wholesaleColors || (wholesale.colors as any) || [];
       if (colorsList.length > 0) {
-        const firstColor = colorsList[0];
-        const colorName = firstColor.color || "";
+        const firstColor = colorsList[0] as any;
+        const colorName = firstColor.color || firstColor.colorName || "";
         setSelectedColor(colorName);
 
-        const sizesList = firstColor.sizes || [];
+        const sizesList = firstColor.sizes || firstColor.variants || [];
         const firstAvailableSize = sizesList[0]?.size || "";
         setSelectedSize(firstAvailableSize);
-      }
 
-      const firstImage = wholesale.images?.[0]?.url || "";
-      setSelectedImage(firstImage);
+        const colorImage =
+          firstColor.images?.[0]?.url ||
+          firstColor.images?.[0]?.imageUrl ||
+          wholesale.images?.find(
+            (img: any) => img.color && colorName && img.color.toLowerCase() === colorName.toLowerCase()
+          )?.url ||
+          wholesale.images?.[0]?.url ||
+          "";
+
+        setSelectedImage(colorImage);
+      } else {
+        const firstImage = wholesale.images?.[0]?.url || (wholesale.images?.[0] as any)?.imageUrl || "";
+        setSelectedImage(firstImage);
+      }
       setQuantity(wholesale.minOrder || 1);
     }
   }, [wholesale]);
 
   const handleColorChange = (colorName: string) => {
     setSelectedColor(colorName);
-    const colorsList = wholesale?.wholesaleColors || [];
+    const colorsList = wholesale?.wholesaleColors || (wholesale?.colors as any) || [];
     const colorObj = colorsList.find(
-      (c) => c.color.toLowerCase() === colorName.toLowerCase()
+      (c: any) => (c.color || c.colorName || "").toLowerCase() === colorName.toLowerCase()
     );
+
+    const colorImage =
+      colorObj?.images?.[0]?.url ||
+      colorObj?.images?.[0]?.imageUrl ||
+      wholesale?.images?.find(
+        (img: any) => img.color && colorName && img.color.toLowerCase() === colorName.toLowerCase()
+      )?.url;
+
+    if (colorImage) {
+      setSelectedImage(colorImage);
+    }
+
     if (colorObj) {
-      const sizesList = colorObj.sizes || [];
+      const sizesList = colorObj.sizes || colorObj.variants || [];
       const firstAvailableSize = sizesList[0]?.size || "";
       setSelectedSize(firstAvailableSize);
     }
@@ -89,12 +112,28 @@ export default function WholesaleDetailsPage() {
       0,
     brandName: typeof wholesale.brand === "string" ? wholesale.brand : wholesale.brand?.name ?? null,
     minOrder: wholesale.minOrder ?? 1,
-    colors: (wholesale.wholesaleColors || []).map((wc) => ({ id: wc.id, color: wc.color })),
+    images: (() => {
+      const colorsList = wholesale.wholesaleColors || wholesale.colors || [];
+      const colorImages = colorsList.flatMap((c: any) =>
+        (c.images || []).map((img: any) => ({
+          id: img.id || img.url || img.imageUrl || "",
+          url: img.url || img.imageUrl || "",
+          color: c.color || c.colorName || "",
+        }))
+      );
+      if (colorImages.length > 0) return colorImages;
+      return (wholesale.images || []).map((img: any) => ({
+        id: img.id || img.url || img.imageUrl || "",
+        url: img.url || img.imageUrl || "",
+        color: img.color || "",
+      }));
+    })(),
+    colors: (wholesale.wholesaleColors || wholesale.colors || []).map((wc: any) => ({ id: wc.id, color: wc.color || wc.colorName })),
     sizes: Array.from(
       new Map(
-        (wholesale.wholesaleColors || [])
-          .flatMap((wc) => wc.sizes || [])
-          .map((s) => [s.size, { id: s.id, size: s.size }])
+        (wholesale.wholesaleColors || wholesale.colors || [])
+          .flatMap((wc: any) => wc.sizes || wc.variants || [])
+          .map((s: any) => [s.size, { id: s.id, size: s.size }])
       ).values()
     ),
   };

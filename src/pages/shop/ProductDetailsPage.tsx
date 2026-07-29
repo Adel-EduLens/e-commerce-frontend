@@ -30,23 +30,37 @@ export default function ProductDetailsPage() {
   // Initialize selected values on product load
   useEffect(() => {
     const func = () => {
-      if (product && product.colors && product.colors.length > 0) {
-        const firstColor = product.colors[0];
-        setSelectedColor(firstColor.colorName || firstColor.color || "");
+      if (product) {
+        if (product.colors && product.colors.length > 0) {
+          const firstColor = product.colors[0];
+          const firstColorName = firstColor.colorName || firstColor.color || "";
+          setSelectedColor(firstColorName);
 
-        const firstAvailableSize =
-          firstColor.variants?.find(
-            (v: { quantity: number; size: string }) => v.quantity > 0,
-          )?.size ||
-          firstColor.variants?.[0]?.size ||
-          "";
-        setSelectedSize(firstAvailableSize);
+          const firstAvailableSize =
+            firstColor.variants?.find(
+              (v: { quantity: number; size: string }) => v.quantity > 0,
+            )?.size ||
+            firstColor.variants?.[0]?.size ||
+            "";
+          setSelectedSize(firstAvailableSize);
 
-        const firstImage =
-          firstColor.images?.[0]?.imageUrl || firstColor.images?.[0]?.url || "";
-        setSelectedImage(firstImage);
-
-        setQuantity(1);
+          const firstImage =
+            firstColor.images?.[0]?.imageUrl ||
+            firstColor.images?.[0]?.url ||
+            product.images?.find(
+              (img: any) =>
+                img.color &&
+                firstColorName &&
+                img.color.toLowerCase() === firstColorName.toLowerCase(),
+            )?.url ||
+            product.images?.[0]?.url ||
+            "";
+          setSelectedImage(firstImage);
+          setQuantity(1);
+        } else if (product.images && product.images.length > 0) {
+          const firstImage = product.images[0].url || (product.images[0] as any).imageUrl || "";
+          setSelectedImage(firstImage);
+        }
       }
     };
     func();
@@ -55,8 +69,22 @@ export default function ProductDetailsPage() {
   const handleColorChange = (colorName: string) => {
     setSelectedColor(colorName);
     const colorObj = product?.colors?.find(
-      (c: ProductColor) => (c.colorName || c.color) === colorName,
+      (c: ProductColor) =>
+        (c.colorName || c.color || "").toLowerCase() === colorName.toLowerCase(),
     );
+
+    const colorImage =
+      colorObj?.images?.[0]?.imageUrl ||
+      colorObj?.images?.[0]?.url ||
+      product?.images?.find(
+        (img: any) =>
+          img.color && colorName && img.color.toLowerCase() === colorName.toLowerCase(),
+      )?.url;
+
+    if (colorImage) {
+      setSelectedImage(colorImage);
+    }
+
     if (colorObj) {
       const firstAvailableSize =
         colorObj.variants?.find(
@@ -65,11 +93,6 @@ export default function ProductDetailsPage() {
         colorObj.variants?.[0]?.size ||
         "";
       setSelectedSize(firstAvailableSize);
-
-      const firstImage =
-        colorObj.images?.[0]?.imageUrl || colorObj.images?.[0]?.url || "";
-      setSelectedImage(firstImage);
-
       setQuantity(1);
     }
   };
@@ -100,16 +123,24 @@ export default function ProductDetailsPage() {
       0,
     brandName: product.brand?.name ?? null,
     sizeguide: product.sizeguide,
-    images:
-      product.colors?.flatMap((c: ProductColor) =>
-        (c.images || []).map(
-          (img: { id: string; url?: string; imageUrl?: string }) => ({
-            id: img.id,
-            url: img.url || img.imageUrl || "",
-            color: c.colorName || c.color || "",
-          }),
-        ),
-      ) ?? [],
+    images: (() => {
+      const colorImages =
+        product.colors?.flatMap((c: ProductColor) =>
+          (c.images || []).map(
+            (img: { id: string; url?: string; imageUrl?: string }) => ({
+              id: img.id || img.url || img.imageUrl || "",
+              url: img.url || img.imageUrl || "",
+              color: c.colorName || c.color || "",
+            }),
+          ),
+        ) ?? [];
+      if (colorImages.length > 0) return colorImages;
+      return (product.images || []).map((img: any) => ({
+        id: img.id || img.url || img.imageUrl || "",
+        url: img.url || img.imageUrl || "",
+        color: img.color || "",
+      }));
+    })(),
     colors: (product.colors || []).map((c: ProductColor) => ({
       id: c.id,
       color: c.colorName || c.color || "",
