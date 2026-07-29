@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Wheel } from "react-custom-roulette";
 import { usePrizes, useSpinPrize } from "../../hooks/queries/prizequery";
 import { toast } from "sonner";
@@ -15,6 +15,72 @@ const getTextColor = (bgColor: string) => {
   return "#ffffff";
 };
 
+const createTextImage = (
+  text: string,
+  color: string,
+  maxWidth = 130,
+  fontSize = 16
+): string => {
+  const dpr = 3; // high DPI for crisp text
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+  const font = `bold ${fontSize * dpr}px "Segoe UI", Arial, sans-serif`;
+  ctx.font = font;
+
+  const scaledMaxWidth = maxWidth * dpr;
+
+  // Split text into lines that fit maxWidth
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
+
+  for (const word of words) {
+    const testLine = currentLine ? currentLine + " " + word : word;
+    if (ctx.measureText(testLine).width > scaledMaxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+
+  // Cap at 2 lines max, truncate if needed
+  if (lines.length > 2) {
+    lines.length = 2;
+    const last = lines[1];
+    if (ctx.measureText(last).width > scaledMaxWidth) {
+      let truncated = last;
+      while (ctx.measureText(truncated + "…").width > scaledMaxWidth && truncated.length > 0) {
+        truncated = truncated.slice(0, -1);
+      }
+      lines[1] = truncated + "…";
+    }
+  }
+
+  const lineHeight = fontSize * dpr * 1.3;
+  const totalHeight = lines.length * lineHeight;
+  const maxLineWidth = Math.max(
+    ...lines.map((l) => ctx.measureText(l).width),
+    20 * dpr
+  );
+
+  canvas.width = maxLineWidth + 8 * dpr;
+  canvas.height = totalHeight + 4 * dpr;
+
+  // Re-set font after canvas resize (resets context)
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+
+  lines.forEach((line, i) => {
+    ctx.fillText(line, canvas.width / 2, i * lineHeight + 2 * dpr);
+  });
+
+  return canvas.toDataURL();
+};
+
 const PrizeWheel = () => {
   const { t } = useTranslation("traderPrizes");
   const theme = useTheme();
@@ -26,16 +92,28 @@ const PrizeWheel = () => {
   const { data: prizes = [], isLoading } = usePrizes();
   const spinMutation = useSpinPrize();
 
-  const wheelData = prizes.map((prize, index) => {
-    const bgColor = colors[index % colors.length];
-    return {
-      option: prize.name,
-      style: {
-        backgroundColor: bgColor,
-        textColor: getTextColor(bgColor),
-      },
-    };
-  });
+  const wheelData = useMemo(
+    () =>
+      prizes.map((prize, index) => {
+        const bgColor = colors[index % colors.length];
+        const textColor = getTextColor(bgColor);
+        const imageUri = createTextImage(prize.name, textColor);
+        return {
+          option: "",
+          image: {
+            uri: imageUri,
+            sizeMultiplier: 0.55,
+            offsetY: 0,
+            landscape: true,
+          },
+          style: {
+            backgroundColor: bgColor,
+            textColor: getTextColor(bgColor),
+          },
+        };
+      }),
+    [prizes, colors]
+  );
 
   const handleSpin = async () => {
     if (mustSpin) return;
@@ -56,7 +134,11 @@ const PrizeWheel = () => {
   }
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="rounded-full p-1 shadow-lg" dir="ltr" style={{ direction: "ltr" }}>
+      <div
+        className="rounded-full p-1 shadow-lg"
+        dir="ltr"
+        style={{ direction: "ltr" }}
+      >
         <Wheel
           mustStartSpinning={mustSpin}
           prizeNumber={prizeNumber}
@@ -66,9 +148,9 @@ const PrizeWheel = () => {
           innerBorderWidth={8}
           innerRadius={12}
           radiusLineWidth={0}
-          fontSize={20}
+          fontSize={14}
           fontWeight={700}
-          textDistance={62}
+          textDistance={55}
           perpendicularText={false}
           onStopSpinning={() => {
             setMustSpin(false);
