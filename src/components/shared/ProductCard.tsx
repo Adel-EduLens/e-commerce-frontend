@@ -10,6 +10,7 @@ import {
   addCompareProduct,
   removeCompareProduct,
   isProductCompared,
+  type CompareProductType,
 } from "../../utils/compareStorage";
 import { useToggleWishlist, useWishlistStatus } from "../../hooks/useWishlist";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -48,7 +49,7 @@ type ImageType = {
   color?: string;
   productId?: string;
 };
-type CompareProductType = "SHOP" | "WHOLESALE" | "RENTAL" | "RETAIL";
+
 export type ProductCardProps = {
   title?: string;
   subtitle?: string;
@@ -154,18 +155,18 @@ export default function ProductCard({
   const showFlashDeal = isFlashDeals && flashDealPrice !== undefined;
   const safeColorsFromProps = Array.isArray(colors) && colors.length > 0
     ? Array.from(
-        new Set(
-          colors
-            .map((c) =>
-              typeof c === "string"
-                ? c
-                : typeof c === "object" && c !== null
-                  ? (c as any).colorName || (c as any).color || (c as any).colorCode || (c as any).name || ""
-                  : "",
-            )
-            .filter((c): c is string => typeof c === "string" && c.trim() !== ""),
-        ),
-      )
+      new Set(
+        colors
+          .map((c) =>
+            typeof c === "string"
+              ? c
+              : typeof c === "object" && c !== null
+                ? (c as any).colorName || (c as any).color || (c as any).colorCode || (c as any).name || ""
+                : "",
+          )
+          .filter((c): c is string => typeof c === "string" && c.trim() !== ""),
+      ),
+    )
     : [];
 
   const safeColorsFromImages = Array.from(
@@ -231,21 +232,32 @@ export default function ProductCard({
 
   const isWholesale = productType === "WHOLESALE";
   const useWholesaleCard = isWholesale && wholesaleCard;
-  const compareType: CompareProductType = productType ?? "SHOP";
+  const isGiftCard =
+    productType === "GIFT_CARD" ||
+    String(actualProductId).toLowerCase().includes("giftcard") ||
+    String(actualProductId).toLowerCase().includes("gift-card") ||
+    String(productId).toLowerCase().includes("giftcard") ||
+    String(productId).toLowerCase().includes("gift-card") ||
+    title?.toLowerCase().includes("gift card") ||
+    (typeof brandName === "string" && brandName.toLowerCase().includes("gift card"));
+  const compareType: CompareProductType =
+    productType === "WHOLESALE" || productType === "RENTAL" || productType === "RETAIL"
+      ? productType
+      : "SHOP";
 
   const selectedColor = safeColors[activeColorIdx] ?? "Default";
 
   const existingCartItem = isWholesale
     ? wholesaleCartItems.find((item) =>
-        String(item.productId) === String(actualProductId) &&
-        (useWholesaleCard ? item.color?.toLowerCase() === selectedColor.toLowerCase() : true)
-      )
+      String(item.productId) === String(actualProductId) &&
+      (useWholesaleCard ? item.color?.toLowerCase() === selectedColor.toLowerCase() : true)
+    )
     : cartItems.find((item) => {
-        return (
-          String(item.productId) === String(actualProductId) ||
-          String(item.id).startsWith(String(actualProductId))
-        );
-      });
+      return (
+        String(item.productId) === String(actualProductId) ||
+        String(item.id).startsWith(String(actualProductId))
+      );
+    });
 
   const isInCart = Boolean(existingCartItem);
 
@@ -471,7 +483,7 @@ export default function ProductCard({
             </button>
 
             {/* Compare button (optional, moved to top right below heart) */}
-            {!useWholesaleCard && (
+            {!useWholesaleCard && !isGiftCard && (
               <button
                 onClick={handleCompare}
                 aria-label={isCompared ? "Remove from compare" : "Add to compare"}

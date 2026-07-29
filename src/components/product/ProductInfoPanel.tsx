@@ -504,13 +504,15 @@ export function ProductInfoPanel({
         </div>
         <span className="text-sm font-semibold text-foreground">{item.rating}</span>
         <span className="text-sm text-gray-text">({reviewCount} {t("reviews")})</span>
-        <button
-          type="button"
-          onClick={handleCompare}
-          className="ml-auto text-xs text-primary hover:underline font-semibold"
-        >
-          {isCompared ? `✓ ${t("inComparison")}` : t("addToCompareLink")}
-        </button>
+        {!isGiftCard && (
+          <button
+            type="button"
+            onClick={handleCompare}
+            className="ml-auto text-xs text-primary hover:underline font-semibold"
+          >
+            {isCompared ? `✓ ${t("inComparison")}` : t("addToCompareLink")}
+          </button>
+        )}
       </div>
 
       {/* Price */}

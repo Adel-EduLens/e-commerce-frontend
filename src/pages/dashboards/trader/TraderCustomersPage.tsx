@@ -9,14 +9,12 @@ const asset = (file: string) =>
 function getStatusPillInfo(status: string, t: (key: string) => string) {
   const s = status?.toUpperCase();
   if (s === "COMPLETED" || s === "DELIVERED")
-    return { bg: "bg-emerald-50", text: "text-emerald-700", label: t("completed") };
-  if (s === "SHIPPED")
-    return { bg: "bg-sky-50", text: "text-sky-700", label: t("shipped") };
-  if (s === "PROCESSING")
-    return { bg: "bg-sky-50", text: "text-sky-700", label: t("processing") };
+    return { bg: "bg-emerald-500/10 border border-emerald-500/20", text: "text-emerald-600 dark:text-emerald-400", label: t("completed") };
+  if (s === "SHIPPED" || s === "PROCESSING")
+    return { bg: "bg-sky-500/10 border border-sky-500/20", text: "text-sky-600 dark:text-sky-400", label: t("shipped") };
   if (s === "CANCELLED")
-    return { bg: "bg-red-50", text: "text-red-600", label: t("cancelled") };
-  return { bg: "bg-amber-50", text: "text-amber-700", label: t("pending") };
+    return { bg: "bg-red-500/10 border border-red-500/20", text: "text-red-600 dark:text-red-400", label: t("cancelled") };
+  return { bg: "bg-amber-500/10 border border-amber-500/20", text: "text-amber-600 dark:text-amber-400", label: t("pending") };
 }
 
 function DonutChart({ total, completed, cancelled, pending }: {
@@ -24,15 +22,15 @@ function DonutChart({ total, completed, cancelled, pending }: {
 }) {
   const { t } = useTranslation("traderCustomers");
   const rawSegs = [
-    { label: t("completed"), value: completed, color: "#A81324" },
-    { label: t("pendingShipped"), value: pending, color: "#FCD34D" },
-    { label: t("cancelled"), value: cancelled, color: "#7DD3FC" },
+    { label: t("completed"), value: completed, color: "#a81324" },
+    { label: t("pendingShipped"), value: pending, color: "#f59e0b" },
+    { label: t("cancelled"), value: cancelled, color: "#ef4444" },
   ];
   const other = Math.max(0, total - completed - cancelled - pending);
-  if (other > 0) rawSegs.push({ label: t("other"), value: other, color: "#E5E7EB" });
+  if (other > 0) rawSegs.push({ label: t("other"), value: other, color: "var(--stroke)" });
   const segments = rawSegs.filter((s) => s.value > 0);
   const isNoData = segments.length === 0;
-  if (isNoData) segments.push({ label: t("noData"), value: 1, color: "#E5E7EB" });
+  if (isNoData) segments.push({ label: t("noData"), value: 1, color: "var(--stroke)" });
 
   const sum = segments.reduce((s, x) => s + x.value, 0);
   const cx = 70, cy = 70, r = 50, innerR = 28;
@@ -56,19 +54,19 @@ function DonutChart({ total, completed, cancelled, pending }: {
     <div className="flex items-center gap-4">
       <svg width="140" height="140" viewBox="0 0 140 140">
         {paths.map((seg) => <path key={seg.label} d={seg.d} fill={seg.color} />)}
-        <text x={cx} y={cy - 4} textAnchor="middle" fontSize="14" fontWeight="700" fill="#111827">{total}</text>
-        <text x={cx} y={cy + 14} textAnchor="middle" fontSize="7" fill="#6B7280">{t("totalCustomers")}</text>
+        <text x={cx} y={cy - 4} textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--foreground)">{total}</text>
+        <text x={cx} y={cy + 14} textAnchor="middle" fontSize="7" fill="var(--gray-text)">{t("totalCustomers")}</text>
       </svg>
       <div className="flex flex-col gap-2">
         {isNoData ? (
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full shrink-0 border border-gray-300 bg-[#E5E7EB]" />
+            <span className="h-3 w-3 rounded-full shrink-0 border border-stroke bg-stroke" />
             <span className="font-['Montserrat'] text-xs text-gray-text">{t("noData")}</span>
           </div>
         ) : (
           segments.map((seg) => (
             <div key={seg.label} className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: seg.color, border: seg.color === "#E5E7EB" ? "1px solid #D1D5DB" : undefined }} />
+              <span className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
               <span className="font-['Montserrat'] text-xs text-gray-text">{seg.label}</span>
               <span className="ml-auto font-['Montserrat'] text-xs font-semibold text-foreground">
                 {total > 0 ? Math.round((seg.value / total) * 100) : 0}%
@@ -110,7 +108,7 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
 
   return (
     <div className="space-y-4">
-      <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-xl border border-stroke bg-white px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer">
+      <button type="button" onClick={onBack} className="flex items-center gap-2 rounded-xl border border-stroke bg-card px-4 py-2.5 font-['Montserrat'] text-sm font-medium text-foreground transition hover:bg-background cursor-pointer shadow-sm">
         <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
           <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -119,32 +117,32 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-            <p className="font-['Montserrat'] text-sm font-medium text-gray-text">{card.label}</p>
+          <div key={card.label} className="rounded-2xl border border-stroke bg-card p-4 shadow-sm">
+            <p className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.label}</p>
             <p className="mt-1 font-['Montserrat'] text-xl font-semibold text-foreground">{card.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <h3 className="mb-4 font-['Montserrat'] text-xl font-semibold text-foreground">{t("customerInformation")}</h3>
+      <div className="rounded-2xl border border-stroke bg-card p-5 shadow-sm">
+        <h3 className="mb-4 font-['Montserrat'] text-lg font-semibold text-foreground">{t("customerInformation")}</h3>
         <div className="flex flex-col gap-4">
           {[{ label: t("name"), value: customer.name }, { label: t("email"), value: customer.email }, { label: t("phone"), value: customer.phone || "—" }].map((row) => (
-            <div key={row.label} className="flex items-center gap-1.5">
-              <div className="h-6 w-6 shrink-0 rounded bg-gray-light flex items-center justify-center font-['Montserrat'] text-xs font-bold text-foreground">
+            <div key={row.label} className="flex items-center gap-2">
+              <div className="h-7 w-7 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center font-['Montserrat'] text-xs font-bold text-primary">
                 {row.label.charAt(0)}
               </div>
-              <span className="font-['Montserrat'] text-base font-semibold text-gray-text">{row.label}: </span>
-              <span className="font-['Montserrat'] text-base font-semibold text-foreground">{row.value}</span>
+              <span className="font-['Montserrat'] text-sm font-semibold text-gray-text">{row.label}: </span>
+              <span className="font-['Montserrat'] text-sm font-semibold text-foreground">{row.value}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
-        <div className="flex items-center justify-between border-b border-stroke px-4 py-4">
-          <h3 className="font-['Montserrat'] text-xl font-semibold text-foreground">{t("orderHistory")}</h3>
-          <span className="font-['Montserrat'] text-sm text-gray-text">{t("ordersCount", { count: customerOrders.length })}</span>
+      <div className="rounded-2xl border border-stroke bg-card shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between border-b border-stroke px-5 py-4">
+          <h3 className="font-['Montserrat'] text-lg font-semibold text-foreground">{t("orderHistory")}</h3>
+          <span className="font-['Montserrat'] text-xs text-gray-text">{t("ordersCount", { count: customerOrders.length })}</span>
         </div>
         {isLoading ? (
           <LoadingSpinner containerClassName="py-12" />
@@ -154,9 +152,9 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
           <div className="overflow-x-auto">
             <table className="trader-table">
               <thead>
-                <tr className="bg-secondary">
+                <tr className="bg-secondary border-b border-stroke">
                   {[t("colOrderId"), t("colDate"), t("colItems"), t("colPayment"), t("colTotal"), t("colStatus")].map((col) => (
-                    <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">{col}</th>
+                    <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-semibold text-primary whitespace-nowrap">{col}</th>
                   ))}
                 </tr>
               </thead>
@@ -168,24 +166,24 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
                   return (
                     <React.Fragment key={order.id}>
                       <tr
-                        className={`${idx % 2 === 0 ? "bg-white" : "bg-background"} transition cursor-pointer hover:bg-background/80`}
+                        className={`transition cursor-pointer hover:bg-primary/5 ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
                         onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
                       >
                         <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">
                           <div className="flex items-center gap-2">
                             <span className="font-bold">{order.orderId}</span>
                             {order.orderType === "WHOLESALE" && (
-                              <span className="inline-flex items-center rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 border border-blue-200">
+                              <span className="inline-flex items-center rounded-lg bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary border border-primary/20">
                                 {t("wholesale", "Wholesale")}
                               </span>
                             )}
                             {order.orderType === "RETAIL" && (
-                              <span className="inline-flex items-center rounded-lg bg-purple-50 px-2 py-0.5 text-[10px] font-bold text-purple-700 border border-purple-200">
+                              <span className="inline-flex items-center rounded-lg bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-400 border border-purple-500/20">
                                 {t("retail", "Retail")}
                               </span>
                             )}
                             {order.orderType === "SHOP" && (
-                              <span className="inline-flex items-center rounded-lg bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                              <span className="inline-flex items-center rounded-lg bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-500/20">
                                 {t("shop", "Shop")}
                               </span>
                             )}
@@ -205,13 +203,13 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
                         <td className="px-4 py-3 font-['Montserrat'] text-xs font-medium text-foreground">{order.payment || "—"}</td>
                         <td className="px-4 py-3 font-['Montserrat'] text-xs font-semibold text-foreground whitespace-nowrap">{order.total}</td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
+                          <span className={`inline-flex rounded-2xl px-2.5 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-gray-50/90">
+                        <tr className="bg-background/90">
                           <td colSpan={6} className="px-6 py-4">
-                            <div className="rounded-xl border border-stroke bg-white p-4 space-y-3 shadow-sm font-['Montserrat']">
+                            <div className="rounded-xl border border-stroke bg-card p-4 space-y-3 shadow-sm font-['Montserrat']">
                               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stroke pb-2 text-xs font-semibold text-foreground">
                                 <span>Address: {order.address || "N/A"}</span>
                                 <span>Payment: {order.payment || "COD"}</span>
@@ -220,11 +218,11 @@ function CustomerDetail({ customer, onBack }: { customer: TraderCustomer; onBack
                                 <p className="text-xs font-bold text-foreground">Order Items:</p>
                                 <div className="grid gap-2 sm:grid-cols-2">
                                   {order.items.map((item, iIdx) => (
-                                    <div key={iIdx} className="flex items-center gap-3 rounded-lg border border-stroke/60 bg-card p-2 text-xs">
+                                    <div key={iIdx} className="flex items-center gap-3 rounded-lg border border-stroke/60 bg-background p-2 text-xs">
                                       {item.imageSrc || item.image ? (
                                         <img src={item.imageSrc || item.image} alt={item.title || item.product} className="h-10 w-10 rounded object-cover shrink-0" />
                                       ) : (
-                                        <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center font-bold text-gray-400 shrink-0">
+                                        <div className="h-10 w-10 rounded bg-stroke/40 flex items-center justify-center font-bold text-gray-text shrink-0">
                                           P
                                         </div>
                                       )}
@@ -307,7 +305,7 @@ export default function TraderCustomersPage() {
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
-          <div key={card.label} className="rounded-2xl border border-stroke bg-card p-4 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+          <div key={card.label} className="rounded-2xl border border-stroke bg-card p-4 shadow-sm">
             <p className="font-['Montserrat'] text-xs font-medium text-gray-text">{card.label}</p>
             <p className="mt-1 font-['Montserrat'] text-2xl font-bold text-foreground">{card.value}</p>
           </div>
@@ -316,7 +314,7 @@ export default function TraderCustomersPage() {
 
       <div className="flex flex-wrap items-center gap-3">
         <label className="relative flex w-full sm:w-auto sm:min-w-[280px] flex-1 items-center">
-          <img className="pointer-events-none absolute left-4 h-5 w-5" src={asset("mynaui_search.svg")} alt="" />
+          <img className="pointer-events-none absolute left-4 h-5 w-5 opacity-70" src={asset("mynaui_search.svg")} alt="" />
           <input
             type="text"
             placeholder={t("searchPlaceholder")}
@@ -327,7 +325,7 @@ export default function TraderCustomersPage() {
         </label>
       </div>
 
-      <div className="rounded-2xl border border-stroke bg-white shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+      <div className="rounded-2xl border border-stroke bg-card shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-stroke">
           <h2 className="font-['Montserrat'] text-base font-semibold text-foreground">{t("customerActivity")}</h2>
           <span className="font-['Montserrat'] text-xs text-gray-text">{t("customersCount", { count: filtered.length })}</span>
@@ -344,9 +342,9 @@ export default function TraderCustomersPage() {
             <div className="overflow-x-auto">
               <table className="trader-table">
                 <thead>
-                  <tr className="bg-secondary">
+                  <tr className="bg-secondary border-b border-stroke">
                     {[t("colCustomerName"), t("email"), t("colPhone"), t("colOrders"), t("colTotalSpent"), t("colLastPurchase"), t("colStatus")].map((col) => (
-                      <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-medium text-primary whitespace-nowrap">{col}</th>
+                      <th key={col} className="px-4 py-3 text-left font-['Montserrat'] text-xs font-semibold text-primary whitespace-nowrap">{col}</th>
                     ))}
                   </tr>
                 </thead>
@@ -356,7 +354,7 @@ export default function TraderCustomersPage() {
                     return (
                       <tr
                         key={customer.email}
-                        className={`cursor-pointer transition hover:bg-background ${idx % 2 === 0 ? "bg-white" : "bg-background"}`}
+                        className={`cursor-pointer transition hover:bg-primary/5 ${idx % 2 === 0 ? "bg-card" : "bg-background"}`}
                         onClick={() => setSelectedCustomer(customer)}
                       >
                         <td className="px-4 py-3">
@@ -375,7 +373,7 @@ export default function TraderCustomersPage() {
                         <td className="px-4 py-3 font-['Montserrat'] text-xs font-semibold text-foreground">{customer.totalSpent}</td>
                         <td className="px-4 py-3 font-['Montserrat'] text-xs text-gray-text">{customer.lastPurchase}</td>
                         <td className="px-4 py-3">
-                          <span className={`inline-flex rounded-2xl px-2 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
+                          <span className={`inline-flex rounded-2xl px-2.5 py-1 text-xs font-medium font-['Montserrat'] ${pill.bg} ${pill.text}`}>{pill.label}</span>
                         </td>
                       </tr>
                     );
@@ -389,11 +387,11 @@ export default function TraderCustomersPage() {
                 {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
               </span>
               <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-white transition hover:bg-background disabled:opacity-40">
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-card transition hover:bg-background disabled:opacity-40 cursor-pointer">
                 <img className="h-3 w-2 rotate-180" src={asset("weui_arrow-filled.svg")} alt="Prev" />
               </button>
               <button type="button" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-white transition hover:bg-background disabled:opacity-40">
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-stroke bg-card transition hover:bg-background disabled:opacity-40 cursor-pointer">
                 <img className="h-3 w-2" src={asset("weui_arrow-filled.svg")} alt="Next" />
               </button>
             </div>
@@ -402,12 +400,12 @@ export default function TraderCustomersPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-sm">
           <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">{t("customersByStatus")}</h3>
           <DonutChart total={customers.length} completed={completedCount} cancelled={cancelledCount} pending={pendingCount} />
         </div>
 
-        <div className="rounded-2xl border border-stroke bg-white p-5 shadow-[0_2px_8px_-2px_rgba(30,37,45,0.08)]">
+        <div className="rounded-2xl border border-stroke bg-card p-5 shadow-sm">
           <h3 className="mb-4 font-['Montserrat'] text-base font-semibold text-foreground">{t("topSpenders")}</h3>
           {isLoading ? (
             <LoadingSpinner containerClassName="py-8" />
