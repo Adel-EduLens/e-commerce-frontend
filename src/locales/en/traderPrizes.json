@@ -16,6 +16,7 @@
   "nameRequired": "Name is required",
   "weightMin": "Weight must be > 0",
   "cancel": "Cancel",
+  "weightHint": "Tip: The higher the weight, the more frequently the prize is likely to appear. Use a weight of 95–100 for prizes you want to appear often, and 1–5 for prizes that should appear very rarely.",
   "spinError": "Failed to spin the wheel. Please try again.",
   "winnerMsg": "Winner: {{name}}",
   "spinning": "Spinning...",

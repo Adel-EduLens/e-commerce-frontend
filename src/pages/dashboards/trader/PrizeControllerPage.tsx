@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Info } from "lucide-react";
 import { handleApiError } from '../../../lib/utils';
 import { toast } from "sonner";
 import {
@@ -97,6 +98,11 @@ const PrizeControllerPage = () => {
           <p className="text-red-500 text-xs min-h-[1rem]">
             {errors.weight ? t(errors.weight) : ""}
           </p>
+
+          <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-xl text-xs text-foreground/90 mb-3">
+            <Info className="siz-8 text-primary shrink-0" />
+            <p className="leading-relaxed text-xl">{t("weightHint")}</p>
+          </div>
         </div>
 
         <button
