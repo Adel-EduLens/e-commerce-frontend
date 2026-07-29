@@ -245,14 +245,23 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   };
 
-  const isLinkActive = (item: (typeof navLinks)[number]) =>
-    item.label === "home"
-      ? location.pathname === "/"
-      : item.label === "shop"
-        ? location.pathname.startsWith(item.path) ||
+  const isLinkActive = (item: (typeof navLinks)[number]) => {
+    if (item.label === "home") {
+      return location.pathname === "/";
+    }
+    if (item.label === "shop") {
+      return (
+        location.pathname.startsWith(item.path) ||
         location.pathname.startsWith("/collections/") ||
         location.pathname.startsWith("/product-details/")
-        : location.pathname.startsWith(item.path);
+      );
+    }
+    if (item.label === "wholesale") {
+      if (location.pathname.startsWith("/wholesale-bag")) return false;
+      return location.pathname === "/wholesale" || location.pathname.startsWith("/wholesale/");
+    }
+    return location.pathname.startsWith(item.path);
+  };
 
   return (
     <div className="relative w-full max-w-full">
