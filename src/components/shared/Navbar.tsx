@@ -349,7 +349,7 @@ export default function Navbar() {
             <Link to="/compare" className="relative flex shrink-0 items-center justify-center mr-2.5 md:mr-0">
               <Scale className="h-5 w-5 sm:h-6 sm:w-6 lg:h-7 lg:w-7 text-foreground hover:text-primary transition-colors" />
               {compareItemsCount > 0 && (
-                <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -top-1 -end-2 flex h-4 w-4 items-center justify-center rounded-full border border-background bg-primary text-[10px] font-bold text-white">
                   {compareItemsCount}
                 </span>
               )}
