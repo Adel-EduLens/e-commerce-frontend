@@ -8,7 +8,7 @@ import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
 import { useGiftCards } from "../../hooks/queries/giftCardsQuery";
 import type { FilterValues } from "../../components/shared/CatalogFilters";
-import { useHomeFilters } from "../../hooks/utils/HomeFilters";
+import { useHomeFilters } from "../../hooks/useHomeFilters";
 
 import { useTranslation } from "react-i18next";
 

@@ -29,7 +29,7 @@ function CouponUsageTrendChart({ series }: { series: { monthKey: string; default
       <div className="relative">
         <svg
           viewBox={`0 0 ${width} ${height}`}
-          className="h-[220px] w-full overflow-visible rounded-2xl bg-[#FFFBF5]"
+          className="h-[220px] w-full overflow-visible rounded-2xl bg-background border border-stroke/40"
           preserveAspectRatio="none"
         >
           <defs>
@@ -41,7 +41,7 @@ function CouponUsageTrendChart({ series }: { series: { monthKey: string; default
           {[0, 1, 2, 3, 4].map((i) => {
             const y = pad.top + (ch / 4) * i;
             return (
-              <line key={i} x1={pad.left} x2={width - pad.right} y1={y} y2={y} stroke="#E5E7EB" strokeWidth="1" strokeDasharray="4 4" />
+              <line key={i} x1={pad.left} x2={width - pad.right} y1={y} y2={y} stroke="var(--stroke)" strokeWidth="1" strokeDasharray="4 4" />
             );
           })}
           <path d={area} fill="url(#couponUsageGradient)" />

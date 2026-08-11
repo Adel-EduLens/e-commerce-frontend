@@ -717,7 +717,7 @@ export function ProductInfoPanel({
               <button
                 type="button"
                 onClick={() => setShowSizeGuide(true)}
-                className="flex items-center gap-1 text-xs text-[#00a2e8] hover:text-[#0081b8] transition-colors"
+                className="flex items-center gap-1 text-xs text-info hover:text-info/80 transition-colors"
               >
                 <Scissors className="h-3 w-3" />
                 {t("sizeGuide")}

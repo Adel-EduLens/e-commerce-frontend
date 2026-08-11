@@ -387,8 +387,7 @@ export default function ProductCard({
       {/* Image container */}
       <Link
         to={targetTo}
-        className={`relative block aspect-[4/5] w-full overflow-hidden ${useWholesaleCard ? "bg-[#f0eeec]" : "bg-[#f5f5f5]"
-          }`}
+        className="relative block aspect-[4/5] w-full overflow-hidden bg-muted"
       >
         <img
           className={`h-full w-full object-cover ${useWholesaleCard
@@ -470,14 +469,9 @@ export default function ProductCard({
               <Heart
                 size={useWholesaleCard ? 18 : 20}
                 strokeWidth={useWholesaleCard ? 2 : 1.8}
-                className={`transition-colors ${useWholesaleCard
-                  ? isWishlisted
-                    ? "text-primary"
-                    : "text-[#555]"
-                  : isWishlisted
-                    ? "text-primary"
-                    : "text-gray-300"
-                  }`}
+                className={`transition-colors ${
+                  isWishlisted ? "text-primary" : "text-gray-text"
+                }`}
                 fill={isWishlisted ? "currentColor" : "none"}
               />
             </button>

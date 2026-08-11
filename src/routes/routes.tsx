@@ -2,11 +2,13 @@ import { Suspense, lazy, type ComponentType, type ReactElement } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import LoadingSpinner from "../components/shared/LoadingSpinner";
 import ProtectedRoute from "../components/ProtectedRoute";
-import InfluencerLayout from "../components/layout/InfluencerLayout";
-import TraderLayout from "../components/layout/TraderLayout";
-import AccountLayout from "../layouts/AccountLayout";
-import StudentLayout from "../layouts/StudentLayout";
-import UserLayout from "../layouts/UserLayout";
+import {
+  AccountLayout,
+  InfluencerLayout,
+  RootLayout,
+  TraderLayout,
+  UserLayout,
+} from "../layouts";
 
 type LazyPageLoader<P extends object = Record<string, never>> = () => Promise<{
   default: ComponentType<P>;
@@ -44,7 +46,7 @@ const renderProtectedUserPage = <P extends object>(
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <StudentLayout />,
+    element: <RootLayout />,
     children: [
       {
         index: true,

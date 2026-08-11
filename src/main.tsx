@@ -21,8 +21,9 @@ function renderApp() {
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#333',
-              color: '#fff',
+              background: 'var(--card)',
+              color: 'var(--foreground)',
+              border: '1px solid var(--stroke)',
             },
           }}
         />

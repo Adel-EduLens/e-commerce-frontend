@@ -1,10 +1,15 @@
-export { default as Navbar } from './Navbar'
-export { default as Footer } from './Footer'
-export { default as ProductCard } from './ProductCard'
-export { default as CatalogFilters } from './CatalogFilters'
-export { default as SidebarFilters } from './SidebarFilters'
-export { default as AccountSidebar } from './AccountSidebar'
-export { default as CollapsibleFAQ } from './CollapsibleFAQ'
-export { default as LoadingSpinner } from './LoadingSpinner'
-export { default as FilterCategory } from './FilterCategory'
-
+export { default as Navbar } from "./Navbar";
+export { default as Footer } from "./Footer";
+export { default as ProductCard } from "./ProductCard";
+export { default as CatalogFilters } from "./CatalogFilters";
+export { default as SidebarFilters } from "./SidebarFilters";
+export { default as AccountSidebar } from "./AccountSidebar";
+export { default as CollapsibleFAQ } from "./CollapsibleFAQ";
+export { default as LoadingSpinner } from "./LoadingSpinner";
+export { default as FilterCategory } from "./FilterCategory";
+export { default as CategorySection } from "./CategorySection";
+export { default as FaqSection } from "./FaqSection";
+export { default as GoogleMap } from "./GoogleMap";
+export { default as Pagination } from "./Pagination";
+export { default as ProductsSection } from "./ProductsSection";
+export { default as WholesaleCard } from "./WholesaleCard";
