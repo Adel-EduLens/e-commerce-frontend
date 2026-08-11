@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { Tags } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useBrands } from "../../hooks/queries/brandsQuery";
 import {
@@ -282,6 +284,13 @@ export function AddItemModal({
   const isSaving = createProduct.isPending;
   const { t } = useTranslation("traderProduct");
   const { t: tShared } = useTranslation("traderInventoryShared");
+  const navigate = useNavigate();
+
+  const handleManageBrands = () => {
+    onClose();
+    navigate("/dashboard/trader/products?tab=brands");
+  };
+
   const handleColorsChange = (colors: string[]) => {
     setSelectedColors(colors);
     setProductColors((prev) => {
@@ -526,18 +535,33 @@ export function AddItemModal({
           />
 
           {type === "product" && (
-            <select
-              value={brandId}
-              onChange={(e) => setBrandId(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-            >
-              <option value="">{tShared("selectBrand")}</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-xs font-semibold text-gray-text">
+                  {tShared("brandLabel")}
+                </label>
+                <button
+                  type="button"
+                  onClick={handleManageBrands}
+                  className="inline-flex items-center gap-1.5 font-['Montserrat'] text-xs font-semibold text-primary transition hover:opacity-80"
+                >
+                  <Tags size={14} />
+                  {tShared("manageBrands", "Manage Brands")}
+                </button>
+              </div>
+              <select
+                value={brandId}
+                onChange={(e) => setBrandId(e.target.value)}
+                className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              >
+                <option value="">{tShared("selectBrand")}</option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
 
           <textarea
@@ -1195,6 +1219,7 @@ export function EditItemModal({
   const { t } = useTranslation("traderProduct");
   const { t: tShared } = useTranslation("traderInventoryShared");
   const isProductType = item.type === "product";
+  const navigate = useNavigate();
 
   const [name, setName] = useState(item.product);
   const [categoryIds, setCategoryIds] = useState<string[]>(item.categoryIds || []);
@@ -1232,6 +1257,11 @@ export function EditItemModal({
   const [wholesaleColorsState, setWholesaleColorsState] = useState<WholesaleColorEditState[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleManageBrands = () => {
+    onClose();
+    navigate("/dashboard/trader/products?tab=brands");
+  };
   const handleAddPackageEdit = () => {
     setWholesaleColorsState((prev) => [
       ...prev,
@@ -1478,18 +1508,33 @@ export function EditItemModal({
           />
 
           {item.type === "product" && (
-            <select
-              value={brandId}
-              onChange={(e) => setBrandId(e.target.value)}
-              className="rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
-            >
-              <option value="">{t("selectBrandOptional")}</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-xs font-semibold text-gray-text">
+                  {tShared("brandLabel")}
+                </label>
+                <button
+                  type="button"
+                  onClick={handleManageBrands}
+                  className="inline-flex items-center gap-1.5 font-['Montserrat'] text-xs font-semibold text-primary transition hover:opacity-80"
+                >
+                  <Tags size={14} />
+                  {tShared("manageBrands", "Manage Brands")}
+                </button>
+              </div>
+              <select
+                value={brandId}
+                onChange={(e) => setBrandId(e.target.value)}
+                className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary"
+              >
+                <option value="">{t("selectBrandOptional")}</option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
 
           <textarea

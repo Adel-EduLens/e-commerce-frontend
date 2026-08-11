@@ -4,6 +4,10 @@
   "wholesale": "Wholesale",
   "blankProducts": "Blank Products",
   "giftCards": "Gift Cards",
+  "brands": "Brands",
   "addProduct": "Add Product",
-  "addGiftCard": "Add Gift Card"
+  "addGiftCard": "Add Gift Card",
+  "backToProducts": "Back to Products",
+  "manageBrandsDescription": "Create, rename, and remove the brands available to your products.",
+  "loadingBrands": "Loading brands..."
 }

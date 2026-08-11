@@ -4,6 +4,10 @@
   "wholesale": "الجملة",
   "blankProducts": "منتجات خام",
   "giftCards": "بطاقات الهدايا",
+  "brands": "العلامات التجارية",
   "addProduct": "إضافة منتج",
-  "addGiftCard": "إضافة بطاقة هدايا"
+  "addGiftCard": "إضافة بطاقة هدايا",
+  "backToProducts": "العودة إلى المنتجات",
+  "manageBrandsDescription": "أنشئ العلامات التجارية الخاصة بمنتجاتك وعدّلها واحذفها من هنا.",
+  "loadingBrands": "جاري تحميل العلامات التجارية..."
 }
