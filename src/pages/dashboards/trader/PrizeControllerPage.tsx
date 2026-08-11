@@ -6,7 +6,7 @@ import {
   usePrizes,
   useAddPrize,
   useDeletePrize,
-} from "../../../hooks/queries/prizequery";
+} from "../../../hooks/queries/prizeQuery";
 import { useTranslation } from "react-i18next";
 
 const PrizeControllerPage = () => {

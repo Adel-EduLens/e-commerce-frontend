@@ -11,8 +11,53 @@ import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useWishlist } from "../../hooks/useWishlist";
-import type { BagProduct } from "../../types/product";
+import type {
+  BagProduct,
+  ProductColorReference,
+  ProductImageReference,
+  ProductSizeReference,
+} from "../../types/product";
 type BagTab = "favorites" | "recent";
+
+type RecentlyViewedItem = {
+  product?: BagProduct;
+  productType?: BagProduct["_productType"];
+};
+
+type WishlistItem = {
+  product?: BagProduct;
+  retailProduct?: BagProduct;
+  shopProduct?: BagProduct;
+  wholesaleProduct?: BagProduct;
+  productType?: BagProduct["_productType"];
+};
+
+const hasText = (value: string | undefined): value is string => Boolean(value);
+
+const getSizeLabel = (size: ProductSizeReference | string) =>
+  typeof size === "string" ? size : size.size || size.name || "";
+
+const getVariantSizes = (color: ProductColorReference | string) =>
+  typeof color === "string"
+    ? []
+    : color.variants?.map((variant) => variant.size).filter(hasText) ?? [];
+
+const getImageUrl = (image: ProductImageReference | string | undefined) =>
+  typeof image === "string" ? image : image?.url || image?.imageUrl;
+
+const getColorImageUrl = (color: ProductColorReference | string | undefined) =>
+  typeof color === "string"
+    ? undefined
+    : getImageUrl(color?.images?.[0]) || color?.imageUrl;
+
+const isBagProduct = (product: BagProduct | null): product is BagProduct =>
+  product !== null;
+
+const withProductType = (
+  product: BagProduct,
+  productType?: BagProduct["_productType"],
+): BagProduct =>
+  productType ? { ...product, _productType: productType } : product;
 
 
 const formatCurrency = (amount: number, currencySuffix = "EGP") =>
@@ -321,20 +366,20 @@ function FavoritesSection({
   const { t } = useTranslation("bag");
   const { data: recentlyViewedData } = useRecentlyViewed();
   const apiRecentlyViewed = Array.isArray(recentlyViewedData?.data)
-    ? recentlyViewedData.data.map((item: any) => {
+    ? (recentlyViewedData.data as RecentlyViewedItem[]).map((item) => {
       const product = item.product;
       if (!product) return null;
-      return { ...product, _productType: item.productType };
-    }).filter(Boolean)
+      return withProductType(product, item.productType);
+    }).filter(isBagProduct)
     : [];
 
   const { data: wishlistData } = useWishlist();
   const apiFavorites = Array.isArray(wishlistData?.data)
-    ? wishlistData.data.map((item: any) => {
+    ? (wishlistData.data as WishlistItem[]).map((item) => {
       const product = item.product || item.retailProduct || item.shopProduct || item.wholesaleProduct;
       if (!product) return null;
-      return { ...product, _productType: item.productType };
-    }).filter(Boolean)
+      return withProductType(product, item.productType);
+    }).filter(isBagProduct)
     : [];
 
   const allProducts = selectedTab === "favorites" ? apiFavorites : apiRecentlyViewed;
@@ -377,8 +422,15 @@ function FavoritesSection({
               const title = product.title || product.name || "Product";
               const rawPrice = product.depositAmount ?? product.rentalPrice ?? product.retailPrice ?? product.shopPrice ?? product.wholesalePrice ?? product.price ?? product.unitPrice ?? "";
               const price: string = typeof rawPrice === "number" ? `${rawPrice} ${t("EGP", "EGP")}` : typeof rawPrice === "string" ? rawPrice : String(rawPrice ?? "");
-              const sizeLabel = product.sizeLabel || (Array.isArray(product.sizes) ? product.sizes.map((s: any) => typeof s === "string" ? s : (s.size || s.name || "")).filter(Boolean).join(" - ") : "") || Array.from(new Set(product.colors?.flatMap((c: any) => c.variants?.map((v: any) => v.size) ?? []) ?? [])).join(" - ");
-              const imageSrc = product.imageSrc || product.image || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === "string" ? product.images[0] : product.images[0].url) : undefined) || product.colors?.[0]?.images?.[0]?.imageUrl || product.colors?.[0]?.images?.[0]?.url;
+              const sizeLabel = product.sizeLabel ||
+                (Array.isArray(product.sizes)
+                  ? product.sizes.map(getSizeLabel).filter(hasText).join(" - ")
+                  : "") ||
+                Array.from(new Set(product.colors?.flatMap(getVariantSizes) ?? [])).join(" - ");
+              const imageSrc = product.imageSrc ||
+                product.image ||
+                getImageUrl(product.images?.[0]) ||
+                getColorImageUrl(product.colors?.[0]);
 
               return (
                 <ProductCard

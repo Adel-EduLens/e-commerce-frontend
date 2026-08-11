@@ -7,7 +7,7 @@ import { useAddSignalMutation } from "../../hooks/queries/recommendQuery";
 import { useWholesale } from "../../hooks/queries/wholesaleQuery";
 import { ProductGallery } from "../../components/product/ProductGallery";
 import { ProductInfoPanel } from "../../components/product/ProductInfoPanel";
-import { RecommedProducts } from "../../components/product/recommedProducts";
+import { RecommendedProducts } from "../../components/product/RecommendedProducts";
 import type { DetailItem } from "../../types/DetailItem";
 import { useAddRecentlyViewed } from "../../hooks/useRecentlyViewed";
 
@@ -165,7 +165,7 @@ export default function WholesaleDetailsPage() {
             rawProduct={wholesale as unknown as Record<string, unknown>}
           />
         </div>
-        <RecommedProducts currentProductId={wholesale.id} />
+        <RecommendedProducts currentProductId={wholesale.id} />
       </div>
     </div>
   );

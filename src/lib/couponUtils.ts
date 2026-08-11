@@ -11,14 +11,17 @@ export type Coupon = {
   type?: "trader" | "influencer";
 };
 
+type CategoryReference = { id?: number | string; name?: string };
+type CategoryInput = CategoryReference | string | number;
+
 type CartItem = {
   categoryIds?: (number | string)[] | null;
   categoryId?: number | string | null;
-  category?: { id?: number | string; name?: string } | string | null;
-  categories?: ({ id?: number | string; name?: string } | string | number)[] | null;
+  category?: CategoryReference | string | null;
+  categories?: CategoryInput[] | null;
   categoryName?: string | null;
   productId?: number | string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export function couponAppliesToItem(coupon: Coupon, item: CartItem): boolean {
@@ -52,7 +55,7 @@ export function couponAppliesToItem(coupon: Coupon, item: CartItem): boolean {
   const itemCatNames: string[] = [];
 
   if (item.categoryIds && Array.isArray(item.categoryIds)) {
-    item.categoryIds.forEach((id: any) => itemCatIds.push(String(id)));
+    item.categoryIds.forEach((id) => itemCatIds.push(String(id)));
   }
   if (item.categoryId) {
     itemCatIds.push(String(item.categoryId));
@@ -66,7 +69,7 @@ export function couponAppliesToItem(coupon: Coupon, item: CartItem): boolean {
     }
   }
   if (item.categories && Array.isArray(item.categories)) {
-    item.categories.forEach((cat: any) => {
+    item.categories.forEach((cat) => {
       if (typeof cat === "object") {
         if (cat.id) itemCatIds.push(String(cat.id));
         if (cat.name) itemCatNames.push(String(cat.name).trim().toLowerCase());

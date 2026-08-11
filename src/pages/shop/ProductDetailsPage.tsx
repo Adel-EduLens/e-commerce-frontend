@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import { ProductGallery } from "../../components/product/ProductGallery";
 import { ProductInfoPanel } from "../../components/product/ProductInfoPanel";
 import { ReviewsSection } from "../../components/product/ReviewsSection";
-import { RecommedProducts } from "../../components/product/recommedProducts";
+import { RecommendedProducts } from "../../components/product/RecommendedProducts";
 import { useReviews } from "../../hooks/queries/reviewQuery";
 import type { DetailItem } from "../../types/DetailItem";
 import { useTranslation } from "react-i18next";
@@ -188,7 +188,7 @@ export default function ProductDetailsPage() {
           />
         </div>
         <ReviewsSection />
-        <RecommedProducts currentProductId={product.id} />
+        <RecommendedProducts currentProductId={product.id} />
       </div>
     </div>
   );

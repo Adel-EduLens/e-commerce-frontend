@@ -8,13 +8,13 @@ import { useCategories } from "../../hooks/queries/categoriesQuery";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
-type RecommedProductsProps = {
+type RecommendedProductsProps = {
   currentProductId?: string;
 };
 
-export function RecommedProducts({
+export function RecommendedProducts({
   currentProductId,
-}: RecommedProductsProps) {
+}: RecommendedProductsProps) {
   const navigate = useNavigate();
   const { t } = useTranslation("productDetails");
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);

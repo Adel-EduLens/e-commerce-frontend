@@ -1,6 +1,6 @@
 import { useAuthStore } from "../../../store/useAuthStore";
 import { asset } from '../../../lib/utils';
-import { RecommedProducts } from "../../../components/product/recommedProducts";
+import { RecommendedProducts } from "../../../components/product/RecommendedProducts";
 import { useWishlist } from "../../../hooks/useWishlist";
 import { useRecentlyViewed } from "../../../hooks/useRecentlyViewed";
 import { useProducts } from "../../../hooks/queries/productsQuery";
@@ -116,7 +116,7 @@ export default function UserDashboard() {
       </div>
 
       <div className="mt-8">
-        <RecommedProducts />
+        <RecommendedProducts />
       </div>
     </div>
   );

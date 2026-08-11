@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Wheel } from "react-custom-roulette";
-import { usePrizes, useSpinPrize } from "../../hooks/queries/prizequery";
+import { usePrizes, useSpinPrize } from "../../hooks/queries/prizeQuery";
 import { toast } from "sonner";
 import { useTheme } from "../../store/useThemeStore";
 import { useTranslation } from "react-i18next";
