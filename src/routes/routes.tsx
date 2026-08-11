@@ -1,83 +1,46 @@
+import { Suspense, lazy, type ComponentType, type ReactElement } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import StudentLayout from "../layouts/StudentLayout";
-import AccountLayout from "../layouts/AccountLayout";
-import UserLayout from "../layouts/UserLayout";
-import HomePage from "../pages/shop/HomePage";
-import ProductDetailsPage from "../pages/shop/ProductDetailsPage";
-import MenCollectionPage from "../pages/shop/MenCollectionPage";
-import BagPage from "../pages/cart/BagPage";
-import WholesaleBagPage from "../pages/cart/WholesaleBagPage";
-import ContactDetailsPage from "../pages/user/ContactDetailsPage";
-import NotificationsPage from "../pages/user/NotificationsPage";
-import NotifyMeListPage from "../pages/user/NotifyMeListPage";
-import SettingsPage from "../pages/user/SettingsPage";
-import AuthPage from "../pages/auth/AuthPage";
-import WholesaleCheckoutPage from "../pages/cart/WholesaleCheckoutPage";
-
-
-import TraderDashboard from "../pages/dashboards/trader/TraderDashboard";
-import TraderCustomersPage from "../pages/dashboards/trader/TraderCustomersPage";
-import TraderOrdersPage from "../pages/dashboards/trader/TraderOrdersPage";
-import TraderInventoryPage from "../pages/dashboards/trader/TraderInventoryPage";
-import TraderFinancePage from "../pages/dashboards/trader/TraderFinancePage";
-import TraderAnalyticsPage from "../pages/dashboards/trader/TraderAnalyticsPage";
-import TraderDropshippingPage from "../pages/dashboards/trader/TraderDropshippingPage";
-import TraderWholesalePage from "../pages/dashboards/trader/TraderWholesalePage";
-import TraderBrandPartnersPage from "../pages/dashboards/trader/TraderBrandPartnersPage";
-import TraderNotificationsPage from "../pages/dashboards/trader/TraderNotificationsPage";
-import TraderStoreSettingsPage from "../pages/dashboards/trader/TraderStoreSettingsPage";
-import TraderPreferencesPage from "../pages/dashboards/trader/TraderPreferencesPage";
-import TraderRentalPage from "../pages/dashboards/trader/TraderRentalPage";
-import TraderLayout from "../components/layout/TraderLayout";
-import TraderCouponsPage from "../pages/dashboards/trader/TraderCouponsPage";
-import UserDashboard from "../pages/dashboards/user/UserDashboard";
-import RecentlyViewedPage from "../pages/shop/RecentlyViewedPage";
-import MyOrdersPage from "../pages/user/MyOrdersPage";
-import MyGiftCardsPage from "../pages/user/MyGiftCardsPage";
-import HelpCenterPage from "../pages/help/HelpCenterPage";
-import WalletRewardsPage from "../pages/user/WalletRewardsPage";
-import CheckoutPage from "../pages/cart/CheckoutPage";
-import DropshippingPage from "../pages/dropshipping/DropshippingPage";
-import FavoritesPage from "../pages/shop/FavoritesPage";
-import WholesalePage from "../pages/wholesale/WholesalePage";
-import WholesaleDetailsPage from "../pages/wholesale/WholesaleDetailsPage";
-import DesignLabPage from "../pages/custom-design/DesignLabPage";
+import LoadingSpinner from "../components/shared/LoadingSpinner";
 import ProtectedRoute from "../components/ProtectedRoute";
-
-import TestPage from "../pages/dev/TestPage";
-import HelpCenterCategorie from "../pages/help/HelpCenterCategorie";
-import TraderDesignPage from "../pages/dashboards/trader/TraderDesignPage";
-import TraderLoginPage from "../pages/auth/TraderLoginPage";
-
-import ProductsPage from "../pages/shop/ProductsPage";
-import RentalPage from "../pages/rental/RentalPage";
-import RentalProductDetailsPage from "../pages/rental/RentalProductDetailsPage";
-
-import ComparePage from "../pages/shop/ComparePage";
-
-import TraderCategoriesPage from "../pages/dashboards/trader/TraderCategoriesPage";
-import TraderWebsiteSettingsPage from "../pages/dashboards/trader/TraderWebsiteSettingsPage";
-
-import CreateYourDesignPage from "../pages/custom-design/CreateYourDesignPage";
-import CreateYourDesignDetailPage from "../pages/custom-design/CreateYourDesignDetailPage";
-
-import TraderRentalProductsPage from "../pages/dashboards/trader/TraderRentalProductsPage";
-import TraderCollectionsPage from "../pages/dashboards/trader/TraderCollectionsPage";
-import TraderBlankProductsPage from "../pages/dashboards/trader/TraderBlankProductsPage";
-import RentalShopPage from "../pages/rental/RentalShopPage";
-
-import InfluencerLoginPage from "../pages/auth/InfluencerLoginPage";
 import InfluencerLayout from "../components/layout/InfluencerLayout";
-import InfluencerDashboard from "../pages/dashboards/influencer/InfluencerDashboard";
-import InfluencerCouponUsersPage from "../pages/dashboards/influencer/InfluencerCouponUsersPage";
-import InfluencerEarningsPage from "../pages/dashboards/influencer/InfluencerEarningsPage";
-import TraderInfluencersPage from "../pages/dashboards/trader/TraderInfluencersPage";
-import TraderShopPage from "../pages/dashboards/trader/TraderShopPage";
-import GiftCardDetailsPage from "../pages/shop/GiftCardDetailsPage";
-import PrizeWheel from "../components/ui/PrizeWheel";
-import PrizeControllerPage from "../pages/dashboards/trader/PrizeControllerPage";
-import TermsPage from "../pages/terms/TermsPage";
-import PrivacyPage from "../pages/privacy/PrivacyPage";
+import TraderLayout from "../components/layout/TraderLayout";
+import AccountLayout from "../layouts/AccountLayout";
+import StudentLayout from "../layouts/StudentLayout";
+import UserLayout from "../layouts/UserLayout";
+
+type LazyPageLoader<P extends object = Record<string, never>> = () => Promise<{
+  default: ComponentType<P>;
+}>;
+
+const RouteFallback = () => (
+  <LoadingSpinner containerClassName="min-h-[40vh]" className="h-8 w-8" />
+);
+
+const renderLazyPage = <P extends object>(
+  load: LazyPageLoader<P>,
+  props?: P,
+): ReactElement => {
+  const Page = lazy(load);
+
+  return (
+    <Suspense fallback={<RouteFallback />}>
+      <Page {...((props ?? {}) as P)} />
+    </Suspense>
+  );
+};
+
+const renderUserPage = <P extends object>(
+  load: LazyPageLoader<P>,
+  props?: P,
+): ReactElement => <UserLayout>{renderLazyPage(load, props)}</UserLayout>;
+
+const renderProtectedUserPage = <P extends object>(
+  load: LazyPageLoader<P>,
+  props?: P,
+): ReactElement => (
+  <ProtectedRoute>{renderUserPage(load, props)}</ProtectedRoute>
+);
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -85,126 +48,78 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <UserLayout>
-            <HomePage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/shop/HomePage")),
       },
       {
         path: "trader/login",
-        element: <TraderLoginPage />,
+        element: renderLazyPage(() => import("../pages/auth/TraderLoginPage")),
       },
       {
         path: "product-details/:id",
-        element: (
-          <UserLayout>
-            <ProductDetailsPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/shop/ProductDetailsPage"),
         ),
       },
       {
         path: "giftcard/:id",
-        element: (
-          <UserLayout>
-            <GiftCardDetailsPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/shop/GiftCardDetailsPage"),
         ),
       },
       {
         path: "gift-card/:id",
-        element: (
-          <UserLayout>
-            <GiftCardDetailsPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/shop/GiftCardDetailsPage"),
         ),
       },
-      // {
-      //   path: "season-must-haves",
-      //   element: (
-      //     <UserLayout>
-      //       <SeasonMustHavesPage />
-      //     </UserLayout>
-      //   ),
-      // },
       {
         path: "products",
-        element: (
-          <UserLayout>
-            <ProductsPage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/shop/ProductsPage")),
       },
       {
         path: "createYourDesign",
-        element: (
-          <UserLayout>
-            <CreateYourDesignPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/custom-design/CreateYourDesignPage"),
         ),
       },
       {
         path: "/createYourDesign/:id",
-        element: (
-          <UserLayout>
-            <CreateYourDesignDetailPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/custom-design/CreateYourDesignDetailPage"),
         ),
       },
       {
         path: "compare",
-        element: (
-          <UserLayout>
-            <ComparePage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/shop/ComparePage")),
       },
       {
         path: "rental",
-        element: (
-          <UserLayout>
-            <RentalPage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/rental/RentalPage")),
       },
       {
         path: "rental/shop",
-        element: (
-          <UserLayout>
-            <RentalShopPage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/rental/RentalShopPage")),
       },
       {
         path: "rental/shop/:id",
-        element: (
-          <UserLayout>
-            <RentalProductDetailsPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/rental/RentalProductDetailsPage"),
         ),
       },
       {
         path: "collections/:category",
-        element: (
-          <UserLayout>
-            <MenCollectionPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/shop/MenCollectionPage"),
         ),
       },
       {
         path: "bag",
-        element: (
-          <UserLayout>
-            <BagPage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/cart/BagPage")),
       },
       {
         path: "wholesale-bag",
-        element: (
-          <UserLayout>
-            <WholesaleBagPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/cart/WholesaleBagPage"),
         ),
       },
       {
@@ -216,19 +131,25 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "dashboard/user",
-            element: <UserDashboard />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/user/UserDashboard"),
+            ),
           },
           {
             path: "prize-wheel",
-            element: <PrizeWheel />,
+            element: renderLazyPage(() => import("../components/ui/PrizeWheel")),
           },
           {
             path: "recently-viewed",
-            element: <RecentlyViewedPage />,
+            element: renderLazyPage(
+              () => import("../pages/shop/RecentlyViewedPage"),
+            ),
           },
           {
             path: "contact-details",
-            element: <ContactDetailsPage />,
+            element: renderLazyPage(
+              () => import("../pages/user/ContactDetailsPage"),
+            ),
             handle: {
               footer: {
                 top: "top-0",
@@ -238,7 +159,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "notifications",
-            element: <NotificationsPage />,
+            element: renderLazyPage(
+              () => import("../pages/user/NotificationsPage"),
+            ),
             handle: {
               footer: {
                 top: "top-[863px]",
@@ -247,7 +170,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "notify-me-list",
-            element: <NotifyMeListPage />,
+            element: renderLazyPage(
+              () => import("../pages/user/NotifyMeListPage"),
+            ),
             handle: {
               footer: {
                 top: "top-[863px]",
@@ -256,7 +181,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "settings",
-            element: <SettingsPage />,
+            element: renderLazyPage(() => import("../pages/user/SettingsPage")),
             handle: {
               footer: {
                 top: "top-[917px]",
@@ -265,7 +190,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "my-orders",
-            element: <MyOrdersPage />,
+            element: renderLazyPage(() => import("../pages/user/MyOrdersPage")),
             handle: {
               footer: {
                 top: "top-[950px]",
@@ -274,7 +199,9 @@ export const router = createBrowserRouter([
           },
           {
             path: "my-gift-cards",
-            element: <MyGiftCardsPage />,
+            element: renderLazyPage(
+              () => import("../pages/user/MyGiftCardsPage"),
+            ),
             handle: {
               footer: {
                 top: "top-[917px]",
@@ -286,17 +213,23 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <HelpCenterPage />,
+                element: renderLazyPage(
+                  () => import("../pages/help/HelpCenterPage"),
+                ),
               },
               {
                 path: ":category",
-                element: <HelpCenterCategorie />,
+                element: renderLazyPage(
+                  () => import("../pages/help/HelpCenterCategorie"),
+                ),
               },
             ],
           },
           {
             path: "wallet-rewards",
-            element: <WalletRewardsPage />,
+            element: renderLazyPage(
+              () => import("../pages/user/WalletRewardsPage"),
+            ),
             handle: {
               footer: {
                 top: "top-[894px]",
@@ -306,25 +239,33 @@ export const router = createBrowserRouter([
         ],
       },
       ...(import.meta.env.DEV
-        ? [{ path: "random", element: <TestPage /> }]
+        ? [
+            {
+              path: "random",
+              element: renderLazyPage(() => import("../pages/dev/TestPage")),
+            },
+          ]
         : []),
       {
         path: "login",
-        element: <AuthPage mode="login" />,
+        element: renderLazyPage(() => import("../pages/auth/AuthPage"), {
+          mode: "login",
+        }),
       },
       {
         path: "signup",
-        element: <AuthPage mode="signup" />,
+        element: renderLazyPage(() => import("../pages/auth/AuthPage"), {
+          mode: "signup",
+        }),
       },
       {
         path: "terms",
-        element: <TermsPage />,
+        element: renderLazyPage(() => import("../pages/terms/TermsPage")),
       },
       {
         path: "privacy",
-        element: <PrivacyPage />,
+        element: renderLazyPage(() => import("../pages/privacy/PrivacyPage")),
       },
-
       {
         path: "dashboard/trader",
         element: (
@@ -335,119 +276,187 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <TraderDashboard />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderDashboard"),
+            ),
           },
           {
             path: "rental",
-            element: <TraderRentalPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderRentalPage"),
+            ),
           },
           {
             path: "blank-products",
-            element: <TraderBlankProductsPage />
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderBlankProductsPage"),
+            ),
           },
           {
             path: "categories",
-            element: <TraderCategoriesPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderCategoriesPage"),
+            ),
           },
           {
             path: "faqs",
-            element: <TraderWebsiteSettingsPage defaultTab="faqs" />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderWebsiteSettingsPage"),
+              { defaultTab: "faqs" },
+            ),
           },
           {
             path: "rentalProducts",
-            element: <TraderRentalProductsPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderRentalProductsPage"),
+            ),
           },
           {
             path: "products",
-            element: <TraderShopPage />
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderShopPage"),
+            ),
           },
           {
             path: "coupons",
-            element: <TraderCouponsPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderCouponsPage"),
+            ),
           },
           {
             path: "customers",
-
-            element: <TraderCustomersPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderCustomersPage"),
+            ),
           },
           {
             path: "shop-banner",
-            element: <TraderWebsiteSettingsPage defaultTab="shop-banners" />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderWebsiteSettingsPage"),
+              { defaultTab: "shop-banners" },
+            ),
           },
           {
             path: "home-banner",
-            element: <TraderWebsiteSettingsPage defaultTab="home-banners" />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderWebsiteSettingsPage"),
+              { defaultTab: "home-banners" },
+            ),
           },
           {
             path: "orders",
-            element: <TraderOrdersPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderOrdersPage"),
+            ),
           },
           {
             path: "collections",
-            element: <TraderCollectionsPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderCollectionsPage"),
+            ),
           },
           {
             path: "influencers",
-            element: <TraderInfluencersPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderInfluencersPage"),
+            ),
           },
           {
             path: "inventory",
-            element: <TraderInventoryPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderInventoryPage"),
+            ),
           },
           {
             path: "finance",
-            element: <TraderFinancePage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderFinancePage"),
+            ),
           },
           {
             path: "analytics",
-            element: <TraderAnalyticsPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderAnalyticsPage"),
+            ),
           },
           {
             path: "dropshipping",
-            element: <TraderDropshippingPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderDropshippingPage"),
+            ),
           },
           {
             path: "wholesale",
-            element: <Navigate to="/dashboard/trader/orders?tab=wholesale" replace />,
+            element: (
+              <Navigate to="/dashboard/trader/orders?tab=wholesale" replace />
+            ),
           },
           {
             path: "brand-partners",
-            element: <TraderBrandPartnersPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderBrandPartnersPage"),
+            ),
           },
           {
             path: "notifications",
-            element: <TraderNotificationsPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderNotificationsPage"),
+            ),
           },
           {
             path: "settings",
-            element: <TraderStoreSettingsPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderStoreSettingsPage"),
+            ),
           },
           {
             path: "help-center",
-            element: <TraderWebsiteSettingsPage defaultTab="help-center" />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderWebsiteSettingsPage"),
+              { defaultTab: "help-center" },
+            ),
           },
           {
             path: "website-settings",
-            element: <TraderWebsiteSettingsPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderWebsiteSettingsPage"),
+            ),
           },
           {
             path: "preferences",
-            element: <TraderPreferencesPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/trader/TraderPreferencesPage"),
+            ),
           },
           {
             path: "designs",
-            element: <TraderDesignPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderDesignPage"),
+            ),
           },
           {
             path: "prizes",
-            element: <PrizeControllerPage />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/PrizeControllerPage"),
+            ),
           },
-
         ],
       },
       {
         path: "influencer/login",
-        element: <InfluencerLoginPage />,
+        element: renderLazyPage(
+          () => import("../pages/auth/InfluencerLoginPage"),
+        ),
       },
       {
         path: "dashboard/influencer",
@@ -459,80 +468,64 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <InfluencerDashboard />,
+            element: renderLazyPage(
+              () => import("../pages/dashboards/influencer/InfluencerDashboard"),
+            ),
           },
           {
             path: "coupon-users",
-            element: <InfluencerCouponUsersPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/influencer/InfluencerCouponUsersPage"),
+            ),
           },
           {
             path: "earnings",
-            element: <InfluencerEarningsPage />,
+            element: renderLazyPage(
+              () =>
+                import("../pages/dashboards/influencer/InfluencerEarningsPage"),
+            ),
           },
         ],
       },
       {
         path: "checkout",
-        element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <CheckoutPage />
-            </UserLayout>
-          </ProtectedRoute>
+        element: renderProtectedUserPage(
+          () => import("../pages/cart/CheckoutPage"),
         ),
       },
       {
         path: "wholesale-checkout",
-        element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <WholesaleCheckoutPage />
-            </UserLayout>
-          </ProtectedRoute>
+        element: renderProtectedUserPage(
+          () => import("../pages/cart/WholesaleCheckoutPage"),
         ),
       },
       {
         path: "dropshipping",
-        element: (
-          <UserLayout>
-            <DropshippingPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/dropshipping/DropshippingPage"),
         ),
       },
       {
         path: "favorites",
-        element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <FavoritesPage />
-            </UserLayout>
-          </ProtectedRoute>
+        element: renderProtectedUserPage(
+          () => import("../pages/shop/FavoritesPage"),
         ),
       },
       {
         path: "wholesale",
-        element: (
-          <UserLayout>
-            <WholesalePage />
-          </UserLayout>
-        ),
+        element: renderUserPage(() => import("../pages/wholesale/WholesalePage")),
       },
       {
         path: "wholesale/:id",
-        element: (
-          <ProtectedRoute>
-            <UserLayout>
-              <WholesaleDetailsPage />
-            </UserLayout>
-          </ProtectedRoute>
+        element: renderProtectedUserPage(
+          () => import("../pages/wholesale/WholesaleDetailsPage"),
         ),
       },
       {
         path: "design-lab",
-        element: (
-          <UserLayout>
-            <DesignLabPage />
-          </UserLayout>
+        element: renderUserPage(
+          () => import("../pages/custom-design/DesignLabPage"),
         ),
       },
     ],

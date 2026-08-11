@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { cartApi } from "../services/cartApi";
 import { useAuthStore } from "./useAuthStore";
+import { useWholesaleCartStore } from "./useWholesaleCartStore";
 
 export type CartItem = {
   id: string;
@@ -38,12 +39,42 @@ type CartStore = {
 
 const INITIAL_CART_ITEMS: CartItem[] = [];
 
+type CartDbItem = {
+  id: string;
+  productId: string;
+  categoryIds?: string[];
+  title: string;
+  price: number;
+  size?: string | null;
+  color?: string | null;
+  quantity: number;
+  imageSrc?: string | null;
+  image?: string | null;
+  minOrder?: number;
+  productType?: CartItem["productType"];
+};
+
+const mapCartDbItem = (dbItem: CartDbItem): CartItem => ({
+  id: dbItem.id,
+  productId: dbItem.productId,
+  categoryIds: dbItem.categoryIds,
+  title: dbItem.title,
+  unitPrice: dbItem.price,
+  currency: "EGP",
+  size: dbItem.size || "",
+  color: dbItem.color || "",
+  colorHex: dbItem.color || "",
+  imageSrc: dbItem.imageSrc || dbItem.image || "",
+  quantity: dbItem.quantity,
+  minOrder: dbItem.minOrder,
+  productType: dbItem.productType,
+});
+
 export const useCartStore = create<CartStore>()((set, get) => ({
   items: INITIAL_CART_ITEMS,
 
   addItem: async (item) => {
     if (item.productType === "WHOLESALE") {
-      const { useWholesaleCartStore } = await import("./useWholesaleCartStore");
       await useWholesaleCartStore.getState().addItem(item);
       return;
     }
@@ -89,37 +120,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
           productType: item.productType,
         });
 
-type CartDbItem = {
-  id: string;
-  productId: string;
-  categoryIds?: string[];
-  title: string;
-  price: number;
-  size?: string;
-  color?: string;
-  quantity: number;
-  image?: string;
-  productType?: "SHOP" | "RENTAL" | "RETAIL" | "WHOLESALE" | "BLANK";
-};
-
         if (res && res.data && res.data.items) {
-          get().setItems(
-            res.data.items.map((dbItem: CartDbItem & { imageSrc?: string; image?: string; minOrder?: number }) => ({
-              id: dbItem.id,
-              productId: dbItem.productId,
-              categoryIds: dbItem.categoryIds,
-              title: dbItem.title,
-              unitPrice: dbItem.price,
-              currency: "EGP",
-              size: dbItem.size || "",
-              color: dbItem.color || "",
-              colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || dbItem.image || "",
-              quantity: dbItem.quantity,
-              minOrder: dbItem.minOrder,
-              productType: dbItem.productType,
-            }))
-          );
+          get().setItems(res.data.items.map(mapCartDbItem));
         }
       } catch (error) {
         console.error("Failed to sync add item to DB:", error);
@@ -137,23 +139,7 @@ type CartDbItem = {
       try {
         const res = await cartApi.removeCartItem(itemId);
         if (res && res.data && res.data.items) {
-          get().setItems(
-            res.data.items.map((dbItem: any) => ({
-              id: dbItem.id,
-              productId: dbItem.productId,
-              categoryIds: dbItem.categoryIds,
-              title: dbItem.title,
-              unitPrice: dbItem.price,
-              currency: "EGP",
-              size: dbItem.size || "",
-              color: dbItem.color || "",
-              colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || dbItem.image || "",
-              quantity: dbItem.quantity,
-              minOrder: dbItem.minOrder,
-              productType: dbItem.productType,
-            }))
-          );
+          get().setItems(res.data.items.map(mapCartDbItem));
         }
       } catch (error) {
         console.error("Failed to sync remove item from DB:", error);
@@ -175,23 +161,7 @@ type CartDbItem = {
       try {
         const res = await cartApi.updateCartItem(itemId, quantity);
         if (res && res.data && res.data.items) {
-          get().setItems(
-            res.data.items.map((dbItem: any) => ({
-              id: dbItem.id,
-              productId: dbItem.productId,
-              categoryIds: dbItem.categoryIds,
-              title: dbItem.title,
-              unitPrice: dbItem.price,
-              currency: "EGP",
-              size: dbItem.size || "",
-              color: dbItem.color || "",
-              colorHex: dbItem.color || "",
-              imageSrc: dbItem.imageSrc || dbItem.image || "",
-              quantity: dbItem.quantity,
-              minOrder: dbItem.minOrder,
-              productType: dbItem.productType,
-            }))
-          );
+          get().setItems(res.data.items.map(mapCartDbItem));
         }
       } catch (error) {
         console.error("Failed to sync update quantity to DB:", error);
