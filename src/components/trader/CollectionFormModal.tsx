@@ -91,8 +91,8 @@ export function CollectionFormModal({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-xl rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+      <div className="w-full max-w-xl rounded-2xl bg-card border border-stroke shadow-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between border-b border-stroke p-5 shrink-0">
           <h2 className="font-['Montserrat'] text-lg font-bold text-foreground">
             {collection ? "Edit Collection" : "Add Collection"}
@@ -100,7 +100,7 @@ export function CollectionFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-text hover:text-foreground text-xl leading-none"
+            className="text-gray-text hover:text-foreground text-xl leading-none cursor-pointer"
           >
             &times;
           </button>
@@ -115,7 +115,7 @@ export function CollectionFormModal({
               placeholder="e.g. Color of Summer Outfit"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white"
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background placeholder:text-gray-text"
             />
           </div>
 
@@ -128,7 +128,7 @@ export function CollectionFormModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
-              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-white resize-none"
+              className="w-full rounded-xl border border-stroke px-4 py-2.5 font-['Montserrat'] text-sm outline-none focus:border-primary text-foreground bg-background resize-none placeholder:text-gray-text"
             />
           </div>
 
@@ -157,10 +157,10 @@ export function CollectionFormModal({
               type="file"
               accept="image/*"
               onChange={handleFile}
-              className="w-full text-sm text-gray-text file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gray-light file:text-foreground hover:file:bg-stroke cursor-pointer"
+              className="w-full text-sm text-gray-text file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-stroke/30 file:text-foreground hover:file:bg-stroke cursor-pointer"
             />
             {image && (
-              <div className="relative w-full h-40 rounded-xl border border-stroke overflow-hidden mt-2 bg-gray-50 flex items-center justify-center">
+              <div className="relative w-full h-40 rounded-xl border border-stroke overflow-hidden mt-2 bg-background flex items-center justify-center">
                 <img
                   src={image}
                   className="h-full max-w-full object-contain"
@@ -180,10 +180,10 @@ export function CollectionFormModal({
               placeholder="Search shop products by name or SKU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full mb-3 rounded-xl border border-stroke px-4 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary text-foreground bg-white"
+              className="w-full mb-3 rounded-xl border border-stroke px-4 py-2 font-['Montserrat'] text-xs outline-none focus:border-primary text-foreground bg-background placeholder:text-gray-text"
             />
 
-            <div className="border border-stroke rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-gray-light/30">
+            <div className="border border-stroke rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-background/50">
               {loadingProducts ? (
                 <div className="text-center py-4 text-xs text-gray-text">Loading products...</div>
               ) : filteredProducts && filteredProducts.length > 0 ? (
@@ -193,19 +193,19 @@ export function CollectionFormModal({
                   return (
                     <label
                       key={p.id}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-white border border-transparent hover:border-stroke cursor-pointer transition"
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-stroke/30 dark:hover:bg-white/5 border border-transparent hover:border-stroke cursor-pointer transition"
                     >
                       <input
                         type="checkbox"
                         checked={isChecked}
                         onChange={() => toggleProduct(p.id)}
-                        className="rounded border-stroke text-primary focus:ring-primary h-4 w-4"
+                        className="rounded border-stroke text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                       />
                       {firstImg && (
                         <img
                           src={firstImg}
                           alt={p.name}
-                          className="w-8 h-8 rounded object-cover border border-stroke"
+                          className="w-8 h-8 rounded object-cover border border-stroke shrink-0"
                         />
                       )}
                       <div className="flex-1 min-w-0">
@@ -228,7 +228,7 @@ export function CollectionFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-background"
+            className="flex-1 rounded-xl border border-stroke py-3 font-['Montserrat'] text-sm font-semibold text-foreground transition hover:bg-stroke/20 cursor-pointer"
           >
             Cancel
           </button>
@@ -236,7 +236,7 @@ export function CollectionFormModal({
             type="button"
             disabled={uploading || !name || !image}
             onClick={() => onSave({ name, description, image, appearOnHome, productIds: selectedProductIds })}
-            className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-foreground transition hover:opacity-90 disabled:opacity-50"
+            className="flex-1 rounded-xl bg-primary py-3 font-['Montserrat'] text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50 cursor-pointer shadow-sm"
           >
             {uploading ? "Uploading..." : "Save"}
           </button>
