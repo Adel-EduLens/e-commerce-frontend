@@ -3,6 +3,7 @@ import { useAuthStore } from "../../../store/useAuthStore";
 import { useUpdateTraderMe } from "../../../hooks/queries/traderQuery";
 import { uploadImageFile } from "../../../components/trader/inventoryUtils";
 import GoogleMapPicker, { type PickedLocation } from "../../../components/shared/GoogleMap";
+import { LoadingSpinner, InlineSpinner } from "../../../components/shared";
 import { Toggle } from "../../../components/ui";
 
 function GeneralInfoTab() {
@@ -85,8 +86,8 @@ function GeneralInfoTab() {
               </div>
             )}
             {avatarUploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <InlineSpinner size="sm" variant="white" />
               </div>
             )}
           </div>

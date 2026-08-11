@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Plus, X, Eye, Edit2 } from "lucide-react";
+import { LoadingSpinner } from "../../../components/shared";
 import { api } from "../../../lib/axios";
 import { handleApiError } from "../../../lib/utils";
 import {
@@ -205,11 +206,7 @@ export default function TraderInfluencersPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-20" size="lg" />;
   }
 
   // Detail View
@@ -407,9 +404,7 @@ export default function TraderInfluencersPage() {
         {detailTab === "coupon-users" && (
           <>
             {couponUsersLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-              </div>
+              <LoadingSpinner containerClassName="py-20" size="lg" />
             ) : couponUsers.length === 0 ? (
               <div className="rounded-2xl border border-stroke bg-card p-10 text-center">
                 <p className="text-gray-text">{t("couponUsers.noUsers", "No coupon users yet")}</p>

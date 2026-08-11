@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LoadingSpinner } from "../../../components/shared";
 import {
   Globe,
   Building2,
@@ -315,11 +316,8 @@ export default function TraderShippingSettings() {
 
       {/* Main Content Area */}
       {isLoading ? (
-        <div className="flex items-center justify-center rounded-2xl border border-stroke bg-card py-16">
-          <div className="flex flex-col items-center gap-3">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="text-xs font-medium text-gray-text">{t("loading")}</p>
-          </div>
+        <div className="rounded-2xl border border-stroke bg-card py-16">
+          <LoadingSpinner text={t("loading")} size="lg" />
         </div>
       ) : viewMode === "grouped" ? (
         /* MODE 1: GROUPED BY COUNTRY WITH ALL CITIES DISPLAYED DIRECTLY */

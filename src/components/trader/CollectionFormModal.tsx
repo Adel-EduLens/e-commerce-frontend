@@ -6,6 +6,7 @@ import ImageCropModal, {
 } from "./ImageCropModal";
 import { Toggle } from "../ui/toggle";
 import { uploadImageFile } from "./inventoryUtils";
+import { LoadingSpinner } from "../shared";
 
 interface CollectionFormModalProps {
   collection?: Collection;
@@ -185,7 +186,7 @@ export function CollectionFormModal({
 
             <div className="border border-stroke rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-background/50">
               {loadingProducts ? (
-                <div className="text-center py-4 text-xs text-gray-text">Loading products...</div>
+                <LoadingSpinner containerClassName="py-6" size="sm" text="Loading products..." />
               ) : filteredProducts && filteredProducts.length > 0 ? (
                 filteredProducts.map((p) => {
                   const isChecked = selectedProductIds.includes(p.id);

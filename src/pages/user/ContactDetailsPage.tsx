@@ -13,6 +13,7 @@ import {
   useDeleteAddress,
 } from "../../hooks/queries/addressQuery";
 import { Modal } from "../../components/ui/modal";
+import { InlineSpinner } from "../../components/shared";
 import type { AxiosError } from "axios";
 
 type ContactForm = {
@@ -283,7 +284,7 @@ function AddressCard({
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-['Montserrat'] text-sm font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isAddressLoading ? (
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <InlineSpinner size="sm" variant="current" />
             ) : (
               <Check className="h-5 w-5" />
             )}

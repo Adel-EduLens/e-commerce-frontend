@@ -9,8 +9,8 @@ import {
 } from "../../../hooks/queries/wholesaleOrderQuery";
 import { useTraderProducts, type Product } from "../../../hooks/queries/productsQuery";
 import { useWholesale, type WholesaleProduct } from "../../../hooks/queries/wholesaleQuery";
+import { LoadingSpinner, InlineSpinner } from "../../../components/shared";
 import {
-  Loader2,
   ArrowLeft,
   User,
   Mail,
@@ -1272,7 +1272,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
           disabled={deleting}
           className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 font-['Montserrat'] text-sm font-bold text-rose-600 transition hover:bg-rose-100 cursor-pointer disabled:opacity-50"
         >
-          {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+          {deleting ? <InlineSpinner size="xs" variant="current" /> : <Trash2 className="h-4 w-4" />}
           {t("deleteOrder", "Delete Order")}
         </button>
       </div>
@@ -1297,7 +1297,7 @@ function OrderDetail({ order, onBack, onUpdateStatus, onDeleteOrder, onUpdateOrd
               <span className="text-gray-text font-medium">{t("statusLabel", "Status")}</span>
               <div className="flex items-center gap-2">
                 {updating ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-secondary" />
+                  <InlineSpinner size="xs" variant="secondary" />
                 ) : (
                   <select
                     value={order.status}
@@ -1630,11 +1630,7 @@ export default function TraderWholesalePage() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-secondary" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="h-96" size="lg" variant="secondary" />;
   }
 
   if (isError) {

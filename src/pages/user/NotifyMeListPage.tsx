@@ -1,7 +1,8 @@
-import { Trash2, Bell, Package, Loader2 } from "lucide-react";
+import { Trash2, Bell, Package } from "lucide-react";
 import { useNotifyMeList, useNotifyMeUnsubscribe } from "../../hooks/useNotifyMe";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LoadingSpinner, InlineSpinner } from "../../components/shared";
 
 const formatCurrency = (amount: number, currencySuffix = "EGP") =>
   `${new Intl.NumberFormat("en-US", {
@@ -103,7 +104,7 @@ function ProductRequestCard({
         aria-label="Remove notification"
       >
         {isRemoving ? (
-          <Loader2 className="h-4 w-4 animate-spin text-gray-text" />
+          <InlineSpinner size="xs" variant="current" />
         ) : (
           <Trash2
             className="h-4 w-4 sm:h-5 sm:w-5 text-urgent"
@@ -148,11 +149,7 @@ export default function NotifyMeListPage() {
   const unsubscribeMutation = useNotifyMeUnsubscribe();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-20" size="lg" />;
   }
 
   if (isError) {

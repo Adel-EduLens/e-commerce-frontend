@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { api } from "../../../lib/axios";
 import { toast } from "sonner";
 import { Eye, X, Search } from "lucide-react";
+import { LoadingSpinner } from "../../../components/shared";
 import {
   formatEgp,
   getItemDiscount,
@@ -77,11 +78,7 @@ export default function InfluencerCouponUsersPage() {
   }, [users, search, dateFrom, dateTo]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-20" size="lg" />;
   }
 
   if (users.length === 0) {

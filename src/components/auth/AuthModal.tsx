@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Eye, EyeOff, Lock, Loader2, LogIn } from 'lucide-react';
+import { X, Eye, EyeOff, Lock, LogIn } from 'lucide-react';
+import { InlineSpinner } from '../shared';
 import { loginSchema, type LoginFormValues } from '../../schemas/auth';
 import { api } from '../../lib/axios';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -146,7 +147,7 @@ export default function AuthModal({
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3 font-['Montserrat'] text-xs font-bold text-primary-foreground shadow-sm transition hover:opacity-90 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <InlineSpinner size="xs" variant="current" />
             ) : (
               <>
                 <LogIn className="h-4 w-4" />

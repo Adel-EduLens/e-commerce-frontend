@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { LoadingSpinner } from "../../components/shared";
 import { useProduct, type Product } from "../../hooks/queries/productsQuery";
 import useRetailNotifyMe from "../../hooks/useRetailNotifyMe";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -239,11 +239,7 @@ export default function RentalProductDetailsPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center gap-2 p-10 text-slate-500">
-        <Loader2 className="h-4 w-4 animate-spin" /> Loading product...
-      </div>
-    );
+    return <LoadingSpinner containerClassName="min-h-[400px]" size="lg" text="Loading product..." />;
   }
 
   if (error) {

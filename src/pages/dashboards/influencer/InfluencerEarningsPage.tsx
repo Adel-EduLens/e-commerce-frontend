@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../lib/axios";
 import { toast } from "sonner";
+import { LoadingSpinner } from "../../../components/shared";
 
 interface Commission {
   id: string;
@@ -59,11 +60,7 @@ export default function InfluencerEarningsPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-20" size="lg" />;
   }
 
   const statusBadge = (status: string) => {

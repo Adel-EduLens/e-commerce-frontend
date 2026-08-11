@@ -11,8 +11,8 @@ import {
   Mail,
   Phone,
   UserCheck,
-  Loader2,
 } from 'lucide-react';
+import { LoadingSpinner } from '../../../components/shared';
 import { useDesignVotes, type DesignVoter } from '../../../hooks/queries/designsQuery';
 import { toast } from 'sonner';
 
@@ -72,11 +72,7 @@ export default function TraderDesignVotesPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="min-h-[400px]" size="lg" text={t('loadingVotes', 'Loading votes...')} />;
   }
 
   if (isError || !design) {

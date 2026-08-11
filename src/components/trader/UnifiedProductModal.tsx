@@ -16,6 +16,7 @@ import type {
   ProductColor as QueryProductColor,
 } from "../../hooks/queries/productsQuery";
 import { Toggle } from "../ui";
+import { LoadingSpinner } from "../shared";
 import { MultiSelect } from "./InventoryShared";
 import ImageCropModal, { validateImageDimensions } from "./ImageCropModal";
 import {
@@ -662,9 +663,7 @@ export function UnifiedProductModal({
         </div>
 
         {isEditing && isProductLoading ? (
-          <div className="flex-1 overflow-y-auto p-5 flex items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          </div>
+          <LoadingSpinner containerClassName="flex-1 min-h-[300px]" size="lg" text="Loading product details..." />
         ) : (
           <form
             onSubmit={handleSubmit}

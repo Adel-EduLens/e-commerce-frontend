@@ -5,7 +5,8 @@ import { useTraderProducts, type Product } from "../../../hooks/queries/products
 import { useCategories } from "../../../hooks/queries/categoriesQuery";
 import { useTraderDashboardOrders } from "../../../hooks/queries/ordersQuery";
 import { useTraderWholesaleOrders } from "../../../hooks/queries/wholesaleOrderQuery";
-import { Loader2, Filter, Calendar, Tag, X, Download, Package } from "lucide-react";
+import { Filter, Calendar, Tag, X, Download, Package } from "lucide-react";
+import { LoadingSpinner } from "../../../components/shared";
 import { toast } from "sonner";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
@@ -827,8 +828,8 @@ export default function TraderDashboard() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_360px]">
         <Panel title={t("revenueOverview", "Revenue Overview")}>
           {isLoading ? (
-            <div className="flex h-[240px] items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="h-[240px] flex items-center justify-center">
+              <LoadingSpinner size="md" />
             </div>
           ) : (
             <RevenueChart revenueSeries={dynamicRevenueSeries} maxVal={maxChartVal} />
@@ -837,8 +838,8 @@ export default function TraderDashboard() {
 
         <Panel title={t("ordersByStatus", "Orders by Status")}>
           {isLoading ? (
-            <div className="flex h-[240px] items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="h-[240px] flex items-center justify-center">
+              <LoadingSpinner size="md" />
             </div>
           ) : (
             <OrdersByStatus

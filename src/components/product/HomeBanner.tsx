@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useActiveShopBanners } from "../../hooks/queries/shopBannerQuery";
+import { LoadingSpinner } from "../shared";
 
 function getBannerLinkProps(buttonLink?: string) {
   const defaultLink = "/products";
@@ -28,8 +29,8 @@ const HomeBanner = () => {
 
   if (isPending) {
     return (
-      <div className="h-[500px] flex items-center justify-center bg-gray-50 dark:bg-card">
-        <span className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+      <div className="h-[500px] flex items-center justify-center bg-gray-50 dark:bg-card rounded-2xl">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

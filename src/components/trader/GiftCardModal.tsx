@@ -9,6 +9,7 @@ import {
 } from "../../hooks/queries/giftCardsQuery";
 import ImageCropModal, { validateImageDimensions } from "./ImageCropModal";
 import { type InventoryItem, uploadImageFile } from "./inventoryUtils";
+import { LoadingSpinner } from "../shared";
 
 interface GiftCardModalProps {
   item?: InventoryItem | null;
@@ -182,9 +183,7 @@ export function GiftCardModal({ item, onClose }: GiftCardModalProps) {
         </div>
 
         {isEditing && isProductLoading ? (
-          <div className="flex-1 overflow-y-auto p-5 flex items-center justify-center">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          </div>
+          <LoadingSpinner containerClassName="flex-1 min-h-[300px]" size="lg" text="Loading gift card details..." />
         ) : (
           <form
             onSubmit={handleSubmit}

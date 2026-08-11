@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../../../lib/axios";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag, Tag } from "lucide-react";
+import { ArrowLeft, User, Mail, Phone, MapPin, ShoppingBag, Tag } from "lucide-react";
+import { LoadingSpinner, InlineSpinner } from "../../../components/shared";
 import TraderWholesalePage from "./TraderWholesalePage";
 
 interface OrderItem {
@@ -154,7 +155,7 @@ function OrderDetail({ order, onBack, onUpdateStatus }: OrderDetailProps) {
               <span className="text-gray-text font-medium">{t("statusLabel")}</span>
               <div className="flex items-center gap-2">
                 {updating ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-secondary" />
+                  <InlineSpinner size="xs" variant="secondary" />
                 ) : (
                   <select
                     value={order.status}
@@ -519,9 +520,7 @@ export default function TraderOrdersPage() {
 
       {activeTab === "retail" ? (
         loading ? (
-          <div className="flex h-96 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-secondary" />
-          </div>
+          <LoadingSpinner containerClassName="h-96" size="lg" variant="secondary" />
         ) : selectedOrder ? (
           <OrderDetail
             order={selectedOrder}

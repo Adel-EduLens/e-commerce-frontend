@@ -2,6 +2,7 @@ import { ChevronRight, Mail, MessageSquare, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUserHelpCenterCategories } from "../../hooks/queries/helpCenterQuery";
+import { LoadingSpinner } from "../../components/shared";
 
 function CategoryCard({ title }: { title: string }) {
   const { t } = useTranslation("helpCenter");
@@ -28,11 +29,7 @@ function HelpCenterPanel() {
   const { data: categories = [], isLoading } = useUserHelpCenterCategories();
 
   if (isLoading) {
-    return (
-      <div className="flex w-full items-center justify-center p-10">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
+    return <LoadingSpinner containerClassName="py-12" size="lg" text={t("loadingCategories", "Loading categories...")} />;
   }
 
   return (
