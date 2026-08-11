@@ -5,7 +5,7 @@ import { useTraderProducts, type Product } from "../../../hooks/queries/products
 import { useCategories } from "../../../hooks/queries/categoriesQuery";
 import { useTraderDashboardOrders } from "../../../hooks/queries/ordersQuery";
 import { useTraderWholesaleOrders } from "../../../hooks/queries/wholesaleOrderQuery";
-import { Loader2, Filter, Calendar, Tag, X, Download } from "lucide-react";
+import { Loader2, Filter, Calendar, Tag, X, Download, Package } from "lucide-react";
 import { toast } from "sonner";
 
 const traderAsset = (file: string) => `/trader-overview/${file.split("/").map(encodeURIComponent).join("/")}`;
@@ -593,7 +593,7 @@ export default function TraderDashboard() {
           (typeof matchedProduct?.image === "string" ? matchedProduct.image : undefined) ||
           item.image ||
           item.imageSrc ||
-          traderAsset("image 69.png");
+          undefined;
 
         if (!salesMap[pId]) {
           salesMap[pId] = {
@@ -617,7 +617,7 @@ export default function TraderDashboard() {
         revenue: `EGP ${p.revenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
         units: t("unitsCount", "{{count}} Units", { count: p.units }),
         unitPrice: `EGP ${p.price.toFixed(2)}`,
-        image: p.image || traderAsset("image 69.png"),
+        image: p.image || undefined,
       }));
     }
 
@@ -629,7 +629,7 @@ export default function TraderDashboard() {
         revenue: `EGP ${numPrice.toFixed(2)}`,
         units: t("stockCount", "{{count}} Stock", { count: p.stock || 0 }),
         unitPrice: `EGP ${numPrice.toFixed(2)}`,
-        image: p.images?.[0]?.url || (typeof p.image === "string" ? p.image : undefined) || traderAsset("image 69.png"),
+        image: p.images?.[0]?.url || (typeof p.image === "string" ? p.image : undefined) || undefined,
       };
     });
   }, [combinedOrders, traderProducts]);
@@ -901,11 +901,17 @@ export default function TraderDashboard() {
                   key={product.name}
                   className="flex items-center gap-3 rounded-2xl border border-stroke bg-background p-3"
                 >
-                  <img
-                    className="h-12 w-12 rounded-xl object-cover"
-                    src={product.image}
-                    alt={product.name}
-                  />
+                  {product.image ? (
+                    <img
+                      className="h-12 w-12 rounded-xl object-cover"
+                      src={product.image}
+                      alt={product.name}
+                    />
+                  ) : (
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-stroke/20 text-gray-text">
+                      <Package className="h-6 w-6" />
+                    </div>
+                  )}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-['Montserrat'] text-sm font-semibold text-foreground truncate">
