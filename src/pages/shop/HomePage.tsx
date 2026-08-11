@@ -143,7 +143,7 @@ function VoteSection() {
     if (designs.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % designs.length);
-    }, 6000);
+    }, 1500);
     return () => clearInterval(interval);
   }, [designs.length]);
 
