@@ -127,12 +127,16 @@ function CollectionSection() {
 import { useDesigns, type VoteDesign } from '../../hooks/queries/designsQuery';
 import { handleApiError } from '../../lib/utils';
 import ProductsSection from '../../components/shared/ProductsSection'
+import { useAuthStore } from '../../store/useAuthStore';
+import AuthModal from '../../components/auth/AuthModal';
 
 function VoteSection() {
   const queryClient = useQueryClient();
   const { data: designs = [], isLoading } = useDesigns();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [voting, setVoting] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { t } = useTranslation("vote");
 
   useEffect(() => {
@@ -152,6 +156,11 @@ function VoteSection() {
 
   async function handleVote() {
     if (!current || voting || current.hasVoted) return;
+
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
 
     if (current.id.startsWith("demo-")) {
       setVoting(true);
@@ -189,99 +198,109 @@ function VoteSection() {
     rawVotes >= 1000 ? `+${(rawVotes / 1000).toFixed(1)}K` : `+${rawVotes}`;
 
   return (
-    <div className="mt-10 sm:mt-16 w-full max-w-[1400px] mx-auto font-['Montserrat'] px-4 sm:px-6">
-      <div className="overflow-hidden rounded-3xl sm:rounded-[36px] bg-[#9E121B] shadow-2xl grid grid-cols-1 lg:grid-cols-2 h-auto lg:h-[520px]">
-        {/* Left Section (Red Background with Swirl Overlay and Content) */}
-        <div className="relative flex flex-col justify-between p-8 sm:p-12 lg:p-16 text-white overflow-hidden bg-gradient-to-br from-[#A8121B] via-[#9B0F17] to-[#880B13] h-full">
-          {/* Organic Background Swirl Overlay */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-15 pointer-events-none"
-            viewBox="0 0 600 600"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M-100 300C50 150 250 450 400 300C550 150 700 450 850 300"
-              stroke="white"
-              strokeWidth="50"
-              strokeLinecap="round"
-            />
-            <path
-              d="M-50 450C100 300 300 600 450 450C600 300 750 600 900 450"
-              stroke="white"
-              strokeWidth="35"
-              strokeLinecap="round"
-            />
-            <path
-              d="M-150 150C0 0 200 300 350 150C500 0 650 300 800 150"
-              stroke="white"
-              strokeWidth="45"
-              strokeLinecap="round"
-            />
-          </svg>
+    <>
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          handleVote();
+        }}
+      />
 
-          {/* Top/Middle Text Content */}
-          <div className="relative z-10 flex flex-col items-start justify-center my-auto space-y-4 sm:space-y-6">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              {current?.title || t("title", "Vote for next design")}
-            </h2>
+      <div className="mt-10 sm:mt-16 w-full max-w-[1400px] mx-auto font-['Montserrat'] px-4 sm:px-6">
+        <div className="overflow-hidden rounded-3xl sm:rounded-[36px] bg-[#9E121B] shadow-2xl grid grid-cols-1 lg:grid-cols-2 h-auto lg:h-[520px]">
+          {/* Left Section (Red Background with Swirl Overlay and Content) */}
+          <div className="relative flex flex-col justify-between p-8 sm:p-12 lg:p-16 text-white overflow-hidden bg-gradient-to-br from-[#A8121B] via-[#9B0F17] to-[#880B13] h-full">
+            {/* Organic Background Swirl Overlay */}
+            <svg
+              className="absolute inset-0 w-full h-full opacity-15 pointer-events-none"
+              viewBox="0 0 600 600"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+            >
+              <path
+                d="M-100 300C50 150 250 450 400 300C550 150 700 450 850 300"
+                stroke="white"
+                strokeWidth="50"
+                strokeLinecap="round"
+              />
+              <path
+                d="M-50 450C100 300 300 600 450 450C600 300 750 600 900 450"
+                stroke="white"
+                strokeWidth="35"
+                strokeLinecap="round"
+              />
+              <path
+                d="M-150 150C0 0 200 300 350 150C500 0 650 300 800 150"
+                stroke="white"
+                strokeWidth="45"
+                strokeLinecap="round"
+              />
+            </svg>
 
-            <p className="text-sm sm:text-base text-white/85 font-normal leading-relaxed max-w-lg line-clamp-3">
-              {current?.description ||
-                t("defaultDescription", "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.")}
-            </p>
+            {/* Top/Middle Text Content */}
+            <div className="relative z-10 flex flex-col items-start justify-center my-auto space-y-4 sm:space-y-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                {current?.title || t("title", "Vote for next design")}
+              </h2>
 
-            <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wide">
-              {formattedVotes} {t("votes", "Votes")}
+              <p className="text-sm sm:text-base text-white/85 font-normal leading-relaxed max-w-lg line-clamp-3">
+                {current?.description ||
+                  t("defaultDescription", "Premium oversized drop-shoulder jacket featuring windproof tech-canvas and utility pockets for maximum comfort.")}
+              </p>
+
+              <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wide">
+                {formattedVotes} {t("votes", "Votes")}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleVote}
+                disabled={voting || Boolean(current?.hasVoted)}
+                className="rounded-xl border border-white bg-transparent px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-200 hover:bg-white hover:text-[#9B0F17] active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
+              >
+                {voting
+                  ? t("voting", "Voting...")
+                  : current?.hasVoted
+                  ? t("voted", "Voted ✓")
+                  : t("voteNow", "Vote Now")}
+              </button>
             </div>
 
-            <button
-              type="button"
-              onClick={handleVote}
-              disabled={voting || Boolean(current?.hasVoted)}
-              className="rounded-xl border border-white bg-transparent px-6 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-200 hover:bg-white hover:text-[#9B0F17] active:scale-95 disabled:opacity-50 cursor-pointer shadow-sm"
-            >
-              {voting
-                ? t("voting", "Voting...")
-                : current?.hasVoted
-                ? t("voted", "Voted ✓")
-                : t("voteNow", "Vote Now")}
-            </button>
+            {/* Carousel Dots at Bottom Center */}
+            <div className="relative z-10 flex items-center justify-center gap-2 pt-6 sm:pt-10">
+              {designs.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setCurrentIndex(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
+                    idx === safeIndex
+                      ? "w-6 bg-white"
+                      : "w-2 bg-white/40 hover:bg-white/70"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* Carousel Dots at Bottom Center */}
-          <div className="relative z-10 flex items-center justify-center gap-2 pt-6 sm:pt-10">
-            {designs.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setCurrentIndex(idx)}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  idx === safeIndex
-                    ? "w-6 bg-white"
-                    : "w-2 bg-white/40 hover:bg-white/70"
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
+          {/* Right Section (Fixed Height Product Image Container) */}
+          <div className="relative w-full h-[360px] sm:h-[480px] lg:h-[520px] overflow-hidden bg-zinc-900">
+            <img
+              key={current?.id || safeIndex}
+              src={current?.imagePath || asset("image 11.png")}
+              alt={current?.title || "Next Design"}
+              className="absolute inset-0 w-full h-full object-cover object-center animate-swap-fade"
+            />
           </div>
-        </div>
-
-        {/* Right Section (Fixed Height Product Image Container) */}
-        <div className="relative w-full h-[360px] sm:h-[480px] lg:h-[520px] overflow-hidden bg-zinc-900">
-          <img
-            key={current?.id || safeIndex}
-            src={current?.imagePath || asset("image 11.png")}
-            alt={current?.title || "Next Design"}
-            className="absolute inset-0 w-full h-full object-cover object-center animate-swap-fade"
-          />
         </div>
       </div>
-    </div>
+    </>
   );
 }
-
 
 export function HomePage() {
   return (

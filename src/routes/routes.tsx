@@ -447,6 +447,12 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: "designs/:id",
+            element: renderLazyPage(
+              () => import("../pages/dashboards/trader/TraderDesignVotesPage"),
+            ),
+          },
+          {
             path: "prizes",
             element: renderLazyPage(
               () => import("../pages/dashboards/trader/PrizeControllerPage"),
